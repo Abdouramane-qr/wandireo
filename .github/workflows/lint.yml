@@ -1,38 +1,39 @@
-name: linter
+name: Lint
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   quality:
+    name: Manual quality checks
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          coverage: none
 
-      - name: Install Dependencies
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
         run: |
-          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm install
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          npm ci
 
-      - name: Run Pint
-        run: composer lint
+      - name: PHP lint check
+        run: composer lint:check
 
-      - name: Format Frontend
-        run: npm run format
+      - name: Frontend format check
+        run: npm run format:check
 
-      - name: Lint Frontend
-        run: npm run lint
+      - name: Frontend lint check
+        run: npm run lint:check
 
-      # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v7
-      #   with:
-      #     commit_message: fix code style
-      #     commit_options: '--no-verify'
+      - name: Frontend type check
+        run: npm run types:check

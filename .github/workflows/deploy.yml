@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -19,14 +20,13 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: DEPLOY_PATH
           script: |
-            cd /opt/wandireo
-            git pull origin main
-            docker compose -f docker-compose.yml -f docker-compose.edge.yml up -d --build --remove-orphans
-            docker compose exec -T app php artisan migrate --force
-            docker compose exec -T app php artisan config:cache
-            docker compose exec -T app php artisan route:cache
-            docker compose exec -T app php artisan view:cache
-            docker compose exec -T app php artisan event:cache
-            docker compose exec -T app php artisan storage:link || true
-            echo "Deployment done: $(date)"
+            export DEPLOY_BRANCH=main
+            DEPLOY_PATH="${DEPLOY_PATH:-/var/www/wandireo-api}"
+            cd "$DEPLOY_PATH"
+            chmod +x ./scripts/deploy-remote.sh
+            ./scripts/deploy-remote.sh
+            echo "Deployment done: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
