@@ -1,0 +1,266 @@
+.wdr-admin-support {
+    min-height: calc(100vh - 64px);
+    background-color: var(--bg-subtle);
+    padding-bottom: 4rem;
+}
+
+@media (min-width: 1180px) {
+    .wdr-admin-support {
+        display: grid;
+        grid-template-columns: minmax(250px, 280px) minmax(0, 1fr);
+        column-gap: 2.25rem;
+        align-items: start;
+    }
+
+    .wdr-admin-support__hero {
+        grid-column: 1 / -1;
+    }
+
+    .wdr-admin-support > .wdr-admin-nav {
+        grid-column: 1;
+        margin-top: 2rem;
+    }
+
+    .wdr-admin-support__body {
+        grid-column: 2;
+        margin: 2rem 2rem 0 0;
+        max-width: none;
+    }
+}
+
+.wdr-admin-support__hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f8ba8 100%);
+    color: #ffffff;
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.wdr-admin-support__hero-content {
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.wdr-admin-support__hero-badge {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.wdr-admin-support__hero-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.wdr-admin-support__hero-subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.wdr-admin-support__body {
+    max-width: 1440px;
+    margin: 2rem auto;
+    padding: 0 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-admin-support__toolbar {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.wdr-admin-support__filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.wdr-admin-support__select {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f5fbfd 100%);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.wdr-admin-support__table-wrapper {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, #f7fbfd 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 22px 40px rgba(5, 31, 40, 0.1);
+}
+
+.wdr-admin-support__table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.wdr-admin-support__table th {
+    background:
+        linear-gradient(180deg, rgba(242, 250, 251, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+    padding: 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wdr-admin-support__table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.875rem;
+}
+
+.wdr-admin-support__date {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.wdr-admin-support__subject {
+    min-width: 260px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.wdr-admin-support__author {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+}
+
+.wdr-admin-support__author .name {
+    font-weight: 500;
+}
+
+.wdr-admin-support__author .role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.wdr-admin-support__status {
+    display: inline-flex;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.wdr-admin-support__status--open { background-color: #ebf8ff; color: #2b6cb0; }
+.wdr-admin-support__status--in_progress { background-color: #fffaf0; color: #9c4221; }
+.wdr-admin-support__status--resolved { background-color: #f0fff4; color: #2f855a; }
+.wdr-admin-support__status--closed { background-color: #edf2f7; color: #4a5568; }
+
+.wdr-admin-support__priority {
+    display: inline-flex;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.wdr-admin-support__priority--low { color: #718096; }
+.wdr-admin-support__priority--medium { color: #2b6cb0; }
+.wdr-admin-support__priority--high { color: #dd6b20; }
+.wdr-admin-support__priority--urgent { color: #e53e3e; background-color: #fff5f5; }
+
+.wdr-admin-support__ticket-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-admin-support__detail-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-subtle);
+    border-radius: var(--radius-md);
+}
+
+.wdr-admin-support__meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.wdr-admin-support__meta-item .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.wdr-admin-support__message-box {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f5fbfd 100%);
+}
+
+.wdr-admin-support__message-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-muted);
+}
+
+.wdr-admin-support__message-content {
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.wdr-admin-support__detail-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.dark .wdr-admin-support__select,
+.dark .wdr-admin-support__table-wrapper,
+.dark .wdr-admin-support__message-box,
+.dark .wdr-admin-support__detail-meta {
+    background:
+        linear-gradient(180deg, rgba(10, 31, 41, 0.96) 0%, rgba(8, 26, 35, 0.96) 100%);
+    border-color: rgba(117, 217, 226, 0.14);
+    box-shadow: 0 22px 40px rgba(0, 0, 0, 0.24);
+}
+
+.dark .wdr-admin-support__select {
+    background:
+        linear-gradient(180deg, rgba(21, 50, 67, 0.98) 0%, rgba(16, 42, 56, 0.98) 100%);
+    color: var(--text-main);
+    border-color: rgba(117, 217, 226, 0.18);
+}
+
+.dark .wdr-admin-support__table th {
+    background:
+        linear-gradient(180deg, rgba(12, 35, 46, 0.98) 0%, rgba(10, 31, 41, 0.96) 100%);
+    border-bottom-color: rgba(117, 217, 226, 0.14);
+}
+
+.dark .wdr-admin-support {
+    background-color: var(--bg-main);
+}

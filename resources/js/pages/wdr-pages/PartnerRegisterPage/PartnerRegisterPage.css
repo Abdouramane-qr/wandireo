@@ -1,0 +1,133 @@
+/* ============================================================
+   PartnerRegisterPage
+   ============================================================ */
+
+.wdr-partner-register {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 2rem 1rem;
+}
+
+.wdr-partner-register__card {
+    width: 100%;
+    max-width: 580px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.wdr-partner-register__card--success {
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+    max-width: 480px;
+}
+
+.wdr-partner-register__success-icon {
+    color: var(--success);
+}
+
+.wdr-partner-register__success-title {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.wdr-partner-register__success-text {
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.wdr-partner-register__header {
+    text-align: center;
+}
+
+.wdr-partner-register__title {
+    font-size: 1.75rem;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-partner-register__subtitle {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.wdr-partner-register__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-partner-register__section {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-partner-register__legend {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    padding: 0 0.375rem;
+}
+
+.wdr-partner-register__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .wdr-partner-register__row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wdr-partner-register__hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+    background-color: var(--bg-subtle);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid var(--primary);
+}
+
+.wdr-partner-register__footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.wdr-partner-register__footer p {
+    margin: 0;
+}
+
+.wdr-partner-register__link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.wdr-partner-register__link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}

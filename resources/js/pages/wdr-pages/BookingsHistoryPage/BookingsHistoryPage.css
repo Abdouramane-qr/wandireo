@@ -1,0 +1,429 @@
+/**
+ * @file pages/BookingsHistoryPage/BookingsHistoryPage.css
+ * @description Styles de l'historique des reservations — Espace Client Wandireo.
+ *
+ * Nomenclature BEM : .wdr-history__[element]--[modifier]
+ * Variables CSS heritees de src/index.css
+ */
+
+/* ============================================================
+   Conteneur racine
+   ============================================================ */
+
+.wdr-history {
+    min-height: calc(100vh - 64px);
+    background-color: var(--bg-subtle);
+    padding: 2rem 1.5rem 4rem;
+}
+
+.wdr-history__inner {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+/* ============================================================
+   En-tete de page
+   ============================================================ */
+
+.wdr-history__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.wdr-history__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.4rem;
+}
+
+.wdr-history__subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ============================================================
+   Onglets de filtre
+   ============================================================ */
+
+.wdr-history__tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.wdr-history__tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition:
+        color var(--transition-base),
+        border-color var(--transition-base);
+    white-space: nowrap;
+}
+
+.wdr-history__tab:hover {
+    color: var(--primary);
+}
+
+.wdr-history__tab--active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.wdr-history__tab-count {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+}
+
+.wdr-history__tab--active .wdr-history__tab-count {
+    background: #e8f1ff;
+    color: var(--primary);
+}
+
+/* ============================================================
+   Liste de reservations
+   ============================================================ */
+
+.wdr-history__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ============================================================
+   Carte de reservation
+   ============================================================ */
+
+.wdr-history__card {
+    background: var(--bg-main);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid var(--border-light);
+    transition:
+        box-shadow var(--transition-base),
+        border-color var(--transition-base);
+}
+
+.wdr-history__card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #c8deff;
+}
+
+/* En-tete de carte */
+
+.wdr-history__card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.wdr-history__card-service {
+    flex: 1;
+    min-width: 0;
+}
+
+.wdr-history__card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wdr-history__card-location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Badges de statut */
+
+.wdr-history__card-badges {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.wdr-history__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* Statuts de reservation */
+.wdr-history__badge--confirmed {
+    background: #e8f5e9;
+    color: var(--success-dark);
+}
+
+.wdr-history__badge--past {
+    background: #f5f5f5;
+    color: #5a5a5a;
+}
+
+.wdr-history__badge--pending {
+    background: #fff8e1;
+    color: var(--warning-dark);
+}
+
+.wdr-history__badge--cancelled {
+    background: #fce4ec;
+    color: var(--danger-dark);
+}
+
+/* Statuts de paiement */
+.wdr-history__badge--payment-paid {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.wdr-history__badge--payment-refunded {
+    background: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.wdr-history__badge--payment-pending {
+    background: #fff3e0;
+    color: var(--warning-dark);
+}
+
+/* Meta-donnees */
+
+.wdr-history__card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.wdr-history__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.wdr-history__extras {
+    margin: -0.15rem 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+/* Pied de carte */
+
+.wdr-history__card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-light);
+    flex-wrap: wrap;
+}
+
+.wdr-history__card-ref {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.wdr-history__card-prices {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.wdr-history__price-online {
+    font-size: 0.8rem;
+    color: var(--success-dark);
+    font-weight: 600;
+}
+
+.wdr-history__price-onsite {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.wdr-history__price-total {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* Note d'annulation */
+
+.wdr-history__cancellation-note {
+    font-size: 0.82rem;
+    color: var(--danger-dark);
+    background: #fce4ec;
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.875rem;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   Etat vide
+   ============================================================ */
+
+.wdr-history__empty {
+    background: var(--bg-main);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 3.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+}
+
+.wdr-history__empty-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #e8f1ff;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.wdr-history__empty-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 600px) {
+    .wdr-history {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .wdr-history__header {
+        flex-direction: column;
+    }
+
+    .wdr-history__card-header {
+        flex-direction: column;
+    }
+
+    .wdr-history__card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wdr-history__card-prices {
+        gap: 0.5rem;
+    }
+}
+
+/* ============================================================
+   Zone avis client
+   ============================================================ */
+
+.wdr-history__review-zone {
+    border-top: 1px solid var(--border-light);
+    padding: 0.875rem 1.25rem;
+    background: var(--bg-subtle);
+}
+
+.wdr-history__review-done {
+    font-size: 0.875rem;
+    color: #16a34a;
+    font-weight: 600;
+    margin: 0;
+}
+
+.wdr-history__review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-history__review-form-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.wdr-history__review-textarea {
+    width: 100%;
+    resize: vertical;
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    background: var(--bg-main);
+    transition: border-color var(--transition-base);
+    box-sizing: border-box;
+    min-height: 72px;
+}
+
+.wdr-history__review-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+}
+
+.wdr-history__review-actions {
+    display: flex;
+    gap: 0.625rem;
+}

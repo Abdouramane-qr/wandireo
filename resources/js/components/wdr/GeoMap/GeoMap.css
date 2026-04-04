@@ -1,0 +1,50 @@
+.wdr-geo-map {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line-color, rgba(15, 23, 42, 0.08));
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 164, 0.16), transparent 42%),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.94));
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.wdr-geo-map__leaflet {
+    height: 100%;
+    min-height: inherit;
+    width: 100%;
+}
+
+.wdr-geo-map__popup {
+    min-width: 180px;
+}
+
+.wdr-geo-map__popup p {
+    margin: 0.35rem 0 0;
+    color: rgba(15, 23, 42, 0.7);
+    font-size: 0.9rem;
+}
+
+.wdr-geo-map__popup-action {
+    margin-top: 0.7rem;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0ea5a4, #0284c7);
+    color: white;
+    cursor: pointer;
+    padding: 0.55rem 0.95rem;
+    font: inherit;
+    font-weight: 700;
+}
+
+:is(.dark) .wdr-geo-map {
+    border-color: rgba(148, 163, 184, 0.18);
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 164, 0.2), transparent 42%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(8, 15, 31, 0.96));
+    box-shadow: 0 24px 60px rgba(2, 8, 23, 0.48);
+}
+
+:is(.dark) .wdr-geo-map__popup p {
+    color: rgba(226, 232, 240, 0.78);
+}

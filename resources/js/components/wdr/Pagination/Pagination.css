@@ -1,0 +1,64 @@
+/* ============================================================
+   Pagination - Wandireo Design System
+   ============================================================ */
+
+.wdr-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.wdr-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base);
+}
+
+.wdr-pagination__btn:hover:not(:disabled):not(.wdr-pagination__btn--active) {
+    background-color: var(--bg-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.wdr-pagination__btn--active {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-light);
+    cursor: default;
+    font-weight: 700;
+}
+
+.wdr-pagination__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.wdr-pagination__btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.wdr-pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    user-select: none;
+}

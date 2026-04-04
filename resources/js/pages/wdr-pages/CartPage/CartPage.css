@@ -1,0 +1,408 @@
+/* ============================================================
+   CartPage — Wandireo Design System
+   Etape 1 du tunnel de reservation : Panier / Recapitulatif
+   ============================================================ */
+
+/* --- Layout principal --- */
+
+.wdr-cart {
+    min-height: 70vh;
+    background: var(--bg-subtle);
+    padding: 2rem 1rem 4rem;
+}
+
+.wdr-cart--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wdr-cart__empty-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 3rem 2rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: var(--card-border);
+}
+
+.wdr-cart__empty-message {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.wdr-cart__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* --- Fil d'Ariane des etapes --- */
+
+.wdr-cart__steps {
+    margin-bottom: 2rem;
+}
+
+.wdr-cart__steps-list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.wdr-cart__step {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.wdr-cart__step--active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.wdr-cart__step--separator {
+    color: var(--border-light);
+    user-select: none;
+}
+
+/* --- En-tete de la page --- */
+
+.wdr-cart__header {
+    margin-bottom: 2rem;
+}
+
+.wdr-cart__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-cart__subtitle {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* --- Layout a deux colonnes --- */
+
+.wdr-cart__layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .wdr-cart__layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Section service selectionne --- */
+
+.wdr-cart__service {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-cart__service-card {
+    display: flex;
+    gap: 1.25rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem;
+    border: var(--card-border);
+}
+
+@media (max-width: 600px) {
+    .wdr-cart__service-card {
+        flex-direction: column;
+    }
+}
+
+.wdr-cart__service-img {
+    width: 160px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .wdr-cart__service-img {
+        width: 100%;
+        height: 200px;
+    }
+}
+
+.wdr-cart__service-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.wdr-cart__service-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+}
+
+.wdr-cart__service-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.wdr-cart__service-location {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+}
+
+.wdr-cart__service-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+}
+
+.wdr-cart__service-star {
+    color: var(--secondary);
+}
+
+.wdr-cart__service-reviews {
+    color: var(--text-muted);
+}
+
+/* --- Detail de la selection --- */
+
+.wdr-cart__selection {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem;
+    border: var(--card-border);
+}
+
+.wdr-cart__selection-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+.wdr-cart__selection-grid {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-cart__selection-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wdr-cart__selection-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.wdr-cart__selection-row dt {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.wdr-cart__selection-row dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: right;
+}
+
+/* --- Colonne de synthese (prix + CTA) --- */
+
+.wdr-cart__summary {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    border: var(--card-border);
+    position: sticky;
+    top: 1.5rem;
+}
+
+.wdr-cart__summary-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+}
+
+/* --- Badge mode de paiement --- */
+
+.wdr-cart__payment-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.25rem;
+    cursor: help;
+}
+
+.wdr-cart__payment-mode-badge--full-online {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.wdr-cart__payment-mode-badge--commission-online-rest-on-site {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffcc80;
+}
+
+.wdr-cart__payment-mode-badge--full-cash-on-site {
+    background: #f3e5f5;
+    color: #6a1b9a;
+    border: 1px solid #ce93d8;
+}
+
+/* --- Decomposition du prix --- */
+
+.wdr-cart__price-breakdown {
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-cart__price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.wdr-cart__price-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.wdr-cart__price-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.wdr-cart__price-value {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.wdr-cart__price-divider {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 0.5rem 0;
+}
+
+.wdr-cart__price-divider--light {
+    border-top: 1px dashed var(--border-light);
+    margin: 0.25rem 0;
+}
+
+/* Ligne total */
+
+.wdr-cart__price-row--total {
+    margin-top: 0.25rem;
+}
+
+.wdr-cart__price-label--total {
+    font-size: 1rem;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.wdr-cart__price-value--total {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+/* Ligne "a payer maintenant" */
+
+.wdr-cart__price-row--now {
+    margin-top: 0.1rem;
+}
+
+.wdr-cart__price-label--now {
+    font-size: 0.875rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.wdr-cart__price-value--now {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+/* Ligne "sur place" */
+
+.wdr-cart__price-label--onsite {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.wdr-cart__price-value--onsite {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* --- Mention securite --- */
+
+.wdr-cart__secure-note {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+}
+
+/* --- Bouton retour --- */
+
+.wdr-cart__back-btn {
+    margin-top: 0.75rem;
+}

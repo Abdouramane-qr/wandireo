@@ -1,0 +1,359 @@
+/* ============================================================
+   ServiceCard - Wandireo Design System
+   Carte de presentation uniforme pour les offres de services.
+   3 variantes : default (grilles), compact (suggestions), featured (mise en avant).
+   ============================================================ */
+
+.wdr-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-main);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition:
+        box-shadow var(--transition-slow),
+        transform var(--transition-slow),
+        border-color var(--transition-slow);
+    cursor: default;
+    text-align: left;
+}
+
+.wdr-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.wdr-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ---- Variante Featured ---- */
+
+.wdr-card--featured {
+    border-color: rgba(255, 153, 0, 0.4);
+    box-shadow:
+        0 0 0 2px rgba(255, 153, 0, 0.15),
+        var(--shadow-sm);
+}
+
+/* ---- Variante Compact ---- */
+
+.wdr-card--compact .wdr-card__image-wrapper {
+    height: 10rem;
+}
+
+.wdr-card--compact .wdr-card__body {
+    padding: 0.875rem;
+    gap: 0.5rem;
+}
+
+.wdr-card--compact .wdr-card__footer {
+    padding: 0.75rem 0.875rem;
+}
+
+/* ---- Service indisponible ---- */
+
+.wdr-card--unavailable {
+    opacity: 0.72;
+}
+
+.wdr-card--unavailable .wdr-card__image {
+    filter: grayscale(0.35);
+}
+
+/* ---- Zone image ---- */
+
+.wdr-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 13.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-color: var(--bg-subtle);
+}
+
+.wdr-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms ease-in-out;
+    display: block;
+}
+
+.wdr-card:hover .wdr-card__image {
+    transform: scale(1.05);
+}
+
+/* Placeholder si pas d'image disponible */
+.wdr-card__image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-light);
+    background-color: var(--bg-subtle);
+}
+
+/* ---- Badges superposes sur l'image ---- */
+
+.wdr-card__badges {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    z-index: 1;
+}
+
+.wdr-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.wdr-card__badge--category {
+    background-color: rgba(255, 255, 255, 0.92);
+    color: var(--text-main);
+}
+
+.wdr-card__badge--featured {
+    background-color: var(--secondary);
+    color: #ffffff;
+}
+
+/* ---- Bouton favori ---- */
+
+.wdr-card__favorite-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition:
+        color var(--transition-base),
+        background-color var(--transition-base),
+        transform var(--transition-base);
+    z-index: 1;
+}
+
+.wdr-card__favorite-btn:hover {
+    background-color: #ffffff;
+    transform: scale(1.1);
+}
+
+.wdr-card__favorite-btn--active {
+    color: var(--danger);
+}
+
+.wdr-card__favorite-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ---- Indicateur de disponibilite ---- */
+
+.wdr-card__availability-dot {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    z-index: 1;
+}
+
+.wdr-card__availability-dot--available {
+    background-color: var(--success);
+}
+
+.wdr-card__availability-dot--unavailable {
+    background-color: var(--danger);
+}
+
+/* ---- Corps de la carte ---- */
+
+.wdr-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.125rem;
+    flex: 1;
+}
+
+/* ---- Localisation ---- */
+
+.wdr-card__location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ---- Titre ---- */
+
+.wdr-card__title {
+    font-family: var(--font-heading);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin: 0;
+    /* Tronquer a 2 lignes maximum */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---- Description courte ---- */
+
+.wdr-card__description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---- Meta-informations (duree, note) ---- */
+
+.wdr-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.wdr-card__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* ---- Notation etoiles ---- */
+
+.wdr-card__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.wdr-card__star {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+}
+
+.wdr-card__star--filled {
+    color: var(--secondary);
+}
+
+.wdr-card__star--empty {
+    color: var(--border-light);
+}
+
+.wdr-card__rating-count {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-left: 0.2rem;
+}
+
+/* ---- Informations partenaire ---- */
+
+.wdr-card__partner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.wdr-card__partner-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background-color: var(--bg-subtle);
+}
+
+.wdr-card__partner-initial {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ---- Pied de carte (prix + CTA) ---- */
+
+.wdr-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.125rem;
+    border-top: 1px solid var(--border-light);
+    gap: 0.75rem;
+}
+
+.wdr-card__price-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.wdr-card__price-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.wdr-card__price {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.wdr-card__price-unit {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}

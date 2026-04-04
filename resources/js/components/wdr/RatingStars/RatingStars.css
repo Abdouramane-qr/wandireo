@@ -1,0 +1,52 @@
+/* ============================================================
+   RatingStars - Wandireo Design System
+   ============================================================ */
+
+.wdr-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* ---- Tailles ---- */
+
+.wdr-stars--sm .wdr-stars__star {
+    width: 14px;
+    height: 14px;
+}
+.wdr-stars--md .wdr-stars__star {
+    width: 18px;
+    height: 18px;
+}
+.wdr-stars--lg .wdr-stars__star {
+    width: 24px;
+    height: 24px;
+}
+
+/* ---- Couleurs ---- */
+
+.wdr-stars__star--filled {
+    color: var(--secondary);
+}
+.wdr-stars__star--empty {
+    color: var(--border-light);
+}
+
+/* ---- Mode interactif ---- */
+
+.wdr-stars--input .wdr-stars__star--interactive {
+    cursor: pointer;
+    transition:
+        transform var(--transition-base),
+        color var(--transition-base);
+}
+
+.wdr-stars--input .wdr-stars__star--interactive:hover,
+.wdr-stars--input .wdr-stars__star--interactive:focus-visible {
+    transform: scale(1.2);
+    outline: none;
+}
+
+.wdr-stars--input .wdr-stars__star--filled {
+    color: var(--secondary);
+}

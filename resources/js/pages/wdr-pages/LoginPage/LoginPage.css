@@ -1,0 +1,128 @@
+/* ============================================================
+   LoginPage
+   ============================================================ */
+
+.wdr-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 2rem 1rem;
+}
+
+.wdr-login__card {
+    width: 100%;
+    max-width: 440px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-login__header {
+    text-align: center;
+}
+
+.wdr-login__title {
+    font-size: 1.75rem;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-login__subtitle {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.wdr-login__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-login__eye-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    transition: color var(--transition-base);
+}
+
+.wdr-login__eye-btn:hover {
+    color: var(--text-main);
+}
+
+.wdr-login__forgot {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--primary);
+    align-self: flex-end;
+    font-family: inherit;
+    transition: color var(--transition-base);
+}
+
+.wdr-login__forgot:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.wdr-login__footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.wdr-login__register-text {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.wdr-login__link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+.wdr-login__link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.wdr-login__dev-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+}
+
+.wdr-login__dev-hint summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.wdr-login__dev-hint ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+    line-height: 1.8;
+}

@@ -1,0 +1,324 @@
+/**
+ * @file pages/ProfilePage/ProfilePage.css
+ * @description Styles de la page de gestion du profil voyageur — Espace Client Wandireo.
+ *
+ * Nomenclature BEM : .wdr-profile__[element]--[modifier]
+ * Variables CSS heritees de src/index.css
+ */
+
+/* ============================================================
+   Conteneur racine
+   ============================================================ */
+
+.wdr-profile {
+    min-height: calc(100vh - 64px);
+    background-color: var(--bg-subtle);
+    padding: 2rem 1.5rem 4rem;
+}
+
+.wdr-profile__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+/* ============================================================
+   Fil d'Ariane / retour
+   ============================================================ */
+
+.wdr-profile__breadcrumb {
+    display: flex;
+}
+
+.wdr-profile__back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0;
+    transition: color var(--transition-base);
+}
+
+.wdr-profile__back-btn:hover {
+    color: var(--primary);
+}
+
+/* ============================================================
+   En-tete du profil
+   ============================================================ */
+
+.wdr-profile__header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        var(--brand-purple) 100%
+    );
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+.wdr-profile__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-light);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.wdr-profile__name {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+}
+
+.wdr-profile__email {
+    font-size: 0.875rem;
+    opacity: 0.85;
+    margin: 0 0 0.2rem;
+}
+
+.wdr-profile__since {
+    font-size: 0.78rem;
+    opacity: 0.65;
+    margin: 0;
+}
+
+/* ============================================================
+   Sections de formulaire
+   ============================================================ */
+
+.wdr-profile__section {
+    background: var(--bg-main);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.wdr-profile__section--info {
+    background: #f8faff;
+}
+
+.wdr-profile__section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wdr-profile__section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wdr-profile__section-icon--personal {
+    background: #e8f1ff;
+    color: var(--primary);
+}
+
+.wdr-profile__section-icon--prefs {
+    background: #e8f5e9;
+    color: var(--success);
+}
+
+.wdr-profile__section-icon--security {
+    background: #fff3e0;
+    color: var(--secondary);
+}
+
+.wdr-profile__section-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* ============================================================
+   Grille de champs
+   ============================================================ */
+
+.wdr-profile__fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+/* ============================================================
+   Champ generique
+   ============================================================ */
+
+.wdr-profile__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.wdr-profile__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.wdr-profile__input,
+.wdr-profile__select {
+    height: 42px;
+    padding: 0 0.875rem;
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    color: var(--text-main);
+    background: var(--bg-main);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+    font-family: var(--font-family);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wdr-profile__input:focus,
+.wdr-profile__select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.12);
+}
+
+.wdr-profile__input--readonly {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.wdr-profile__readonly-note {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ============================================================
+   Actions de sauvegarde
+   ============================================================ */
+
+.wdr-profile__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* ============================================================
+   Bloc d'informations (securite)
+   ============================================================ */
+
+.wdr-profile__info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.wdr-profile__info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--border-light);
+}
+
+.wdr-profile__info-row:last-child {
+    border-bottom: none;
+}
+
+.wdr-profile__info-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    flex-shrink: 0;
+}
+
+.wdr-profile__info-value {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.wdr-profile__info-value--muted {
+    font-style: italic;
+}
+
+/* ============================================================
+   Zone danger (deconnexion)
+   ============================================================ */
+
+.wdr-profile__danger-zone {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 600px) {
+    .wdr-profile {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .wdr-profile__header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .wdr-profile__fields-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wdr-profile__info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .wdr-profile__info-value {
+        text-align: left;
+    }
+
+    .wdr-profile__actions {
+        justify-content: stretch;
+    }
+}

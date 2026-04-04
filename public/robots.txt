@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://tripanova.code-ai-insight.com/sitemap.xml

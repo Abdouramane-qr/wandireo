@@ -1,0 +1,504 @@
+/* ============================================================
+   ConfirmationPage — Wandireo Design System
+   Etape 4 (finale) du tunnel : Confirmation de reservation
+   ============================================================ */
+
+/* --- Conteneur principal --- */
+
+.wdr-confirm {
+    min-height: 70vh;
+    background: var(--bg-subtle);
+    padding: 2rem 1rem 4rem;
+}
+
+.wdr-confirm--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wdr-confirm__empty-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 3rem 2rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: var(--card-border);
+}
+
+.wdr-confirm__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* --- Bandeau de succes --- */
+
+.wdr-confirm__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 2rem 2.5rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+    border: var(--card-border);
+}
+
+/* Icone de validation */
+.wdr-confirm__icon {
+    width: 72px;
+    height: 72px;
+    color: var(--success);
+    stroke-width: 1.5;
+    margin-bottom: 1.25rem;
+    animation: wdr-pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes wdr-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.wdr-confirm__hero-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--success-dark);
+    margin: 0 0 0.75rem;
+}
+
+.wdr-confirm__hero-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    max-width: 520px;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.wdr-confirm__hero-email {
+    color: var(--text-main);
+}
+
+/* Badge de reference */
+.wdr-confirm__reference {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1.25rem;
+}
+
+.wdr-confirm__reference-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.wdr-confirm__reference-code {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.03em;
+}
+
+/* --- Layout deux colonnes --- */
+
+.wdr-confirm__layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .wdr-confirm__layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Details de la reservation --- */
+
+.wdr-confirm__details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Carte du service */
+.wdr-confirm__service-card {
+    display: flex;
+    gap: 1.25rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem;
+    border: var(--card-border);
+}
+
+@media (max-width: 600px) {
+    .wdr-confirm__service-card {
+        flex-direction: column;
+    }
+}
+
+.wdr-confirm__service-img {
+    width: 150px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .wdr-confirm__service-img {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+.wdr-confirm__service-info {
+    flex: 1;
+}
+
+.wdr-confirm__service-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+}
+
+.wdr-confirm__service-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.375rem;
+    line-height: 1.3;
+}
+
+.wdr-confirm__service-location {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Blocs d'informations */
+.wdr-confirm__info-block {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem;
+    border: var(--card-border);
+}
+
+.wdr-confirm__block-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wdr-confirm__info-grid {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-confirm__info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wdr-confirm__info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.wdr-confirm__info-row dt {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.wdr-confirm__info-row dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: right;
+}
+
+/* --- Aside : prix + prochaines etapes --- */
+
+.wdr-confirm__aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: sticky;
+    top: 1.5rem;
+}
+
+/* Carte de paiement */
+.wdr-confirm__price-card {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    border: var(--card-border);
+}
+
+.wdr-confirm__price-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem;
+}
+
+.wdr-confirm__price-breakdown {
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-confirm__price-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.wdr-confirm__price-row dt {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+}
+
+.wdr-confirm__price-meta {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.wdr-confirm__price-row dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.wdr-confirm__price-divider {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 0.25rem 0;
+}
+
+.wdr-confirm__price-divider--light {
+    border-top: 1px dashed var(--border-light);
+    margin: 0.1rem 0;
+}
+
+.wdr-confirm__price-row--total dt {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.wdr-confirm__price-row--total dd {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--success);
+}
+
+/* Ligne "Paye en ligne" */
+.wdr-confirm__price-row--online dt {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--success);
+}
+
+.wdr-confirm__price-row--online dd {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--success);
+    margin: 0;
+}
+
+/* Ligne "A regler sur place" */
+.wdr-confirm__price-row--onsite dt {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.wdr-confirm__price-row--onsite dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Badge "Paye" */
+.wdr-confirm__paid-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+    color: var(--success-dark);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    padding: 0.375rem 1rem;
+}
+
+.wdr-confirm__paid-badge::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+}
+
+/* Badge variante cash-on-site */
+.wdr-confirm__paid-badge--cash {
+    background: #f3e5f5;
+    color: #6a1b9a;
+    border-color: #ce93d8;
+}
+
+.wdr-confirm__paid-badge--cash::before {
+    background: #6a1b9a;
+}
+
+/* Prochaines etapes */
+.wdr-confirm__next-steps {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    border: var(--card-border);
+}
+
+.wdr-confirm__next-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem;
+}
+
+.wdr-confirm__next-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-confirm__next-item {
+    display: flex;
+    gap: 0.875rem;
+    align-items: flex-start;
+}
+
+.wdr-confirm__next-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wdr-confirm__next-item strong {
+    display: block;
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+}
+
+.wdr-confirm__next-item p {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Actions */
+.wdr-confirm__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-confirm__search-btn {
+    margin: 0;
+}
+
+.dark .wdr-confirm {
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 164, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(6, 20, 28, 0.98) 0%, rgba(9, 27, 36, 0.96) 100%);
+}
+
+.dark .wdr-confirm__empty-box,
+.dark .wdr-confirm__hero,
+.dark .wdr-confirm__service-card,
+.dark .wdr-confirm__info-block,
+.dark .wdr-confirm__price-card,
+.dark .wdr-confirm__next-steps,
+.dark .wdr-confirm__reference {
+    background:
+        linear-gradient(180deg, rgba(10, 31, 41, 0.96) 0%, rgba(8, 26, 35, 0.96) 100%);
+    border-color: rgba(117, 217, 226, 0.14);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.dark .wdr-confirm__hero-title,
+.dark .wdr-confirm__service-title,
+.dark .wdr-confirm__block-title,
+.dark .wdr-confirm__price-title,
+.dark .wdr-confirm__next-title,
+.dark .wdr-confirm__info-row dd {
+    color: var(--text-main);
+}
+
+.dark .wdr-confirm__hero-subtitle,
+.dark .wdr-confirm__service-location,
+.dark .wdr-confirm__info-row dt,
+.dark .wdr-confirm__price-row dt,
+.dark .wdr-confirm__next-item p,
+.dark .wdr-confirm__reference-label {
+    color: var(--text-muted);
+}
+
+.dark .wdr-confirm__reference-code {
+    color: var(--primary);
+}

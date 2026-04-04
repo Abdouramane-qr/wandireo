@@ -1,0 +1,51 @@
+/* ============================================================
+   Breadcrumb - Wandireo Design System
+   ============================================================ */
+
+.wdr-breadcrumb__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wdr-breadcrumb__item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.wdr-breadcrumb__separator {
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.wdr-breadcrumb__link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--primary);
+    font-family: inherit;
+    transition: color var(--transition-base);
+}
+
+.wdr-breadcrumb__link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.wdr-breadcrumb__link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+.wdr-breadcrumb__current {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}

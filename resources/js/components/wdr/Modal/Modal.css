@@ -1,0 +1,194 @@
+/* ============================================================
+   Modal - Wandireo Design System
+   Fenetre modale accessible : focus trap, fermeture ESC,
+   rendu via ReactDOM.createPortal hors du flux DOM principal.
+   ============================================================ */
+
+/* Fond assombri (overlay) */
+.wdr-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(8, 20, 29, 0.58) 0%, rgba(8, 20, 29, 0.7) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: var(--z-modal);
+    /* Animation d'entree */
+    animation: wdr-overlay-in var(--transition-slow) ease-out;
+}
+
+@keyframes wdr-overlay-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Conteneur de la modale */
+.wdr-modal {
+    position: relative;
+    background:
+        linear-gradient(180deg, var(--bg-main) 0%, var(--bg-elevated) 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 2rem);
+    width: 100%;
+    animation: wdr-modal-in var(--transition-slow) ease-out;
+    overflow: hidden;
+}
+
+:is(.dark) .wdr-modal-overlay {
+    background:
+        radial-gradient(circle at top, rgba(51, 184, 213, 0.08), transparent 24%),
+        rgba(2, 10, 16, 0.84);
+}
+
+:is(.dark) .wdr-modal {
+    background:
+        linear-gradient(180deg, #102534 0%, #0d2230 100%);
+    border-color: var(--border-light);
+}
+
+:is(.dark) .wdr-modal__header,
+:is(.dark) .wdr-modal__footer {
+    background: rgba(8, 24, 34, 0.42);
+    border-color: var(--border-light);
+}
+
+:is(.dark) .wdr-modal__body {
+    background: transparent;
+}
+
+:is(.dark) .wdr-modal__close-btn:hover {
+    background-color: var(--bg-soft);
+}
+
+@keyframes wdr-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ---- Tailles ---- */
+
+.wdr-modal--sm {
+    max-width: 28rem; /* 448px */
+}
+
+.wdr-modal--md {
+    max-width: 38rem; /* 608px */
+}
+
+.wdr-modal--lg {
+    max-width: 52rem; /* 832px */
+}
+
+.wdr-modal--xl {
+    max-width: 72rem; /* 1152px */
+}
+
+.wdr-modal--full {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+}
+
+/* ---- En-tete ---- */
+
+.wdr-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    flex-shrink: 0;
+    gap: 1rem;
+}
+
+.wdr-modal__title {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Bouton de fermeture */
+.wdr-modal__close-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background-color: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+        background-color var(--transition-base),
+        color var(--transition-base);
+}
+
+.wdr-modal__close-btn:hover {
+    background-color: var(--bg-subtle);
+    color: var(--text-main);
+}
+
+.wdr-modal__close-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ---- Corps scrollable ---- */
+
+.wdr-modal__body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---- Pied (actions) ---- */
+
+.wdr-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-light);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+/* ---- Responsivite ---- */
+
+@media (max-width: 480px) {
+    .wdr-modal {
+        border-radius: var(--radius-md);
+    }
+
+    .wdr-modal__footer {
+        flex-direction: column-reverse;
+    }
+
+    .wdr-modal__footer .wdr-btn {
+        width: 100%;
+    }
+}

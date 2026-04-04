@@ -1,0 +1,473 @@
+/**
+ * @file pages/DashboardPage/DashboardPage.css
+ * @description Styles du tableau de bord voyageur — Espace Client Wandireo.
+ *
+ * Nomenclature BEM : .wdr-dashboard__[element]--[modifier]
+ * Variables CSS heritees de src/index.css
+ */
+
+/* ============================================================
+   Conteneur racine
+   ============================================================ */
+
+.wdr-dashboard {
+    min-height: calc(100vh - 64px);
+    background-color: var(--bg-subtle);
+}
+
+/* ============================================================
+   Hero de bienvenue
+   ============================================================ */
+
+.wdr-dashboard__hero {
+    background: linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        var(--brand-purple) 100%
+    );
+    color: var(--text-light);
+    padding: 2.5rem 1.5rem;
+}
+
+.wdr-dashboard__hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.wdr-dashboard__hero-greeting {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin: 0 0 0.4rem;
+}
+
+.wdr-dashboard__hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+}
+
+.wdr-dashboard__hero-title span {
+    color: #cfe8ff;
+}
+
+.wdr-dashboard__hero-since {
+    font-size: 0.875rem;
+    opacity: 0.75;
+    margin: 0;
+}
+
+.wdr-dashboard__hero-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-light);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   Corps principal
+   ============================================================ */
+
+.wdr-dashboard__body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+/* ============================================================
+   Bandeau de statistiques
+   ============================================================ */
+
+.wdr-dashboard__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.wdr-dashboard__stat-card {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: var(--card-border);
+    transition:
+        box-shadow var(--transition-base),
+        border-color var(--transition-base),
+        transform var(--transition-base);
+}
+
+.wdr-dashboard__stat-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+}
+
+.wdr-dashboard__stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wdr-dashboard__stat-card--upcoming .wdr-dashboard__stat-icon {
+    background: #e8f1ff;
+    color: var(--primary);
+}
+
+.wdr-dashboard__stat-card--completed .wdr-dashboard__stat-icon {
+    background: #e8f5e9;
+    color: var(--success);
+}
+
+.wdr-dashboard__stat-card--spent .wdr-dashboard__stat-icon {
+    background: #fff3e0;
+    color: var(--secondary);
+}
+
+.wdr-dashboard__stat-data {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.wdr-dashboard__stat-value {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+.wdr-dashboard__stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* ============================================================
+   En-tetes de sections
+   ============================================================ */
+
+.wdr-dashboard__section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-dashboard__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wdr-dashboard__section-title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.wdr-dashboard__section-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 0;
+    transition: color var(--transition-base);
+}
+
+.wdr-dashboard__section-link:hover {
+    color: var(--primary-dark);
+}
+
+/* ============================================================
+   Liste des voyages a venir
+   ============================================================ */
+
+.wdr-dashboard__trip-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-dashboard__trip-card {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.25rem 1.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    border: var(--card-border);
+    transition:
+        box-shadow var(--transition-base),
+        border-color var(--transition-base);
+}
+
+.wdr-dashboard__trip-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--border-strong);
+}
+
+.wdr-dashboard__trip-date {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    grid-column: 1 / -1;
+}
+
+.wdr-dashboard__trip-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+    grid-column: 1 / 3;
+}
+
+.wdr-dashboard__trip-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    grid-column: 1 / 3;
+}
+
+.wdr-dashboard__trip-separator {
+    color: var(--border-light);
+}
+
+.wdr-dashboard__trip-status {
+    grid-column: -1;
+    grid-row: 2 / 4;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.wdr-dashboard__trip-status--confirmed {
+    background: #e8f5e9;
+    color: var(--success-dark);
+}
+
+/* ============================================================
+   Etat vide (aucun voyage a venir)
+   ============================================================ */
+
+.wdr-dashboard__empty {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    border: var(--card-border);
+}
+
+.wdr-dashboard__empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #e8f1ff;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.wdr-dashboard__empty-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.wdr-dashboard__empty-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+    max-width: 340px;
+}
+
+/* ============================================================
+   Acces rapides
+   ============================================================ */
+
+.wdr-dashboard__quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-dashboard__quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.wdr-dashboard__quick-card {
+    background: var(--bg-elevated);
+    border: var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition:
+        box-shadow var(--transition-base),
+        border-color var(--transition-base),
+        transform var(--transition-base);
+}
+
+.wdr-dashboard__quick-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+}
+
+.wdr-dashboard__quick-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wdr-dashboard__quick-icon--history {
+    background: #e8f1ff;
+    color: var(--primary);
+}
+
+.wdr-dashboard__quick-icon--profile {
+    background: #f3e5f5;
+    color: var(--brand-purple);
+}
+
+.wdr-dashboard__quick-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.wdr-dashboard__quick-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.wdr-dashboard__quick-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* ============================================================
+   Deconnexion
+   ============================================================ */
+
+.wdr-dashboard__logout-row {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .wdr-dashboard__hero-content {
+        flex-direction: row-reverse;
+    }
+
+    .wdr-dashboard__hero-avatar {
+        width: 52px;
+        height: 52px;
+        font-size: 1rem;
+    }
+
+    .wdr-dashboard__stats {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .wdr-dashboard__trip-card {
+        grid-template-columns: 1fr auto;
+    }
+
+    .wdr-dashboard__trip-date {
+        grid-column: 1 / -1;
+    }
+
+    .wdr-dashboard__trip-title {
+        grid-column: 1 / 2;
+    }
+
+    .wdr-dashboard__trip-meta {
+        grid-column: 1 / 2;
+    }
+
+    .wdr-dashboard__trip-status {
+        grid-column: 2;
+        grid-row: 2 / 4;
+    }
+
+    .wdr-dashboard__quick-grid {
+        grid-template-columns: 1fr;
+    }
+}

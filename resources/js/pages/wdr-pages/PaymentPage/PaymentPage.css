@@ -1,0 +1,597 @@
+/* ============================================================
+   PaymentPage — Wandireo Design System
+   Etape 3 du tunnel de reservation : Simulation de paiement
+   ============================================================ */
+
+/* --- Conteneur principal --- */
+
+.wdr-payment {
+    min-height: 70vh;
+    background: var(--bg-subtle);
+    padding: 2rem 1rem 4rem;
+}
+
+.wdr-payment--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wdr-payment__empty-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 3rem 2rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: var(--card-border);
+}
+
+.wdr-payment__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* --- Fil d'Ariane --- */
+
+.wdr-payment__steps {
+    margin-bottom: 2rem;
+}
+
+.wdr-payment__steps-list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.wdr-payment__step {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.wdr-payment__step--active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.wdr-payment__step--done {
+    color: var(--success);
+}
+
+.wdr-payment__step--separator {
+    color: var(--border-light);
+    user-select: none;
+}
+
+.wdr-payment__step-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--success);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-family: var(--font-family);
+}
+
+.wdr-payment__step-btn:hover {
+    color: var(--success-dark);
+}
+
+/* --- En-tete --- */
+
+.wdr-payment__header {
+    margin-bottom: 2rem;
+}
+
+.wdr-payment__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-payment__subtitle {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* --- Layout deux colonnes --- */
+
+.wdr-payment__layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .wdr-payment__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .wdr-payment__aside {
+        order: -1;
+    }
+}
+
+/* --- Section formulaire --- */
+
+.wdr-payment__form-section {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    border: var(--card-border);
+}
+
+/* --- Bandeau securite --- */
+
+.wdr-payment__secure-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: color-mix(in srgb, var(--success) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+    color: var(--success-dark);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Visuel de carte bancaire --- */
+
+.wdr-payment__card-visual {
+    perspective: 1000px;
+    margin-bottom: 1.75rem;
+}
+
+.wdr-payment__card-visual-inner {
+    background: linear-gradient(
+        135deg,
+        var(--primary-dark) 0%,
+        var(--brand-purple) 100%
+    );
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    color: var(--text-light);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-family: 'Courier New', monospace;
+    min-height: 140px;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.wdr-payment__card-visual-chip {
+    width: 36px;
+    height: 26px;
+    background: linear-gradient(135deg, #f5d57b, #c8a84b);
+    border-radius: 4px;
+}
+
+.wdr-payment__card-visual-number {
+    font-size: 1.125rem;
+    letter-spacing: 0.15em;
+    opacity: 0.95;
+}
+
+.wdr-payment__card-visual-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.wdr-payment__card-visual-holder {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+}
+
+.wdr-payment__card-visual-expiry {
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+}
+
+/* --- Formulaire --- */
+
+.wdr-payment__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.wdr-payment__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.wdr-payment__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.wdr-payment__required {
+    color: var(--danger);
+}
+
+/* Input de base */
+.wdr-payment__input {
+    width: 100%;
+    height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: 0.9375rem;
+    color: var(--text-main);
+    background: var(--bg-main);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+    box-sizing: border-box;
+}
+
+.wdr-payment__input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.wdr-payment__input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.wdr-payment__input--error {
+    border-color: var(--danger);
+}
+
+.wdr-payment__input--error:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+/* Input avec icone a gauche */
+.wdr-payment__input-icon-wrap {
+    position: relative;
+}
+
+.wdr-payment__input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.wdr-payment__input--with-icon {
+    padding-left: 2.5rem;
+}
+
+.wdr-payment__error {
+    font-size: 0.8125rem;
+    color: var(--danger);
+    font-weight: 500;
+}
+
+.wdr-payment__sync-note {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Ligne expiry + CVV */
+.wdr-payment__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 400px) {
+    .wdr-payment__row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Actions --- */
+
+.wdr-payment__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 500px) {
+    .wdr-payment__actions {
+        flex-direction: column-reverse;
+    }
+}
+
+/* --- Mention simulation --- */
+
+.wdr-payment__mock-notice {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    border: 1px dashed var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    margin-top: 1.5rem;
+    line-height: 1.5;
+}
+
+/* --- Aside recap --- */
+
+.wdr-payment__aside {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    border: var(--card-border);
+    position: sticky;
+    top: 1.5rem;
+}
+
+.wdr-payment__aside-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+.wdr-payment__aside-service {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.wdr-payment__aside-img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.wdr-payment__aside-service-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Bloc voyageur */
+.wdr-payment__aside-traveler {
+    background: var(--bg-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.wdr-payment__aside-traveler-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 0.375rem;
+}
+
+.wdr-payment__aside-traveler-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-payment__aside-traveler-email {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Prix dans l'aside */
+.wdr-payment__aside-prices {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-payment__aside-price-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.wdr-payment__aside-price-row dt {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.wdr-payment__aside-price-row dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.wdr-payment__aside-divider {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 0.25rem 0;
+}
+
+.wdr-payment__aside-divider--light {
+    border-top: 1px dashed var(--border-light);
+    margin: 0.15rem 0;
+}
+
+.wdr-payment__aside-price-row--total dt {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.wdr-payment__aside-price-row--total dd {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+/* "Preleve maintenant" row */
+.wdr-payment__aside-price-row--now dt {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--success);
+}
+
+.wdr-payment__aside-price-row--now dd {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+/* "Sur place" row */
+.wdr-payment__aside-price-row--onsite dt {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.wdr-payment__aside-price-row--onsite dd {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   Mode FULL_CASH_ON_SITE — panneau de confirmation sans carte
+   ============================================================ */
+
+.wdr-payment__cash-panel {
+    background: var(--bg-elevated);
+    border: var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+}
+
+.wdr-payment__cash-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.wdr-payment__cash-title {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #6a1b9a;
+    margin: 0;
+}
+
+.wdr-payment__cash-desc {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0;
+}
+
+.wdr-payment__cash-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    width: 100%;
+    max-width: 360px;
+}
+
+.wdr-payment__cash-list li {
+    font-size: 0.875rem;
+    color: var(--text-body);
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.wdr-payment__cash-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #6a1b9a;
+    font-weight: 700;
+}
+
+.wdr-payment__cash-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.dark .wdr-payment {
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 164, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(6, 20, 28, 0.98) 0%, rgba(9, 27, 36, 0.96) 100%);
+}
+
+.dark .wdr-payment__empty-box,
+.dark .wdr-payment__form-section,
+.dark .wdr-payment__aside,
+.dark .wdr-payment__cash-panel,
+.dark .wdr-payment__aside-traveler,
+.dark .wdr-payment__mock-notice {
+    background:
+        linear-gradient(180deg, rgba(10, 31, 41, 0.96) 0%, rgba(8, 26, 35, 0.96) 100%);
+    border-color: rgba(117, 217, 226, 0.14);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.dark .wdr-payment__title,
+.dark .wdr-payment__aside-title,
+.dark .wdr-payment__aside-service-title,
+.dark .wdr-payment__aside-traveler-name {
+    color: var(--text-main);
+}
+
+.dark .wdr-payment__subtitle,
+.dark .wdr-payment__sync-note,
+.dark .wdr-payment__aside-traveler-email,
+.dark .wdr-payment__aside-price-row dt,
+.dark .wdr-payment__cash-list li {
+    color: var(--text-muted);
+}
+
+.dark .wdr-payment__cash-title {
+    color: var(--secondary);
+}
+
+.dark .wdr-payment__cash-list li::before {
+    color: var(--secondary);
+}

@@ -1,0 +1,72 @@
+/* ============================================================
+   ReviewCard - Wandireo Design System
+   ============================================================ */
+
+.wdr-review {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.wdr-review__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.wdr-review__author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.wdr-review__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.wdr-review__avatar-initial {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wdr-review__author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wdr-review__author-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.wdr-review__date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.wdr-review__comment {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    line-height: 1.6;
+}

@@ -1,0 +1,110 @@
+/* ============================================================
+   RegisterPage
+   ============================================================ */
+
+.wdr-register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 2rem 1rem;
+}
+
+.wdr-register__card {
+    width: 100%;
+    max-width: 520px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wdr-register__header {
+    text-align: center;
+}
+
+.wdr-register__title {
+    font-size: 1.75rem;
+    margin: 0 0 0.25rem;
+}
+
+.wdr-register__subtitle {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.wdr-register__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wdr-register__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .wdr-register__row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wdr-register__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.wdr-register__checkbox input[type='checkbox'] {
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.wdr-register__checkbox-error {
+    font-size: 0.8rem;
+    color: var(--danger);
+    margin-top: -0.5rem;
+}
+
+.wdr-register__link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+.wdr-register__link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.wdr-register__footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.wdr-register__footer p {
+    margin: 0;
+}

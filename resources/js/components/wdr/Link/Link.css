@@ -1,0 +1,91 @@
+/* ============================================================
+   Link - Wandireo Design System
+   Hyperliens styles, coherents avec la charte graphique.
+   ============================================================ */
+
+.wdr-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: var(--font-family);
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    transition:
+        color var(--transition-base),
+        background-color var(--transition-base),
+        text-decoration-color var(--transition-base),
+        opacity var(--transition-base);
+}
+
+.wdr-link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ---- Variante Default (lien inline de contenu) ---- */
+
+.wdr-link--default {
+    color: var(--primary);
+    text-underline-offset: 3px;
+}
+
+.wdr-link--default:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ---- Variante Muted (lien secondaire, mentions, credits) ---- */
+
+.wdr-link--muted {
+    color: var(--text-muted);
+}
+
+.wdr-link--muted:hover {
+    color: var(--text-main);
+}
+
+/* ---- Variante Nav (liens de navigation principale) ---- */
+
+.wdr-link--nav {
+    color: var(--text-main);
+    font-weight: 500;
+    padding: 0.3rem 0.625rem;
+    border-radius: var(--radius-sm);
+}
+
+.wdr-link--nav:hover {
+    color: var(--primary);
+    background-color: rgba(0, 132, 255, 0.07);
+}
+
+/* Lien actif dans la navigation */
+.wdr-link--nav.wdr-link--active {
+    color: var(--primary);
+    font-weight: 600;
+    background-color: rgba(0, 132, 255, 0.07);
+}
+
+/* ---- Variante Underline (lien avec soulignement decoratif) ---- */
+
+.wdr-link--underline {
+    color: var(--text-main);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--border-light);
+}
+
+.wdr-link--underline:hover {
+    color: var(--primary);
+    text-decoration-color: var(--primary);
+}
+
+/* ---- Icone lien externe ---- */
+
+.wdr-link__external-icon {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.65;
+    margin-left: 0.125rem;
+}
