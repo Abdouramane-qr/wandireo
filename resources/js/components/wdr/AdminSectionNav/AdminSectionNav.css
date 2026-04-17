@@ -30,7 +30,7 @@
     padding: 1rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--text-main);
     background: none;
     border: none;
     border-bottom: 3px solid transparent;
@@ -131,7 +131,7 @@
         border-radius: 16px;
         position: relative;
         overflow: hidden;
-        color: var(--text-muted);
+        color: var(--text-main);
     }
 
     .wdr-admin-nav__item::after {

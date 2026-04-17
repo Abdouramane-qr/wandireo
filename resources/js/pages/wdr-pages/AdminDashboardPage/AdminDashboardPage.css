@@ -1,9 +1,5 @@
 /**
- * @file pages/AdminDashboardPage/AdminDashboardPage
-
-
-
- 
+ * @file pages/AdminDashboardPage/AdminDashboardPage/
  * @description Styles du tableau de bord Administration Wandireo.
  *
  * Nomenclature BEM : .wdr-admin-dash__[element]--[modifier]
@@ -34,8 +30,8 @@
    ============================================================ */
 
 .wdr-admin-dash {
-    --wdr-admin-hero-from: #12344a;
-    --wdr-admin-hero-to: var(--brand-purple);
+    --wdr-admin-hero-from: #0f172a;
+    --wdr-admin-hero-to: #1e293b;
     --wdr-admin-hero-accent: #d7ecff;
     --wdr-admin-badge-bg: rgba(255, 255, 255, 0.16);
     --wdr-admin-badge-border: rgba(255, 255, 255, 0.24);
