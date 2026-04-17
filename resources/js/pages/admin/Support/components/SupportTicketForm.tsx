@@ -20,7 +20,7 @@ export const SupportTicketForm = ({ onClose }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin.support.store'), {
+        post('/admin/support/tickets', {
             onSuccess: () => {
                 reset();
                 onClose();
