@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { servicesApi } from "@/api/services";
 import { uploadsApi } from "@/api/uploads";
 import { Breadcrumb, Button, Input, Select } from "@/components/wdr";
@@ -253,6 +254,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
     existingService,
     adminMode = false,
 }) => {
+    const queryClient = useQueryClient();
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const { success, error } = useToast();
@@ -779,6 +781,8 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             } else {
                 await servicesApi.create(payload);
             }
+
+            await queryClient.invalidateQueries({ queryKey: ["services"] });
 
             success(
                 isEditing
