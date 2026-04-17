@@ -7,6 +7,7 @@
  */
 
 import axios from 'axios';
+import { getBrowserLocale } from '@/lib/locale';
 
 const SESSION_KEY = 'wandireo-session-id';
 
@@ -47,6 +48,8 @@ api.interceptors.request.use((config) => {
     if (sessionId) {
         config.headers['X-Wandireo-Session'] = sessionId;
     }
+
+    config.headers['Accept-Language'] = getBrowserLocale();
 
     return config;
 });

@@ -113,6 +113,7 @@
     grid-template-columns: 1fr 340px;
     gap: 2rem;
     align-items: start;
+    min-width: 0;
 }
 
 @media (max-width: 900px) {
@@ -135,6 +136,7 @@
     box-shadow: 0 24px 48px rgba(5, 31, 40, 0.1);
     padding: 2rem;
     border: var(--card-border);
+    min-width: 0;
 }
 
 .wdr-checkout__form {
@@ -249,7 +251,13 @@
     padding: 1.5rem;
     border: var(--card-border);
     position: sticky;
-    top: 1.5rem;
+    top: 5.75rem;
+}
+
+@media (max-width: 900px) {
+    .wdr-checkout__aside {
+        position: static;
+    }
 }
 
 .wdr-checkout__aside-title {
@@ -292,6 +300,22 @@
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .wdr-checkout {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .wdr-checkout__form-section,
+    .wdr-checkout__aside {
+        padding: 1rem;
+    }
+
+    .wdr-checkout__aside-price-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .wdr-checkout__aside-price-row dt {

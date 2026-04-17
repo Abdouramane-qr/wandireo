@@ -9,6 +9,7 @@
 
 import React, { useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useRouter } from '@/hooks/useWdrRouter';
 
 interface ProtectedRouteProps {
@@ -17,6 +18,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { currentUser, isLoading } = useUser();
+    const { t } = useTranslation();
     const { navigate } = useRouter();
 
     useEffect(() => {
@@ -27,7 +29,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     if (isLoading) {
 return (
-            <div className="wdr-protected-loading" aria-label="Chargement…" />
+            <div
+                className="wdr-protected-loading"
+                aria-label={t('common.loading_aria')}
+            />
         );
 }
 

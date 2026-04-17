@@ -194,7 +194,9 @@ export const PartnerRegisterPage: React.FC = () => {
                             <Input
                                 label={t('auth.register.first_name')}
                                 type="text"
-                                placeholder="Jean"
+                                placeholder={t(
+                                    'partner.register.first_name_placeholder',
+                                )}
                                 value={form.firstName}
                                 onChange={setField('firstName')}
                                 error={errors.firstName}
@@ -203,7 +205,9 @@ export const PartnerRegisterPage: React.FC = () => {
                             <Input
                                 label={t('auth.register.last_name')}
                                 type="text"
-                                placeholder="Experience"
+                                placeholder={t(
+                                    'partner.register.last_name_placeholder',
+                                )}
                                 value={form.lastName}
                                 onChange={setField('lastName')}
                                 error={errors.lastName}
@@ -213,7 +217,9 @@ export const PartnerRegisterPage: React.FC = () => {
                         <Input
                             label={t('partner.register.business_email')}
                             type="email"
-                            placeholder="contact@monentreprise.com"
+                            placeholder={t(
+                                'partner.register.email_placeholder',
+                            )}
                             value={form.email}
                             onChange={setField('email')}
                             error={errors.email}
@@ -222,7 +228,9 @@ export const PartnerRegisterPage: React.FC = () => {
                         <Input
                             label={t('partner.register.phone')}
                             type="tel"
-                            placeholder="+33 6 00 00 00 00"
+                            placeholder={t(
+                                'partner.register.phone_placeholder',
+                            )}
                             value={form.phone}
                             onChange={setField('phone')}
                             error={errors.phone}
@@ -236,7 +244,9 @@ export const PartnerRegisterPage: React.FC = () => {
                         <Input
                             label={t('partner.register.company_name')}
                             type="text"
-                            placeholder="Mon Entreprise SAS"
+                            placeholder={t(
+                                'partner.register.company_placeholder',
+                            )}
                             value={form.companyName}
                             onChange={setField('companyName')}
                             error={errors.companyName}
@@ -245,7 +255,9 @@ export const PartnerRegisterPage: React.FC = () => {
                         <Input
                             label={t('partner.register.address')}
                             type="text"
-                            placeholder="12 rue de la Decouverte, 75001 Paris"
+                            placeholder={t(
+                                'partner.register.address_placeholder',
+                            )}
                             value={form.address}
                             onChange={setField('address')}
                             error={errors.address}

@@ -15,6 +15,10 @@
 // CONSTANTES ET TYPES COMMUNS
 // ============================================================
 
+import type { Locale } from '@/lib/locale';
+
+export type LocalizedTextMap = Partial<Record<Locale, string>>;
+
 export const ServiceCategoryNames = {
     ACTIVITE: 'ACTIVITE',
     BATEAU: 'BATEAU',
@@ -25,7 +29,8 @@ export const ServiceCategoryNames = {
 export type ServiceCategory =
     (typeof ServiceCategoryNames)[keyof typeof ServiceCategoryNames];
 
-export type BookingMode = 'INSTANT' | 'REQUEST';
+export type BookingMode = 'INSTANT' | 'REQUEST' | 'EXTERNAL_REDIRECT';
+export type FareHarborPriceStatus = 'KNOWN' | 'DEPOSIT_ONLY' | 'UNKNOWN';
 export type ServiceAttributeType = 'text' | 'number' | 'boolean' | 'select';
 export type ServiceExtraInputType = 'CHECKBOX' | 'REQUIRED';
 
@@ -118,6 +123,7 @@ export const PaymentModeNames = {
     COMMISSION_ONLINE_REST_ON_SITE: 'COMMISSION_ONLINE_REST_ON_SITE',
     FULL_ONLINE: 'FULL_ONLINE',
     CONNECTED_ACCOUNT: 'CONNECTED_ACCOUNT',
+    EXTERNAL_REDIRECT: 'EXTERNAL_REDIRECT',
 } as const;
 
 export type PaymentMode =
@@ -128,6 +134,7 @@ export const PaymentModeLabels: Record<PaymentMode, string> = {
     COMMISSION_ONLINE_REST_ON_SITE: 'Commission en ligne + reste sur place',
     FULL_ONLINE: 'Paiement en ligne',
     CONNECTED_ACCOUNT: 'Compte connecte Stripe',
+    EXTERNAL_REDIRECT: 'Reservation externe',
 };
 
 export const PaymentModeDescriptions: Record<PaymentMode, string> = {
@@ -139,6 +146,8 @@ export const PaymentModeDescriptions: Record<PaymentMode, string> = {
         'Le montant total est preleve en ligne. Aucun paiement supplementaire sur place.',
     CONNECTED_ACCOUNT:
         'Le paiement est traite en ligne via un compte connecte du partenaire.',
+    EXTERNAL_REDIRECT:
+        'La reservation et le paiement sont geres sur la plateforme du partenaire.',
 };
 
 export interface ServiceLocation {
@@ -161,7 +170,9 @@ export interface BaseService {
     /** Référence au PartnerUser.id propriétaire du service. */
     partnerId?: string;
     title: string;
+    titleTranslations?: LocalizedTextMap;
     description: string;
+    descriptionTranslations?: LocalizedTextMap;
     location: ServiceLocation;
     /** Chemins d'images, format : '/assets/images/services/<id>_<index>.jpg' */
     images: string[];
@@ -192,12 +203,33 @@ export interface BaseService {
     sourceType?: 'LOCAL' | 'EXTERNAL';
     sourceProvider?: string;
     sourceExternalId?: string;
+    isExternalRedirect?: boolean;
     lastSyncedAt?: Date;
     serviceCategoryId?: string;
     serviceSubcategoryId?: string;
     serviceCategoryName?: string;
     serviceSubcategoryName?: string;
-    extraData?: Record<string, unknown>;
+    extraData?: Record<string, unknown> & {
+        fareharbor?: {
+            company?: string;
+            itemId?: string;
+            bookingUrl?: string;
+            bookingFlow?: string;
+            paymentCollection?: string;
+            isDepositRequired?: boolean;
+            depositAmount?: number;
+            depositAmountEur?: number;
+            processorCurrency?: string;
+            priceStatus?: FareHarborPriceStatus;
+            headline?: string;
+            shortDescription?: string;
+            meetingPoint?: string;
+            duration?: string;
+            images?: string[];
+            calendarTimezone?: string;
+            raw?: Record<string, unknown>;
+        };
+    };
 }
 
 // ============================================================
@@ -493,4 +525,9 @@ export interface ServiceCardData {
     isFeatured?: boolean;
     tags: string[];
     highlights: string[];
+    isExternalRedirect?: boolean;
+    sourceProvider?: string;
+    externalPriceStatus?: FareHarborPriceStatus;
+    externalDepositAmount?: number;
+    externalDepositCurrency?: string;
 }

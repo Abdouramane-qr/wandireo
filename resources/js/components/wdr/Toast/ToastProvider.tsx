@@ -21,24 +21,26 @@ import React, {
     useContext,
     useReducer,
     useCallback,
+    useEffect,
     useRef,
     useState,
-} from 'react';
-import ReactDOM from 'react-dom';
-import './Toast.css';
+} from "react";
+import ReactDOM from "react-dom";
+import { useTranslation } from "@/hooks/useTranslation";
+import "./Toast.css";
 
 /* ============================================================
    Types
    ============================================================ */
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+export type ToastType = "success" | "error" | "warning" | "info";
 
 export type ToastPosition =
-    | 'top-right'
-    | 'top-left'
-    | 'top-center'
-    | 'bottom-right'
-    | 'bottom-left';
+    | "top-right"
+    | "top-left"
+    | "top-center"
+    | "bottom-right"
+    | "bottom-left";
 
 export interface ToastOptions {
     /** Duree d'affichage en millisecondes. 0 = persistant. Par defaut: 4000 */
@@ -60,14 +62,14 @@ interface ToastItem {
    ============================================================ */
 
 type ToastAction =
-    | { type: 'ADD'; toast: ToastItem }
-    | { type: 'REMOVE'; id: string };
+    | { type: "ADD"; toast: ToastItem }
+    | { type: "REMOVE"; id: string };
 
 function toastReducer(state: ToastItem[], action: ToastAction): ToastItem[] {
     switch (action.type) {
-        case 'ADD':
+        case "ADD":
             return [...state, action.toast];
-        case 'REMOVE':
+        case "REMOVE":
             return state.filter((t) => t.id !== action.id);
         default:
             return state;
@@ -97,7 +99,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 const ToastIcon: React.FC<{ type: ToastType }> = ({ type }) => {
     switch (type) {
-        case 'success':
+        case "success":
             return (
                 <svg
                     viewBox="0 0 24 24"
@@ -112,7 +114,7 @@ const ToastIcon: React.FC<{ type: ToastType }> = ({ type }) => {
                     <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
             );
-        case 'error':
+        case "error":
             return (
                 <svg
                     viewBox="0 0 24 24"
@@ -128,7 +130,7 @@ const ToastIcon: React.FC<{ type: ToastType }> = ({ type }) => {
                     <line x1="9" y1="9" x2="15" y2="15" />
                 </svg>
             );
-        case 'warning':
+        case "warning":
             return (
                 <svg
                     viewBox="0 0 24 24"
@@ -144,7 +146,7 @@ const ToastIcon: React.FC<{ type: ToastType }> = ({ type }) => {
                     <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
             );
-        case 'info':
+        case "info":
         default:
             return (
                 <svg
@@ -164,11 +166,11 @@ const ToastIcon: React.FC<{ type: ToastType }> = ({ type }) => {
     }
 };
 
-const ARIA_LIVE: Record<ToastType, 'assertive' | 'polite'> = {
-    success: 'polite',
-    error: 'assertive',
-    warning: 'assertive',
-    info: 'polite',
+const ARIA_LIVE: Record<ToastType, "assertive" | "polite"> = {
+    success: "polite",
+    error: "assertive",
+    warning: "assertive",
+    info: "polite",
 };
 
 /* ============================================================
@@ -181,7 +183,9 @@ interface SingleToastProps {
 }
 
 const SingleToast: React.FC<SingleToastProps> = ({ toast, onRemove }) => {
+    const { t } = useTranslation();
     const [exiting, setExiting] = useState(false);
+    const progressRef = useRef<HTMLDivElement | null>(null);
 
     const dismiss = useCallback(() => {
         setExiting(true);
@@ -192,25 +196,44 @@ const SingleToast: React.FC<SingleToastProps> = ({ toast, onRemove }) => {
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     React.useEffect(() => {
         if (toast.duration <= 0) {
-return;
-}
+            return;
+        }
 
         timerRef.current = setTimeout(dismiss, toast.duration);
 
         return () => {
             if (timerRef.current) {
-clearTimeout(timerRef.current);
-}
+                clearTimeout(timerRef.current);
+            }
         };
     }, [dismiss, toast.duration]);
 
+    useEffect(() => {
+        const progressElement = progressRef.current;
+
+        if (!progressElement || toast.duration <= 0) {
+            return;
+        }
+
+        const animation = progressElement.animate(
+            [{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }],
+            {
+                duration: toast.duration,
+                easing: "linear",
+                fill: "forwards",
+            },
+        );
+
+        return () => animation.cancel();
+    }, [toast.duration]);
+
     const toastClassNames = [
-        'wdr-toast',
+        "wdr-toast",
         `wdr-toast--${toast.type}`,
-        exiting ? 'wdr-toast--exiting' : '',
+        exiting ? "wdr-toast--exiting" : "",
     ]
         .filter(Boolean)
-        .join(' ');
+        .join(" ");
 
     return (
         <div
@@ -236,7 +259,7 @@ clearTimeout(timerRef.current);
             <button
                 className="wdr-toast__close-btn"
                 onClick={dismiss}
-                aria-label="Fermer la notification"
+                aria-label={t("common.close_notification")}
                 type="button"
             >
                 <svg
@@ -257,8 +280,8 @@ clearTimeout(timerRef.current);
             {/* Barre de progression si duree definie */}
             {toast.duration > 0 && (
                 <div
+                    ref={progressRef}
                     className="wdr-toast__progress"
-                    style={{ animationDuration: `${toast.duration}ms` }}
                     aria-hidden="true"
                 />
             )}
@@ -291,9 +314,10 @@ export interface ToastProviderProps {
  */
 export const ToastProvider: React.FC<ToastProviderProps> = ({
     children,
-    position = 'top-right',
+    position = "top-right",
     defaultDuration = 4000,
 }) => {
+    const { t } = useTranslation();
     const [toasts, dispatch] = useReducer(toastReducer, []);
 
     const addToast = useCallback(
@@ -304,7 +328,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
                     ? options.duration
                     : defaultDuration;
             dispatch({
-                type: 'ADD',
+                type: "ADD",
                 toast: { id, type, message, title: options?.title, duration },
             });
         },
@@ -312,14 +336,14 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
     );
 
     const removeToast = useCallback((id: string) => {
-        dispatch({ type: 'REMOVE', id });
+        dispatch({ type: "REMOVE", id });
     }, []);
 
     const contextValue: ToastContextValue = {
-        success: (msg, opts) => addToast('success', msg, opts),
-        error: (msg, opts) => addToast('error', msg, opts),
-        warning: (msg, opts) => addToast('warning', msg, opts),
-        info: (msg, opts) => addToast('info', msg, opts),
+        success: (msg, opts) => addToast("success", msg, opts),
+        error: (msg, opts) => addToast("error", msg, opts),
+        warning: (msg, opts) => addToast("warning", msg, opts),
+        info: (msg, opts) => addToast("info", msg, opts),
     };
 
     return (
@@ -328,7 +352,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
             {ReactDOM.createPortal(
                 <div
                     className={`wdr-toast-container wdr-toast-container--${position}`}
-                    aria-label="Notifications"
+                    aria-label={t("common.notifications")}
                 >
                     {toasts.map((toast) => (
                         <SingleToast

@@ -12,20 +12,20 @@
  * Guard : Redirige vers l'accueil si aucun utilisateur connecte.
  */
 
-import { useQueries } from '@tanstack/react-query';
-import React, { useEffect, useMemo, useState } from 'react';
-import { reviewsApi } from '@/api/reviews';
-import { Button, RatingStars } from '@/components/wdr';
-import { useToast } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useMyBookingsData } from '@/hooks/useBookingsData';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { BookingStatusNames, PaymentStatusNames } from '@/types/booking';
-import type { Booking } from '@/types/booking';
-import './BookingsHistoryPage.css';
+import { useQueries } from "@tanstack/react-query";
+import React, { useEffect, useMemo, useState } from "react";
+import { reviewsApi } from "@/api/reviews";
+import { Button, RatingStars } from "@/components/wdr";
+import { useToast } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useMyBookingsData } from "@/hooks/useBookingsData";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames, PaymentStatusNames } from "@/types/booking";
+import type { Booking } from "@/types/booking";
+import "./BookingsHistoryPage.css";
 
 // ============================================================
 // Resolution : serviceId -> donnees du service
@@ -40,18 +40,18 @@ interface ServiceSummary {
 // Configuration des onglets de filtre
 // ============================================================
 
-type FilterTab = 'all' | 'upcoming' | 'past' | 'cancelled';
+type FilterTab = "all" | "upcoming" | "past" | "cancelled";
 
 interface TabConfig {
     key: FilterTab;
-    label: string;
+    labelKey: string;
 }
 
 const TABS: TabConfig[] = [
-    { key: 'all', label: 'Toutes' },
-    { key: 'upcoming', label: 'A venir' },
-    { key: 'past', label: 'Passees' },
-    { key: 'cancelled', label: 'Annulees' },
+    { key: "all", labelKey: "history.tab.all" },
+    { key: "upcoming", labelKey: "history.tab.upcoming" },
+    { key: "past", labelKey: "history.tab.past" },
+    { key: "cancelled", labelKey: "history.tab.cancelled" },
 ];
 
 // ============================================================
@@ -61,46 +61,58 @@ const TABS: TabConfig[] = [
 /**
  * Retourne les proprietes d'affichage du badge de statut de reservation.
  */
-function getBookingStatusBadge(booking: Booking): {
+function getBookingStatusBadge(
+    booking: Booking,
+    t: (key: string) => string,
+): {
     label: string;
     modifier: string;
 } {
     const now = new Date();
 
     if (booking.status === BookingStatusNames.CANCELLED) {
-        return { label: 'Annulee', modifier: 'cancelled' };
+        return { label: t("history.status.cancelled"), modifier: "cancelled" };
     }
 
     if (booking.status === BookingStatusNames.PENDING) {
-        return { label: 'En attente', modifier: 'pending' };
+        return { label: t("history.status.pending"), modifier: "pending" };
     }
 
     if (booking.status === BookingStatusNames.CONFIRMED) {
         if (booking.startDate > now) {
-            return { label: 'Confirmee', modifier: 'confirmed' };
+            return {
+                label: t("history.status.confirmed"),
+                modifier: "confirmed",
+            };
         }
 
-        return { label: 'Terminee', modifier: 'past' };
+        return { label: t("history.status.completed"), modifier: "past" };
     }
 
-    return { label: booking.status, modifier: 'pending' };
+    return { label: booking.status, modifier: "pending" };
 }
 
 /**
  * Retourne les proprietes d'affichage du badge de statut de paiement.
  */
-function getPaymentStatusBadge(status: string): {
+function getPaymentStatusBadge(
+    status: string,
+    t: (key: string) => string,
+): {
     label: string;
     modifier: string;
 } {
     switch (status) {
         case PaymentStatusNames.PAID:
-            return { label: 'Paye', modifier: 'paid' };
+            return { label: t("history.payment.paid"), modifier: "paid" };
         case PaymentStatusNames.REFUNDED:
-            return { label: 'Rembourse', modifier: 'refunded' };
+            return {
+                label: t("history.payment.refunded"),
+                modifier: "refunded",
+            };
         case PaymentStatusNames.PENDING:
         default:
-            return { label: 'Paiement en attente', modifier: 'pending' };
+            return { label: t("history.payment.pending"), modifier: "pending" };
     }
 }
 
@@ -185,14 +197,6 @@ const InboxIcon: React.FC = () => (
 // Utilitaires
 // ============================================================
 
-function formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    }).format(date);
-}
-
 function formatExtrasSummary(booking: Booking): string | null {
     if (!booking.selectedExtras || booking.selectedExtras.length === 0) {
         return null;
@@ -200,9 +204,11 @@ function formatExtrasSummary(booking: Booking): string | null {
 
     const label = booking.selectedExtras
         .map((extra) =>
-            extra.quantity > 1 ? `${extra.name} x${extra.quantity}` : extra.name,
+            extra.quantity > 1
+                ? `${extra.name} x${extra.quantity}`
+                : extra.name,
         )
-        .join(', ');
+        .join(", ");
 
     return `${label} · ${formatPrice(booking.extrasTotal ?? 0, booking.currency)}`;
 }
@@ -235,10 +241,10 @@ const BookingCard: React.FC<BookingCardProps> = ({
     reviewedIds,
     existingReviewedServiceIds,
 }) => {
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const service = servicesById[booking.serviceId];
-    const bookingBadge = getBookingStatusBadge(booking);
-    const paymentBadge = getPaymentStatusBadge(booking.paymentStatus);
+    const bookingBadge = getBookingStatusBadge(booking, t);
+    const paymentBadge = getPaymentStatusBadge(booking.paymentStatus, t);
 
     const now = new Date();
     const isPastConfirmed =
@@ -250,13 +256,18 @@ const BookingCard: React.FC<BookingCardProps> = ({
     const isReviewing = reviewingId === booking.id;
 
     const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState('');
+    const [comment, setComment] = useState("");
     const extrasSummary = formatExtrasSummary(booking);
+    const formattedStartDate = new Intl.DateTimeFormat(intlLocale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(booking.startDate);
 
     return (
         <article
             className="wdr-history__card"
-            aria-label={t('history.rating.aria').replace('{id}', booking.id)}
+            aria-label={t("history.rating.aria").replace("{id}", booking.id)}
         >
             {/* En-tete de la carte */}
             <div className="wdr-history__card-header">
@@ -289,27 +300,27 @@ const BookingCard: React.FC<BookingCardProps> = ({
             <div className="wdr-history__card-meta">
                 <span className="wdr-history__meta-item">
                     <CalendarIcon />
-                    {formatDate(booking.startDate)}
+                    {formattedStartDate}
                 </span>
                 <span className="wdr-history__meta-item">
                     <UsersIcon />
-                    {booking.participants}{' '}
+                    {booking.participants}{" "}
                     {booking.participants !== 1
-                        ? t('history.participants_other')
-                        : t('history.participants_one')}
+                        ? t("history.participants_other")
+                        : t("history.participants_one")}
                 </span>
             </div>
 
             {extrasSummary && (
                 <p className="wdr-history__extras">
-                    {t('history.extras')}: {extrasSummary}
+                    {t("history.extras")}: {extrasSummary}
                 </p>
             )}
 
             {/* Pied : reference + prix */}
             <div className="wdr-history__card-footer">
                 <span className="wdr-history__card-ref">
-                    {t('history.reference')} {booking.id}
+                    {t("history.reference")} {booking.id}
                 </span>
                 <div className="wdr-history__card-prices">
                     {booking.amountPaidOnline > 0 && (
@@ -317,8 +328,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
                             {formatPrice(
                                 booking.amountPaidOnline,
                                 booking.currency,
-                            )}{' '}
-                            {t('history.online')}
+                            )}{" "}
+                            {t("history.online")}
                         </span>
                     )}
                     {booking.totalPrice - booking.amountPaidOnline > 0 && (
@@ -326,12 +337,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
                             {formatPrice(
                                 booking.totalPrice - booking.amountPaidOnline,
                                 booking.currency,
-                            )}{' '}
-                            {t('history.onsite')}
+                            )}{" "}
+                            {t("history.onsite")}
                         </span>
                     )}
                     <span className="wdr-history__price-total">
-                        {t('history.total')}{' '}
+                        {t("history.total")}{" "}
                         {formatPrice(booking.totalPrice, booking.currency)}
                     </span>
                 </div>
@@ -342,12 +353,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 <div className="wdr-history__review-zone">
                     {alreadyReviewed ? (
                         <p className="wdr-history__review-done">
-                            Avis depose — merci !
+                            {t("history.review_done")}
                         </p>
                     ) : isReviewing ? (
                         <div className="wdr-history__review-form">
                             <p className="wdr-history__review-form-title">
-                                Votre avis sur ce service
+                                {t("history.review_title")}
                             </p>
                             <RatingStars
                                 value={rating}
@@ -358,7 +369,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
                             <textarea
                                 className="wdr-history__review-textarea"
                                 rows={3}
-                                placeholder="Partagez votre experience (optionnel)..."
+                                placeholder={t("history.review_placeholder")}
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                                 maxLength={500}
@@ -376,17 +387,17 @@ const BookingCard: React.FC<BookingCardProps> = ({
                                             comment,
                                         );
                                         setRating(0);
-                                        setComment('');
+                                        setComment("");
                                     }}
                                 >
-                                    Envoyer
+                                    {t("history.review_send")}
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => onReviewClick('')}
+                                    onClick={() => onReviewClick("")}
                                 >
-                                    Annuler
+                                    {t("history.review_cancel")}
                                 </Button>
                             </div>
                         </div>
@@ -396,7 +407,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
                             size="sm"
                             onClick={() => onReviewClick(booking.id)}
                         >
-                            &#9733; Laisser un avis
+                            &#9733; {t("history.review_cta")}
                         </Button>
                     )}
                 </div>
@@ -406,7 +417,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
             {booking.status === BookingStatusNames.CANCELLED &&
                 booking.cancellationReason && (
                     <div className="wdr-history__cancellation-note">
-                        <strong>Motif d'annulation :</strong>{' '}
+                        <strong>{t("history.cancellation_reason")}</strong>{" "}
                         {booking.cancellationReason}
                     </div>
                 )}
@@ -423,11 +434,11 @@ export const BookingsHistoryPage: React.FC = () => {
     const { navigate } = useRouter();
     const { success } = useToast();
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<FilterTab>('all');
+    const [activeTab, setActiveTab] = useState<FilterTab>("all");
     const [reviewingId, setReviewingId] = useState<string | null>(null);
     const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
 
-    const { bookings: userBookings } = useMyBookingsData(currentUser?.id ?? '');
+    const { bookings: userBookings } = useMyBookingsData(currentUser?.id ?? "");
     const { services } = useServicesData();
     const serviceIds = useMemo(
         () => [...new Set(userBookings.map((booking) => booking.serviceId))],
@@ -435,7 +446,7 @@ export const BookingsHistoryPage: React.FC = () => {
     );
     const reviewQueries = useQueries({
         queries: serviceIds.map((serviceId) => ({
-            queryKey: ['reviews', serviceId, 'history'],
+            queryKey: ["reviews", serviceId, "history"],
             queryFn: () => reviewsApi.list(serviceId),
             staleTime: 60_000,
             enabled: Boolean(serviceId),
@@ -487,12 +498,12 @@ export const BookingsHistoryPage: React.FC = () => {
 
         setReviewedIds((prev) => new Set([...prev, bookingId]));
         setReviewingId(null);
-        success(t('history.review_success'));
+        success(t("history.review_success"));
     };
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
         }
     }, [currentUser, navigate]);
 
@@ -501,23 +512,23 @@ export const BookingsHistoryPage: React.FC = () => {
     /* Filtrage selon l'onglet actif */
     const filteredBookings = useMemo<Booking[]>(() => {
         switch (activeTab) {
-            case 'upcoming':
+            case "upcoming":
                 return userBookings.filter(
                     (b) =>
                         b.status === BookingStatusNames.CONFIRMED &&
                         b.startDate.getTime() > now.getTime(),
                 );
-            case 'past':
+            case "past":
                 return userBookings.filter(
                     (b) =>
                         b.status === BookingStatusNames.CONFIRMED &&
                         b.startDate.getTime() <= now.getTime(),
                 );
-            case 'cancelled':
+            case "cancelled":
                 return userBookings.filter(
                     (b) => b.status === BookingStatusNames.CANCELLED,
                 );
-            case 'all':
+            case "all":
             default:
                 return userBookings;
         }
@@ -544,10 +555,10 @@ export const BookingsHistoryPage: React.FC = () => {
     }, [now, userBookings]);
 
     const emptyMessages: Record<FilterTab, string> = {
-        all: t('history.empty.all'),
-        upcoming: t('history.empty.upcoming'),
-        past: t('history.empty.past'),
-        cancelled: t('history.empty.cancelled'),
+        all: t("history.empty.all"),
+        upcoming: t("history.empty.upcoming"),
+        past: t("history.empty.past"),
+        cancelled: t("history.empty.cancelled"),
     };
 
     /* Guard : attend la redirection si non connecte */
@@ -562,25 +573,25 @@ export const BookingsHistoryPage: React.FC = () => {
                 <header className="wdr-history__header">
                     <div className="wdr-history__header-text">
                         <h1 className="wdr-history__title">
-                            {t('history.title')}
+                            {t("history.title")}
                         </h1>
                         <p className="wdr-history__subtitle">
-                            {t('history.subtitle')}
+                            {t("history.subtitle")}
                         </p>
                     </div>
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate({ name: 'dashboard' })}
+                        onClick={() => navigate({ name: "dashboard" })}
                     >
-                        {t('history.dashboard')}
+                        {t("history.dashboard")}
                     </Button>
                 </header>
 
                 {/* Onglets de filtre */}
                 <nav
                     className="wdr-history__tabs"
-                    aria-label={t('history.filters')}
+                    aria-label={t("history.filters")}
                     role="tablist"
                 >
                     {TABS.map((tab) => (
@@ -590,14 +601,14 @@ export const BookingsHistoryPage: React.FC = () => {
                             type="button"
                             aria-selected={activeTab === tab.key}
                             className={[
-                                'wdr-history__tab',
+                                "wdr-history__tab",
                                 activeTab === tab.key
-                                    ? 'wdr-history__tab--active'
-                                    : '',
-                            ].join(' ')}
+                                    ? "wdr-history__tab--active"
+                                    : "",
+                            ].join(" ")}
                             onClick={() => setActiveTab(tab.key)}
                         >
-                            {tab.label}
+                            {t(tab.labelKey)}
                             {counts[tab.key] > 0 && (
                                 <span className="wdr-history__tab-count">
                                     {counts[tab.key]}
@@ -636,21 +647,21 @@ export const BookingsHistoryPage: React.FC = () => {
                         <p className="wdr-history__empty-title">
                             {emptyMessages[activeTab]}
                         </p>
-                        {(activeTab === 'all' || activeTab === 'upcoming') && (
+                        {(activeTab === "all" || activeTab === "upcoming") && (
                             <Button
                                 variant="primary"
                                 size="md"
                                 onClick={() =>
                                     navigate({
-                                        name: 'search',
-                                        query: '',
-                                        category: '',
-                                        dateFrom: '',
-                                        dateTo: '',
+                                        name: "search",
+                                        query: "",
+                                        category: "",
+                                        dateFrom: "",
+                                        dateTo: "",
                                     })
                                 }
                             >
-                                Decouvrir les activites
+                                {t("history.discover")}
                             </Button>
                         )}
                     </div>

@@ -3,40 +3,60 @@
  * @description Gestion du profil voyageur.
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from '@/components/wdr';
-import { useToast } from '@/components/wdr/Toast/ToastProvider';
-import { useUser } from '@/context/UserContext';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import './ProfilePage.css';
+import React, { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/wdr";
+import { useToast } from "@/components/wdr/Toast/ToastProvider";
+import { useUser } from "@/context/UserContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import "./ProfilePage.css";
 
 const LANGUAGE_OPTIONS: { value: string; label: string }[] = [
-    { value: 'fr', label: 'Francais' },
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Espanol' },
-    { value: 'de', label: 'Deutsch' },
-    { value: 'it', label: 'Italiano' },
-    { value: 'pt', label: 'Portugues' },
+    { value: "fr", label: "Français" },
+    { value: "en", label: "English" },
+    { value: "es", label: "Espagnol" },
+    { value: "de", label: "Deutsch" },
+    { value: "it", label: "Italiano" },
+    { value: "pt", label: "Portugais" },
 ];
 
 const CURRENCY_OPTIONS: { value: string; label: string }[] = [
-    { value: 'EUR', label: 'Euro (EUR)' },
-    { value: 'USD', label: 'Dollar US (USD)' },
-    { value: 'GBP', label: 'Livre sterling (GBP)' },
-    { value: 'CHF', label: 'Franc suisse (CHF)' },
-    { value: 'CAD', label: 'Dollar canadien (CAD)' },
+    { value: "EUR", label: "Euro (EUR)" },
+    { value: "USD", label: "Dollar US (USD)" },
+    { value: "GBP", label: "Livre sterling (GBP)" },
+    { value: "CHF", label: "Franc suisse (CHF)" },
+    { value: "CAD", label: "Dollar canadien (CAD)" },
 ];
 
 const UserIcon: React.FC = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="7" r="4" />
     </svg>
 );
 
 const GlobeIcon: React.FC = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
         <circle cx="12" cy="12" r="10" />
         <line x1="2" y1="12" x2="22" y2="12" />
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -44,7 +64,17 @@ const GlobeIcon: React.FC = () => (
 );
 
 const ShieldIcon: React.FC = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
 );
@@ -72,7 +102,7 @@ interface ProfileFieldProps {
 const ProfileField: React.FC<ProfileFieldProps> = ({
     id,
     label,
-    type = 'text',
+    type = "text",
     value,
     onChange,
     readOnly = false,
@@ -86,7 +116,7 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
         <input
             id={id}
             type={type}
-            className={`wdr-profile__input${readOnly ? ' wdr-profile__input--readonly' : ''}`}
+            className={`wdr-profile__input${readOnly ? " wdr-profile__input--readonly" : ""}`}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             readOnly={readOnly}
@@ -138,21 +168,21 @@ export const ProfilePage: React.FC = () => {
     const toast = useToast();
     const { t, intlLocale } = useTranslation();
     const preferredCurrency =
-        currentUser?.role === 'CLIENT' ? currentUser.preferredCurrency : 'EUR';
+        currentUser?.role === "CLIENT" ? currentUser.preferredCurrency : "EUR";
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
         }
     }, [currentUser, navigate]);
 
     const [form, setForm] = useState<ProfileFormState>({
-        firstName: currentUser?.firstName ?? '',
-        lastName: currentUser?.lastName ?? '',
-        email: currentUser?.email ?? '',
-        phoneNumber: currentUser?.phoneNumber ?? '',
-        language: currentUser?.language ?? 'fr',
-        preferredCurrency: preferredCurrency ?? 'EUR',
+        firstName: currentUser?.firstName ?? "",
+        lastName: currentUser?.lastName ?? "",
+        email: currentUser?.email ?? "",
+        phoneNumber: currentUser?.phoneNumber ?? "",
+        language: currentUser?.language ?? "fr",
+        preferredCurrency: preferredCurrency ?? "EUR",
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -167,8 +197,8 @@ export const ProfilePage: React.FC = () => {
         setIsSaving(true);
         await new Promise<void>((resolve) => setTimeout(resolve, 800));
         setIsSaving(false);
-        toast.success(t('profile.save_success_desc'), {
-            title: t('profile.save_success_title'),
+        toast.success(t("profile.save_success_desc"), {
+            title: t("profile.save_success_title"),
         });
     }, [t, toast]);
 
@@ -179,12 +209,12 @@ export const ProfilePage: React.FC = () => {
     const avatarInitials =
         form.firstName.charAt(0).toUpperCase() +
         form.lastName.charAt(0).toUpperCase();
-    const memberSince = t('profile.member_since').replace(
-        '{date}',
+    const memberSince = t("profile.member_since").replace(
+        "{date}",
         new Intl.DateTimeFormat(intlLocale, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
+            day: "numeric",
+            month: "long",
+            year: "numeric",
         }).format(currentUser.createdAt),
     );
 
@@ -193,12 +223,12 @@ export const ProfilePage: React.FC = () => {
             <div className="wdr-profile__inner">
                 <nav
                     className="wdr-profile__breadcrumb"
-                    aria-label={t('profile.back_dashboard')}
+                    aria-label={t("profile.back_dashboard")}
                 >
                     <button
                         type="button"
                         className="wdr-profile__back-btn"
-                        onClick={() => navigate({ name: 'dashboard' })}
+                        onClick={() => navigate({ name: "dashboard" })}
                     >
                         <svg
                             width="16"
@@ -214,7 +244,7 @@ export const ProfilePage: React.FC = () => {
                             <line x1="19" y1="12" x2="5" y2="12" />
                             <polyline points="12 19 5 12 12 5" />
                         </svg>
-                        {t('profile.back_dashboard')}
+                        {t("profile.back_dashboard")}
                     </button>
                 </nav>
 
@@ -233,48 +263,48 @@ export const ProfilePage: React.FC = () => {
 
                 <section
                     className="wdr-profile__section"
-                    aria-label={t('profile.personal')}
+                    aria-label={t("profile.personal")}
                 >
                     <div className="wdr-profile__section-header">
                         <div className="wdr-profile__section-icon wdr-profile__section-icon--personal">
                             <UserIcon />
                         </div>
                         <h2 className="wdr-profile__section-title">
-                            {t('profile.personal')}
+                            {t("profile.personal")}
                         </h2>
                     </div>
 
                     <div className="wdr-profile__fields-grid">
                         <ProfileField
                             id="profile-firstname"
-                            label={t('profile.first_name')}
+                            label={t("profile.first_name")}
                             value={form.firstName}
-                            onChange={handleChange('firstName')}
+                            onChange={handleChange("firstName")}
                             autoComplete="given-name"
                         />
                         <ProfileField
                             id="profile-lastname"
-                            label={t('profile.last_name')}
+                            label={t("profile.last_name")}
                             value={form.lastName}
-                            onChange={handleChange('lastName')}
+                            onChange={handleChange("lastName")}
                             autoComplete="family-name"
                         />
                         <ProfileField
                             id="profile-email"
-                            label={t('profile.email')}
+                            label={t("profile.email")}
                             type="email"
                             value={form.email}
-                            onChange={handleChange('email')}
+                            onChange={handleChange("email")}
                             readOnly
                             autoComplete="email"
-                            readOnlyNote={t('profile.readonly_note')}
+                            readOnlyNote={t("profile.readonly_note")}
                         />
                         <ProfileField
                             id="profile-phone"
-                            label={t('profile.phone')}
+                            label={t("profile.phone")}
                             type="tel"
                             value={form.phoneNumber}
-                            onChange={handleChange('phoneNumber')}
+                            onChange={handleChange("phoneNumber")}
                             autoComplete="tel"
                         />
                     </div>
@@ -282,31 +312,31 @@ export const ProfilePage: React.FC = () => {
 
                 <section
                     className="wdr-profile__section"
-                    aria-label={t('profile.preferences')}
+                    aria-label={t("profile.preferences")}
                 >
                     <div className="wdr-profile__section-header">
                         <div className="wdr-profile__section-icon wdr-profile__section-icon--prefs">
                             <GlobeIcon />
                         </div>
                         <h2 className="wdr-profile__section-title">
-                            {t('profile.preferences')}
+                            {t("profile.preferences")}
                         </h2>
                     </div>
 
                     <div className="wdr-profile__fields-grid">
                         <ProfileSelect
                             id="profile-language"
-                            label={t('profile.language')}
+                            label={t("profile.language")}
                             value={form.language}
                             options={LANGUAGE_OPTIONS}
-                            onChange={handleChange('language')}
+                            onChange={handleChange("language")}
                         />
                         <ProfileSelect
                             id="profile-currency"
-                            label={t('profile.currency')}
+                            label={t("profile.currency")}
                             value={form.preferredCurrency}
                             options={CURRENCY_OPTIONS}
-                            onChange={handleChange('preferredCurrency')}
+                            onChange={handleChange("preferredCurrency")}
                         />
                     </div>
                 </section>
@@ -318,46 +348,46 @@ export const ProfilePage: React.FC = () => {
                         onClick={handleSave}
                         disabled={isSaving}
                     >
-                        {isSaving ? t('profile.saving') : t('profile.save')}
+                        {isSaving ? t("profile.saving") : t("profile.save")}
                     </Button>
                 </div>
 
                 <section
                     className="wdr-profile__section wdr-profile__section--info"
-                    aria-label={t('profile.security')}
+                    aria-label={t("profile.security")}
                 >
                     <div className="wdr-profile__section-header">
                         <div className="wdr-profile__section-icon wdr-profile__section-icon--security">
                             <ShieldIcon />
                         </div>
                         <h2 className="wdr-profile__section-title">
-                            {t('profile.security')}
+                            {t("profile.security")}
                         </h2>
                     </div>
 
                     <div className="wdr-profile__info-block">
                         <div className="wdr-profile__info-row">
                             <span className="wdr-profile__info-label">
-                                {t('profile.password')}
+                                {t("profile.password")}
                             </span>
                             <span className="wdr-profile__info-value">
-                                {t('profile.password_desc')}
+                                {t("profile.password_desc")}
                             </span>
                         </div>
                         <div className="wdr-profile__info-row">
                             <span className="wdr-profile__info-label">
-                                {t('profile.two_factor')}
+                                {t("profile.two_factor")}
                             </span>
                             <span className="wdr-profile__info-value wdr-profile__info-value--muted">
-                                {t('profile.two_factor_desc')}
+                                {t("profile.two_factor_desc")}
                             </span>
                         </div>
                         <div className="wdr-profile__info-row">
                             <span className="wdr-profile__info-label">
-                                {t('profile.sessions')}
+                                {t("profile.sessions")}
                             </span>
                             <span className="wdr-profile__info-value">
-                                {t('profile.sessions_desc')}
+                                {t("profile.sessions_desc")}
                             </span>
                         </div>
                     </div>
@@ -365,7 +395,7 @@ export const ProfilePage: React.FC = () => {
 
                 <div className="wdr-profile__danger-zone">
                     <Button variant="ghost" size="sm" onClick={logout}>
-                        {t('nav.logout')}
+                        {t("nav.logout")}
                     </Button>
                 </div>
             </div>

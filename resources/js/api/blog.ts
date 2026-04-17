@@ -4,8 +4,11 @@
  */
 
 import { normalizeBlogPost } from '@/lib/api-normalizers';
+import type { Locale } from '@/lib/locale';
 import type { BlogPost, BlogStatus } from '@/types/blog';
 import api from './client';
+
+export type LocalizedTextInput = string | Partial<Record<Locale, string>>;
 
 export interface BlogPostsParams {
     status?: BlogStatus;
@@ -22,10 +25,10 @@ export interface BlogPostsResponse {
 }
 
 export interface CreateBlogPostRequest {
-    title: string;
+    title: LocalizedTextInput;
     slug: string;
-    excerpt: string;
-    content: string;
+    excerpt: LocalizedTextInput;
+    content: LocalizedTextInput;
     coverImage: string;
     tags: string[];
     status: BlogStatus;

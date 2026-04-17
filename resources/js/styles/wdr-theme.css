@@ -43,8 +43,8 @@
     --z-sidebar: 300;
     --z-modal: 400;
     --z-toast: 500;
-    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-heading: 'Montserrat', system-ui, sans-serif;
+    --font-family: "Inter", system-ui, -apple-system, sans-serif;
+    --font-heading: "Montserrat", system-ui, sans-serif;
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -62,8 +62,11 @@
     font-family: var(--font-family);
     line-height: 1.5;
     min-height: 100svh;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    overflow-x: clip;
+    isolation: isolate;
 }
 
 :is(.dark) .wdr-theme {
@@ -117,6 +120,10 @@
     box-sizing: border-box;
 }
 
+.wdr-theme * {
+    min-width: 0;
+}
+
 .wdr-theme h1,
 .wdr-theme h2,
 .wdr-theme h3,
@@ -141,6 +148,7 @@
 
 .wdr-theme__content {
     flex: 1;
+    min-width: 0;
 }
 
 :is(.dark) .wdr-header,
@@ -188,12 +196,11 @@
 :is(.dark) .wdr-admin-structure select,
 :is(.dark) .wdr-editor__slug-input,
 :is(.dark) .wdr-editor__textarea {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(21, 50, 67, 0.98) 0%,
-            rgba(16, 42, 56, 0.98) 100%
-        ) !important;
+    background: linear-gradient(
+        180deg,
+        rgba(21, 50, 67, 0.98) 0%,
+        rgba(16, 42, 56, 0.98) 100%
+    ) !important;
     color: var(--text-main) !important;
     border-color: var(--border-light) !important;
 }
@@ -221,34 +228,31 @@
 :is(.dark) .wdr-home__category-card:hover,
 :is(.dark) .wdr-home__destination-card:hover,
 :is(.dark) .wdr-blog__tag-btn--active {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(51, 184, 213, 0.18) 0%,
-            rgba(99, 224, 212, 0.08) 100%
-        ) !important;
+    background: linear-gradient(
+        180deg,
+        rgba(51, 184, 213, 0.18) 0%,
+        rgba(99, 224, 212, 0.08) 100%
+    ) !important;
     border-color: var(--primary) !important;
 }
 
 :is(.dark) .wdr-home__intro {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(51, 184, 213, 0.08) 0%,
-            rgba(8, 24, 34, 0) 100%
-        );
+    background: linear-gradient(
+        180deg,
+        rgba(51, 184, 213, 0.08) 0%,
+        rgba(8, 24, 34, 0) 100%
+    );
 }
 
 :is(.dark) .wdr-home__featured,
 :is(.dark) .wdr-blog__hero,
 :is(.dark) .wdr-home__partner-cta {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(8, 24, 34, 0.96) 0%,
-            rgba(13, 50, 67, 0.96) 55%,
-            rgba(15, 139, 168, 0.72) 100%
-        );
+    background: linear-gradient(
+        135deg,
+        rgba(8, 24, 34, 0.96) 0%,
+        rgba(13, 50, 67, 0.96) 55%,
+        rgba(15, 139, 168, 0.72) 100%
+    );
 }
 
 :is(.dark) .wdr-blog__hero-inner,
@@ -319,6 +323,8 @@
 :is(.dark) .wdr-admin-reviews__select,
 :is(.dark) .wdr-admin-structure select {
     color-scheme: dark;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 :is(.dark) .wdr-select,
@@ -333,6 +339,36 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb6c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.875rem center;
+}
+
+:is(.dark) .wdr-select option,
+:is(.dark) .wdr-home__sfield-select option,
+:is(.dark) .wdr-search__destination-select option,
+:is(.dark) .wdr-admin-support__select option,
+:is(.dark) .wdr-admin-svc__filter-select option,
+:is(.dark) .wdr-admin-users__edit-form select option,
+:is(.dark) .wdr-editor select option,
+:is(.dark) .wdr-admin-tx__filter-select option,
+:is(.dark) .wdr-admin-reviews__select option,
+:is(.dark) .wdr-admin-structure select option,
+:is(.dark) .wdr-partner-catalog select option {
+    background: #102a38;
+    color: var(--text-main);
+}
+
+:is(.dark) .wdr-select optgroup,
+:is(.dark) .wdr-home__sfield-select optgroup,
+:is(.dark) .wdr-search__destination-select optgroup,
+:is(.dark) .wdr-admin-support__select optgroup,
+:is(.dark) .wdr-admin-svc__filter-select optgroup,
+:is(.dark) .wdr-admin-users__edit-form select optgroup,
+:is(.dark) .wdr-editor select optgroup,
+:is(.dark) .wdr-admin-tx__filter-select optgroup,
+:is(.dark) .wdr-admin-reviews__select optgroup,
+:is(.dark) .wdr-admin-structure select optgroup,
+:is(.dark) .wdr-partner-catalog select optgroup {
+    background: #102a38;
+    color: var(--text-muted);
 }
 
 :is(.dark) .wdr-select {
@@ -356,7 +392,7 @@
     border-color: var(--border-light);
 }
 
-:is(.dark) .wdr-footer__social-link[data-social='tiktok'] {
+:is(.dark) .wdr-footer__social-link[data-social="tiktok"] {
     color: var(--text-light);
 }
 
@@ -421,6 +457,8 @@
 }
 
 :is(.dark) .wdr-admin-reviews,
+:is(.dark) .wdr-admin-svc,
+:is(.dark) .wdr-admin-users,
 :is(.dark) .wdr-admin-dash,
 :is(.dark) .wdr-admin-structure,
 :is(.dark) .wdr-admin-tx,
@@ -434,15 +472,33 @@
 }
 
 :is(.dark) .wdr-admin-section-nav,
+:is(.dark) .wdr-admin-svc__fareharbor,
+:is(.dark) .wdr-admin-svc__table-wrapper,
+:is(.dark) .wdr-admin-svc__fareharbor-card,
+:is(.dark) .wdr-admin-users__partner-card,
+:is(.dark) .wdr-admin-users__table-wrapper,
+:is(.dark) .wdr-admin-users__form-section,
+:is(.dark) .wdr-admin-users__contract-card,
+:is(.dark) .wdr-admin-users__empty-state,
 :is(.dark) .wdr-admin-reviews__card,
+:is(.dark) .wdr-admin-reviews__hero,
 :is(.dark) .wdr-admin-reviews__toolbar,
 :is(.dark) .wdr-admin-reviews__empty,
 :is(.dark) .wdr-admin-dash__metric-card,
+:is(.dark) .wdr-admin-dash__recent,
+:is(.dark) .wdr-admin-dash__table-wrapper,
+:is(.dark) .wdr-admin-dash__shortcut,
 :is(.dark) .wdr-admin-dash__table-card,
 :is(.dark) .wdr-admin-dash__quick-link,
 :is(.dark) .wdr-admin-dash__note,
+:is(.dark) .wdr-admin-structure__hero,
 :is(.dark) .wdr-admin-structure__panel,
+:is(.dark) .wdr-admin-structure__category-card,
+:is(.dark) .wdr-admin-structure__item,
 :is(.dark) .wdr-admin-structure__empty,
+:is(.dark) .wdr-admin-tx__formula-banner,
+:is(.dark) .wdr-admin-tx__table-wrapper,
+:is(.dark) .wdr-admin-tx__total-card,
 :is(.dark) .wdr-admin-tx__card,
 :is(.dark) .wdr-admin-tx__table-card,
 :is(.dark) .wdr-pprofile__stats-bar,
@@ -464,6 +520,110 @@
     color: var(--text-main) !important;
     border-color: var(--border-light) !important;
     box-shadow: var(--shadow-sm);
+}
+
+:is(.dark) .wdr-admin-svc__filter-tabs,
+:is(.dark) .wdr-admin-svc__filter-tab,
+:is(.dark) .wdr-admin-users__partner-metrics,
+:is(.dark) .wdr-admin-users__stripe-id,
+:is(.dark) .wdr-admin-tx__rate-badge,
+:is(.dark) .wdr-admin-tx__stripe-id,
+:is(.dark) .wdr-admin-tx__stripe-intent,
+:is(.dark) .wdr-admin-structure__category-card--active {
+    border-color: var(--border-light) !important;
+}
+
+:is(.dark) .wdr-admin-svc__filter-tab,
+:is(.dark) .wdr-admin-users__partner-metrics,
+:is(.dark) .wdr-admin-users__stripe-id,
+:is(.dark) .wdr-admin-tx__formula-banner,
+:is(.dark) .wdr-admin-tx__rate-badge,
+:is(.dark) .wdr-admin-tx__stripe-id,
+:is(.dark) .wdr-admin-tx__stripe-intent,
+:is(.dark) .wdr-admin-structure__category-card,
+:is(.dark) .wdr-admin-structure__item {
+    background: var(--bg-soft) !important;
+    color: var(--text-main) !important;
+}
+
+:is(.dark) .wdr-admin-svc__table th,
+:is(.dark) .wdr-admin-svc__table td,
+:is(.dark) .wdr-admin-users__table th,
+:is(.dark) .wdr-admin-users__table td,
+:is(.dark) .wdr-admin-dash__table th,
+:is(.dark) .wdr-admin-dash__table td,
+:is(.dark) .wdr-admin-tx__table th,
+:is(.dark) .wdr-admin-tx__table td {
+    border-bottom-color: var(--border-light) !important;
+}
+
+:is(.dark) .wdr-admin-svc__table th,
+:is(.dark) .wdr-admin-users__table th,
+:is(.dark) .wdr-admin-dash__table th,
+:is(.dark) .wdr-admin-tx__table th,
+:is(.dark) .wdr-admin-svc__filter-count,
+:is(.dark) .wdr-admin-users__partner-name,
+:is(.dark) .wdr-admin-users__partner-email,
+:is(.dark) .wdr-admin-users__partner-address,
+:is(.dark) .wdr-admin-users__stripe-label,
+:is(.dark) .wdr-admin-users__form-section-copy,
+:is(.dark) .wdr-admin-users__edit-intro,
+:is(.dark) .wdr-admin-reviews__hero p,
+:is(.dark) .wdr-admin-reviews__card-head span,
+:is(.dark) .wdr-admin-reviews__card-head small,
+:is(.dark) .wdr-admin-reviews__meta,
+:is(.dark) .wdr-admin-reviews__empty,
+:is(.dark) .wdr-admin-dash__metric-label,
+:is(.dark) .wdr-admin-dash__metric-sub,
+:is(.dark) .wdr-admin-dash__hero-subtitle,
+:is(.dark) .wdr-admin-dash__shortcut small,
+:is(.dark) .wdr-admin-tx__filter-count,
+:is(.dark) .wdr-admin-tx__table-empty,
+:is(.dark) .wdr-admin-tx__table-date,
+:is(.dark) .wdr-admin-tx__table-extras,
+:is(.dark) .wdr-admin-tx__table-mode,
+:is(.dark) .wdr-admin-structure__hero p,
+:is(.dark) .wdr-admin-structure__panel-subtitle,
+:is(.dark) .wdr-admin-structure__description,
+:is(.dark) .wdr-admin-structure__empty,
+:is(.dark) .wdr-admin-structure__item span {
+    color: var(--text-muted) !important;
+}
+
+:is(.dark) .wdr-admin-svc__table td,
+:is(.dark) .wdr-admin-svc__service-title,
+:is(.dark) .wdr-admin-svc__fareharbor-card-title,
+:is(.dark) .wdr-admin-svc__fareharbor-card-slug,
+:is(.dark) .wdr-admin-users__section-title,
+:is(.dark) .wdr-admin-users__partner-company,
+:is(.dark) .wdr-admin-users__partner-metric-value,
+:is(.dark) .wdr-admin-users__form-section-title,
+:is(.dark) .wdr-admin-reviews__comment,
+:is(.dark) .wdr-admin-dash__section-title,
+:is(.dark) .wdr-admin-dash__metric-value,
+:is(.dark) .wdr-admin-dash__hero-name,
+:is(.dark) .wdr-admin-dash__shortcut span,
+:is(.dark) .wdr-admin-tx__section-title,
+:is(.dark) .wdr-admin-tx__total-value,
+:is(.dark) .wdr-admin-tx__partner-name,
+:is(.dark) .wdr-admin-structure__hero h1,
+:is(.dark) .wdr-admin-structure__panel-header h2,
+:is(.dark) .wdr-admin-structure__label,
+:is(.dark) .wdr-admin-structure__check,
+:is(.dark) .wdr-admin-structure__category-card strong,
+:is(.dark) .wdr-admin-structure__item strong {
+    color: var(--text-main) !important;
+}
+
+:is(.dark) .wdr-admin-svc__table tbody tr:hover td,
+:is(.dark) .wdr-admin-users__table tbody tr:hover td,
+:is(.dark) .wdr-admin-dash__table tbody tr:hover td,
+:is(.dark) .wdr-admin-tx__table tbody tr:hover td {
+    background-color: color-mix(
+        in srgb,
+        var(--bg-soft) 82%,
+        var(--primary) 18%
+    ) !important;
 }
 
 :is(.dark) .wdr-admin-reviews__search,

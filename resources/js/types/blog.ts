@@ -1,3 +1,5 @@
+import type { LocalizedTextMap } from './service';
+
 /**
  * @file blog.ts
  * @description Type pour les articles de blog Wandireo.
@@ -15,10 +17,13 @@ export interface BlogPost {
     /** Identifiant URL-friendly unique (ex: "5-jours-en-corse-guide-complet"). */
     slug: string;
     title: string;
+    titleTranslations?: LocalizedTextMap;
     /** Résumé court affiché dans les listes et les aperçus. */
     excerpt: string;
+    excerptTranslations?: LocalizedTextMap;
     /** Contenu complet de l'article en HTML. Doit être assaini avant rendu. */
     content: string;
+    contentTranslations?: LocalizedTextMap;
     /** URL absolue ou chemin relatif vers l'image principale de l'article. */
     coverImage: string;
     /** Référence à l'AdminUser.id ou PartnerUser.id auteur de l'article. */

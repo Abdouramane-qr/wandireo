@@ -123,4 +123,43 @@ class ServiceCalendarSyncTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors('service');
     }
+
+    public function test_ical_sync_configuration_keeps_a_distinct_row_from_fareharbor_sync_state(): void
+    {
+        $partner = User::factory()->create(['role' => 'PARTNER']);
+        $service = Service::factory()
+            ->state(['partner_id' => $partner->id])
+            ->category('HEBERGEMENT', 'PAR_NUIT')
+            ->create();
+
+        ServiceCalendarSync::query()->create([
+            'service_id' => $service->id,
+            'provider' => 'FAREHARBOR',
+            'last_status' => 'SUCCESS',
+            'last_synced_at' => now(),
+            'imported_events_count' => 0,
+        ]);
+
+        Sanctum::actingAs($partner);
+
+        $this->putJson("/api/services/{$service->id}/calendar-sync", [
+            'importUrl' => 'https://example.test/accommodation.ics',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('service_calendar_syncs', [
+            'service_id' => $service->id,
+            'provider' => 'FAREHARBOR',
+            'last_status' => 'SUCCESS',
+        ]);
+        $this->assertDatabaseHas('service_calendar_syncs', [
+            'service_id' => $service->id,
+            'provider' => 'ICAL',
+            'import_url' => 'https://example.test/accommodation.ics',
+            'last_status' => 'IDLE',
+        ]);
+        $this->assertSame(
+            2,
+            ServiceCalendarSync::query()->where('service_id', $service->id)->count(),
+        );
+    }
 }

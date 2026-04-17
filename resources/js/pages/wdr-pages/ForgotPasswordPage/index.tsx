@@ -4,25 +4,27 @@
  * confirmation simulé après saisie de l'email.
  */
 
-import React, { useState } from 'react';
-import { authApi } from '@/api/auth';
-import { Button, Input } from '@/components/wdr';
-import { useRouter } from '@/hooks/useWdrRouter';
-import './ForgotPasswordPage.css';
+import React, { useState } from "react";
+import { authApi } from "@/api/auth";
+import { Button, Input } from "@/components/wdr";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import "./ForgotPasswordPage.css";
 
 export const ForgotPasswordPage: React.FC = () => {
     const { navigate } = useRouter();
-    const [email, setEmail] = useState('');
-    const [error, setError] = useState('');
+    const { t } = useTranslation();
+    const [email, setEmail] = useState("");
+    const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [sent, setSent] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+        setError("");
 
         if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError('Veuillez saisir une adresse email valide.');
+            setError(t("forgot.error.invalid_email"));
 
             return;
         }
@@ -47,11 +49,10 @@ export const ForgotPasswordPage: React.FC = () => {
                     <>
                         <div className="wdr-forgot__header">
                             <h1 className="wdr-forgot__title">
-                                Mot de passe oublié
+                                {t("forgot.title")}
                             </h1>
                             <p className="wdr-forgot__subtitle">
-                                Saisissez votre adresse email et nous vous
-                                enverrons un lien de réinitialisation.
+                                {t("forgot.subtitle")}
                             </p>
                         </div>
 
@@ -61,13 +62,13 @@ export const ForgotPasswordPage: React.FC = () => {
                             noValidate
                         >
                             <Input
-                                label="Adresse email"
+                                label={t("forgot.email_label")}
                                 type="email"
-                                placeholder="vous@exemple.com"
+                                placeholder={t("forgot.email_placeholder")}
                                 value={email}
                                 onChange={(e) => {
                                     setEmail(e.target.value);
-                                    setError('');
+                                    setError("");
                                 }}
                                 error={error || undefined}
                                 required
@@ -79,7 +80,7 @@ export const ForgotPasswordPage: React.FC = () => {
                                 fullWidth
                                 loading={isLoading}
                             >
-                                Envoyer le lien
+                                {t("forgot.submit")}
                             </Button>
                         </form>
                     </>
@@ -104,12 +105,19 @@ export const ForgotPasswordPage: React.FC = () => {
                             </svg>
                         </div>
                         <h2 className="wdr-forgot__success-title">
-                            Email envoyé !
+                            {t("forgot.success_title")}
                         </h2>
                         <p className="wdr-forgot__success-text">
-                            Si un compte est associé à <strong>{email}</strong>,
-                            vous recevrez un email avec les instructions pour
-                            réinitialiser votre mot de passe.
+                            {t("forgot.success_text")
+                                .split("{email}")
+                                .map((part, index, parts) => (
+                                    <React.Fragment key={`${part}-${index}`}>
+                                        {part}
+                                        {index < parts.length - 1 && (
+                                            <strong>{email}</strong>
+                                        )}
+                                    </React.Fragment>
+                                ))}
                         </p>
                     </div>
                 )}
@@ -118,9 +126,9 @@ export const ForgotPasswordPage: React.FC = () => {
                     <button
                         type="button"
                         className="wdr-forgot__back"
-                        onClick={() => navigate({ name: 'login' })}
+                        onClick={() => navigate({ name: "login" })}
                     >
-                        ← Retour à la connexion
+                        {t("forgot.back_login")}
                     </button>
                 </div>
             </div>

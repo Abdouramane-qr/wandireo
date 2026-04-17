@@ -3,17 +3,17 @@
  * @description Profil du partenaire connecte.
  */
 
-import React, { useMemo } from 'react';
-import { Breadcrumb, Button, ServiceCard } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { usePartnerApprovalGuard } from '@/hooks/usePartnerApprovalGuard';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { toServiceCardData } from '@/lib/serviceAdapter';
-import type { PartnerUser } from '@/types/wdr-user';
-import './PartnerProfilePage.css';
+import React, { useMemo } from "react";
+import { Breadcrumb, Button, ServiceCard } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { toServiceCardData } from "@/lib/serviceAdapter";
+import type { PartnerUser } from "@/types/wdr-user";
+import "./PartnerProfilePage.css";
 
 export const PartnerProfilePage: React.FC = () => {
     const { navigate } = useRouter();
@@ -21,7 +21,7 @@ export const PartnerProfilePage: React.FC = () => {
     const { isBlocked } = usePartnerApprovalGuard();
     const { t } = useTranslation();
 
-    if (isBlocked || !currentUser || currentUser.role !== 'PARTNER') {
+    if (isBlocked || !currentUser || currentUser.role !== "PARTNER") {
         return null;
     }
 
@@ -59,15 +59,15 @@ export const PartnerProfilePage: React.FC = () => {
                 <Breadcrumb
                     items={[
                         {
-                            label: t('nav.home'),
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("nav.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
                         {
-                            label: t('partner.dashboard.title'),
+                            label: t("partner.dashboard.title"),
                             onClick: () =>
-                                navigate({ name: 'partner-dashboard' }),
+                                navigate({ name: "partner-dashboard" }),
                         },
-                        { label: t('partner.profile.title') },
+                        { label: t("partner.profile.title") },
                     ]}
                 />
             </div>
@@ -114,8 +114,8 @@ export const PartnerProfilePage: React.FC = () => {
                             </p>
                         )}
                         <p className="wdr-pprofile__since">
-                            {t('partner.profile.since').replace(
-                                '{year}',
+                            {t("partner.profile.since").replace(
+                                "{year}",
                                 String(joinYear),
                             )}
                         </p>
@@ -125,10 +125,10 @@ export const PartnerProfilePage: React.FC = () => {
                         <Button
                             variant="primary"
                             onClick={() =>
-                                navigate({ name: 'partner-service-form' })
+                                navigate({ name: "partner-service-form" })
                             }
                         >
-                            + {t('partner.profile.add_service')}
+                            + {t("partner.profile.add_service")}
                         </Button>
                     </div>
                 </div>
@@ -141,7 +141,7 @@ export const PartnerProfilePage: React.FC = () => {
                             {activeCount}
                         </span>
                         <span className="wdr-pprofile__stat-label">
-                            {activeCount === 1 ? 'service' : 'services'}
+                            {activeCount === 1 ? "service" : "services"}
                         </span>
                     </div>
                     <div
@@ -150,10 +150,10 @@ export const PartnerProfilePage: React.FC = () => {
                     />
                     <div className="wdr-pprofile__stat">
                         <span className="wdr-pprofile__stat-value">
-                            {avgRating !== null ? avgRating.toFixed(1) : '-'}
+                            {avgRating !== null ? avgRating.toFixed(1) : "-"}
                         </span>
                         <span className="wdr-pprofile__stat-label">
-                            {t('partner.profile.rating')}
+                            {t("partner.profile.rating")}
                         </span>
                     </div>
                     <div
@@ -162,10 +162,10 @@ export const PartnerProfilePage: React.FC = () => {
                     />
                     <div className="wdr-pprofile__stat">
                         <span className="wdr-pprofile__stat-value">
-                            {formatPrice(partner.totalSales, 'EUR')}
+                            {formatPrice(partner.totalSales, "EUR")}
                         </span>
                         <span className="wdr-pprofile__stat-label">
-                            {t('partner.profile.sales')}
+                            {t("partner.profile.sales")}
                         </span>
                     </div>
                     <div
@@ -177,7 +177,7 @@ export const PartnerProfilePage: React.FC = () => {
                             {(partner.commissionRate * 100).toFixed(0)} %
                         </span>
                         <span className="wdr-pprofile__stat-label">
-                            {t('partner.profile.commission')}
+                            {t("partner.profile.commission")}
                         </span>
                     </div>
                 </div>
@@ -187,29 +187,29 @@ export const PartnerProfilePage: React.FC = () => {
                 <div className="wdr-pprofile__catalog-inner">
                     <div className="wdr-pprofile__catalog-header">
                         <h2 className="wdr-pprofile__catalog-title">
-                            {t('partner.profile.catalog_title')}
+                            {t("partner.profile.catalog_title")}
                         </h2>
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() =>
-                                navigate({ name: 'partner-catalog' })
+                                navigate({ name: "partner-catalog" })
                             }
                         >
-                            {t('partner.profile.catalog_manage')}
+                            {t("partner.profile.catalog_manage")}
                         </Button>
                     </div>
 
                     {partnerServices.length === 0 ? (
                         <div className="wdr-pprofile__empty">
-                            <p>{t('partner.profile.empty')}</p>
+                            <p>{t("partner.profile.empty")}</p>
                             <Button
                                 variant="primary"
                                 onClick={() =>
-                                    navigate({ name: 'partner-service-form' })
+                                    navigate({ name: "partner-service-form" })
                                 }
                             >
-                                {t('partner.profile.first_service')}
+                                {t("partner.profile.first_service")}
                             </Button>
                         </div>
                     ) : (
@@ -220,7 +220,7 @@ export const PartnerProfilePage: React.FC = () => {
                                     service={s}
                                     variant="default"
                                     onBookClick={(id) =>
-                                        navigate({ name: 'service', id })
+                                        navigate({ name: "service", id })
                                     }
                                 />
                             ))}

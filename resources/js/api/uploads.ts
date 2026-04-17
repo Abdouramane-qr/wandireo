@@ -14,6 +14,8 @@ export interface PresignRequest {
 export interface PresignResponse {
     uploadUrl: string;
     publicUrl: string;
+    key: string;
+    expiresAt: string;
 }
 
 function readCookie(name: string): string | null {

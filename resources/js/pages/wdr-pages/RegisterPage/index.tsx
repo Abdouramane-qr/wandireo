@@ -1,10 +1,10 @@
-import { router } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
-import { Button, Input } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { useTranslation } from '@/hooks/useTranslation';
-import './RegisterPage.css';
+import { router } from "@inertiajs/react";
+import React, { useEffect, useState } from "react";
+import { Button, Input } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { useTranslation } from "@/hooks/useTranslation";
+import "./RegisterPage.css";
 
 interface FormState {
     firstName: string;
@@ -33,42 +33,42 @@ export const RegisterPage: React.FC = () => {
         const errors: FormErrors = {};
 
         if (!form.firstName.trim()) {
-            errors.firstName = t('auth.register.error.first_name');
+            errors.firstName = t("auth.register.error.first_name");
         }
 
         if (!form.lastName.trim()) {
-            errors.lastName = t('auth.register.error.last_name');
+            errors.lastName = t("auth.register.error.last_name");
         }
 
         if (!form.email.trim()) {
-            errors.email = t('auth.register.error.email_required');
+            errors.email = t("auth.register.error.email_required");
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-            errors.email = t('auth.register.error.email_invalid');
+            errors.email = t("auth.register.error.email_invalid");
         }
 
         if (!form.password) {
-            errors.password = t('auth.register.error.password_required');
+            errors.password = t("auth.register.error.password_required");
         } else if (form.password.length < 6) {
-            errors.password = t('auth.register.error.password_length');
+            errors.password = t("auth.register.error.password_length");
         }
 
         if (form.password !== form.confirmPassword) {
-            errors.confirmPassword = t('auth.register.error.password_match');
+            errors.confirmPassword = t("auth.register.error.password_match");
         }
 
         if (!form.acceptTerms) {
-            errors.acceptTerms = t('auth.register.error.accept_terms');
+            errors.acceptTerms = t("auth.register.error.accept_terms");
         }
 
         return errors;
     };
 
     const [form, setForm] = useState<FormState>({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
         acceptTerms: false,
     });
     const [errors, setErrors] = useState<FormErrors>({});
@@ -79,17 +79,17 @@ export const RegisterPage: React.FC = () => {
             return;
         }
 
-        if (currentUser.role === 'PARTNER') {
-            navigate({ name: 'partner-dashboard' });
+        if (currentUser.role === "PARTNER") {
+            navigate({ name: "partner-dashboard" });
             return;
         }
 
-        if (currentUser.role === 'ADMIN') {
-            navigate({ name: 'admin-dashboard' });
+        if (currentUser.role === "ADMIN") {
+            navigate({ name: "admin-dashboard" });
             return;
         }
 
-        navigate({ name: 'home' });
+        navigate({ name: "home" });
     }, [currentUser, navigate]);
 
     if (currentUser) {
@@ -100,7 +100,7 @@ export const RegisterPage: React.FC = () => {
         (field: keyof FormState) =>
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const value =
-                event.target.type === 'checkbox'
+                event.target.type === "checkbox"
                     ? event.target.checked
                     : event.target.value;
             setForm((prev) => ({ ...prev, [field]: value }));
@@ -121,7 +121,7 @@ export const RegisterPage: React.FC = () => {
 
         setIsLoading(true);
         router.post(
-            '/register',
+            "/register",
             {
                 name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
                 firstName: form.firstName.trim(),
@@ -135,24 +135,24 @@ export const RegisterPage: React.FC = () => {
                 onError: (serverErrors) => {
                     setErrors({
                         firstName:
-                            typeof serverErrors.firstName === 'string'
+                            typeof serverErrors.firstName === "string"
                                 ? serverErrors.firstName
                                 : undefined,
                         lastName:
-                            typeof serverErrors.lastName === 'string'
+                            typeof serverErrors.lastName === "string"
                                 ? serverErrors.lastName
                                 : undefined,
                         email:
-                            typeof serverErrors.email === 'string'
+                            typeof serverErrors.email === "string"
                                 ? serverErrors.email
                                 : undefined,
                         password:
-                            typeof serverErrors.password === 'string'
+                            typeof serverErrors.password === "string"
                                 ? serverErrors.password
                                 : undefined,
                         confirmPassword:
                             typeof serverErrors.password_confirmation ===
-                            'string'
+                            "string"
                                 ? serverErrors.password_confirmation
                                 : undefined,
                     });
@@ -167,10 +167,10 @@ export const RegisterPage: React.FC = () => {
             <div className="wdr-register__card">
                 <div className="wdr-register__header">
                     <h1 className="wdr-register__title">
-                        {t('auth.register.title')}
+                        {t("auth.register.title")}
                     </h1>
                     <p className="wdr-register__subtitle">
-                        {t('auth.register.subtitle')}
+                        {t("auth.register.subtitle")}
                     </p>
                 </div>
 
@@ -181,21 +181,25 @@ export const RegisterPage: React.FC = () => {
                 >
                     <div className="wdr-register__row">
                         <Input
-                            label={t('auth.register.first_name')}
+                            label={t("auth.register.first_name")}
                             type="text"
-                            placeholder="Alice"
+                            placeholder={t(
+                                "auth.register.first_name_placeholder",
+                            )}
                             value={form.firstName}
-                            onChange={setField('firstName')}
+                            onChange={setField("firstName")}
                             error={errors.firstName}
                             required
                             autoComplete="given-name"
                         />
                         <Input
-                            label={t('auth.register.last_name')}
+                            label={t("auth.register.last_name")}
                             type="text"
-                            placeholder="Voyageuse"
+                            placeholder={t(
+                                "auth.register.last_name_placeholder",
+                            )}
                             value={form.lastName}
-                            onChange={setField('lastName')}
+                            onChange={setField("lastName")}
                             error={errors.lastName}
                             required
                             autoComplete="family-name"
@@ -203,33 +207,33 @@ export const RegisterPage: React.FC = () => {
                     </div>
 
                     <Input
-                        label={t('auth.login.email')}
+                        label={t("auth.login.email")}
                         type="email"
-                        placeholder={t('auth.login.email_placeholder')}
+                        placeholder={t("auth.login.email_placeholder")}
                         value={form.email}
-                        onChange={setField('email')}
+                        onChange={setField("email")}
                         error={errors.email}
                         required
                         autoComplete="email"
                     />
 
                     <Input
-                        label={t('auth.register.password')}
+                        label={t("auth.register.password")}
                         type="password"
-                        placeholder={t('auth.register.password_hint')}
+                        placeholder={t("auth.register.password_hint")}
                         value={form.password}
-                        onChange={setField('password')}
+                        onChange={setField("password")}
                         error={errors.password}
                         required
                         autoComplete="new-password"
                     />
 
                     <Input
-                        label={t('auth.register.confirm_password')}
+                        label={t("auth.register.confirm_password")}
                         type="password"
-                        placeholder={t('auth.register.confirm_placeholder')}
+                        placeholder={t("auth.register.confirm_placeholder")}
                         value={form.confirmPassword}
-                        onChange={setField('confirmPassword')}
+                        onChange={setField("confirmPassword")}
                         error={errors.confirmPassword}
                         required
                         autoComplete="new-password"
@@ -239,24 +243,24 @@ export const RegisterPage: React.FC = () => {
                         <input
                             type="checkbox"
                             checked={form.acceptTerms}
-                            onChange={setField('acceptTerms')}
+                            onChange={setField("acceptTerms")}
                         />
                         <span>
-                            {t('auth.register.accept_terms_prefix')}{' '}
+                            {t("auth.register.accept_terms_prefix")}{" "}
                             <button
                                 type="button"
                                 className="wdr-register__link"
-                                onClick={() => navigate({ name: 'terms' })}
+                                onClick={() => navigate({ name: "terms" })}
                             >
-                                {t('auth.register.terms')}
-                            </button>{' '}
-                            {t('auth.register.accept_terms_join')}{' '}
+                                {t("auth.register.terms")}
+                            </button>{" "}
+                            {t("auth.register.accept_terms_join")}{" "}
                             <button
                                 type="button"
                                 className="wdr-register__link"
-                                onClick={() => navigate({ name: 'privacy' })}
+                                onClick={() => navigate({ name: "privacy" })}
                             >
-                                {t('auth.register.privacy')}
+                                {t("auth.register.privacy")}
                             </button>
                         </span>
                     </label>
@@ -272,19 +276,19 @@ export const RegisterPage: React.FC = () => {
                         fullWidth
                         loading={isLoading}
                     >
-                        {t('auth.register.submit')}
+                        {t("auth.register.submit")}
                     </Button>
                 </form>
 
                 <div className="wdr-register__footer">
                     <p>
-                        {t('auth.register.have_account')}{' '}
+                        {t("auth.register.have_account")}{" "}
                         <button
                             type="button"
                             className="wdr-register__link"
-                            onClick={() => navigate({ name: 'login' })}
+                            onClick={() => navigate({ name: "login" })}
                         >
-                            {t('auth.register.login')}
+                            {t("auth.register.login")}
                         </button>
                     </p>
                 </div>

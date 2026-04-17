@@ -1,16 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AdminSectionNav, Button, Input, Modal, useToast } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useAdminBookingsData } from '@/hooks/useBookingsData';
+import React, { useEffect, useMemo, useState } from "react";
+import {
+    AdminSectionNav,
+    Button,
+    Input,
+    Modal,
+    useToast,
+} from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useAdminBookingsData } from "@/hooks/useBookingsData";
 import {
     useAdminCreateUserData,
     useAdminUploadPartnerContractData,
     useAdminUpdateUserData,
     useAdminUsersData,
-} from '@/hooks/useUsersData';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { BookingStatusNames } from '@/types/booking';
+} from "@/hooks/useUsersData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames } from "@/types/booking";
 import type {
     AdminUser,
     ClientUser,
@@ -18,8 +25,8 @@ import type {
     MandateContractStatus,
     PartnerStatus,
     PartnerUser,
-} from '@/types/wdr-user';
-import './AdminUsersPage.css';
+} from "@/types/wdr-user";
+import "./AdminUsersPage.css";
 
 type PartnerEditForm = {
     commissionRate: string;
@@ -57,70 +64,79 @@ type PartnerCreateForm = {
 };
 
 const DEFAULT_CREATE_FORM: PartnerCreateForm = {
-    role: 'PARTNER',
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    companyName: '',
-    phoneNumber: '',
-    businessAddress: '',
-    language: 'fr',
-    preferredCurrency: 'EUR',
-    commissionRate: '20',
-    partnerStatus: 'PENDING',
-    mandateContractStatus: 'NOT_SENT',
+    role: "PARTNER",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    companyName: "",
+    phoneNumber: "",
+    businessAddress: "",
+    language: "fr",
+    preferredCurrency: "EUR",
+    commissionRate: "20",
+    partnerStatus: "PENDING",
+    mandateContractStatus: "NOT_SENT",
 };
 
-const statusLabel = (status: PartnerStatus): string =>
+const statusLabel = (
+    status: PartnerStatus,
+    t: (key: string) => string,
+): string =>
     ({
-        APPROVED: 'Valide',
-        REJECTED: 'Refuse',
-        SUSPENDED: 'Suspendu',
-        PENDING: 'En attente',
+        APPROVED: t("admin.users.partner_status.approved"),
+        REJECTED: t("admin.users.partner_status.rejected"),
+        SUSPENDED: t("admin.users.partner_status.suspended"),
+        PENDING: t("admin.users.partner_status.pending"),
     })[status];
 
 const statusClass = (status: PartnerStatus): string =>
     ({
-        APPROVED: 'wdr-admin-users__partner-status--active',
-        REJECTED: 'wdr-admin-users__partner-status--inactive',
-        SUSPENDED: 'wdr-admin-users__partner-status--inactive',
-        PENDING: 'wdr-admin-users__partner-status--pending',
+        APPROVED: "wdr-admin-users__partner-status--active",
+        REJECTED: "wdr-admin-users__partner-status--inactive",
+        SUSPENDED: "wdr-admin-users__partner-status--inactive",
+        PENDING: "wdr-admin-users__partner-status--pending",
     })[status];
 
-const contractStatusLabel = (status: MandateContractStatus): string =>
+const contractStatusLabel = (
+    status: MandateContractStatus,
+    t: (key: string) => string,
+): string =>
     ({
-        NOT_SENT: 'Non envoye',
-        PENDING_SIGNATURE: 'En attente de signature',
-        SIGNED: 'Signe',
-        REJECTED: 'Refuse',
+        NOT_SENT: t("admin.users.contract_status.not_sent"),
+        PENDING_SIGNATURE: t("admin.users.contract_status.pending_signature"),
+        SIGNED: t("admin.users.contract_status.signed"),
+        REJECTED: t("admin.users.contract_status.rejected"),
     })[status];
 
-const formatDate = (date?: Date): string =>
+const formatDate = (
+    date: Date | undefined,
+    locale: string,
+    fallback: string,
+): string =>
     date
-        ? new Intl.DateTimeFormat('fr-FR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
+        ? new Intl.DateTimeFormat(locale, {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
           }).format(date)
-        : 'Non renseignee';
+        : fallback;
 
 export const AdminUsersPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
     const { success, error } = useToast();
+    const { t, intlLocale } = useTranslation();
     const [partnerStatusFilter, setPartnerStatusFilter] = useState<
-        PartnerStatus | 'all'
-    >('all');
-    const [searchTerm, setSearchTerm] = useState('');
-    const { users: allUsers } = useAdminUsersData(
-        {
-            ...(partnerStatusFilter === 'all'
-                ? {}
-                : { role: 'PARTNER', partnerStatus: partnerStatusFilter }),
-            ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
-        },
-    );
+        PartnerStatus | "all"
+    >("all");
+    const [searchTerm, setSearchTerm] = useState("");
+    const { users: allUsers } = useAdminUsersData({
+        ...(partnerStatusFilter === "all"
+            ? {}
+            : { role: "PARTNER", partnerStatus: partnerStatusFilter }),
+        ...(searchTerm.trim() ? { search: searchTerm.trim() } : {}),
+    });
     const { bookings } = useAdminBookingsData();
     const updateUserMutation = useAdminUpdateUserData();
     const createUserMutation = useAdminCreateUserData();
@@ -128,25 +144,23 @@ export const AdminUsersPage: React.FC = () => {
 
     const partners = useMemo(
         () =>
-            allUsers.filter(
-                (user) => user.role === 'PARTNER',
-            ) as PartnerUser[],
+            allUsers.filter((user) => user.role === "PARTNER") as PartnerUser[],
         [allUsers],
     );
     const clients = useMemo(
         () =>
-            partnerStatusFilter === 'all'
+            partnerStatusFilter === "all"
                 ? (allUsers.filter(
-                      (user) => user.role === 'CLIENT',
+                      (user) => user.role === "CLIENT",
                   ) as ClientUser[])
                 : [],
         [allUsers, partnerStatusFilter],
     );
     const admins = useMemo(
         () =>
-            partnerStatusFilter === 'all'
+            partnerStatusFilter === "all"
                 ? (allUsers.filter(
-                      (user) => user.role === 'ADMIN',
+                      (user) => user.role === "ADMIN",
                   ) as AdminUser[])
                 : [],
         [allUsers, partnerStatusFilter],
@@ -158,33 +172,33 @@ export const AdminUsersPage: React.FC = () => {
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editForm, setEditForm] = useState<PartnerEditForm>({
-        commissionRate: '',
-        stripeConnectedAccountId: '',
-        businessAddress: '',
-        partnerStatus: 'PENDING',
-        partnerRejectionReason: '',
-        mandateContractStatus: 'NOT_SENT',
-        mandateContractFilePath: '',
+        commissionRate: "",
+        stripeConnectedAccountId: "",
+        businessAddress: "",
+        partnerStatus: "PENDING",
+        partnerRejectionReason: "",
+        mandateContractStatus: "NOT_SENT",
+        mandateContractFilePath: "",
     });
     const [contractFile, setContractFile] = useState<File | null>(null);
     const [generalEditForm, setGeneralEditForm] = useState<GeneralEditForm>({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        language: 'fr',
-        preferredCurrency: 'EUR',
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        language: "fr",
+        preferredCurrency: "EUR",
     });
     const [createForm, setCreateForm] =
         useState<PartnerCreateForm>(DEFAULT_CREATE_FORM);
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
             return;
         }
-        if (currentUser.role !== 'ADMIN') {
-            navigate({ name: 'dashboard' });
+        if (currentUser.role !== "ADMIN") {
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -230,12 +244,12 @@ export const AdminUsersPage: React.FC = () => {
         setEditingPartnerId(partner.id);
         setEditForm({
             commissionRate: String(Math.round(partner.commissionRate * 100)),
-            stripeConnectedAccountId: partner.stripeConnectedAccountId ?? '',
-            businessAddress: partner.businessAddress ?? '',
+            stripeConnectedAccountId: partner.stripeConnectedAccountId ?? "",
+            businessAddress: partner.businessAddress ?? "",
             partnerStatus: partner.partnerStatus,
-            partnerRejectionReason: partner.partnerRejectionReason ?? '',
+            partnerRejectionReason: partner.partnerRejectionReason ?? "",
             mandateContractStatus: partner.mandateContractStatus,
-            mandateContractFilePath: partner.mandateContractFilePath ?? '',
+            mandateContractFilePath: partner.mandateContractFilePath ?? "",
         });
         setContractFile(null);
     };
@@ -246,10 +260,10 @@ export const AdminUsersPage: React.FC = () => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            phoneNumber: user.phoneNumber ?? '',
-            language: user.language ?? 'fr',
+            phoneNumber: user.phoneNumber ?? "",
+            language: user.language ?? "fr",
             preferredCurrency:
-                user.role === 'CLIENT' ? user.preferredCurrency ?? 'EUR' : '',
+                user.role === "CLIENT" ? (user.preferredCurrency ?? "EUR") : "",
         });
     };
 
@@ -261,13 +275,13 @@ export const AdminUsersPage: React.FC = () => {
         const ratePercent = Number.parseFloat(editForm.commissionRate);
 
         if (Number.isNaN(ratePercent) || ratePercent < 20 || ratePercent > 30) {
-            error('Le taux de commission partenaire doit etre entre 20 % et 30 %.');
+            error(t("admin.users.error.commission_range"));
             return;
         }
 
         const stripeId = editForm.stripeConnectedAccountId.trim();
-        if (stripeId && !stripeId.startsWith('acct_')) {
-            error('L identifiant Stripe Connect doit commencer par acct_.');
+        if (stripeId && !stripeId.startsWith("acct_")) {
+            error(t("admin.users.error.stripe_prefix"));
             return;
         }
 
@@ -287,10 +301,10 @@ export const AdminUsersPage: React.FC = () => {
                         editForm.mandateContractFilePath.trim() || undefined,
                 },
             });
-            success('Partenaire mis a jour.');
+            success(t("admin.users.toast.partner_updated"));
             setEditingPartnerId(null);
         } catch {
-            error('Impossible de sauvegarder les informations du partenaire.');
+            error(t("admin.users.toast.partner_update_error"));
         }
     };
 
@@ -304,7 +318,7 @@ export const AdminUsersPage: React.FC = () => {
             !generalEditForm.lastName.trim() ||
             !generalEditForm.email.trim()
         ) {
-            error('Le prenom, le nom et l email sont obligatoires.');
+            error(t("admin.users.error.general_required"));
             return;
         }
 
@@ -315,25 +329,26 @@ export const AdminUsersPage: React.FC = () => {
                     firstName: generalEditForm.firstName.trim(),
                     lastName: generalEditForm.lastName.trim(),
                     email: generalEditForm.email.trim(),
-                    phoneNumber: generalEditForm.phoneNumber.trim() || undefined,
+                    phoneNumber:
+                        generalEditForm.phoneNumber.trim() || undefined,
                     language: generalEditForm.language.trim() || undefined,
                     preferredCurrency:
-                        editingUser.role === 'CLIENT'
+                        editingUser.role === "CLIENT"
                             ? generalEditForm.preferredCurrency.trim() ||
                               undefined
                             : undefined,
                 },
             });
-            success('Compte mis a jour.');
+            success(t("admin.users.toast.account_updated"));
             setEditingUserId(null);
         } catch {
-            error('Impossible de mettre a jour ce compte.');
+            error(t("admin.users.toast.account_update_error"));
         }
     };
 
     const uploadContract = async (): Promise<void> => {
         if (!editingPartnerId || !contractFile) {
-            error('Selectionnez un fichier PDF avant de lancer l upload.');
+            error(t("admin.users.error.pdf_required"));
             return;
         }
 
@@ -346,18 +361,18 @@ export const AdminUsersPage: React.FC = () => {
             setEditForm((form) => ({
                 ...form,
                 mandateContractFilePath:
-                    updatedPartner.role === 'PARTNER'
-                        ? updatedPartner.mandateContractFilePath ?? ''
+                    updatedPartner.role === "PARTNER"
+                        ? (updatedPartner.mandateContractFilePath ?? "")
                         : form.mandateContractFilePath,
                 mandateContractStatus:
-                    updatedPartner.role === 'PARTNER'
+                    updatedPartner.role === "PARTNER"
                         ? updatedPartner.mandateContractStatus
                         : form.mandateContractStatus,
             }));
             setContractFile(null);
-            success('Contrat partenaire televerse.');
+            success(t("admin.users.toast.contract_uploaded"));
         } catch {
-            error('Impossible de televerser le contrat partenaire.');
+            error(t("admin.users.toast.contract_upload_error"));
         }
     };
 
@@ -370,23 +385,20 @@ export const AdminUsersPage: React.FC = () => {
             !createForm.email.trim() ||
             !createForm.password.trim()
         ) {
-            error('Completez les champs obligatoires du compte.');
+            error(t("admin.users.error.create_required"));
+            return;
+        }
+
+        if (createForm.role === "PARTNER" && !createForm.companyName.trim()) {
+            error(t("admin.users.error.company_required"));
             return;
         }
 
         if (
-            createForm.role === 'PARTNER' &&
-            !createForm.companyName.trim()
-        ) {
-            error('Le nom de societe est obligatoire pour un partenaire.');
-            return;
-        }
-
-        if (
-            createForm.role === 'PARTNER' &&
+            createForm.role === "PARTNER" &&
             (Number.isNaN(ratePercent) || ratePercent < 20 || ratePercent > 30)
         ) {
-            error('Le taux de commission partenaire doit etre entre 20 % et 30 %.');
+            error(t("admin.users.error.commission_range"));
             return;
         }
 
@@ -402,43 +414,43 @@ export const AdminUsersPage: React.FC = () => {
                 businessAddress: createForm.businessAddress.trim() || undefined,
                 language: createForm.language.trim() || undefined,
                 preferredCurrency:
-                    createForm.role === 'CLIENT'
+                    createForm.role === "CLIENT"
                         ? createForm.preferredCurrency.trim() || undefined
                         : undefined,
                 commissionRate:
-                    createForm.role === 'PARTNER'
+                    createForm.role === "PARTNER"
                         ? ratePercent / 100
                         : undefined,
                 partnerStatus:
-                    createForm.role === 'PARTNER'
+                    createForm.role === "PARTNER"
                         ? createForm.partnerStatus
                         : undefined,
                 mandateContractStatus:
-                    createForm.role === 'PARTNER'
+                    createForm.role === "PARTNER"
                         ? createForm.mandateContractStatus
                         : undefined,
             });
-            success('Compte cree.');
+            success(t("admin.users.toast.account_created"));
             setCreateForm(DEFAULT_CREATE_FORM);
             setIsCreateModalOpen(false);
         } catch {
-            error('Impossible de creer ce compte.');
+            error(t("admin.users.toast.account_create_error"));
         }
     };
 
     const exportPartnersCsv = (): void => {
         const rows = [
             [
-                'id',
-                'societe',
-                'prenom',
-                'nom',
-                'email',
-                'statut_partenaire',
-                'statut_contrat',
-                'commission',
-                'stripe_connect_id',
-                'adresse',
+                "id",
+                t("admin.users.csv.company"),
+                t("admin.users.csv.first_name"),
+                "nom",
+                "email",
+                "statut_partenaire",
+                "statut_contrat",
+                "commission",
+                "stripe_connect_id",
+                "adresse",
             ],
             ...partners.map((partner) => [
                 partner.id,
@@ -449,22 +461,22 @@ export const AdminUsersPage: React.FC = () => {
                 partner.partnerStatus,
                 partner.mandateContractStatus,
                 String(partner.commissionRate),
-                partner.stripeConnectedAccountId ?? '',
-                partner.businessAddress ?? '',
+                partner.stripeConnectedAccountId ?? "",
+                partner.businessAddress ?? "",
             ]),
         ];
         const csv = rows
             .map((row) =>
                 row
                     .map((value) => `"${String(value).replaceAll('"', '""')}"`)
-                    .join(','),
+                    .join(","),
             )
-            .join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            .join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.download = 'wandireo-partenaires.csv';
+        link.download = "wandireo-partenaires.csv";
         link.click();
         URL.revokeObjectURL(url);
     };
@@ -500,30 +512,29 @@ export const AdminUsersPage: React.FC = () => {
             });
             success(successMessage);
         } catch {
-            error('Impossible d appliquer cette action rapide.');
+            error(t("admin.users.toast.quick_action_error"));
         }
     };
 
-    if (!currentUser || currentUser.role !== 'ADMIN') {
+    if (!currentUser || currentUser.role !== "ADMIN") {
         return null;
     }
 
-    const isPartnerCreation = createForm.role === 'PARTNER';
-    const isClientCreation = createForm.role === 'CLIENT';
+    const isPartnerCreation = createForm.role === "PARTNER";
+    const isClientCreation = createForm.role === "CLIENT";
 
     return (
         <div className="wdr-admin-users">
             <section className="wdr-admin-users__hero">
                 <div className="wdr-admin-users__hero-content">
                     <p className="wdr-admin-users__hero-badge">
-                        Administration
+                        {t("admin.users.badge")}
                     </p>
                     <h1 className="wdr-admin-users__hero-title">
-                        Gestion des utilisateurs
+                        {t("admin.users.title")}
                     </h1>
                     <p className="wdr-admin-users__hero-subtitle">
-                        Validation partenaires, contrat de mandat et creation de
-                        compte depuis l admin.
+                        {t("admin.users.subtitle")}
                     </p>
                 </div>
             </section>
@@ -534,42 +545,50 @@ export const AdminUsersPage: React.FC = () => {
                 <section>
                     <div className="wdr-admin-users__partner-actions">
                         <h2 className="wdr-admin-users__section-title">
-                            Comptes Partenaires ({partners.length})
+                            {t("admin.users.hero.partners_count").replace(
+                                "{count}",
+                                String(partners.length),
+                            )}
                         </h2>
                         <div className="wdr-admin-users__toolbar">
                             <Input
-                                placeholder="Rechercher un partenaire"
+                                placeholder={t("admin.users.search_partner")}
                                 value={searchTerm}
-                                onChange={(e) =>
-                                    setSearchTerm(e.target.value)
-                                }
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
                             <select
                                 className="wdr-admin-users__input"
                                 value={partnerStatusFilter}
                                 onChange={(e) =>
                                     setPartnerStatusFilter(
-                                        e.target.value as PartnerStatus | 'all',
+                                        e.target.value as PartnerStatus | "all",
                                     )
                                 }
                             >
-                                <option value="all">Tous les statuts</option>
-                                <option value="PENDING">En attente</option>
-                                <option value="APPROVED">Valides</option>
-                                <option value="REJECTED">Refuses</option>
-                                <option value="SUSPENDED">Suspendus</option>
+                                <option value="all">
+                                    {t("admin.users.filter.all_statuses")}
+                                </option>
+                                <option value="PENDING">
+                                    {t("admin.users.filter.pending")}
+                                </option>
+                                <option value="APPROVED">
+                                    {t("admin.users.filter.approved")}
+                                </option>
+                                <option value="REJECTED">
+                                    {t("admin.users.filter.rejected")}
+                                </option>
+                                <option value="SUSPENDED">
+                                    {t("admin.users.filter.suspended")}
+                                </option>
                             </select>
                             <Button
                                 variant="primary"
                                 onClick={() => setIsCreateModalOpen(true)}
                             >
-                                Creer un utilisateur
+                                {t("admin.users.create_user")}
                             </Button>
-                            <Button
-                                variant="ghost"
-                                onClick={exportPartnersCsv}
-                            >
-                                Export CSV
+                            <Button variant="ghost" onClick={exportPartnersCsv}>
+                                {t("admin.users.export_csv")}
                             </Button>
                         </div>
                     </div>
@@ -594,14 +613,14 @@ export const AdminUsersPage: React.FC = () => {
                                             aria-hidden="true"
                                         >
                                             {partner.companyName[0]?.toUpperCase() ??
-                                                'P'}
+                                                "P"}
                                         </div>
                                         <div className="wdr-admin-users__partner-info">
                                             <span className="wdr-admin-users__partner-company">
                                                 {partner.companyName}
                                             </span>
                                             <span className="wdr-admin-users__partner-name">
-                                                {partner.firstName}{' '}
+                                                {partner.firstName}{" "}
                                                 {partner.lastName}
                                             </span>
                                             <span className="wdr-admin-users__partner-email">
@@ -610,14 +629,15 @@ export const AdminUsersPage: React.FC = () => {
                                         </div>
                                         <span
                                             className={[
-                                                'wdr-admin-users__partner-status',
+                                                "wdr-admin-users__partner-status",
                                                 statusClass(
                                                     partner.partnerStatus,
                                                 ),
-                                            ].join(' ')}
+                                            ].join(" ")}
                                         >
                                             {statusLabel(
                                                 partner.partnerStatus,
+                                                t,
                                             )}
                                         </span>
                                     </div>
@@ -625,37 +645,46 @@ export const AdminUsersPage: React.FC = () => {
                                     <div className="wdr-admin-users__partner-metrics">
                                         <div className="wdr-admin-users__partner-metric">
                                             <span className="wdr-admin-users__partner-metric-label">
-                                                Volume confirme
+                                                {t("admin.users.metric.volume")}
                                             </span>
                                             <span className="wdr-admin-users__partner-metric-value">
                                                 {formatPrice(
                                                     revenue.total,
-                                                    'EUR',
+                                                    "EUR",
                                                 )}
                                             </span>
                                         </div>
                                         <div className="wdr-admin-users__partner-metric">
                                             <span className="wdr-admin-users__partner-metric-label">
-                                                Commission
+                                                {t(
+                                                    "admin.users.metric.commission",
+                                                )}
                                             </span>
                                             <span className="wdr-admin-users__partner-metric-value">
-                                                {(partner.commissionRate * 100).toFixed(0)} %
+                                                {(
+                                                    partner.commissionRate * 100
+                                                ).toFixed(0)}{" "}
+                                                %
                                             </span>
                                         </div>
                                         <div className="wdr-admin-users__partner-metric">
                                             <span className="wdr-admin-users__partner-metric-label">
-                                                Net partenaire
+                                                {t(
+                                                    "admin.users.metric.partner_net",
+                                                )}
                                             </span>
                                             <span className="wdr-admin-users__partner-metric-value">
                                                 {formatPrice(
                                                     revenue.partnerNet,
-                                                    'EUR',
+                                                    "EUR",
                                                 )}
                                             </span>
                                         </div>
                                         <div className="wdr-admin-users__partner-metric">
                                             <span className="wdr-admin-users__partner-metric-label">
-                                                Reservations
+                                                {t(
+                                                    "admin.users.metric.bookings",
+                                                )}
                                             </span>
                                             <span className="wdr-admin-users__partner-metric-value">
                                                 {revenue.bookingsCount}
@@ -665,24 +694,28 @@ export const AdminUsersPage: React.FC = () => {
 
                                     <div className="wdr-admin-users__stripe-row">
                                         <span className="wdr-admin-users__stripe-label">
-                                            Dossier
+                                            {t("admin.users.folder")}
                                         </span>
                                         <code className="wdr-admin-users__stripe-id">
-                                            {statusLabel(partner.partnerStatus)} /
-                                            contrat{' '}
+                                            {statusLabel(
+                                                partner.partnerStatus,
+                                                t,
+                                            )}
+                                            {t("admin.users.contract_prefix")}
                                             {contractStatusLabel(
                                                 partner.mandateContractStatus,
+                                                t,
                                             )}
                                         </code>
                                     </div>
 
                                     <div className="wdr-admin-users__stripe-row">
                                         <span className="wdr-admin-users__stripe-label">
-                                            Stripe Connect ID
+                                            {t("admin.users.stripe_id")}
                                         </span>
                                         <code className="wdr-admin-users__stripe-id">
                                             {partner.stripeConnectedAccountId ||
-                                                '— non configure —'}
+                                                t("admin.users.stripe_missing")}
                                         </code>
                                     </div>
 
@@ -694,28 +727,53 @@ export const AdminUsersPage: React.FC = () => {
 
                                     {partner.mandateContractFilePath && (
                                         <p className="wdr-admin-users__partner-address">
-                                            Contrat: {partner.mandateContractFilePath}
+                                            {t(
+                                                "admin.users.contract_file",
+                                            ).replace(
+                                                "{path}",
+                                                partner.mandateContractFilePath,
+                                            )}
                                         </p>
                                     )}
 
                                     <p className="wdr-admin-users__partner-address">
-                                        Validation admin:{' '}
-                                        {formatDate(partner.partnerValidatedAt)}
+                                        {t(
+                                            "admin.users.admin_validation",
+                                        ).replace(
+                                            "{date}",
+                                            formatDate(
+                                                partner.partnerValidatedAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            ),
+                                        )}
                                     </p>
 
                                     <p className="wdr-admin-users__partner-address">
-                                        Signature contrat:{' '}
-                                        {formatDate(partner.mandateSignedAt)}
+                                        {t(
+                                            "admin.users.contract_signature",
+                                        ).replace(
+                                            "{date}",
+                                            formatDate(
+                                                partner.mandateSignedAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            ),
+                                        )}
                                     </p>
 
                                     {partner.partnerRejectionReason && (
                                         <p className="wdr-admin-users__partner-address">
-                                            Motif: {partner.partnerRejectionReason}
+                                            {t("admin.users.reason").replace(
+                                                "{reason}",
+                                                partner.partnerRejectionReason,
+                                            )}
                                         </p>
                                     )}
 
                                     <div className="wdr-admin-users__partner-actions">
-                                        {partner.partnerStatus !== 'APPROVED' && (
+                                        {partner.partnerStatus !==
+                                            "APPROVED" && (
                                             <Button
                                                 variant="primary"
                                                 size="sm"
@@ -724,20 +782,22 @@ export const AdminUsersPage: React.FC = () => {
                                                         partner,
                                                         {
                                                             partnerStatus:
-                                                                'APPROVED',
+                                                                "APPROVED",
                                                         },
-                                                        'Partenaire valide.',
+                                                        t(
+                                                            "admin.users.quick.approve_success",
+                                                        ),
                                                     )
                                                 }
                                                 disabled={
                                                     updateUserMutation.isPending
                                                 }
                                             >
-                                                Valider
+                                                {t("admin.users.quick.approve")}
                                             </Button>
                                         )}
                                         {partner.mandateContractStatus !==
-                                            'SIGNED' && (
+                                            "SIGNED" && (
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -746,20 +806,24 @@ export const AdminUsersPage: React.FC = () => {
                                                         partner,
                                                         {
                                                             mandateContractStatus:
-                                                                'SIGNED',
+                                                                "SIGNED",
                                                         },
-                                                        'Contrat marque comme signe.',
+                                                        t(
+                                                            "admin.users.quick.contract_signed_success",
+                                                        ),
                                                     )
                                                 }
                                                 disabled={
                                                     updateUserMutation.isPending
                                                 }
                                             >
-                                                Marquer signe
+                                                {t(
+                                                    "admin.users.quick.contract_signed",
+                                                )}
                                             </Button>
                                         )}
                                         {partner.partnerStatus !==
-                                            'SUSPENDED' && (
+                                            "SUSPENDED" && (
                                             <Button
                                                 variant="danger"
                                                 size="sm"
@@ -768,16 +832,18 @@ export const AdminUsersPage: React.FC = () => {
                                                         partner,
                                                         {
                                                             partnerStatus:
-                                                                'SUSPENDED',
+                                                                "SUSPENDED",
                                                         },
-                                                        'Partenaire suspendu.',
+                                                        t(
+                                                            "admin.users.quick.suspend_success",
+                                                        ),
                                                     )
                                                 }
                                                 disabled={
                                                     updateUserMutation.isPending
                                                 }
                                             >
-                                                Suspendre
+                                                {t("admin.users.quick.suspend")}
                                             </Button>
                                         )}
                                         <Button
@@ -787,7 +853,7 @@ export const AdminUsersPage: React.FC = () => {
                                                 openEditModal(partner)
                                             }
                                         >
-                                            Modifier
+                                            {t("admin.users.edit")}
                                         </Button>
                                     </div>
                                 </article>
@@ -796,92 +862,114 @@ export const AdminUsersPage: React.FC = () => {
                     </div>
                 </section>
 
-                {partnerStatusFilter === 'all' && (
-                <section>
-                    <h2 className="wdr-admin-users__section-title">
-                        Comptes Clients ({clients.length})
-                    </h2>
-                    <div className="wdr-admin-users__table-wrapper">
-                        <table className="wdr-admin-users__table">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Email</th>
-                                    <th>Langue</th>
-                                    <th>Devise</th>
-                                    <th>Reservations</th>
-                                    <th>Avis</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {clients.map((client) => (
-                                    <tr key={client.id}>
-                                        <td>
-                                            {client.firstName} {client.lastName}
-                                        </td>
-                                        <td>{client.email}</td>
-                                        <td>
-                                            {client.language?.toUpperCase() ??
-                                                '—'}
-                                        </td>
-                                        <td>
-                                            {client.preferredCurrency ?? '—'}
-                                        </td>
-                                        <td>{client.bookingsCount ?? 0}</td>
-                                        <td>{client.reviewsCount ?? 0}</td>
-                                        <td>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    openGeneralEditModal(client)
-                                                }
-                                            >
-                                                Modifier
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-                )}
-
-                {partnerStatusFilter === 'all' && (
+                {partnerStatusFilter === "all" && (
                     <section>
                         <h2 className="wdr-admin-users__section-title">
-                            Comptes Admin ({admins.length})
+                            {t("admin.users.hero.clients_count").replace(
+                                "{count}",
+                                String(clients.length),
+                            )}
                         </h2>
                         <div className="wdr-admin-users__table-wrapper">
                             <table className="wdr-admin-users__table">
                                 <thead>
                                     <tr>
-                                        <th>Nom</th>
-                                        <th>Email</th>
-                                        <th>Langue</th>
-                                        <th>Permissions</th>
-                                        <th>Action</th>
+                                        <th>{t("admin.users.table.name")}</th>
+                                        <th>{t("admin.users.table.email")}</th>
+                                        <th>
+                                            {t("admin.users.table.language")}
+                                        </th>
+                                        <th>
+                                            {t("admin.users.table.currency")}
+                                        </th>
+                                        <th>
+                                            {t("admin.users.table.bookings")}
+                                        </th>
+                                        <th>
+                                            {t("admin.users.table.reviews")}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {clients.map((client) => (
+                                        <tr key={client.id}>
+                                            <td>
+                                                {client.firstName}{" "}
+                                                {client.lastName}
+                                            </td>
+                                            <td>{client.email}</td>
+                                            <td>
+                                                {client.language?.toUpperCase() ??
+                                                    "—"}
+                                            </td>
+                                            <td>
+                                                {client.preferredCurrency ??
+                                                    "—"}
+                                            </td>
+                                            <td>{client.bookingsCount ?? 0}</td>
+                                            <td>{client.reviewsCount ?? 0}</td>
+                                            <td>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openGeneralEditModal(
+                                                            client,
+                                                        )
+                                                    }
+                                                >
+                                                    {t("admin.users.edit")}
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                )}
+
+                {partnerStatusFilter === "all" && (
+                    <section>
+                        <h2 className="wdr-admin-users__section-title">
+                            {t("admin.users.hero.admins_count").replace(
+                                "{count}",
+                                String(admins.length),
+                            )}
+                        </h2>
+                        <div className="wdr-admin-users__table-wrapper">
+                            <table className="wdr-admin-users__table">
+                                <thead>
+                                    <tr>
+                                        <th>{t("admin.users.table.name")}</th>
+                                        <th>{t("admin.users.table.email")}</th>
+                                        <th>
+                                            {t("admin.users.table.language")}
+                                        </th>
+                                        <th>
+                                            {t("admin.users.table.permissions")}
+                                        </th>
+                                        <th>{t("admin.users.table.action")}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {admins.map((admin) => (
                                         <tr key={admin.id}>
                                             <td>
-                                                {admin.firstName}{' '}
+                                                {admin.firstName}{" "}
                                                 {admin.lastName}
                                             </td>
                                             <td>{admin.email}</td>
                                             <td>
                                                 {admin.language?.toUpperCase() ??
-                                                    '—'}
+                                                    "—"}
                                             </td>
                                             <td>
                                                 {admin.permissions.length > 0
                                                     ? admin.permissions.join(
-                                                          ', ',
+                                                          ", ",
                                                       )
-                                                    : '—'}
+                                                    : "—"}
                                             </td>
                                             <td>
                                                 <Button
@@ -893,7 +981,7 @@ export const AdminUsersPage: React.FC = () => {
                                                         )
                                                     }
                                                 >
-                                                    Modifier
+                                                    {t("admin.users.edit")}
                                                 </Button>
                                             </td>
                                         </tr>
@@ -909,13 +997,16 @@ export const AdminUsersPage: React.FC = () => {
                 <Modal
                     isOpen={!!editingPartnerId}
                     onClose={() => setEditingPartnerId(null)}
-                    title={`Modifier - ${editingPartner.companyName}`}
+                    title={t("admin.users.modal.partner_title").replace(
+                        "{name}",
+                        editingPartner.companyName,
+                    )}
                     size="md"
                 >
                     <div className="wdr-admin-users__edit-form">
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Commission (%)
+                                {t("admin.users.field.commission")}
                             </label>
                             <Input
                                 type="number"
@@ -933,7 +1024,7 @@ export const AdminUsersPage: React.FC = () => {
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Statut partenaire
+                                {t("admin.users.field.partner_status")}
                             </label>
                             <select
                                 className="wdr-admin-users__input"
@@ -946,15 +1037,23 @@ export const AdminUsersPage: React.FC = () => {
                                     }))
                                 }
                             >
-                                <option value="PENDING">En attente</option>
-                                <option value="APPROVED">Valide</option>
-                                <option value="REJECTED">Refuse</option>
-                                <option value="SUSPENDED">Suspendu</option>
+                                <option value="PENDING">
+                                    {t("admin.users.partner_status.pending")}
+                                </option>
+                                <option value="APPROVED">
+                                    {t("admin.users.partner_status.approved")}
+                                </option>
+                                <option value="REJECTED">
+                                    {t("admin.users.partner_status.rejected")}
+                                </option>
+                                <option value="SUSPENDED">
+                                    {t("admin.users.partner_status.suspended")}
+                                </option>
                             </select>
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Statut contrat
+                                {t("admin.users.field.contract_status")}
                             </label>
                             <select
                                 className="wdr-admin-users__input"
@@ -967,17 +1066,25 @@ export const AdminUsersPage: React.FC = () => {
                                     }))
                                 }
                             >
-                                <option value="NOT_SENT">Non envoye</option>
-                                <option value="PENDING_SIGNATURE">
-                                    En attente de signature
+                                <option value="NOT_SENT">
+                                    {t("admin.users.contract_status.not_sent")}
                                 </option>
-                                <option value="SIGNED">Signe</option>
-                                <option value="REJECTED">Refuse</option>
+                                <option value="PENDING_SIGNATURE">
+                                    {t(
+                                        "admin.users.contract_status.pending_signature",
+                                    )}
+                                </option>
+                                <option value="SIGNED">
+                                    {t("admin.users.contract_status.signed")}
+                                </option>
+                                <option value="REJECTED">
+                                    {t("admin.users.contract_status.rejected")}
+                                </option>
                             </select>
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Stripe Connected Account ID
+                                {t("admin.users.field.stripe_account")}
                             </label>
                             <Input
                                 value={editForm.stripeConnectedAccountId}
@@ -993,7 +1100,7 @@ export const AdminUsersPage: React.FC = () => {
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Adresse professionnelle
+                                {t("admin.users.field.business_address")}
                             </label>
                             <Input
                                 value={editForm.businessAddress}
@@ -1007,15 +1114,14 @@ export const AdminUsersPage: React.FC = () => {
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Contrat
+                                {t("admin.users.field.contract")}
                             </label>
                             <Input
                                 value={editForm.mandateContractFilePath}
                                 onChange={(e) =>
                                     setEditForm((form) => ({
                                         ...form,
-                                        mandateContractFilePath:
-                                            e.target.value,
+                                        mandateContractFilePath: e.target.value,
                                     }))
                                 }
                                 placeholder="storage/contracts/mandat.pdf"
@@ -1027,31 +1133,43 @@ export const AdminUsersPage: React.FC = () => {
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    Ouvrir le contrat actuel
+                                    {t(
+                                        "admin.users.field.open_current_contract",
+                                    )}
                                 </a>
                             )}
                             {editingPartner && (
                                 <p className="wdr-admin-users__edit-hint">
-                                    Validation admin:{' '}
-                                    {formatDate(
-                                        editingPartner.partnerValidatedAt,
-                                    )} | Signature:{' '}
-                                    {formatDate(editingPartner.mandateSignedAt)}
+                                    {t("admin.users.field.contract_hint")
+                                        .replace(
+                                            "{validated}",
+                                            formatDate(
+                                                editingPartner.partnerValidatedAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            ),
+                                        )
+                                        .replace(
+                                            "{signed}",
+                                            formatDate(
+                                                editingPartner.mandateSignedAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            ),
+                                        )}
                                 </p>
                             )}
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Televerser un PDF de contrat
+                                {t("admin.users.field.upload_contract_pdf")}
                             </label>
                             <input
                                 className="wdr-admin-users__input"
                                 type="file"
                                 accept="application/pdf"
                                 onChange={(e) =>
-                                    setContractFile(
-                                        e.target.files?.[0] ?? null,
-                                    )
+                                    setContractFile(e.target.files?.[0] ?? null)
                                 }
                             />
                             <div className="wdr-admin-users__edit-actions">
@@ -1060,7 +1178,7 @@ export const AdminUsersPage: React.FC = () => {
                                     onClick={() => setContractFile(null)}
                                     disabled={uploadContractMutation.isPending}
                                 >
-                                    Reinitialiser
+                                    {t("admin.users.field.reset")}
                                 </Button>
                                 <Button
                                     variant="primary"
@@ -1071,14 +1189,14 @@ export const AdminUsersPage: React.FC = () => {
                                     }
                                 >
                                     {uploadContractMutation.isPending
-                                        ? 'Upload...'
-                                        : 'Televerser le PDF'}
+                                        ? t("admin.users.field.uploading")
+                                        : t("admin.users.field.upload_pdf")}
                                 </Button>
                             </div>
                         </div>
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
-                                Motif
+                                {t("admin.users.field.reason")}
                             </label>
                             <textarea
                                 className="wdr-admin-users__input"
@@ -1086,8 +1204,7 @@ export const AdminUsersPage: React.FC = () => {
                                 onChange={(e) =>
                                     setEditForm((form) => ({
                                         ...form,
-                                        partnerRejectionReason:
-                                            e.target.value,
+                                        partnerRejectionReason: e.target.value,
                                     }))
                                 }
                                 rows={3}
@@ -1098,15 +1215,15 @@ export const AdminUsersPage: React.FC = () => {
                                 variant="ghost"
                                 onClick={() => setEditingPartnerId(null)}
                             >
-                                Annuler
+                                {t("admin.users.cancel")}
                             </Button>
                             <Button
                                 variant="primary"
                                 onClick={() => void savePartner()}
                             >
                                 {updateUserMutation.isPending
-                                    ? 'Enregistrement...'
-                                    : 'Enregistrer'}
+                                    ? t("admin.users.saving")
+                                    : t("admin.users.save")}
                             </Button>
                         </div>
                     </div>
@@ -1117,12 +1234,17 @@ export const AdminUsersPage: React.FC = () => {
                 <Modal
                     isOpen={!!editingUserId}
                     onClose={() => setEditingUserId(null)}
-                    title={`Modifier - ${editingUser.firstName} ${editingUser.lastName}`}
+                    title={t("admin.users.modal.user_title").replace(
+                        "{name}",
+                        `${editingUser.firstName} ${editingUser.lastName}`,
+                    )}
                     size="md"
                 >
                     <div className="wdr-admin-users__edit-form">
                         <Input
-                            placeholder="Prenom"
+                            placeholder={t(
+                                "admin.users.placeholder.first_name",
+                            )}
                             value={generalEditForm.firstName}
                             onChange={(e) =>
                                 setGeneralEditForm((form) => ({
@@ -1132,7 +1254,7 @@ export const AdminUsersPage: React.FC = () => {
                             }
                         />
                         <Input
-                            placeholder="Nom"
+                            placeholder={t("admin.users.placeholder.last_name")}
                             value={generalEditForm.lastName}
                             onChange={(e) =>
                                 setGeneralEditForm((form) => ({
@@ -1143,7 +1265,7 @@ export const AdminUsersPage: React.FC = () => {
                         />
                         <Input
                             type="email"
-                            placeholder="Email"
+                            placeholder={t("admin.users.placeholder.email")}
                             value={generalEditForm.email}
                             onChange={(e) =>
                                 setGeneralEditForm((form) => ({
@@ -1153,7 +1275,7 @@ export const AdminUsersPage: React.FC = () => {
                             }
                         />
                         <Input
-                            placeholder="Telephone"
+                            placeholder={t("admin.users.placeholder.phone")}
                             value={generalEditForm.phoneNumber}
                             onChange={(e) =>
                                 setGeneralEditForm((form) => ({
@@ -1163,7 +1285,7 @@ export const AdminUsersPage: React.FC = () => {
                             }
                         />
                         <Input
-                            placeholder="Langue"
+                            placeholder={t("admin.users.placeholder.language")}
                             value={generalEditForm.language}
                             onChange={(e) =>
                                 setGeneralEditForm((form) => ({
@@ -1172,9 +1294,11 @@ export const AdminUsersPage: React.FC = () => {
                                 }))
                             }
                         />
-                        {editingUser.role === 'CLIENT' && (
+                        {editingUser.role === "CLIENT" && (
                             <Input
-                                placeholder="Devise preferee"
+                                placeholder={t(
+                                    "admin.users.placeholder.preferred_currency",
+                                )}
                                 value={generalEditForm.preferredCurrency}
                                 onChange={(e) =>
                                     setGeneralEditForm((form) => ({
@@ -1189,15 +1313,15 @@ export const AdminUsersPage: React.FC = () => {
                                 variant="ghost"
                                 onClick={() => setEditingUserId(null)}
                             >
-                                Annuler
+                                {t("admin.users.cancel")}
                             </Button>
                             <Button
                                 variant="primary"
                                 onClick={() => void saveGeneralUser()}
                             >
                                 {updateUserMutation.isPending
-                                    ? 'Enregistrement...'
-                                    : 'Enregistrer'}
+                                    ? t("admin.users.saving")
+                                    : t("admin.users.save")}
                             </Button>
                         </div>
                     </div>
@@ -1207,20 +1331,18 @@ export const AdminUsersPage: React.FC = () => {
             <Modal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                title="Creer un compte utilisateur"
-                size="md"
+                title={t("admin.users.modal.create_title")}
+                size="lg"
             >
                 <div className="wdr-admin-users__edit-form">
                     <p className="wdr-admin-users__edit-intro">
-                        Choisissez le type de compte puis completez les
-                        informations utiles. Les champs partenaires
-                        n’apparaissent que si le compte cree est un partenaire.
+                        {t("admin.users.create_intro")}
                     </p>
 
                     <div className="wdr-admin-users__form-section">
                         <div className="wdr-admin-users__form-section-head">
                             <h3 className="wdr-admin-users__form-section-title">
-                                Type de compte
+                                {t("admin.users.section.account_type")}
                             </h3>
                             <span className="wdr-admin-users__role-pill">
                                 {createForm.role}
@@ -1236,19 +1358,27 @@ export const AdminUsersPage: React.FC = () => {
                                 }))
                             }
                         >
-                            <option value="PARTNER">Partenaire</option>
-                            <option value="CLIENT">Client</option>
-                            <option value="ADMIN">Admin</option>
+                            <option value="PARTNER">
+                                {t("admin.users.role.partner")}
+                            </option>
+                            <option value="CLIENT">
+                                {t("admin.users.role.client")}
+                            </option>
+                            <option value="ADMIN">
+                                {t("admin.users.role.admin")}
+                            </option>
                         </select>
                     </div>
 
                     <div className="wdr-admin-users__form-section">
                         <h3 className="wdr-admin-users__form-section-title">
-                            Identite
+                            {t("admin.users.section.identity")}
                         </h3>
                         <div className="wdr-admin-users__form-grid">
                             <Input
-                                placeholder="Prenom"
+                                placeholder={t(
+                                    "admin.users.placeholder.first_name",
+                                )}
                                 value={createForm.firstName}
                                 onChange={(e) =>
                                     setCreateForm((form) => ({
@@ -1258,7 +1388,9 @@ export const AdminUsersPage: React.FC = () => {
                                 }
                             />
                             <Input
-                                placeholder="Nom"
+                                placeholder={t(
+                                    "admin.users.placeholder.last_name",
+                                )}
                                 value={createForm.lastName}
                                 onChange={(e) =>
                                     setCreateForm((form) => ({
@@ -1272,12 +1404,12 @@ export const AdminUsersPage: React.FC = () => {
 
                     <div className="wdr-admin-users__form-section">
                         <h3 className="wdr-admin-users__form-section-title">
-                            Compte
+                            {t("admin.users.section.account")}
                         </h3>
                         <div className="wdr-admin-users__form-grid">
                             <Input
                                 type="email"
-                                placeholder="Email"
+                                placeholder={t("admin.users.placeholder.email")}
                                 value={createForm.email}
                                 onChange={(e) =>
                                     setCreateForm((form) => ({
@@ -1288,7 +1420,9 @@ export const AdminUsersPage: React.FC = () => {
                             />
                             <Input
                                 type="password"
-                                placeholder="Mot de passe initial"
+                                placeholder={t(
+                                    "admin.users.placeholder.initial_password",
+                                )}
                                 value={createForm.password}
                                 onChange={(e) =>
                                     setCreateForm((form) => ({
@@ -1302,11 +1436,13 @@ export const AdminUsersPage: React.FC = () => {
 
                     <div className="wdr-admin-users__form-section">
                         <h3 className="wdr-admin-users__form-section-title">
-                            Profil
+                            {t("admin.users.section.profile")}
                         </h3>
                         <div className="wdr-admin-users__form-grid">
                             <Input
-                                placeholder="Langue"
+                                placeholder={t(
+                                    "admin.users.placeholder.language",
+                                )}
                                 value={createForm.language}
                                 onChange={(e) =>
                                     setCreateForm((form) => ({
@@ -1317,7 +1453,9 @@ export const AdminUsersPage: React.FC = () => {
                             />
                             {isClientCreation && (
                                 <Input
-                                    placeholder="Devise preferee"
+                                    placeholder={t(
+                                        "admin.users.placeholder.preferred_currency",
+                                    )}
                                     value={createForm.preferredCurrency}
                                     onChange={(e) =>
                                         setCreateForm((form) => ({
@@ -1334,16 +1472,17 @@ export const AdminUsersPage: React.FC = () => {
                         <div className="wdr-admin-users__form-section wdr-admin-users__form-section--partner">
                             <div className="wdr-admin-users__form-section-head">
                                 <h3 className="wdr-admin-users__form-section-title">
-                                    Parametres partenaire
+                                    {t("admin.users.section.partner_settings")}
                                 </h3>
                                 <span className="wdr-admin-users__form-section-copy">
-                                    Structure commerciale, commission et statut
-                                    initial du partenaire.
+                                    {t("admin.users.section.partner_copy")}
                                 </span>
                             </div>
                             <div className="wdr-admin-users__form-grid">
                                 <Input
-                                    placeholder="Societe"
+                                    placeholder={t(
+                                        "admin.users.placeholder.company",
+                                    )}
                                     value={createForm.companyName}
                                     onChange={(e) =>
                                         setCreateForm((form) => ({
@@ -1353,7 +1492,9 @@ export const AdminUsersPage: React.FC = () => {
                                     }
                                 />
                                 <Input
-                                    placeholder="Telephone"
+                                    placeholder={t(
+                                        "admin.users.placeholder.phone",
+                                    )}
                                     value={createForm.phoneNumber}
                                     onChange={(e) =>
                                         setCreateForm((form) => ({
@@ -1363,7 +1504,9 @@ export const AdminUsersPage: React.FC = () => {
                                     }
                                 />
                                 <Input
-                                    placeholder="Adresse professionnelle"
+                                    placeholder={t(
+                                        "admin.users.field.business_address",
+                                    )}
                                     value={createForm.businessAddress}
                                     onChange={(e) =>
                                         setCreateForm((form) => ({
@@ -1377,7 +1520,9 @@ export const AdminUsersPage: React.FC = () => {
                                     min={20}
                                     max={30}
                                     step={1}
-                                    placeholder="Commission (%)"
+                                    placeholder={t(
+                                        "admin.users.placeholder.commission",
+                                    )}
                                     value={createForm.commissionRate}
                                     onChange={(e) =>
                                         setCreateForm((form) => ({
@@ -1397,10 +1542,26 @@ export const AdminUsersPage: React.FC = () => {
                                         }))
                                     }
                                 >
-                                    <option value="PENDING">En attente</option>
-                                    <option value="APPROVED">Valide</option>
-                                    <option value="REJECTED">Refuse</option>
-                                    <option value="SUSPENDED">Suspendu</option>
+                                    <option value="PENDING">
+                                        {t(
+                                            "admin.users.partner_status.pending",
+                                        )}
+                                    </option>
+                                    <option value="APPROVED">
+                                        {t(
+                                            "admin.users.partner_status.approved",
+                                        )}
+                                    </option>
+                                    <option value="REJECTED">
+                                        {t(
+                                            "admin.users.partner_status.rejected",
+                                        )}
+                                    </option>
+                                    <option value="SUSPENDED">
+                                        {t(
+                                            "admin.users.partner_status.suspended",
+                                        )}
+                                    </option>
                                 </select>
                                 <select
                                     className="wdr-admin-users__input"
@@ -1414,16 +1575,18 @@ export const AdminUsersPage: React.FC = () => {
                                     }
                                 >
                                     <option value="NOT_SENT">
-                                        Contrat non envoye
+                                        {t("admin.users.contract.not_sent")}
                                     </option>
                                     <option value="PENDING_SIGNATURE">
-                                        Contrat en attente de signature
+                                        {t(
+                                            "admin.users.contract.pending_signature",
+                                        )}
                                     </option>
                                     <option value="SIGNED">
-                                        Contrat signe
+                                        {t("admin.users.contract.signed")}
                                     </option>
                                     <option value="REJECTED">
-                                        Contrat refuse
+                                        {t("admin.users.contract.rejected")}
                                     </option>
                                 </select>
                             </div>
@@ -1435,15 +1598,15 @@ export const AdminUsersPage: React.FC = () => {
                             variant="ghost"
                             onClick={() => setIsCreateModalOpen(false)}
                         >
-                            Annuler
+                            {t("admin.users.cancel")}
                         </Button>
                         <Button
                             variant="primary"
                             onClick={() => void createUser()}
                         >
                             {createUserMutation.isPending
-                                ? 'Creation...'
-                                : 'Creer le compte'}
+                                ? t("admin.users.creating")
+                                : t("admin.users.create_account")}
                         </Button>
                     </div>
                 </div>

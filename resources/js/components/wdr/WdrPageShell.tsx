@@ -45,6 +45,7 @@ export function WdrPageShell({ children }: WdrPageShellProps) {
                 currentPath={currentPath}
                 onLoginClick={() => navigate({ name: 'login' })}
                 onRegisterClick={() => navigate({ name: 'register' })}
+                onLogoutClick={logout}
             />
             <main className="wdr-theme__content">{children}</main>
             <Footer />

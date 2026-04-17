@@ -3,20 +3,44 @@
  * @description Couche de donnees services basee sur l'API Laravel.
  */
 
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { servicesApi  } from '@/api/services';
-import type {ServicesParams} from '@/api/services';
-import type { Service } from '@/types/service';
+import { useQuery } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import { useMemo } from "react";
+import { servicesApi } from "@/api/services";
+import type { ServicesParams } from "@/api/services";
+import type { Service } from "@/types/service";
+
+interface UseServicesDataOptions {
+    fetchAll?: boolean;
+}
 
 export function useServicesData(params?: ServicesParams): {
     services: Service[];
     isLoading: boolean;
     isApiActive: boolean;
 } {
+    return useServicesDataWithOptions(params);
+}
+
+export function useServicesDataWithOptions(
+    params?: ServicesParams,
+    options?: UseServicesDataOptions,
+): {
+    services: Service[];
+    isLoading: boolean;
+    isApiActive: boolean;
+} {
     const query = useQuery({
-        queryKey: ['services', 'list', params ?? {}],
-        queryFn: async () => servicesApi.list(params),
+        queryKey: [
+            "services",
+            "list",
+            params ?? {},
+            options?.fetchAll ?? false,
+        ],
+        queryFn: async () =>
+            options?.fetchAll
+                ? servicesApi.listAll(params)
+                : servicesApi.list(params),
         staleTime: 60_000,
         retry: 1,
     });
@@ -36,14 +60,27 @@ export function useServicesData(params?: ServicesParams): {
 export function useServiceData(id: string): {
     service: Service | undefined;
     isLoading: boolean;
+    isError: boolean;
+    error: AxiosError | null;
+    isFetched: boolean;
+    isNotFound: boolean;
 } {
     const query = useQuery({
-        queryKey: ['services', 'detail', id],
+        queryKey: ["services", "detail", id],
         queryFn: async () => servicesApi.get(id),
         staleTime: 60_000,
         enabled: Boolean(id),
         retry: 1,
     });
 
-    return { service: query.data, isLoading: query.isLoading };
+    const error = (query.error as AxiosError | null) ?? null;
+
+    return {
+        service: query.data,
+        isLoading: query.isLoading,
+        isError: query.isError,
+        error,
+        isFetched: query.isFetched,
+        isNotFound: error?.response?.status === 404,
+    };
 }

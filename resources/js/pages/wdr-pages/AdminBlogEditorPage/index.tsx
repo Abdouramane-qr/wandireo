@@ -1,36 +1,101 @@
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import React, { useEffect, useMemo, useState } from 'react';
-import { blogApi } from '@/api/blog';
-import { uploadsApi } from '@/api/uploads';
-import { Breadcrumb, Button, Input, useToast } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useAdminBlogPostData } from '@/hooks/useBlogData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { sanitizeHtml } from '@/lib/sanitizeHtml';
-import { BlogStatusNames } from '@/types/blog';
-import type { BlogStatus } from '@/types/blog';
-import './AdminBlogEditorPage.css';
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
+import { blogApi } from "@/api/blog";
+import { uploadsApi } from "@/api/uploads";
+import { Breadcrumb, Button, Input, useToast } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useAdminBlogPostData } from "@/hooks/useBlogData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import {
+    LOCALE_LABELS,
+    SUPPORTED_LOCALES,
+    type Locale,
+} from "@/lib/locale";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
+import { BlogStatusNames } from "@/types/blog";
+import type { BlogStatus } from "@/types/blog";
+import type { LocalizedTextMap } from "@/types/service";
+import "./AdminBlogEditorPage.css";
 
 function slugify(title: string): string {
     return title
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s-]/g, '')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
         .trim()
-        .replace(/\s+/g, '-');
+        .replace(/\s+/g, "-");
 }
 
 interface BlogFormState {
-    title: string;
+    titleTranslations: LocalizedTextMap;
     slug: string;
-    excerpt: string;
-    content: string;
+    excerptTranslations: LocalizedTextMap;
+    contentTranslations: LocalizedTextMap;
     coverImage: string;
     tags: string;
     status: BlogStatus;
+}
+
+interface BlogFormErrors {
+    title?: string;
+    slug?: string;
+    excerpt?: string;
+    content?: string;
+    coverImage?: string;
+    tags?: string;
+    status?: string;
+}
+
+function buildLocalizedTextMap(
+    value: LocalizedTextMap | undefined,
+    fallback = "",
+): LocalizedTextMap {
+    if (value && Object.keys(value).length > 0) {
+        return { ...value };
+    }
+
+    return fallback.trim() ? { fr: fallback.trim() } : {};
+}
+
+function readLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+): string {
+    return translations[locale] ?? "";
+}
+
+function writeLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+    value: string,
+): LocalizedTextMap {
+    const normalized = value.trim();
+    const next = { ...translations };
+
+    if (normalized) {
+        next[locale] = value;
+    } else {
+        delete next[locale];
+    }
+
+    return next;
+}
+
+function hasAnyTranslation(translations: LocalizedTextMap): boolean {
+    return Object.values(translations).some(
+        (value) => typeof value === "string" && value.trim() !== "",
+    );
+}
+
+function hasLocaleTranslation(
+    translations: LocalizedTextMap,
+    locale: Locale,
+): boolean {
+    return typeof translations[locale] === "string"
+        && translations[locale]!.trim() !== "";
 }
 
 interface AdminBlogEditorPageProps {
@@ -46,24 +111,23 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const isEditing = !!postId;
-    const { post: existingPost } = useAdminBlogPostData(postId ?? '');
+    const { post: existingPost } = useAdminBlogPostData(postId ?? "");
 
     const [form, setForm] = useState<BlogFormState>({
-        title: '',
-        slug: '',
-        excerpt: '',
-        content: '',
-        coverImage: '',
-        tags: '',
+        titleTranslations: {},
+        slug: "",
+        excerptTranslations: {},
+        contentTranslations: {},
+        coverImage: "",
+        tags: "",
         status: BlogStatusNames.DRAFT,
     });
+    const [activeLocale, setActiveLocale] = useState<Locale>("fr");
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditing);
     const [saving, setSaving] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
-    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
-    const [errors, setErrors] = useState<
-        Partial<Record<keyof BlogFormState, string>>
-    >({});
+    const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
+    const [errors, setErrors] = useState<BlogFormErrors>({});
 
     useEffect(() => {
         if (!existingPost || !isEditing) {
@@ -71,19 +135,31 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         }
 
         setForm({
-            title: existingPost.title,
+            titleTranslations: buildLocalizedTextMap(
+                existingPost.titleTranslations,
+                existingPost.title,
+            ),
             slug: existingPost.slug,
-            excerpt: existingPost.excerpt,
-            content: existingPost.content,
+            excerptTranslations: buildLocalizedTextMap(
+                existingPost.excerptTranslations,
+                existingPost.excerpt,
+            ),
+            contentTranslations: buildLocalizedTextMap(
+                existingPost.contentTranslations,
+                existingPost.content,
+            ),
             coverImage: existingPost.coverImage,
-            tags: existingPost.tags.join(', '),
+            tags: existingPost.tags.join(", "),
             status: existingPost.status,
         });
     }, [existingPost, isEditing]);
 
     const safePreview = useMemo(
-        () => sanitizeHtml(form.content),
-        [form.content],
+        () =>
+            sanitizeHtml(
+                readLocalizedValue(form.contentTranslations, activeLocale),
+            ),
+        [activeLocale, form.contentTranslations],
     );
 
     const setField = <K extends keyof BlogFormState>(
@@ -91,14 +167,30 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         value: BlogFormState[K],
     ) => {
         setForm((current) => ({ ...current, [key]: value }));
-        setErrors((current) => ({ ...current, [key]: undefined }));
+        setErrors((current) => ({
+            ...current,
+            [key === "titleTranslations"
+                ? "title"
+                : key === "excerptTranslations"
+                  ? "excerpt"
+                  : key === "contentTranslations"
+                    ? "content"
+                    : key]: undefined,
+        }));
+    };
+
+    const handleLocalizedFieldChange = (
+        key: "titleTranslations" | "excerptTranslations" | "contentTranslations",
+        value: string,
+    ) => {
+        setField(key, writeLocalizedValue(form[key], activeLocale, value));
     };
 
     const handleTitleChange = (value: string) => {
-        setField('title', value);
+        handleLocalizedFieldChange("titleTranslations", value);
 
-        if (!slugManuallyEdited) {
-            setField('slug', slugify(value));
+        if (!slugManuallyEdited && activeLocale === "fr") {
+            setField("slug", slugify(value));
         }
     };
 
@@ -116,8 +208,8 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         try {
             const presigned = await uploadsApi.presign({
                 fileName: file.name,
-                contentType: file.type || 'application/octet-stream',
-                folder: 'blog',
+                contentType: file.type || "application/octet-stream",
+                folder: "blog",
             });
 
             const response = await uploadsApi.uploadFile(
@@ -126,36 +218,53 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
             );
 
             if (!response.ok) {
-                throw new Error('upload_failed');
+                throw new Error("upload_failed");
             }
 
-            setField('coverImage', presigned.publicUrl);
-            success(t('admin.blog.editor.cover_success'));
+            setField("coverImage", presigned.publicUrl);
+            success(t("admin.blog.editor.cover_success"));
         } catch {
-            error(t('admin.blog.editor.cover_error'));
+            error(t("admin.blog.editor.cover_error"));
         } finally {
             setUploadingCover(false);
-            event.target.value = '';
+            event.target.value = "";
         }
     };
 
     function validate(): boolean {
-        const nextErrors: Partial<Record<keyof BlogFormState, string>> = {};
+        const nextErrors: BlogFormErrors = {};
 
-        if (!form.title.trim()) {
-            nextErrors.title = t('admin.blog.editor.error.title');
+        if (!hasAnyTranslation(form.titleTranslations)) {
+            nextErrors.title = t("admin.blog.editor.error.title");
+        } else if (
+            form.status === BlogStatusNames.PUBLISHED &&
+            !hasLocaleTranslation(form.titleTranslations, "fr")
+        ) {
+            nextErrors.title = "Le titre FR est obligatoire avant publication.";
         }
 
         if (!form.slug.trim()) {
-            nextErrors.slug = t('admin.blog.editor.error.slug');
+            nextErrors.slug = t("admin.blog.editor.error.slug");
         }
 
-        if (!form.excerpt.trim()) {
-            nextErrors.excerpt = t('admin.blog.editor.error.excerpt');
+        if (!hasAnyTranslation(form.excerptTranslations)) {
+            nextErrors.excerpt = t("admin.blog.editor.error.excerpt");
+        } else if (
+            form.status === BlogStatusNames.PUBLISHED &&
+            !hasLocaleTranslation(form.excerptTranslations, "fr")
+        ) {
+            nextErrors.excerpt =
+                "Le resume FR est obligatoire avant publication.";
         }
 
-        if (!form.content.trim()) {
-            nextErrors.content = t('admin.blog.editor.error.content');
+        if (!hasAnyTranslation(form.contentTranslations)) {
+            nextErrors.content = t("admin.blog.editor.error.content");
+        } else if (
+            form.status === BlogStatusNames.PUBLISHED &&
+            !hasLocaleTranslation(form.contentTranslations, "fr")
+        ) {
+            nextErrors.content =
+                "Le contenu FR est obligatoire avant publication.";
         }
 
         setErrors(nextErrors);
@@ -167,20 +276,20 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         event.preventDefault();
 
         if (!validate()) {
-            error(t('admin.blog.editor.validate_error'));
+            error(t("admin.blog.editor.validate_error"));
             return;
         }
 
         setSaving(true);
 
         const payload = {
-            title: form.title.trim(),
+            title: form.titleTranslations,
             slug: form.slug.trim(),
-            excerpt: form.excerpt.trim(),
-            content: form.content,
+            excerpt: form.excerptTranslations,
+            content: form.contentTranslations,
             coverImage: form.coverImage.trim(),
             tags: form.tags
-                .split(',')
+                .split(",")
                 .map((tag) => tag.trim())
                 .filter(Boolean),
             status: form.status,
@@ -189,28 +298,26 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         try {
             if (isEditing && postId) {
                 await blogApi.update(postId, payload);
-                success(t('admin.blog.editor.save_success_update'));
+                success(t("admin.blog.editor.save_success_update"));
             } else {
                 await blogApi.create(payload);
-                success(t('admin.blog.editor.save_success_create'));
+                success(t("admin.blog.editor.save_success_create"));
             }
 
-            await queryClient.invalidateQueries({ queryKey: ['blog'] });
-            navigate({ name: 'admin-blog' });
+            await queryClient.invalidateQueries({ queryKey: ["blog"] });
+            navigate({ name: "admin-blog" });
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 const validationErrors = err.response?.data?.errors as
                     | Record<string, string[]>
                     | undefined;
                 const firstMessage = validationErrors
-                    ? Object.values(validationErrors)
-                          .flat()
-                          .find(Boolean)
+                    ? Object.values(validationErrors).flat().find(Boolean)
                     : undefined;
 
-                error(firstMessage ?? t('admin.blog.editor.save_error'));
+                error(firstMessage ?? t("admin.blog.editor.save_error"));
             } else {
-                error(t('admin.blog.editor.save_error'));
+                error(t("admin.blog.editor.save_error"));
             }
         } finally {
             setSaving(false);
@@ -218,16 +325,16 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
     }
 
     const submitLabel = saving
-        ? t('admin.blog.editor.actions.saving')
+        ? t("admin.blog.editor.actions.saving")
         : uploadingCover
-          ? t('admin.blog.editor.actions.uploading')
+          ? t("admin.blog.editor.actions.uploading")
           : form.status === BlogStatusNames.PUBLISHED
             ? isEditing
-                ? t('admin.blog.editor.actions.update')
-                : t('admin.blog.editor.actions.publish')
+                ? t("admin.blog.editor.actions.update")
+                : t("admin.blog.editor.actions.publish")
             : isEditing
-              ? t('admin.blog.editor.actions.save')
-              : t('admin.blog.editor.actions.save_draft');
+              ? t("admin.blog.editor.actions.save")
+              : t("admin.blog.editor.actions.save_draft");
 
     return (
         <div className="wdr-editor">
@@ -235,22 +342,22 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                 <Breadcrumb
                     items={[
                         {
-                            label: t('admin.blog.home'),
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("admin.blog.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
                         {
-                            label: t('admin.blog.admin'),
+                            label: t("admin.blog.admin"),
                             onClick: () =>
-                                navigate({ name: 'admin-dashboard' }),
+                                navigate({ name: "admin-dashboard" }),
                         },
                         {
-                            label: t('nav.blog'),
-                            onClick: () => navigate({ name: 'admin-blog' }),
+                            label: t("nav.blog"),
+                            onClick: () => navigate({ name: "admin-blog" }),
                         },
                         {
                             label: isEditing
-                                ? t('admin.blog.editor.edit')
-                                : t('admin.blog.editor.new'),
+                                ? t("admin.blog.editor.edit")
+                                : t("admin.blog.editor.new"),
                         },
                     ]}
                 />
@@ -260,12 +367,12 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                 <div className="wdr-editor__header-inner">
                     <h1 className="wdr-editor__title">
                         {isEditing
-                            ? t('admin.blog.editor.edit')
-                            : t('admin.blog.editor.new')}
+                            ? t("admin.blog.editor.edit")
+                            : t("admin.blog.editor.new")}
                     </h1>
                     {currentUser && (
                         <p className="wdr-editor__hint">
-                            {t('admin.blog.editor.author')} :{' '}
+                            {t("admin.blog.editor.author")} :{" "}
                             {currentUser.firstName} {currentUser.lastName}
                         </p>
                     )}
@@ -280,24 +387,53 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                 <div className="wdr-editor__layout">
                     <div className="wdr-editor__main">
                         <div className="wdr-editor__field">
+                            <div className="wdr-editor__locale-bar">
+                                <span className="wdr-editor__locale-label">
+                                    Locale d'edition
+                                </span>
+                                <div className="wdr-editor__locale-tabs">
+                                    {SUPPORTED_LOCALES.map((locale) => (
+                                        <button
+                                            key={locale}
+                                            type="button"
+                                            className={`wdr-editor__locale-tab ${activeLocale === locale ? "wdr-editor__locale-tab--active" : ""}`}
+                                            onClick={() =>
+                                                setActiveLocale(locale)
+                                            }
+                                        >
+                                            {LOCALE_LABELS[locale]}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <p className="wdr-editor__locale-hint">
+                                La locale FR sert de base. Elle est requise pour
+                                publier un article.
+                            </p>
+                        </div>
+
+                        <div className="wdr-editor__field">
                             <label
                                 htmlFor="ed-title"
                                 className="wdr-editor__label"
                             >
-                                {t('admin.blog.editor.title')}{' '}
+                                {t("admin.blog.editor.title")}{" "}
                                 <span aria-hidden="true">*</span>
                             </label>
                             <Input
                                 id="ed-title"
-                                value={form.title}
+                                value={readLocalizedValue(
+                                    form.titleTranslations,
+                                    activeLocale,
+                                )}
                                 onChange={(e) =>
                                     handleTitleChange(e.target.value)
                                 }
                                 placeholder={t(
-                                    'admin.blog.editor.placeholder.title',
+                                    "admin.blog.editor.placeholder.title",
                                 )}
                                 aria-describedby={
-                                    errors.title ? 'ed-title-err' : undefined
+                                    errors.title ? "ed-title-err" : undefined
                                 }
                             />
                             {errors.title && (
@@ -315,7 +451,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                 htmlFor="ed-slug"
                                 className="wdr-editor__label"
                             >
-                                {t('admin.blog.editor.slug')}{' '}
+                                {t("admin.blog.editor.slug")}{" "}
                                 <span aria-hidden="true">*</span>
                             </label>
                             <div className="wdr-editor__slug-wrapper">
@@ -330,17 +466,17 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                     onChange={(e) => {
                                         setSlugManuallyEdited(true);
                                         setField(
-                                            'slug',
+                                            "slug",
                                             e.target.value
                                                 .toLowerCase()
-                                                .replace(/\s+/g, '-'),
+                                                .replace(/\s+/g, "-"),
                                         );
                                     }}
                                     placeholder={t(
-                                        'admin.blog.editor.placeholder.slug',
+                                        "admin.blog.editor.placeholder.slug",
                                     )}
                                     aria-describedby={
-                                        errors.slug ? 'ed-slug-err' : undefined
+                                        errors.slug ? "ed-slug-err" : undefined
                                     }
                                 />
                             </div>
@@ -359,23 +495,29 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                 htmlFor="ed-excerpt"
                                 className="wdr-editor__label"
                             >
-                                {t('admin.blog.editor.excerpt')}{' '}
+                                {t("admin.blog.editor.excerpt")}{" "}
                                 <span aria-hidden="true">*</span>
                             </label>
                             <textarea
                                 id="ed-excerpt"
                                 className="wdr-editor__textarea wdr-editor__textarea--sm"
                                 rows={2}
-                                value={form.excerpt}
+                                value={readLocalizedValue(
+                                    form.excerptTranslations,
+                                    activeLocale,
+                                )}
                                 onChange={(e) =>
-                                    setField('excerpt', e.target.value)
+                                    handleLocalizedFieldChange(
+                                        "excerptTranslations",
+                                        e.target.value,
+                                    )
                                 }
                                 placeholder={t(
-                                    'admin.blog.editor.placeholder.excerpt',
+                                    "admin.blog.editor.placeholder.excerpt",
                                 )}
                                 aria-describedby={
                                     errors.excerpt
-                                        ? 'ed-excerpt-err'
+                                        ? "ed-excerpt-err"
                                         : undefined
                                 }
                             />
@@ -392,47 +534,56 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                         <div className="wdr-editor__field">
                             <div className="wdr-editor__content-header">
                                 <label className="wdr-editor__label">
-                                    {t('admin.blog.editor.content')}{' '}
+                                    {t("admin.blog.editor.content")}{" "}
                                     <span aria-hidden="true">*</span>
                                 </label>
-                                <div className="wdr-editor__tabs" role="tablist">
+                                <div
+                                    className="wdr-editor__tabs"
+                                    role="tablist"
+                                >
                                     <button
                                         type="button"
                                         role="tab"
-                                        className={`wdr-editor__tab ${activeTab === 'edit' ? 'wdr-editor__tab--active' : ''}`}
-                                        aria-selected={activeTab === 'edit'}
-                                        onClick={() => setActiveTab('edit')}
+                                        className={`wdr-editor__tab ${activeTab === "edit" ? "wdr-editor__tab--active" : ""}`}
+                                        aria-selected={activeTab === "edit"}
+                                        onClick={() => setActiveTab("edit")}
                                     >
-                                        {t('admin.blog.editor.edit_tab')}
+                                        {t("admin.blog.editor.edit_tab")}
                                     </button>
                                     <button
                                         type="button"
                                         role="tab"
-                                        className={`wdr-editor__tab ${activeTab === 'preview' ? 'wdr-editor__tab--active' : ''}`}
-                                        aria-selected={activeTab === 'preview'}
-                                        onClick={() => setActiveTab('preview')}
+                                        className={`wdr-editor__tab ${activeTab === "preview" ? "wdr-editor__tab--active" : ""}`}
+                                        aria-selected={activeTab === "preview"}
+                                        onClick={() => setActiveTab("preview")}
                                     >
-                                        {t('admin.blog.editor.preview_tab')}
+                                        {t("admin.blog.editor.preview_tab")}
                                     </button>
                                 </div>
                             </div>
 
-                            {activeTab === 'edit' ? (
+                            {activeTab === "edit" ? (
                                 <>
                                     <textarea
                                         id="ed-content"
                                         className="wdr-editor__textarea wdr-editor__textarea--lg"
                                         rows={20}
-                                        value={form.content}
+                                        value={readLocalizedValue(
+                                            form.contentTranslations,
+                                            activeLocale,
+                                        )}
                                         onChange={(e) =>
-                                            setField('content', e.target.value)
+                                            handleLocalizedFieldChange(
+                                                "contentTranslations",
+                                                e.target.value,
+                                            )
                                         }
                                         placeholder={t(
-                                            'admin.blog.editor.placeholder.content',
+                                            "admin.blog.editor.placeholder.content",
                                         )}
                                         aria-describedby={
                                             errors.content
-                                                ? 'ed-content-err'
+                                                ? "ed-content-err"
                                                 : undefined
                                         }
                                         spellCheck
@@ -452,7 +603,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                     dangerouslySetInnerHTML={{
                                         __html:
                                             safePreview ||
-                                            `<p><em>${t('admin.blog.editor.placeholder.preview')}</em></p>`,
+                                            `<p><em>${t("admin.blog.editor.placeholder.preview")}</em></p>`,
                                     }}
                                 />
                             )}
@@ -462,7 +613,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                     <aside className="wdr-editor__sidebar">
                         <div className="wdr-editor__panel">
                             <h2 className="wdr-editor__panel-title">
-                                {t('admin.blog.editor.status')}
+                                {t("admin.blog.editor.status")}
                             </h2>
                             <div className="wdr-editor__field">
                                 <div className="wdr-editor__status-btns">
@@ -475,9 +626,9 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                         <button
                                             key={status}
                                             type="button"
-                                            className={`wdr-editor__status-btn ${form.status === status ? 'wdr-editor__status-btn--active' : ''}`}
+                                            className={`wdr-editor__status-btn ${form.status === status ? "wdr-editor__status-btn--active" : ""}`}
                                             onClick={() =>
-                                                setField('status', status)
+                                                setField("status", status)
                                             }
                                         >
                                             <span
@@ -485,11 +636,9 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                                 aria-hidden="true"
                                             />
                                             {status === BlogStatusNames.DRAFT
-                                                ? t(
-                                                      'admin.blog.status.draft',
-                                                  )
+                                                ? t("admin.blog.status.draft")
                                                 : t(
-                                                      'admin.blog.status.published',
+                                                      "admin.blog.status.published",
                                                   )}
                                         </button>
                                     ))}
@@ -499,7 +648,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
 
                         <div className="wdr-editor__panel">
                             <h2 className="wdr-editor__panel-title">
-                                {t('admin.blog.editor.cover')}
+                                {t("admin.blog.editor.cover")}
                             </h2>
                             <div className="wdr-editor__field">
                                 <input
@@ -512,13 +661,11 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                     disabled={uploadingCover || saving}
                                 />
                                 <p className="wdr-editor__hint">
-                                    {t('admin.blog.editor.cover_hint')}
+                                    {t("admin.blog.editor.cover_hint")}
                                 </p>
                                 {uploadingCover && (
                                     <p className="wdr-editor__hint">
-                                        {t(
-                                            'admin.blog.editor.cover_uploading',
-                                        )}
+                                        {t("admin.blog.editor.cover_uploading")}
                                     </p>
                                 )}
                                 {form.coverImage && (
@@ -526,7 +673,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                         <img
                                             src={form.coverImage}
                                             alt={t(
-                                                'admin.blog.editor.cover_preview',
+                                                "admin.blog.editor.cover_preview",
                                             )}
                                         />
                                     </div>
@@ -537,13 +684,11 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
-                                            setField('coverImage', '')
+                                            setField("coverImage", "")
                                         }
                                         disabled={saving || uploadingCover}
                                     >
-                                        {t(
-                                            'admin.blog.editor.cover_remove',
-                                        )}
+                                        {t("admin.blog.editor.cover_remove")}
                                     </Button>
                                 )}
                             </div>
@@ -551,28 +696,28 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
 
                         <div className="wdr-editor__panel">
                             <h2 className="wdr-editor__panel-title">
-                                {t('admin.blog.column.tags')}
+                                {t("admin.blog.column.tags")}
                             </h2>
                             <div className="wdr-editor__field">
                                 <Input
                                     value={form.tags}
                                     onChange={(e) =>
-                                        setField('tags', e.target.value)
+                                        setField("tags", e.target.value)
                                     }
                                     placeholder={t(
-                                        'admin.blog.editor.placeholder.tags',
+                                        "admin.blog.editor.placeholder.tags",
                                     )}
                                     aria-label={t(
-                                        'admin.blog.editor.tags_aria',
+                                        "admin.blog.editor.tags_aria",
                                     )}
                                 />
                                 <p className="wdr-editor__hint">
-                                    {t('admin.blog.editor.tags_hint')}
+                                    {t("admin.blog.editor.tags_hint")}
                                 </p>
                                 {form.tags && (
                                     <div className="wdr-editor__tag-preview">
                                         {form.tags
-                                            .split(',')
+                                            .split(",")
                                             .map((tag) => tag.trim())
                                             .filter(Boolean)
                                             .map((tag) => (
@@ -601,10 +746,10 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                 type="button"
                                 variant="ghost"
                                 fullWidth
-                                onClick={() => navigate({ name: 'admin-blog' })}
+                                onClick={() => navigate({ name: "admin-blog" })}
                                 disabled={saving}
                             >
-                                {t('admin.blog.editor.actions.back')}
+                                {t("admin.blog.editor.actions.back")}
                             </Button>
                         </div>
                     </aside>

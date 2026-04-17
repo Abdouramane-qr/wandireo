@@ -14,6 +14,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import { useTranslation } from '@/hooks/useTranslation';
 import './Modal.css';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -76,6 +77,7 @@ export const Modal: React.FC<ModalProps> = ({
     closeOnOverlayClick = true,
     closeOnEsc = true,
 }) => {
+    const { t } = useTranslation();
     const dialogRef = useRef<HTMLDivElement>(null);
     const titleId = `wdr-modal-title-${React.useId()}`;
     /** Sauvegarde l'element qui avait le focus avant l'ouverture */
@@ -186,7 +188,7 @@ return null;
                     <button
                         className="wdr-modal__close-btn"
                         onClick={onClose}
-                        aria-label="Fermer la fenetre"
+                        aria-label={t('common.close_window')}
                         type="button"
                     >
                         <svg

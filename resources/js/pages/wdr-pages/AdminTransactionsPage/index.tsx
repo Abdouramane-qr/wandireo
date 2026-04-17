@@ -1,70 +1,73 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AdminSectionNav } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useAdminBookingsData } from '@/hooks/useBookingsData';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useAdminUsersData } from '@/hooks/useUsersData';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import {
-    BookingStatusNames,
-    PaymentStatusNames
-    
-} from '@/types/booking';
-import type {PaymentStatus} from '@/types/booking';
-import { PaymentModeLabels } from '@/types/service';
-import './AdminTransactionsPage.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { AdminSectionNav } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useAdminBookingsData } from "@/hooks/useBookingsData";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAdminUsersData } from "@/hooks/useUsersData";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames, PaymentStatusNames } from "@/types/booking";
+import type { PaymentStatus } from "@/types/booking";
+import { PaymentModeLabels } from "@/types/service";
+import "./AdminTransactionsPage.css";
 
 function calcCommission(totalPrice: number, rate: number): number {
     return (totalPrice * rate) / (1 + rate);
 }
 
-function getPaymentStatusLabel(status: PaymentStatus): string {
+function getPaymentStatusLabel(
+    status: PaymentStatus,
+    t: (key: string) => string,
+): string {
     if (status === PaymentStatusNames.PAID) {
-return 'Paye';
-}
+        return t("admin.transactions.payment.paid");
+    }
 
     if (status === PaymentStatusNames.REFUNDED) {
-return 'Rembourse';
-}
+        return t("admin.transactions.payment.refunded");
+    }
 
-    return 'En attente';
+    return t("admin.transactions.payment.pending");
 }
 
 function getPaymentStatusClass(status: PaymentStatus): string {
     if (status === PaymentStatusNames.PAID) {
-return 'paid';
-}
+        return "paid";
+    }
 
     if (status === PaymentStatusNames.REFUNDED) {
-return 'refunded';
+        return "refunded";
+    }
+
+    return "pending";
 }
 
-    return 'pending';
-}
-
-function getBookingStatusLabel(status: string): string {
+function getBookingStatusLabel(
+    status: string,
+    t: (key: string) => string,
+): string {
     if (status === BookingStatusNames.CONFIRMED) {
-return 'Confirmee';
-}
+        return t("admin.transactions.booking.confirmed");
+    }
 
     if (status === BookingStatusNames.PENDING) {
-return 'En attente';
-}
+        return t("admin.transactions.booking.pending");
+    }
 
-    return 'Annulee';
+    return t("admin.transactions.booking.cancelled");
 }
 
 function getBookingStatusClass(status: string): string {
     if (status === BookingStatusNames.CONFIRMED) {
-return 'confirmed';
-}
+        return "confirmed";
+    }
 
     if (status === BookingStatusNames.PENDING) {
-return 'pending';
-}
+        return "pending";
+    }
 
-    return 'cancelled';
+    return "cancelled";
 }
 
 function formatExtrasSummary(entry: {
@@ -78,9 +81,11 @@ function formatExtrasSummary(entry: {
 
     const names = entry.selectedExtras
         .map((extra) =>
-            extra.quantity > 1 ? `${extra.name} x${extra.quantity}` : extra.name,
+            extra.quantity > 1
+                ? `${extra.name} x${extra.quantity}`
+                : extra.name,
         )
-        .join(', ');
+        .join(", ");
 
     return `${names} · ${formatPrice(entry.extrasTotal ?? 0, entry.currency)}`;
 }
@@ -88,27 +93,28 @@ function formatExtrasSummary(entry: {
 export const AdminTransactionsPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
+    const { t, intlLocale } = useTranslation();
     const { bookings } = useAdminBookingsData();
     const { services } = useServicesData({ adminAll: true, limit: 200 });
     const { users } = useAdminUsersData();
 
-    const allPartners = users.filter((user) => user.role === 'PARTNER');
-    const allClients = users.filter((user) => user.role === 'CLIENT');
+    const allPartners = users.filter((user) => user.role === "PARTNER");
+    const allClients = users.filter((user) => user.role === "CLIENT");
 
-    const [filterPartner, setFilterPartner] = useState<string>('all');
+    const [filterPartner, setFilterPartner] = useState<string>("all");
     const [filterPaymentStatus, setFilterPaymentStatus] = useState<
-        PaymentStatus | 'all'
-    >('all');
+        PaymentStatus | "all"
+    >("all");
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
 
             return;
         }
 
-        if (currentUser.role !== 'ADMIN') {
-            navigate({ name: 'dashboard' });
+        if (currentUser.role !== "ADMIN") {
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -125,7 +131,7 @@ export const AdminTransactionsPage: React.FC = () => {
                     (entry) => entry.id === booking.serviceId,
                 );
                 const rate =
-                    partner?.role === 'PARTNER' ? partner.commissionRate : 0;
+                    partner?.role === "PARTNER" ? partner.commissionRate : 0;
                 const commission = calcCommission(booking.totalPrice, rate);
 
                 return {
@@ -145,14 +151,14 @@ export const AdminTransactionsPage: React.FC = () => {
         () =>
             enrichedBookings.filter((entry) => {
                 if (
-                    filterPartner !== 'all' &&
+                    filterPartner !== "all" &&
                     entry.booking.partnerId !== filterPartner
                 ) {
                     return false;
                 }
 
                 if (
-                    filterPaymentStatus !== 'all' &&
+                    filterPaymentStatus !== "all" &&
                     entry.booking.paymentStatus !== filterPaymentStatus
                 ) {
                     return false;
@@ -223,14 +229,14 @@ export const AdminTransactionsPage: React.FC = () => {
                 summaryMap.set(entry.booking.partnerId, {
                     partnerId: entry.booking.partnerId,
                     companyName:
-                        entry.partner?.role === 'PARTNER'
+                        entry.partner?.role === "PARTNER"
                             ? entry.partner.companyName
                             : entry.booking.partnerId,
                     rate: entry.rate,
                     stripeId:
-                        entry.partner?.role === 'PARTNER'
-                            ? (entry.partner.stripeConnectedAccountId ?? '—')
-                            : '—',
+                        entry.partner?.role === "PARTNER"
+                            ? (entry.partner.stripeConnectedAccountId ?? "—")
+                            : "—",
                     volume: entry.booking.totalPrice,
                     commission: entry.commission,
                     partnerNet: entry.partnerNet,
@@ -241,7 +247,7 @@ export const AdminTransactionsPage: React.FC = () => {
         return Array.from(summaryMap.values());
     }, [enrichedBookings]);
 
-    if (!currentUser || currentUser.role !== 'ADMIN') {
+    if (!currentUser || currentUser.role !== "ADMIN") {
         return null;
     }
 
@@ -249,13 +255,14 @@ export const AdminTransactionsPage: React.FC = () => {
         <div className="wdr-admin-tx">
             <section className="wdr-admin-tx__hero">
                 <div className="wdr-admin-tx__hero-content">
-                    <p className="wdr-admin-tx__hero-badge">Administration</p>
+                    <p className="wdr-admin-tx__hero-badge">
+                        {t("admin.transactions.badge")}
+                    </p>
                     <h1 className="wdr-admin-tx__hero-title">
-                        Supervision des transactions
+                        {t("admin.transactions.title")}
                     </h1>
                     <p className="wdr-admin-tx__hero-subtitle">
-                        Vue financee depuis Laravel sur les reservations,
-                        commissions et statuts de paiement.
+                        {t("admin.transactions.subtitle")}
                     </p>
                 </div>
             </section>
@@ -264,68 +271,82 @@ export const AdminTransactionsPage: React.FC = () => {
 
             <div className="wdr-admin-tx__body">
                 <div className="wdr-admin-tx__formula-banner" role="note">
-                    <strong>Modele de commission Wandireo :</strong> clientPrice
-                    = partnerPrice × (1 + rate) &nbsp;|&nbsp; commission =
-                    totalPrice × rate / (1 + rate) &nbsp;|&nbsp; net partenaire
-                    = totalPrice − commission
+                    <strong>{t("admin.transactions.formula_label")}</strong>{" "}
+                    {t("admin.transactions.formula")}
                 </div>
 
                 <section
                     className="wdr-admin-tx__totals"
-                    aria-label="Totaux filtres"
+                    aria-label={t("admin.transactions.totals_aria")}
                 >
                     <div className="wdr-admin-tx__total-card">
                         <span className="wdr-admin-tx__total-label">
-                            Volume confirme
+                            {t("admin.transactions.total.volume")}
                         </span>
                         <span className="wdr-admin-tx__total-value">
-                            {formatPrice(globalTotals.volume, 'EUR')}
+                            {formatPrice(globalTotals.volume, "EUR")}
                         </span>
                     </div>
                     <div className="wdr-admin-tx__total-card wdr-admin-tx__total-card--commission">
                         <span className="wdr-admin-tx__total-label">
-                            Commissions Wandireo
+                            {t("admin.transactions.total.commissions")}
                         </span>
                         <span className="wdr-admin-tx__total-value">
-                            {formatPrice(globalTotals.commissions, 'EUR')}
+                            {formatPrice(globalTotals.commissions, "EUR")}
                         </span>
                     </div>
                     <div className="wdr-admin-tx__total-card">
                         <span className="wdr-admin-tx__total-label">
-                            Net reverse partenaires
+                            {t("admin.transactions.total.partner_net")}
                         </span>
                         <span className="wdr-admin-tx__total-value">
-                            {formatPrice(globalTotals.partnerNet, 'EUR')}
+                            {formatPrice(globalTotals.partnerNet, "EUR")}
                         </span>
                     </div>
                     <div className="wdr-admin-tx__total-card">
                         <span className="wdr-admin-tx__total-label">
-                            Collecte en ligne
+                            {t("admin.transactions.total.online_collected")}
                         </span>
                         <span className="wdr-admin-tx__total-value">
-                            {formatPrice(globalTotals.onlineCollected, 'EUR')}
+                            {formatPrice(globalTotals.onlineCollected, "EUR")}
                         </span>
                     </div>
                 </section>
 
                 <section>
                     <h2 className="wdr-admin-tx__section-title">
-                        Commissions par prestataire
+                        {t("admin.transactions.partners.title")}
                     </h2>
                     <div className="wdr-admin-tx__table-wrapper">
                         <table
                             className="wdr-admin-tx__table"
-                            aria-label="Commissions par prestataire"
+                            aria-label={t("admin.transactions.partners.aria")}
                         >
                             <thead>
                                 <tr>
-                                    <th scope="col">Prestataire</th>
-                                    <th scope="col">Taux</th>
-                                    <th scope="col">Stripe Connect ID</th>
-                                    <th scope="col">Volume</th>
-                                    <th scope="col">Commission</th>
-                                    <th scope="col">Net partenaire</th>
-                                    <th scope="col">Reservations</th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.provider")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.rate")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.stripe_id")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.volume")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.commission")}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.partner_net",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.bookings")}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -335,7 +356,9 @@ export const AdminTransactionsPage: React.FC = () => {
                                             colSpan={7}
                                             className="wdr-admin-tx__table-empty"
                                         >
-                                            Aucune reservation confirmee.
+                                            {t(
+                                                "admin.transactions.no_confirmed",
+                                            )}
                                         </td>
                                     </tr>
                                 ) : (
@@ -348,31 +371,31 @@ export const AdminTransactionsPage: React.FC = () => {
                                                 <span className="wdr-admin-tx__rate-badge">
                                                     {Math.round(
                                                         summary.rate * 100,
-                                                    )}{' '}
+                                                    )}{" "}
                                                     %
                                                 </span>
                                             </td>
                                             <td>
                                                 <code className="wdr-admin-tx__stripe-id">
-                                                    {summary.stripeId || '—'}
+                                                    {summary.stripeId || "—"}
                                                 </code>
                                             </td>
                                             <td className="wdr-admin-tx__amount">
                                                 {formatPrice(
                                                     summary.volume,
-                                                    'EUR',
+                                                    "EUR",
                                                 )}
                                             </td>
                                             <td className="wdr-admin-tx__commission">
                                                 {formatPrice(
                                                     summary.commission,
-                                                    'EUR',
+                                                    "EUR",
                                                 )}
                                             </td>
                                             <td className="wdr-admin-tx__net">
                                                 {formatPrice(
                                                     summary.partnerNet,
-                                                    'EUR',
+                                                    "EUR",
                                                 )}
                                             </td>
                                             <td>{summary.bookingsCount}</td>
@@ -387,18 +410,20 @@ export const AdminTransactionsPage: React.FC = () => {
                 <div
                     className="wdr-admin-tx__filters"
                     role="group"
-                    aria-label="Filtres des transactions"
+                    aria-label={t("admin.transactions.filters_aria")}
                 >
                     <select
                         className="wdr-admin-tx__filter-select"
                         value={filterPartner}
                         onChange={(e) => setFilterPartner(e.target.value)}
-                        aria-label="Filtrer par partenaire"
+                        aria-label={t("admin.transactions.filter.partner")}
                     >
-                        <option value="all">Tous les partenaires</option>
+                        <option value="all">
+                            {t("admin.transactions.filter.partner_all")}
+                        </option>
                         {allPartners.map((partner) => (
                             <option key={partner.id} value={partner.id}>
-                                {partner.role === 'PARTNER'
+                                {partner.role === "PARTNER"
                                     ? partner.companyName
                                     : partner.email}
                             </option>
@@ -410,49 +435,94 @@ export const AdminTransactionsPage: React.FC = () => {
                         value={filterPaymentStatus}
                         onChange={(e) =>
                             setFilterPaymentStatus(
-                                e.target.value as PaymentStatus | 'all',
+                                e.target.value as PaymentStatus | "all",
                             )
                         }
-                        aria-label="Filtrer par statut de paiement"
+                        aria-label={t(
+                            "admin.transactions.filter.payment_status",
+                        )}
                     >
-                        <option value="all">Tous les statuts</option>
-                        <option value={PaymentStatusNames.PAID}>Paye</option>
+                        <option value="all">
+                            {t("admin.transactions.filter.status_all")}
+                        </option>
+                        <option value={PaymentStatusNames.PAID}>
+                            {t("admin.transactions.payment.paid")}
+                        </option>
                         <option value={PaymentStatusNames.PENDING}>
-                            En attente
+                            {t("admin.transactions.payment.pending")}
                         </option>
                         <option value={PaymentStatusNames.REFUNDED}>
-                            Rembourse
+                            {t("admin.transactions.payment.refunded")}
                         </option>
                     </select>
 
                     <span className="wdr-admin-tx__filter-count">
-                        {filteredBookings.length} transaction(s)
+                        {t("admin.transactions.count").replace(
+                            "{count}",
+                            String(filteredBookings.length),
+                        )}
                     </span>
                 </div>
 
                 <section>
                     <h2 className="wdr-admin-tx__section-title">
-                        Detail des transactions
+                        {t("admin.transactions.details.title")}
                     </h2>
                     <div className="wdr-admin-tx__table-wrapper">
                         <table
                             className="wdr-admin-tx__table"
-                            aria-label="Detail des transactions"
+                            aria-label={t("admin.transactions.details.aria")}
                         >
                             <thead>
                                 <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Client</th>
-                                    <th scope="col">Service</th>
-                                    <th scope="col">Partenaire</th>
-                                    <th scope="col">Mode paiement</th>
-                                    <th scope="col">Total client</th>
-                                    <th scope="col">Commission</th>
-                                    <th scope="col">Net partenaire</th>
-                                    <th scope="col">Ligne Stripe</th>
-                                    <th scope="col">Statut resa.</th>
-                                    <th scope="col">Statut paiement</th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.id")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.date")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.client")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.service")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.partner")}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.payment_mode",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.client_total",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.transactions.col.commission")}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.partner_net",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.stripe_line",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.booking_status",
+                                        )}
+                                    </th>
+                                    <th scope="col">
+                                        {t(
+                                            "admin.transactions.col.payment_status",
+                                        )}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -462,8 +532,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                             colSpan={12}
                                             className="wdr-admin-tx__table-empty"
                                         >
-                                            Aucune transaction ne correspond aux
-                                            filtres.
+                                            {t("admin.transactions.no_match")}
                                         </td>
                                     </tr>
                                 ) : (
@@ -482,11 +551,11 @@ export const AdminTransactionsPage: React.FC = () => {
                                                 </td>
                                                 <td className="wdr-admin-tx__table-date">
                                                     {booking.createdAt.toLocaleDateString(
-                                                        'fr-FR',
+                                                        intlLocale,
                                                         {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: '2-digit',
+                                                            day: "2-digit",
+                                                            month: "2-digit",
+                                                            year: "2-digit",
                                                         },
                                                     )}
                                                 </td>
@@ -504,15 +573,19 @@ export const AdminTransactionsPage: React.FC = () => {
                                                         booking,
                                                     ) && (
                                                         <div className="wdr-admin-tx__table-extras">
-                                                            Extras:{' '}
-                                                            {formatExtrasSummary(
-                                                                booking,
+                                                            {t(
+                                                                "admin.transactions.extras",
+                                                            ).replace(
+                                                                "{summary}",
+                                                                formatExtrasSummary(
+                                                                    booking,
+                                                                ) ?? "",
                                                             )}
                                                         </div>
                                                     )}
                                                 </td>
                                                 <td>
-                                                    {partner?.role === 'PARTNER'
+                                                    {partner?.role === "PARTNER"
                                                         ? partner.companyName
                                                         : booking.partnerId}
                                                 </td>
@@ -536,7 +609,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                                               commission,
                                                               booking.currency,
                                                           )
-                                                        : '—'}
+                                                        : "—"}
                                                 </td>
                                                 <td className="wdr-admin-tx__net">
                                                     {booking.status ===
@@ -545,12 +618,12 @@ export const AdminTransactionsPage: React.FC = () => {
                                                               partnerNet,
                                                               booking.currency,
                                                           )
-                                                        : '—'}
+                                                        : "—"}
                                                 </td>
                                                 <td>
                                                     <code className="wdr-admin-tx__stripe-intent">
                                                         {booking.stripePaymentIntentId ??
-                                                            '—'}
+                                                            "—"}
                                                     </code>
                                                 </td>
                                                 <td>
@@ -559,6 +632,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                                     >
                                                         {getBookingStatusLabel(
                                                             booking.status,
+                                                            t,
                                                         )}
                                                     </span>
                                                 </td>
@@ -568,6 +642,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                                     >
                                                         {getPaymentStatusLabel(
                                                             booking.paymentStatus,
+                                                            t,
                                                         )}
                                                     </span>
                                                 </td>

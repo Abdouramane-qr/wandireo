@@ -4,15 +4,15 @@
  * via sanitizeHtml avant rendu.
  */
 
-import React, { useMemo } from 'react';
-import { BlogCard, Breadcrumb } from '@/components/wdr';
-import { useBlogPostData, useBlogPostsData } from '@/hooks/useBlogData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { sanitizeHtml } from '@/lib/sanitizeHtml';
-import { BlogStatusNames } from '@/types/blog';
-import { NotFoundPage } from '../NotFoundPage';
-import './BlogPostPage.css';
+import React, { useMemo } from "react";
+import { BlogCard, Breadcrumb } from "@/components/wdr";
+import { useBlogPostData, useBlogPostsData } from "@/hooks/useBlogData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
+import { BlogStatusNames } from "@/types/blog";
+import { NotFoundPage } from "../NotFoundPage";
+import "./BlogPostPage.css";
 
 interface BlogPostPageProps {
     slug: string;
@@ -29,16 +29,16 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug }) => {
 
     const formatDate = (date: Date): string => {
         return new Intl.DateTimeFormat(intlLocale, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+            year: "numeric",
+            month: "long",
+            day: "numeric",
         }).format(date);
     };
 
     const relatedPosts = useMemo(() => {
         if (!post) {
-return [];
-}
+            return [];
+        }
 
         return allPublished
             .filter(
@@ -50,8 +50,8 @@ return [];
     }, [post, allPublished]);
 
     if (!post) {
-return <NotFoundPage />;
-}
+        return <NotFoundPage />;
+    }
 
     const safeContent = sanitizeHtml(post.content);
 
@@ -62,12 +62,12 @@ return <NotFoundPage />;
                 <Breadcrumb
                     items={[
                         {
-                            label: t('nav.home'),
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("nav.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
                         {
-                            label: t('nav.blog'),
-                            onClick: () => navigate({ name: 'blog' }),
+                            label: t("nav.blog"),
+                            onClick: () => navigate({ name: "blog" }),
                         },
                         { label: post.title },
                     ]}
@@ -79,7 +79,7 @@ return <NotFoundPage />;
                 <div className="wdr-post__cover-wrapper">
                     <img
                         src={post.coverImage}
-                        alt={`Illustration : ${post.title}`}
+                        alt={`${t("blog.cover_alt")} : ${post.title}`}
                         className="wdr-post__cover"
                         loading="eager"
                     />
@@ -89,13 +89,16 @@ return <NotFoundPage />;
             {/* En-tête */}
             <header className="wdr-post__header">
                 {/* Tags */}
-                <div className="wdr-post__tags" aria-label="Thèmes">
+                <div
+                    className="wdr-post__tags"
+                    aria-label={t("blog.tags_aria")}
+                >
                     {post.tags.map((tag) => (
                         <button
                             key={tag}
                             type="button"
                             className="wdr-post__tag"
-                            onClick={() => navigate({ name: 'blog' })}
+                            onClick={() => navigate({ name: "blog" })}
                         >
                             {tag}
                         </button>
@@ -108,11 +111,13 @@ return <NotFoundPage />;
                 {post.publishedAt && (
                     <div className="wdr-post__meta">
                         <time dateTime={post.publishedAt.toISOString()}>
-                            {t('blog.published_on')} {formatDate(post.publishedAt)}
+                            {t("blog.published_on")}{" "}
+                            {formatDate(post.publishedAt)}
                         </time>
                         {post.updatedAt > post.publishedAt && (
                             <span className="wdr-post__updated">
-                                · {t('blog.updated_on')} {formatDate(post.updatedAt)}
+                                · {t("blog.updated_on")}{" "}
+                                {formatDate(post.updatedAt)}
                             </span>
                         )}
                     </div>
@@ -136,7 +141,7 @@ return <NotFoundPage />;
                             id="related-heading"
                             className="wdr-post__related-title"
                         >
-                            {t('blog.related_posts')}
+                            {t("blog.related_posts")}
                         </h2>
                         <div className="wdr-post__related-grid">
                             {relatedPosts.map((p) => (
@@ -144,7 +149,7 @@ return <NotFoundPage />;
                                     key={p.id}
                                     post={p}
                                     onClick={(s) =>
-                                        navigate({ name: 'blog-post', slug: s })
+                                        navigate({ name: "blog-post", slug: s })
                                     }
                                 />
                             ))}

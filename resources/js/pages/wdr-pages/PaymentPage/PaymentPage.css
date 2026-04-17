@@ -109,6 +109,7 @@
     grid-template-columns: 1fr 340px;
     gap: 2rem;
     align-items: start;
+    min-width: 0;
 }
 
 @media (max-width: 900px) {
@@ -129,6 +130,7 @@
     box-shadow: var(--card-shadow);
     padding: 2rem;
     border: var(--card-border);
+    min-width: 0;
 }
 
 /* --- Bandeau securite --- */
@@ -348,7 +350,13 @@
     padding: 1.5rem;
     border: var(--card-border);
     position: sticky;
-    top: 1.5rem;
+    top: 5.75rem;
+}
+
+@media (max-width: 900px) {
+    .wdr-payment__aside {
+        position: static;
+    }
 }
 
 .wdr-payment__aside-title {
@@ -419,6 +427,23 @@
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .wdr-payment {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .wdr-payment__form-section,
+    .wdr-payment__aside,
+    .wdr-payment__cash-panel {
+        padding: 1rem;
+    }
+
+    .wdr-payment__aside-price-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .wdr-payment__aside-price-row dt {

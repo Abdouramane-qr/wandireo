@@ -3,12 +3,14 @@
  * @description Page 404 — rendue pour toute route non reconnue par le router.
  */
 
-import React from 'react';
-import { Button } from '@/components/wdr';
-import { useRouter } from '@/hooks/useWdrRouter';
-import './NotFoundPage.css';
+import React from "react";
+import { Button } from "@/components/wdr";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import "./NotFoundPage.css";
 
 export const NotFoundPage: React.FC = () => {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
 
     return (
@@ -17,16 +19,16 @@ export const NotFoundPage: React.FC = () => {
                 <span className="wdr-404__code" aria-hidden="true">
                     404
                 </span>
-                <h1 className="wdr-404__title">Page introuvable</h1>
+                <h1 className="wdr-404__title">{t("not_found.title")}</h1>
                 <p className="wdr-404__description">
-                    La page que vous recherchez n'existe pas ou a été déplacée.
+                    {t("not_found.description")}
                 </p>
                 <Button
                     variant="primary"
                     size="lg"
-                    onClick={() => navigate({ name: 'home' })}
+                    onClick={() => navigate({ name: "home" })}
                 >
-                    Retour à l'accueil
+                    {t("not_found.cta")}
                 </Button>
             </div>
         </div>

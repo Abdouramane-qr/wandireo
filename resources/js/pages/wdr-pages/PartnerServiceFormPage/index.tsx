@@ -4,52 +4,59 @@
  * Gere les champs communs a toutes les categories de service.
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { servicesApi } from '@/api/services';
-import { uploadsApi } from '@/api/uploads';
-import { Breadcrumb, Button, Input, Select } from '@/components/wdr';
-import { useToast } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
+import React, { useEffect, useMemo, useState } from "react";
+import { servicesApi } from "@/api/services";
+import { uploadsApi } from "@/api/uploads";
+import { Breadcrumb, Button, Input, Select } from "@/components/wdr";
+import { useToast } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
 import {
     useCalendarSyncData,
     useRunCalendarSyncData,
     useSaveCalendarSyncData,
-} from '@/hooks/useCalendarSyncData';
+} from "@/hooks/useCalendarSyncData";
 import {
     useCreateServicePricingRuleData,
     useDeleteServicePricingRuleData,
     useServicePricingRulesData,
-} from '@/hooks/useServicePricingData';
-import { useServiceStructureData } from '@/hooks/useServiceStructureData';
-import { useAdminUsersData } from '@/hooks/useUsersData';
-import { usePartnerApprovalGuard } from '@/hooks/usePartnerApprovalGuard';
-import { useServiceData } from '@/hooks/useServicesData';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
+} from "@/hooks/useServicePricingData";
+import { useServiceStructureData } from "@/hooks/useServiceStructureData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAdminUsersData } from "@/hooks/useUsersData";
+import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
+import { useServiceData } from "@/hooks/useServicesData";
+import { useRouter } from "@/hooks/useWdrRouter";
+import {
+    LOCALE_LABELS,
+    SUPPORTED_LOCALES,
+    type Locale,
+} from "@/lib/locale";
+import { formatPrice } from "@/lib/formatters";
 import type {
     PricingAdjustmentType,
     PricingRuleType,
-} from '@/types/pricing-rule';
+} from "@/types/pricing-rule";
 import type {
     BookingMode,
     PaymentMode,
     Service,
     ServiceCategory,
     ServicePricingUnit,
-} from '@/types/service';
+    LocalizedTextMap,
+} from "@/types/service";
 import {
     PaymentModeDescriptions,
     PaymentModeLabels,
     PaymentModeNames,
     ServiceCategoryLabels,
     ServiceCategoryNames,
-} from '@/types/service';
-import type { PartnerUser } from '@/types/wdr-user';
-import './PartnerServiceFormPage.css';
+} from "@/types/service";
+import type { PartnerUser } from "@/types/wdr-user";
+import "./PartnerServiceFormPage.css";
 
 interface ServiceFormState {
-    title: string;
-    description: string;
+    titleTranslations: LocalizedTextMap;
+    descriptionTranslations: LocalizedTextMap;
     category: ServiceCategory;
     serviceCategoryId: string;
     serviceSubcategoryId: string;
@@ -68,6 +75,16 @@ interface ServiceFormState {
     dynamicAttributes: Record<string, string | boolean>;
 }
 
+interface ServiceFormErrors {
+    title?: string;
+    description?: string;
+    serviceCategoryId?: string;
+    city?: string;
+    country?: string;
+    partnerPrice?: string;
+    imageUrls?: string;
+}
+
 interface PricingRuleFormState {
     name: string;
     ruleType: PricingRuleType;
@@ -78,15 +95,6 @@ interface PricingRuleFormState {
     minUnits: string;
     priority: string;
 }
-
-const PRICING_UNIT_OPTIONS = [
-    { value: 'PAR_PERSONNE', label: 'Par personne' },
-    { value: 'PAR_GROUPE', label: 'Par groupe' },
-    { value: 'PAR_JOUR', label: 'Par jour' },
-    { value: 'PAR_NUIT', label: 'Par nuit' },
-    { value: 'PAR_SEMAINE', label: 'Par semaine' },
-    { value: 'PAR_DEMI_JOURNEE', label: 'Par demi-journee' },
-];
 
 const CATEGORY_OPTIONS = [
     {
@@ -123,114 +131,106 @@ const PAYMENT_MODE_OPTIONS = [
     },
 ];
 
-const PRICING_RULE_TYPE_OPTIONS = [
-    { value: 'WEEKEND', label: 'Week-end' },
-    { value: 'SEASONAL', label: 'Saisonnier' },
-    { value: 'DURATION', label: 'Long sejour' },
-];
+const DEFAULT_SERVICE_REGION = "Algarve";
+const DEFAULT_SERVICE_COUNTRY = "Portugal";
 
-const PRICING_ADJUSTMENT_OPTIONS = [
-    { value: 'PERCENTAGE', label: 'Pourcentage' },
-    { value: 'FIXED_AMOUNT', label: 'Montant fixe (EUR)' },
-];
-
-const DEFAULT_SERVICE_REGION = 'Algarve';
-const DEFAULT_SERVICE_COUNTRY = 'Portugal';
-const ALGARVE_CITY_OPTIONS = [
-    { value: '', label: 'Choisir une ville' },
-    { value: 'Lagos', label: 'Lagos' },
-    { value: 'Alvor', label: 'Alvor' },
-    { value: 'Portimão', label: 'Portimão' },
-    { value: 'Silves', label: 'Silves' },
-    { value: 'Benagil', label: 'Benagil' },
-    { value: 'Armação de Pêra', label: 'Armação de Pêra' },
-    { value: 'Vilamoura', label: 'Vilamoura' },
-    { value: 'Albufeira', label: 'Albufeira' },
-];
-const CATEGORY_GUIDANCE: Record<
-    ServiceCategory,
-    {
-        title: string;
-        points: string[];
+function buildLocalizedTextMap(
+    value: LocalizedTextMap | undefined,
+    fallback = "",
+): LocalizedTextMap {
+    if (value && Object.keys(value).length > 0) {
+        return { ...value };
     }
-> = {
-    ACTIVITE: {
-        title: 'Points attendus pour une activite',
-        points: [
-            'Decrivez clairement l experience, le niveau requis et ce qui est inclus.',
-            'Renseignez une ville precise et un prix lisible par personne ou par groupe.',
-            'Ajoutez des images qui montrent l activite en situation reelle.',
-        ],
-    },
-    BATEAU: {
-        title: 'Points attendus pour un bateau',
-        points: [
-            'Choisissez la sous-categorie adaptee : yacht, catamaran, jet ski ou location simple.',
-            'Completez les attributs techniques comme longueur, cabines, vitesse ou carburant.',
-            'Verifiez que les extras utiles comme skipper ou carburant sont bien visibles.',
-        ],
-    },
-    HEBERGEMENT: {
-        title: 'Points attendus pour un hebergement',
-        points: [
-            'Precisez la capacite reelle et les attributs de confort comme chambres, salles de bain, WiFi ou piscine.',
-            'Soignez les images de couverture et la localisation exacte.',
-            'Utilisez des extras clairs comme menage final ou petit-dejeuner si necessaire.',
-        ],
-    },
-    VOITURE: {
-        title: 'Points attendus pour une voiture',
-        points: [
-            'Choisissez la bonne sous-categorie : SUV, luxe, electrique ou citadine.',
-            'Renseignez les attributs utiles comme transmission, carburant, portes et climatisation.',
-            'Ajoutez des extras simples a comprendre, par exemple chauffeur ou livraison.',
-        ],
-    },
-};
+
+    return fallback.trim() ? { fr: fallback.trim() } : {};
+}
+
+function readLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+): string {
+    return translations[locale] ?? "";
+}
+
+function writeLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+    value: string,
+): LocalizedTextMap {
+    const normalized = value.trim();
+    const next = { ...translations };
+
+    if (normalized) {
+        next[locale] = value;
+    } else {
+        delete next[locale];
+    }
+
+    return next;
+}
+
+function hasAnyTranslation(translations: LocalizedTextMap): boolean {
+    return Object.values(translations).some(
+        (value) => typeof value === "string" && value.trim() !== "",
+    );
+}
+
+function hasLocaleTranslation(
+    translations: LocalizedTextMap,
+    locale: Locale,
+): boolean {
+    return typeof translations[locale] === "string"
+        && translations[locale]!.trim() !== "";
+}
 
 function buildInitialState(existingService?: Service): ServiceFormState {
     if (existingService) {
         return {
-            title: existingService.title,
-            description: existingService.description,
+            titleTranslations: buildLocalizedTextMap(
+                existingService.titleTranslations,
+                existingService.title,
+            ),
+            descriptionTranslations: buildLocalizedTextMap(
+                existingService.descriptionTranslations,
+                existingService.description,
+            ),
             category: existingService.category,
-            serviceCategoryId: existingService.serviceCategoryId ?? '',
-            serviceSubcategoryId: existingService.serviceSubcategoryId ?? '',
+            serviceCategoryId: existingService.serviceCategoryId ?? "",
+            serviceSubcategoryId: existingService.serviceSubcategoryId ?? "",
             city: existingService.location.city,
             country: existingService.location.country,
-            region: existingService.location.region ?? '',
+            region: existingService.location.region ?? "",
             partnerPrice: String(existingService.partnerPrice),
             pricingUnit: existingService.pricingUnit,
             paymentMode: existingService.paymentMode,
-            bookingMode: existingService.bookingMode ?? 'REQUEST',
+            bookingMode: existingService.bookingMode ?? "REQUEST",
             featured: existingService.featured ?? false,
-            videoUrl: existingService.videoUrl ?? '',
-            tags: existingService.tags.join(', '),
+            videoUrl: existingService.videoUrl ?? "",
+            tags: existingService.tags.join(", "),
             imageUrls: existingService.images,
             isAvailable: existingService.isAvailable,
-            dynamicAttributes: ((existingService.extraData?.attributes as Record<
-                string,
-                string | boolean
-            >) ?? {}) as Record<string, string | boolean>,
+            dynamicAttributes: ((existingService.extraData
+                ?.attributes as Record<string, string | boolean>) ??
+                {}) as Record<string, string | boolean>,
         };
     }
 
     return {
-        title: '',
-        description: '',
+        titleTranslations: {},
+        descriptionTranslations: {},
         category: ServiceCategoryNames.ACTIVITE,
-        serviceCategoryId: '',
-        serviceSubcategoryId: '',
-        city: '',
+        serviceCategoryId: "",
+        serviceSubcategoryId: "",
+        city: "",
         country: DEFAULT_SERVICE_COUNTRY,
         region: DEFAULT_SERVICE_REGION,
-        partnerPrice: '',
-        pricingUnit: 'PAR_PERSONNE',
+        partnerPrice: "",
+        pricingUnit: "PAR_PERSONNE",
         paymentMode: PaymentModeNames.FULL_ONLINE,
-        bookingMode: 'REQUEST',
+        bookingMode: "REQUEST",
         featured: false,
-        videoUrl: '',
-        tags: '',
+        videoUrl: "",
+        tags: "",
         imageUrls: [],
         isAvailable: true,
         dynamicAttributes: {},
@@ -256,68 +256,129 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const { success, error } = useToast();
+    const { t } = useTranslation();
     const { isBlocked } = usePartnerApprovalGuard(!adminMode);
     const { categories: serviceCategories } = useServiceStructureData();
-    const { users } = useAdminUsersData({ role: 'PARTNER' }, adminMode);
+    const { users } = useAdminUsersData({ role: "PARTNER" }, adminMode);
+    const pricingUnitOptions = useMemo(
+        () => [
+            {
+                value: "PAR_PERSONNE",
+                label: t("service.form.pricing_unit.person"),
+            },
+            {
+                value: "PAR_GROUPE",
+                label: t("service.form.pricing_unit.group"),
+            },
+            { value: "PAR_JOUR", label: t("service.form.pricing_unit.day") },
+            { value: "PAR_NUIT", label: t("service.form.pricing_unit.night") },
+            {
+                value: "PAR_SEMAINE",
+                label: t("service.form.pricing_unit.week"),
+            },
+            {
+                value: "PAR_DEMI_JOURNEE",
+                label: t("service.form.pricing_unit.half_day"),
+            },
+        ],
+        [t],
+    );
+    const pricingRuleTypeOptions = useMemo(
+        () => [
+            { value: "WEEKEND", label: t("service.form.rule_type.weekend") },
+            { value: "SEASONAL", label: t("service.form.rule_type.seasonal") },
+            { value: "DURATION", label: t("service.form.rule_type.duration") },
+        ],
+        [t],
+    );
+    const pricingAdjustmentOptions = useMemo(
+        () => [
+            {
+                value: "PERCENTAGE",
+                label: t("service.form.adjustment.percentage"),
+            },
+            {
+                value: "FIXED_AMOUNT",
+                label: t("service.form.adjustment.fixed"),
+            },
+        ],
+        [t],
+    );
+    const algarveCityOptions = useMemo(
+        () => [
+            { value: "", label: t("service.form.city.choose") },
+            { value: "Lagos", label: t("service.form.city.lagos") },
+            { value: "Alvor", label: t("service.form.city.alvor") },
+            { value: "Portimão", label: t("service.form.city.portimao") },
+            { value: "Silves", label: t("service.form.city.silves") },
+            { value: "Benagil", label: t("service.form.city.benagil") },
+            {
+                value: "Armação de Pêra",
+                label: t("service.form.city.armacao_de_pera"),
+            },
+            { value: "Vilamoura", label: t("service.form.city.vilamoura") },
+            { value: "Albufeira", label: t("service.form.city.albufeira") },
+        ],
+        [t],
+    );
 
-    const isAdmin = currentUser?.role === 'ADMIN';
-    const partnerOptions = users.filter((user) => user.role === 'PARTNER');
+    const isAdmin = currentUser?.role === "ADMIN";
+    const partnerOptions = users.filter((user) => user.role === "PARTNER");
     const [selectedPartnerId, setSelectedPartnerId] = useState<string>(
-        existingService?.partnerId ?? (adminMode ? '' : currentUser?.id ?? ''),
+        existingService?.partnerId ??
+            (adminMode ? "" : (currentUser?.id ?? "")),
     );
 
     if (
         !currentUser ||
-        (!adminMode && (isBlocked || currentUser.role !== 'PARTNER')) ||
+        (!adminMode && (isBlocked || currentUser.role !== "PARTNER")) ||
         (adminMode && !isAdmin)
     ) {
         return null;
     }
 
     const partner = currentUser as PartnerUser;
-    const selectedPartner =
-        adminMode
-            ? (partnerOptions.find((entry) => entry.id === selectedPartnerId) ??
-              null)
-            : partner;
+    const selectedPartner = adminMode
+        ? (partnerOptions.find((entry) => entry.id === selectedPartnerId) ??
+          null)
+        : partner;
+    const isExternalService = existingService?.sourceType === "EXTERNAL";
     const isEditing = !!serviceId;
     const [form, setForm] = useState<ServiceFormState>(() =>
         buildInitialState(existingService),
     );
+    const [activeLocale, setActiveLocale] = useState<Locale>("fr");
     const [saving, setSaving] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false);
-    const [calendarImportUrl, setCalendarImportUrl] = useState('');
-    const [errors, setErrors] = useState<
-        Partial<Record<keyof ServiceFormState, string>>
-    >({});
-    const [pricingRuleForm, setPricingRuleForm] = useState<PricingRuleFormState>(
-        {
-            name: '',
-            ruleType: 'WEEKEND',
-            adjustmentType: 'PERCENTAGE',
-            adjustmentValue: '',
-            startDate: '',
-            endDate: '',
-            minUnits: '',
-            priority: '100',
-        },
-    );
+    const [calendarImportUrl, setCalendarImportUrl] = useState("");
+    const [errors, setErrors] = useState<ServiceFormErrors>({});
+    const [pricingRuleForm, setPricingRuleForm] =
+        useState<PricingRuleFormState>({
+            name: "",
+            ruleType: "WEEKEND",
+            adjustmentType: "PERCENTAGE",
+            adjustmentValue: "",
+            startDate: "",
+            endDate: "",
+            minUnits: "",
+            priority: "100",
+        });
     const canUseIcalSync =
         isEditing &&
         (form.category === ServiceCategoryNames.HEBERGEMENT ||
             form.category === ServiceCategoryNames.BATEAU);
     const pricingRulesQuery = useServicePricingRulesData(
-        serviceId ?? '',
+        serviceId ?? "",
         isEditing && Boolean(serviceId),
     );
-    const createPricingRule = useCreateServicePricingRuleData(serviceId ?? '');
-    const deletePricingRule = useDeleteServicePricingRuleData(serviceId ?? '');
+    const createPricingRule = useCreateServicePricingRuleData(serviceId ?? "");
+    const deletePricingRule = useDeleteServicePricingRuleData(serviceId ?? "");
     const calendarSyncQuery = useCalendarSyncData(
-        serviceId ?? '',
+        serviceId ?? "",
         canUseIcalSync && Boolean(serviceId),
     );
-    const saveCalendarSync = useSaveCalendarSyncData(serviceId ?? '');
-    const runCalendarSync = useRunCalendarSyncData(serviceId ?? '');
+    const saveCalendarSync = useSaveCalendarSyncData(serviceId ?? "");
+    const runCalendarSync = useRunCalendarSyncData(serviceId ?? "");
 
     useEffect(() => {
         if (!existingService) {
@@ -327,13 +388,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         setForm(buildInitialState(existingService));
         setSelectedPartnerId(
             existingService.partnerId ??
-                (adminMode ? '' : currentUser?.id ?? ''),
+                (adminMode ? "" : (currentUser?.id ?? "")),
         );
         setErrors({});
     }, [adminMode, currentUser?.id, existingService]);
 
     useEffect(() => {
-        setCalendarImportUrl(calendarSyncQuery.data?.importUrl ?? '');
+        setCalendarImportUrl(calendarSyncQuery.data?.importUrl ?? "");
     }, [calendarSyncQuery.data?.importUrl]);
 
     const availableStructureCategories = useMemo(
@@ -353,7 +414,8 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         [availableStructureCategories, form.serviceCategoryId],
     );
 
-    const availableSubcategories = selectedStructureCategory?.subcategories ?? [];
+    const availableSubcategories =
+        selectedStructureCategory?.subcategories ?? [];
     const activeExtras = useMemo(
         () =>
             (selectedStructureCategory?.extras ?? []).filter(
@@ -361,10 +423,48 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             ),
         [selectedStructureCategory],
     );
-    const categoryGuidance = CATEGORY_GUIDANCE[form.category];
+    const categoryGuidance = useMemo<
+        Record<ServiceCategory, { title: string; points: string[] }>
+    >(
+        () => ({
+            ACTIVITE: {
+                title: t("service.form.guidance.activity.title"),
+                points: [
+                    t("service.form.guidance.activity.1"),
+                    t("service.form.guidance.activity.2"),
+                    t("service.form.guidance.activity.3"),
+                ],
+            },
+            BATEAU: {
+                title: t("service.form.guidance.boat.title"),
+                points: [
+                    t("service.form.guidance.boat.1"),
+                    t("service.form.guidance.boat.2"),
+                    t("service.form.guidance.boat.3"),
+                ],
+            },
+            HEBERGEMENT: {
+                title: t("service.form.guidance.stay.title"),
+                points: [
+                    t("service.form.guidance.stay.1"),
+                    t("service.form.guidance.stay.2"),
+                    t("service.form.guidance.stay.3"),
+                ],
+            },
+            VOITURE: {
+                title: t("service.form.guidance.car.title"),
+                points: [
+                    t("service.form.guidance.car.1"),
+                    t("service.form.guidance.car.2"),
+                    t("service.form.guidance.car.3"),
+                ],
+            },
+        }),
+        [t],
+    )[form.category];
     const effectivePartnerId =
         adminMode && !isEditing
-            ? selectedPartnerId || partnerOptions[0]?.id || ''
+            ? selectedPartnerId || partnerOptions[0]?.id || ""
             : selectedPartnerId;
     const requiredAttributes = useMemo(
         () =>
@@ -383,15 +483,18 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         ) {
             setForm((previous) => ({
                 ...previous,
-                serviceCategoryId: '',
-                serviceSubcategoryId: '',
+                serviceCategoryId: "",
+                serviceSubcategoryId: "",
                 dynamicAttributes: {},
             }));
         }
     }, [availableStructureCategories, form.serviceCategoryId]);
 
     useEffect(() => {
-        if (!form.serviceCategoryId && availableStructureCategories.length === 1) {
+        if (
+            !form.serviceCategoryId &&
+            availableStructureCategories.length === 1
+        ) {
             setForm((previous) => ({
                 ...previous,
                 serviceCategoryId: availableStructureCategories[0].id,
@@ -408,34 +511,10 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         ) {
             setForm((previous) => ({
                 ...previous,
-                serviceSubcategoryId: '',
+                serviceSubcategoryId: "",
             }));
         }
     }, [availableSubcategories, form.serviceSubcategoryId]);
-
-    if (existingService?.sourceType === 'EXTERNAL') {
-        return (
-            <div className="wdr-sform">
-                <div className="wdr-sform__header">
-                    <div className="wdr-sform__header-inner">
-                        <h1 className="wdr-sform__title">
-                            Offre externe en lecture seule
-                        </h1>
-                        <p className="wdr-sform__subtitle">
-                            Cette offre est synchronisee depuis une source
-                            externe et ne peut pas etre modifiee ici.
-                        </p>
-                        <Button
-                            variant="primary"
-                            onClick={() => navigate({ name: 'partner-catalog' })}
-                        >
-                            Retour au catalogue
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     const clientPrice = useMemo(() => {
         const price = parseFloat(form.partnerPrice);
@@ -444,19 +523,19 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             return null;
         }
 
-        return price * (1 + (selectedPartner?.commissionRate ?? 0.20));
+        return price * (1 + (selectedPartner?.commissionRate ?? 0.2));
     }, [form.partnerPrice, selectedPartner?.commissionRate]);
 
     const resetPricingRuleForm = () => {
         setPricingRuleForm({
-            name: '',
-            ruleType: 'WEEKEND',
-            adjustmentType: 'PERCENTAGE',
-            adjustmentValue: '',
-            startDate: '',
-            endDate: '',
-            minUnits: '',
-            priority: '100',
+            name: "",
+            ruleType: "WEEKEND",
+            adjustmentType: "PERCENTAGE",
+            adjustmentValue: "",
+            startDate: "",
+            endDate: "",
+            minUnits: "",
+            priority: "100",
         });
     };
 
@@ -465,7 +544,14 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         value: ServiceFormState[K],
     ) => {
         setForm((previous) => ({ ...previous, [key]: value }));
-        setErrors((previous) => ({ ...previous, [key]: undefined }));
+        setErrors((previous) => ({
+            ...previous,
+            [key === "titleTranslations"
+                ? "title"
+                : key === "descriptionTranslations"
+                  ? "description"
+                  : key]: undefined,
+        }));
     };
 
     const setDynamicAttribute = (key: string, value: string | boolean) => {
@@ -495,7 +581,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         }));
     };
 
-    const moveImage = (imageUrl: string, direction: 'left' | 'right') => {
+    const moveImage = (imageUrl: string, direction: "left" | "right") => {
         setForm((previous) => {
             const currentIndex = previous.imageUrls.findIndex(
                 (entry) => entry === imageUrl,
@@ -506,12 +592,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             }
 
             const targetIndex =
-                direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+                direction === "left" ? currentIndex - 1 : currentIndex + 1;
 
-            if (
-                targetIndex < 0 ||
-                targetIndex >= previous.imageUrls.length
-            ) {
+            if (targetIndex < 0 || targetIndex >= previous.imageUrls.length) {
                 return previous;
             }
 
@@ -543,8 +626,8 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             for (const file of files) {
                 const presigned = await uploadsApi.presign({
                     fileName: file.name,
-                    contentType: file.type || 'application/octet-stream',
-                    folder: 'services',
+                    contentType: file.type || "application/octet-stream",
+                    folder: "services",
                 });
 
                 const response = await uploadsApi.uploadFile(
@@ -553,7 +636,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 );
 
                 if (!response.ok) {
-                    throw new Error('upload_failed');
+                    throw new Error("upload_failed");
                 }
 
                 uploadedUrls.push(presigned.publicUrl);
@@ -564,59 +647,79 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 imageUrls: [...previous.imageUrls, ...uploadedUrls],
             }));
             success(
-                `${uploadedUrls.length} image${uploadedUrls.length > 1 ? 's televersees.' : ' televersee.'}`,
+                uploadedUrls.length > 1
+                    ? t("service.form.toast.images_uploaded_other").replace(
+                          "{count}",
+                          String(uploadedUrls.length),
+                      )
+                    : t("service.form.toast.images_uploaded_one"),
             );
         } catch {
-            error('Le televersement des images a echoue.');
+            error(t("service.form.toast.images_upload_error"));
         } finally {
             setUploadingImages(false);
-            event.target.value = '';
+            event.target.value = "";
         }
     };
 
     const validate = (): boolean => {
-        const nextErrors: Partial<Record<keyof ServiceFormState, string>> = {};
+        const nextErrors: ServiceFormErrors = {};
 
-        if (!form.title.trim()) {
-            nextErrors.title = 'Le titre est obligatoire.';
+        if (!hasAnyTranslation(form.titleTranslations)) {
+            nextErrors.title = t("service.form.error.title_required");
+        } else if (!hasLocaleTranslation(form.titleTranslations, "fr")) {
+            nextErrors.title = "Le titre FR est obligatoire.";
         }
 
-        if (!form.description.trim()) {
-            nextErrors.description = 'La description est obligatoire.';
+        if (!hasAnyTranslation(form.descriptionTranslations)) {
+            nextErrors.description = t(
+                "service.form.error.description_required",
+            );
+        } else if (!hasLocaleTranslation(form.descriptionTranslations, "fr")) {
+            nextErrors.description = "La description FR est obligatoire.";
         }
 
-        if (!form.serviceCategoryId && availableStructureCategories.length > 0) {
-            nextErrors.serviceCategoryId = 'Choisissez une categorie detaillee.';
+        if (
+            !form.serviceCategoryId &&
+            availableStructureCategories.length > 0
+        ) {
+            nextErrors.serviceCategoryId = t(
+                "service.form.error.category_required",
+            );
         }
 
         if (!form.city.trim()) {
-            nextErrors.city = 'La ville est obligatoire.';
+            nextErrors.city = t("service.form.error.city_required");
         }
 
         if (!form.country.trim()) {
-            nextErrors.country = 'Le pays est obligatoire.';
+            nextErrors.country = t("service.form.error.country_required");
         }
 
         const price = parseFloat(form.partnerPrice);
 
-        if (Number.isNaN(price) || price <= 0) {
-            nextErrors.partnerPrice = 'Saisissez un prix positif.';
+        if (
+            Number.isNaN(price) ||
+            (!isExternalService && price <= 0) ||
+            (isExternalService && price < 0)
+        ) {
+            nextErrors.partnerPrice = t("service.form.error.price_positive");
         }
 
         if (form.imageUrls.length === 0) {
-            nextErrors.imageUrls =
-                'Ajoutez au moins une image pour ce service.';
+            nextErrors.imageUrls = t("service.form.error.image_required");
         }
 
         selectedStructureCategory?.attributes.forEach((attribute) => {
             if (
                 attribute.isRequired &&
                 (form.dynamicAttributes[attribute.key] === undefined ||
-                    form.dynamicAttributes[attribute.key] === '' ||
+                    form.dynamicAttributes[attribute.key] === "" ||
                     form.dynamicAttributes[attribute.key] === false)
             ) {
-                nextErrors.serviceCategoryId =
-                    'Les attributs obligatoires doivent etre renseignes.';
+                nextErrors.serviceCategoryId = t(
+                    "service.form.error.required_attributes",
+                );
             }
         });
 
@@ -629,7 +732,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         event.preventDefault();
 
         if (!validate()) {
-            error('Veuillez corriger les erreurs avant de continuer.');
+            error(t("service.form.error.fix_before_continue"));
 
             return;
         }
@@ -638,14 +741,14 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
         const price = parseFloat(form.partnerPrice);
         const tags = form.tags
-            .split(',')
+            .split(",")
             .map((tag) => tag.trim())
             .filter(Boolean);
 
         const payload = {
             partner_id: adminMode ? effectivePartnerId || undefined : undefined,
-            title: form.title,
-            description: form.description,
+            title: form.titleTranslations,
+            description: form.descriptionTranslations,
             category: form.category,
             service_category_id: form.serviceCategoryId || undefined,
             service_subcategory_id: form.serviceSubcategoryId || undefined,
@@ -654,8 +757,12 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             location_region: form.region || undefined,
             partner_price: price,
             pricing_unit: form.pricingUnit,
-            payment_mode: form.paymentMode,
-            booking_mode: form.bookingMode,
+            payment_mode: isExternalService
+                ? PaymentModeNames.EXTERNAL_REDIRECT
+                : form.paymentMode,
+            booking_mode: isExternalService
+                ? "EXTERNAL_REDIRECT"
+                : form.bookingMode,
             featured: adminMode ? form.featured : undefined,
             video_url: form.videoUrl || undefined,
             tags,
@@ -675,20 +782,18 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
             success(
                 isEditing
-                    ? 'Service mis a jour avec succes.'
-                    : 'Service cree avec succes.',
+                    ? t("service.form.toast.save_update")
+                    : t("service.form.toast.save_create"),
             );
         } catch {
-            error(
-                'La sauvegarde du service a echoue. Verifiez les donnees puis reessayez.',
-            );
+            error(t("service.form.toast.save_error"));
             setSaving(false);
 
             return;
         }
 
         setSaving(false);
-        navigate({ name: adminMode ? 'admin-services' : 'partner-catalog' });
+        navigate({ name: adminMode ? "admin-services" : "partner-catalog" });
     };
 
     const handleSaveCalendarSync = async () => {
@@ -700,9 +805,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             await saveCalendarSync.mutateAsync({
                 importUrl: calendarImportUrl.trim() || undefined,
             });
-            success('Configuration iCal enregistree.');
+            success(t("service.form.toast.ical_saved"));
         } catch {
-            error('Impossible d enregistrer la configuration iCal.');
+            error(t("service.form.toast.ical_save_error"));
         }
     };
 
@@ -714,25 +819,25 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         const adjustmentValue = parseFloat(pricingRuleForm.adjustmentValue);
 
         if (!pricingRuleForm.name.trim() || Number.isNaN(adjustmentValue)) {
-            error('Renseignez un nom de regle et une valeur de tarification.');
+            error(t("service.form.error.rule_name_value"));
 
             return;
         }
 
         if (
-            pricingRuleForm.ruleType === 'SEASONAL' &&
+            pricingRuleForm.ruleType === "SEASONAL" &&
             (!pricingRuleForm.startDate || !pricingRuleForm.endDate)
         ) {
-            error('Les dates sont obligatoires pour une regle saisonniere.');
+            error(t("service.form.error.rule_dates"));
 
             return;
         }
 
         if (
-            pricingRuleForm.ruleType === 'DURATION' &&
+            pricingRuleForm.ruleType === "DURATION" &&
             !pricingRuleForm.minUnits
         ) {
-            error('Le nombre minimal d unites est obligatoire.');
+            error(t("service.form.error.rule_min_units"));
 
             return;
         }
@@ -744,33 +849,33 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 adjustment_type: pricingRuleForm.adjustmentType,
                 adjustment_value: adjustmentValue,
                 start_date:
-                    pricingRuleForm.ruleType === 'SEASONAL'
+                    pricingRuleForm.ruleType === "SEASONAL"
                         ? pricingRuleForm.startDate
                         : null,
                 end_date:
-                    pricingRuleForm.ruleType === 'SEASONAL'
+                    pricingRuleForm.ruleType === "SEASONAL"
                         ? pricingRuleForm.endDate
                         : null,
                 min_units:
-                    pricingRuleForm.ruleType === 'DURATION'
+                    pricingRuleForm.ruleType === "DURATION"
                         ? Number(pricingRuleForm.minUnits)
                         : null,
-                priority: Number(pricingRuleForm.priority || '100'),
+                priority: Number(pricingRuleForm.priority || "100"),
                 is_active: true,
             });
             resetPricingRuleForm();
-            success('Regle tarifaire ajoutee.');
+            success(t("service.form.toast.rule_created"));
         } catch {
-            error('Impossible d enregistrer la regle tarifaire.');
+            error(t("service.form.toast.rule_create_error"));
         }
     };
 
     const handleDeletePricingRule = async (ruleId: string) => {
         try {
             await deletePricingRule.mutateAsync(ruleId);
-            success('Regle tarifaire supprimee.');
+            success(t("service.form.toast.rule_deleted"));
         } catch {
-            error('Impossible de supprimer la regle tarifaire.');
+            error(t("service.form.toast.rule_delete_error"));
         }
     };
 
@@ -782,10 +887,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         try {
             const result = await runCalendarSync.mutateAsync();
             success(
-                `${result.importedEventsCount} evenement(s) importes depuis le calendrier externe.`,
+                t("service.form.toast.ical_sync_result").replace(
+                    "{count}",
+                    String(result.importedEventsCount),
+                ),
             );
         } catch {
-            error('La synchronisation iCal a echoue.');
+            error(t("service.form.toast.ical_sync_error"));
         }
     };
 
@@ -798,9 +906,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
         try {
             await navigator.clipboard.writeText(exportUrl);
-            success('Lien iCal copie.');
+            success(t("service.form.toast.ical_copy"));
         } catch {
-            error('Impossible de copier le lien iCal.');
+            error(t("service.form.toast.ical_copy_error"));
         }
     };
 
@@ -810,22 +918,24 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 <Breadcrumb
                     items={[
                         {
-                            label: 'Accueil',
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("nav.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
                         {
-                            label: adminMode ? 'Catalogue admin' : 'Catalogue',
+                            label: adminMode
+                                ? t("service.form.breadcrumb.catalog_admin")
+                                : t("service.form.breadcrumb.catalog"),
                             onClick: () =>
                                 navigate({
                                     name: adminMode
-                                        ? 'admin-services'
-                                        : 'partner-catalog',
+                                        ? "admin-services"
+                                        : "partner-catalog",
                                 }),
                         },
                         {
                             label: isEditing
-                                ? 'Modifier le service'
-                                : 'Nouveau service',
+                                ? t("service.form.breadcrumb.edit")
+                                : t("service.form.breadcrumb.new"),
                         },
                     ]}
                 />
@@ -834,12 +944,14 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             <div className="wdr-sform__header">
                 <div className="wdr-sform__header-inner">
                     <h1 className="wdr-sform__title">
-                        {isEditing ? 'Modifier le service' : 'Creer un service'}
+                        {isEditing
+                            ? t("service.form.title.edit")
+                            : t("service.form.title.create")}
                     </h1>
                     <p className="wdr-sform__subtitle">
                         {isEditing
-                            ? 'Modifiez les informations de votre service.'
-                            : 'Renseignez les informations principales de votre nouvelle offre.'}
+                            ? t("service.form.subtitle.edit")
+                            : t("service.form.subtitle.create")}
                     </p>
                 </div>
             </div>
@@ -850,35 +962,49 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 noValidate
             >
                 <div className="wdr-sform__inner">
+                    {isExternalService && (
+                        <fieldset className="wdr-sform__fieldset">
+                            <legend className="wdr-sform__legend">
+                                {t("service.form.external.title")}
+                            </legend>
+                            <p className="wdr-sform__hint">
+                                {t("service.form.external.subtitle")}
+                            </p>
+                        </fieldset>
+                    )}
                     <fieldset className="wdr-sform__fieldset">
                         <legend className="wdr-sform__legend">
-                            Informations generales
+                            {t("service.form.section.general")}
                         </legend>
 
-                        {adminMode && (
+                        {adminMode && !isExternalService && (
                             <div className="wdr-sform__field">
                                 <label
                                     htmlFor="sf-partner"
                                     className="wdr-sform__label"
                                 >
-                                    Partenaire proprietaire optionnel
+                                    {t("service.form.partner_optional")}
                                 </label>
                                 <Select
                                     id="sf-partner"
                                     options={[
                                         {
-                                            value: '',
+                                            value: "",
                                             label:
                                                 partnerOptions.length > 0
-                                                    ? 'Aucun partenaire assigne'
-                                                    : 'Aucun partenaire disponible',
+                                                    ? t(
+                                                          "service.form.partner.none_assigned",
+                                                      )
+                                                    : t(
+                                                          "service.form.partner.none_available",
+                                                      ),
                                             disabled:
                                                 partnerOptions.length === 0,
                                         },
                                         ...partnerOptions.map((entry) => ({
                                             value: entry.id,
                                             label:
-                                                entry.role === 'PARTNER'
+                                                entry.role === "PARTNER"
                                                     ? entry.companyName
                                                     : entry.email,
                                         })),
@@ -890,37 +1016,73 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 />
                                 {partnerOptions.length === 0 ? (
                                     <p className="wdr-sform__hint">
-                                        Creez ou validez d abord un partenaire
-                                        avant de publier un service depuis
-                                        l admin.
+                                        {t("service.form.partner.hint_none")}
                                     </p>
                                 ) : (
                                     <p className="wdr-sform__hint">
-                                        Vous pouvez laisser ce champ vide pour
-                                        creer un service non rattache a un
-                                        partenaire.
+                                        {t(
+                                            "service.form.partner.hint_optional",
+                                        )}
                                     </p>
                                 )}
                             </div>
                         )}
 
                         <div className="wdr-sform__field">
+                            <div className="wdr-sform__locale-bar">
+                                <span className="wdr-sform__locale-label">
+                                    Locale d'edition
+                                </span>
+                                <div className="wdr-sform__locale-tabs">
+                                    {SUPPORTED_LOCALES.map((locale) => (
+                                        <button
+                                            key={locale}
+                                            type="button"
+                                            className={`wdr-sform__locale-tab ${activeLocale === locale ? "wdr-sform__locale-tab--active" : ""}`}
+                                            onClick={() =>
+                                                setActiveLocale(locale)
+                                            }
+                                        >
+                                            {LOCALE_LABELS[locale]}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <p className="wdr-sform__locale-hint">
+                                La locale FR sert de base pour le catalogue et
+                                reste obligatoire.
+                            </p>
+                        </div>
+
+                        <div className="wdr-sform__field">
                             <label
                                 htmlFor="sf-title"
                                 className="wdr-sform__label"
                             >
-                                Titre du service{' '}
+                                {t("service.form.label.title")}{" "}
                                 <span aria-hidden="true">*</span>
                             </label>
                             <Input
                                 id="sf-title"
-                                value={form.title}
+                                value={readLocalizedValue(
+                                    form.titleTranslations,
+                                    activeLocale,
+                                )}
                                 onChange={(e) =>
-                                    setField('title', e.target.value)
+                                    setField(
+                                        "titleTranslations",
+                                        writeLocalizedValue(
+                                            form.titleTranslations,
+                                            activeLocale,
+                                            e.target.value,
+                                        ),
+                                    )
                                 }
-                                placeholder="Ex : Plongee sous-marine cote d'Azur"
+                                placeholder={t(
+                                    "service.form.placeholder.title",
+                                )}
                                 aria-describedby={
-                                    errors.title ? 'sf-title-err' : undefined
+                                    errors.title ? "sf-title-err" : undefined
                                 }
                             />
                             {errors.title && (
@@ -938,20 +1100,33 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 htmlFor="sf-desc"
                                 className="wdr-sform__label"
                             >
-                                Description <span aria-hidden="true">*</span>
+                                {t("service.form.label.description")}{" "}
+                                <span aria-hidden="true">*</span>
                             </label>
                             <textarea
                                 id="sf-desc"
                                 className="wdr-sform__textarea"
                                 rows={4}
-                                value={form.description}
+                                value={readLocalizedValue(
+                                    form.descriptionTranslations,
+                                    activeLocale,
+                                )}
                                 onChange={(e) =>
-                                    setField('description', e.target.value)
+                                    setField(
+                                        "descriptionTranslations",
+                                        writeLocalizedValue(
+                                            form.descriptionTranslations,
+                                            activeLocale,
+                                            e.target.value,
+                                        ),
+                                    )
                                 }
-                                placeholder="Decrivez votre service de maniere detaillee..."
+                                placeholder={t(
+                                    "service.form.placeholder.description",
+                                )}
                                 aria-describedby={
                                     errors.description
-                                        ? 'sf-desc-err'
+                                        ? "sf-desc-err"
                                         : undefined
                                 }
                             />
@@ -971,7 +1146,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-category"
                                     className="wdr-sform__label"
                                 >
-                                    Categorie
+                                    {t("service.form.label.category")}
                                 </label>
                                 <Select
                                     id="sf-category"
@@ -979,7 +1154,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     value={form.category}
                                     onChange={(e) =>
                                         setField(
-                                            'category',
+                                            "category",
                                             e.target.value as ServiceCategory,
                                         )
                                     }
@@ -991,17 +1166,20 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-structure-category"
                                     className="wdr-sform__label"
                                 >
-                                    Categorie detaillee
+                                    {t("service.form.label.detailed_category")}
                                 </label>
                                 <Select
                                     id="sf-structure-category"
                                     options={[
                                         {
-                                            value: '',
-                                            label:
-                                                availableStructureCategories.length
-                                                    ? 'Choisir une categorie'
-                                                    : 'Aucune categorie admin disponible',
+                                            value: "",
+                                            label: availableStructureCategories.length
+                                                ? t(
+                                                      "service.form.choose_category",
+                                                  )
+                                                : t(
+                                                      "service.form.no_admin_category",
+                                                  ),
                                         },
                                         ...availableStructureCategories.map(
                                             (entry) => ({
@@ -1015,7 +1193,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         setForm((previous) => ({
                                             ...previous,
                                             serviceCategoryId: e.target.value,
-                                            serviceSubcategoryId: '',
+                                            serviceSubcategoryId: "",
                                             dynamicAttributes: {},
                                         }))
                                     }
@@ -1035,7 +1213,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         checked={form.isAvailable}
                                         onChange={(e) =>
                                             setField(
-                                                'isAvailable',
+                                                "isAvailable",
                                                 e.target.checked,
                                             )
                                         }
@@ -1045,7 +1223,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         htmlFor="sf-available"
                                         className="wdr-sform__label wdr-sform__label--inline"
                                     >
-                                        Service disponible a la reservation
+                                        {t("service.form.available")}
                                     </label>
                                 </div>
                             </div>
@@ -1057,20 +1235,30 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-subcategory"
                                     className="wdr-sform__label"
                                 >
-                                    Sous-categorie
+                                    {t("service.form.label.subcategory")}
                                 </label>
                                 <Select
                                     id="sf-subcategory"
                                     options={[
-                                        { value: '', label: 'Choisir une sous-categorie' },
-                                        ...availableSubcategories.map((entry) => ({
-                                            value: entry.id,
-                                            label: entry.name,
-                                        })),
+                                        {
+                                            value: "",
+                                            label: t(
+                                                "service.form.choose_subcategory",
+                                            ),
+                                        },
+                                        ...availableSubcategories.map(
+                                            (entry) => ({
+                                                value: entry.id,
+                                                label: entry.name,
+                                            }),
+                                        ),
                                     ]}
                                     value={form.serviceSubcategoryId}
                                     onChange={(e) =>
-                                        setField('serviceSubcategoryId', e.target.value)
+                                        setField(
+                                            "serviceSubcategoryId",
+                                            e.target.value,
+                                        )
                                     }
                                 />
                             </div>
@@ -1080,12 +1268,10 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                             <div className="wdr-sform__structure-summary-header">
                                 <div>
                                     <h3 className="wdr-sform__structure-summary-title">
-                                        Structure appliquee
+                                        {t("service.form.structure.title")}
                                     </h3>
                                     <p className="wdr-sform__structure-summary-subtitle">
-                                        La categorie detaillee choisie pilote
-                                        les sous-categories, attributs et extras
-                                        de cette offre.
+                                        {t("service.form.structure.subtitle")}
                                     </p>
                                 </div>
                                 {adminMode && (
@@ -1095,11 +1281,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         size="sm"
                                         onClick={() =>
                                             navigate({
-                                                name: 'admin-service-structure',
+                                                name: "admin-service-structure",
                                             })
                                         }
                                     >
-                                        Gerer la structure
+                                        {t("service.form.structure.manage")}
                                     </Button>
                                 )}
                             </div>
@@ -1107,23 +1293,29 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                             {!selectedStructureCategory ? (
                                 <p className="wdr-sform__structure-summary-empty">
                                     {availableStructureCategories.length > 0
-                                        ? 'Choisissez une categorie detaillee pour afficher la structure attendue.'
-                                        : 'Aucune structure admin active n est disponible pour ce type de service.'}
+                                        ? t(
+                                              "service.form.structure.choose_hint",
+                                          )
+                                        : t(
+                                              "service.form.structure.none_active",
+                                          )}
                                 </p>
                             ) : (
                                 <div className="wdr-sform__structure-grid">
                                     <section className="wdr-sform__structure-card">
                                         <span className="wdr-sform__structure-kicker">
-                                            Categorie active
+                                            {t("service.form.structure.active")}
                                         </span>
                                         <strong className="wdr-sform__structure-name">
                                             {selectedStructureCategory.name}
                                         </strong>
                                         <p className="wdr-sform__structure-meta">
-                                            {ServiceCategoryLabels[
-                                                selectedStructureCategory
-                                                    .serviceType
-                                            ]}{' '}
+                                            {
+                                                ServiceCategoryLabels[
+                                                    selectedStructureCategory
+                                                        .serviceType
+                                                ]
+                                            }{" "}
                                             · {selectedStructureCategory.slug}
                                         </p>
                                         {selectedStructureCategory.description && (
@@ -1137,7 +1329,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
                                     <section className="wdr-sform__structure-card">
                                         <span className="wdr-sform__structure-kicker">
-                                            Sous-categories
+                                            {t(
+                                                "service.form.structure.subcategories",
+                                            )}
                                         </span>
                                         {availableSubcategories.length > 0 ? (
                                             <ul className="wdr-sform__structure-list">
@@ -1155,7 +1349,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                             {form.serviceSubcategoryId ===
                                                                 subcategory.id && (
                                                                 <strong>
-                                                                    Selectionnee
+                                                                    {t(
+                                                                        "service.form.structure.selected",
+                                                                    )}
                                                                 </strong>
                                                             )}
                                                         </li>
@@ -1164,28 +1360,40 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             </ul>
                                         ) : (
                                             <p className="wdr-sform__structure-copy">
-                                                Aucune sous-categorie admin
-                                                configuree.
+                                                {t(
+                                                    "service.form.structure.none_subcategories",
+                                                )}
                                             </p>
                                         )}
                                     </section>
 
                                     <section className="wdr-sform__structure-card">
                                         <span className="wdr-sform__structure-kicker">
-                                            Attributs attendus
+                                            {t(
+                                                "service.form.structure.attributes",
+                                            )}
                                         </span>
                                         {selectedStructureCategory.attributes
                                             .length > 0 ? (
                                             <>
                                                 <p className="wdr-sform__structure-meta">
-                                                    {
-                                                        requiredAttributes.length
-                                                    }{' '}
-                                                    obligatoire(s) sur{' '}
-                                                    {
-                                                        selectedStructureCategory
-                                                            .attributes.length
-                                                    }
+                                                    {t(
+                                                        "service.form.structure.required_count",
+                                                    )
+                                                        .replace(
+                                                            "{required}",
+                                                            String(
+                                                                requiredAttributes.length,
+                                                            ),
+                                                        )
+                                                        .replace(
+                                                            "{total}",
+                                                            String(
+                                                                selectedStructureCategory
+                                                                    .attributes
+                                                                    .length,
+                                                            ),
+                                                        )}
                                                 </p>
                                                 <ul className="wdr-sform__structure-list">
                                                     {selectedStructureCategory.attributes.map(
@@ -1199,17 +1407,24 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                                 <span>
                                                                     {
                                                                         attribute.label
-                                                                    }{' '}
-                                                                    ({attribute.type}
+                                                                    }{" "}
+                                                                    (
+                                                                    {
+                                                                        attribute.type
+                                                                    }
                                                                     )
                                                                 </span>
                                                                 <strong>
                                                                     {attribute.isRequired
-                                                                        ? 'Obligatoire'
-                                                                        : 'Optionnel'}
+                                                                        ? t(
+                                                                              "service.form.structure.required",
+                                                                          )
+                                                                        : t(
+                                                                              "service.form.structure.optional",
+                                                                          )}
                                                                     {attribute.isFilterable
-                                                                        ? ' · Filtre'
-                                                                        : ''}
+                                                                        ? ` · ${t("service.form.structure.filter")}`
+                                                                        : ""}
                                                                 </strong>
                                                             </li>
                                                         ),
@@ -1218,15 +1433,16 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             </>
                                         ) : (
                                             <p className="wdr-sform__structure-copy">
-                                                Aucun attribut dynamique pour
-                                                cette categorie detaillee.
+                                                {t(
+                                                    "service.form.structure.none_attributes",
+                                                )}
                                             </p>
                                         )}
                                     </section>
 
                                     <section className="wdr-sform__structure-card">
                                         <span className="wdr-sform__structure-kicker">
-                                            Extras herites
+                                            {t("service.form.structure.extras")}
                                         </span>
                                         {activeExtras.length > 0 ? (
                                             <ul className="wdr-sform__structure-list">
@@ -1241,20 +1457,25 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         <strong>
                                                             {formatPrice(
                                                                 extra.defaultPrice,
-                                                                'EUR',
-                                                            )}{' '}
-                                                            ·{' '}
+                                                                "EUR",
+                                                            )}{" "}
+                                                            ·{" "}
                                                             {extra.isRequired
-                                                                ? 'Obligatoire'
-                                                                : 'Optionnel'}
+                                                                ? t(
+                                                                      "service.form.structure.required",
+                                                                  )
+                                                                : t(
+                                                                      "service.form.structure.optional",
+                                                                  )}
                                                         </strong>
                                                     </li>
                                                 ))}
                                             </ul>
                                         ) : (
                                             <p className="wdr-sform__structure-copy">
-                                                Aucun extra actif defini sur
-                                                cette categorie.
+                                                {t(
+                                                    "service.form.structure.none_extras",
+                                                )}
                                             </p>
                                         )}
                                     </section>
@@ -1265,7 +1486,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
                     <fieldset className="wdr-sform__fieldset">
                         <legend className="wdr-sform__legend">
-                            Aide de saisie
+                            {t("service.form.section.guidance")}
                         </legend>
 
                         <div className="wdr-sform__guidance-card">
@@ -1280,8 +1501,12 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 </div>
                                 {selectedStructureCategory && (
                                     <span className="wdr-sform__guidance-chip">
-                                        Structure :{' '}
-                                        {selectedStructureCategory.name}
+                                        {t(
+                                            "service.form.guidance.structure",
+                                        ).replace(
+                                            "{name}",
+                                            selectedStructureCategory.name,
+                                        )}
                                     </span>
                                 )}
                             </div>
@@ -1302,7 +1527,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                         selectedStructureCategory.attributes.length > 0 && (
                             <fieldset className="wdr-sform__fieldset">
                                 <legend className="wdr-sform__legend">
-                                    Attributs dynamiques
+                                    {t(
+                                        "service.form.section.dynamic_attributes",
+                                    )}
                                 </legend>
 
                                 <div className="wdr-sform__row">
@@ -1315,35 +1542,42 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                 <label className="wdr-sform__label">
                                                     {attribute.label}
                                                 </label>
-                                                {attribute.type === 'boolean' ? (
+                                                {attribute.type ===
+                                                "boolean" ? (
                                                     <div className="wdr-sform__field--inline">
                                                         <input
                                                             type="checkbox"
                                                             checked={
-                                                                form.dynamicAttributes[
-                                                                    attribute.key
+                                                                form
+                                                                    .dynamicAttributes[
+                                                                    attribute
+                                                                        .key
                                                                 ] === true
                                                             }
                                                             onChange={(e) =>
                                                                 setDynamicAttribute(
                                                                     attribute.key,
-                                                                    e.target.checked,
+                                                                    e.target
+                                                                        .checked,
                                                                 )
                                                             }
                                                             className="wdr-sform__checkbox"
                                                         />
                                                         <span className="wdr-sform__hint">
                                                             {attribute.isRequired
-                                                                ? 'Obligatoire'
-                                                                : 'Optionnel'}
+                                                                ? "Obligatoire"
+                                                                : "Optionnel"}
                                                         </span>
                                                     </div>
-                                                ) : attribute.type === 'select' ? (
+                                                ) : attribute.type ===
+                                                  "select" ? (
                                                     <Select
                                                         options={[
                                                             {
-                                                                value: '',
-                                                                label: 'Choisir',
+                                                                value: "",
+                                                                label: t(
+                                                                    "service.form.choose",
+                                                                ),
                                                             },
                                                             ...attribute.options.map(
                                                                 (option) => ({
@@ -1352,13 +1586,12 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                                 }),
                                                             ),
                                                         ]}
-                                                        value={
-                                                            String(
-                                                                form.dynamicAttributes[
-                                                                    attribute.key
-                                                                ] ?? '',
-                                                            )
-                                                        }
+                                                        value={String(
+                                                            form
+                                                                .dynamicAttributes[
+                                                                attribute.key
+                                                            ] ?? "",
+                                                        )}
                                                         onChange={(e) =>
                                                             setDynamicAttribute(
                                                                 attribute.key,
@@ -1370,14 +1603,15 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                     <Input
                                                         type={
                                                             attribute.type ===
-                                                            'number'
-                                                                ? 'number'
-                                                                : 'text'
+                                                            "number"
+                                                                ? "number"
+                                                                : "text"
                                                         }
                                                         value={String(
-                                                            form.dynamicAttributes[
+                                                            form
+                                                                .dynamicAttributes[
                                                                 attribute.key
-                                                            ] ?? '',
+                                                            ] ?? "",
                                                         )}
                                                         onChange={(e) =>
                                                             setDynamicAttribute(
@@ -1396,7 +1630,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
                     <fieldset className="wdr-sform__fieldset">
                         <legend className="wdr-sform__legend">
-                            Localisation
+                            {t("service.form.section.location")}
                         </legend>
 
                         <div className="wdr-sform__row">
@@ -1405,17 +1639,18 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-city"
                                     className="wdr-sform__label"
                                 >
-                                    Ville <span aria-hidden="true">*</span>
+                                    {t("service.form.label.city")}{" "}
+                                    <span aria-hidden="true">*</span>
                                 </label>
                                 <Select
                                     id="sf-city"
-                                    options={ALGARVE_CITY_OPTIONS}
+                                    options={algarveCityOptions}
                                     value={form.city}
                                     onChange={(e) =>
-                                        setField('city', e.target.value)
+                                        setField("city", e.target.value)
                                     }
                                     aria-describedby={
-                                        errors.city ? 'sf-city-err' : undefined
+                                        errors.city ? "sf-city-err" : undefined
                                     }
                                 />
                                 {errors.city && (
@@ -1433,18 +1668,21 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-country"
                                     className="wdr-sform__label"
                                 >
-                                    Pays <span aria-hidden="true">*</span>
+                                    {t("service.form.label.country")}{" "}
+                                    <span aria-hidden="true">*</span>
                                 </label>
                                 <Input
                                     id="sf-country"
                                     value={form.country}
                                     onChange={(e) =>
-                                        setField('country', e.target.value)
+                                        setField("country", e.target.value)
                                     }
-                                    placeholder="Ex : Portugal"
+                                    placeholder={t(
+                                        "service.form.placeholder.country",
+                                    )}
                                     aria-describedby={
                                         errors.country
-                                            ? 'sf-country-err'
+                                            ? "sf-country-err"
                                             : undefined
                                     }
                                 />
@@ -1463,15 +1701,17 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-region"
                                     className="wdr-sform__label"
                                 >
-                                    Region
+                                    {t("service.form.label.region")}
                                 </label>
                                 <Input
                                     id="sf-region"
                                     value={form.region}
                                     onChange={(e) =>
-                                        setField('region', e.target.value)
+                                        setField("region", e.target.value)
                                     }
-                                    placeholder="Ex : Algarve"
+                                    placeholder={t(
+                                        "service.form.placeholder.region",
+                                    )}
                                 />
                             </div>
                         </div>
@@ -1479,7 +1719,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
                     <fieldset className="wdr-sform__fieldset">
                         <legend className="wdr-sform__legend">
-                            Tarification
+                            {t("service.form.section.pricing")}
                         </legend>
 
                         <div className="wdr-sform__row">
@@ -1488,22 +1728,24 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-price"
                                     className="wdr-sform__label"
                                 >
-                                    Votre prix (EUR){' '}
+                                    {t("service.form.label.price")}{" "}
                                     <span aria-hidden="true">*</span>
                                 </label>
                                 <Input
                                     id="sf-price"
                                     type="number"
-                                    min={1}
+                                    min={isExternalService ? 0 : 1}
                                     step="0.01"
                                     value={form.partnerPrice}
                                     onChange={(e) =>
-                                        setField('partnerPrice', e.target.value)
+                                        setField("partnerPrice", e.target.value)
                                     }
-                                    placeholder="Ex : 85.00"
+                                    placeholder={t(
+                                        "service.form.placeholder.price",
+                                    )}
                                     aria-describedby={
                                         errors.partnerPrice
-                                            ? 'sf-price-err'
+                                            ? "sf-price-err"
                                             : undefined
                                     }
                                 />
@@ -1522,15 +1764,15 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     htmlFor="sf-unit"
                                     className="wdr-sform__label"
                                 >
-                                    Unite de facturation
+                                    {t("service.form.label.pricing_unit")}
                                 </label>
                                 <Select
                                     id="sf-unit"
-                                    options={PRICING_UNIT_OPTIONS}
+                                    options={pricingUnitOptions}
                                     value={form.pricingUnit}
                                     onChange={(e) =>
                                         setField(
-                                            'pricingUnit',
+                                            "pricingUnit",
                                             e.target
                                                 .value as ServicePricingUnit,
                                         )
@@ -1546,41 +1788,45 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 aria-live="polite"
                             >
                                 <span className="wdr-sform__price-preview-label">
-                                    Prix affiche au client :
+                                    {t("service.form.client_price")}
                                 </span>
                                 <strong className="wdr-sform__price-preview-value">
-                                    {formatPrice(clientPrice, 'EUR')}
+                                    {formatPrice(clientPrice, "EUR")}
                                 </strong>
                                 <span className="wdr-sform__price-preview-note">
-                                    (inclut{' '}
-                                    {(
-                                        (selectedPartner?.commissionRate ??
-                                            0.20) * 100
-                                    ).toFixed(0)}{' '}
-                                    % de commission Wandireo)
+                                    {t(
+                                        "service.form.client_price_note",
+                                    ).replace(
+                                        "{rate}",
+                                        (
+                                            (selectedPartner?.commissionRate ??
+                                                0.2) * 100
+                                        ).toFixed(0),
+                                    )}
                                 </span>
                             </div>
                         )}
 
-                        <div className="wdr-sform__field">
-                            <label className="wdr-sform__label">
-                                Regles tarifaires dynamiques
-                            </label>
+                        {!isExternalService && (
+                            <div className="wdr-sform__field">
+                                <label className="wdr-sform__label">
+                                    {t("service.form.dynamic_rules")}
+                                </label>
 
-                            {!isEditing && (
-                                <p className="wdr-sform__hint">
-                                    Enregistrez d abord le service pour ajouter
-                                    des regles de week-end, saison ou long
-                                    sejour.
-                                </p>
-                            )}
+                                {!isEditing && (
+                                    <p className="wdr-sform__hint">
+                                        {t(
+                                            "service.form.dynamic_rules_hint_create",
+                                        )}
+                                    </p>
+                                )}
 
-                            {isEditing && (
+                                {isEditing && (
                                 <>
                                     <div className="wdr-sform__row">
                                         <div className="wdr-sform__field">
                                             <label className="wdr-sform__label">
-                                                Nom de la regle
+                                                {t("service.form.rule.name")}
                                             </label>
                                             <Input
                                                 value={pricingRuleForm.name}
@@ -1588,32 +1834,30 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                     setPricingRuleForm(
                                                         (previous) => ({
                                                             ...previous,
-                                                            name: e.target.value,
+                                                            name: e.target
+                                                                .value,
                                                         }),
                                                     )
                                                 }
-                                                placeholder="Ex : Majoration week-end"
+                                                placeholder={t(
+                                                    "service.form.rule.name_placeholder",
+                                                )}
                                             />
                                         </div>
 
                                         <div className="wdr-sform__field">
                                             <label className="wdr-sform__label">
-                                                Type de regle
+                                                {t("service.form.rule.type")}
                                             </label>
                                             <Select
-                                                options={
-                                                    PRICING_RULE_TYPE_OPTIONS
-                                                }
-                                                value={
-                                                    pricingRuleForm.ruleType
-                                                }
+                                                options={pricingRuleTypeOptions}
+                                                value={pricingRuleForm.ruleType}
                                                 onChange={(e) =>
                                                     setPricingRuleForm(
                                                         (previous) => ({
                                                             ...previous,
-                                                            ruleType:
-                                                                e.target
-                                                                    .value as PricingRuleType,
+                                                            ruleType: e.target
+                                                                .value as PricingRuleType,
                                                         }),
                                                     )
                                                 }
@@ -1624,11 +1868,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     <div className="wdr-sform__row">
                                         <div className="wdr-sform__field">
                                             <label className="wdr-sform__label">
-                                                Ajustement
+                                                {t(
+                                                    "service.form.rule.adjustment",
+                                                )}
                                             </label>
                                             <Select
                                                 options={
-                                                    PRICING_ADJUSTMENT_OPTIONS
+                                                    pricingAdjustmentOptions
                                                 }
                                                 value={
                                                     pricingRuleForm.adjustmentType
@@ -1637,9 +1883,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                     setPricingRuleForm(
                                                         (previous) => ({
                                                             ...previous,
-                                                            adjustmentType:
-                                                                e.target
-                                                                    .value as PricingAdjustmentType,
+                                                            adjustmentType: e
+                                                                .target
+                                                                .value as PricingAdjustmentType,
                                                         }),
                                                     )
                                                 }
@@ -1648,7 +1894,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
                                         <div className="wdr-sform__field">
                                             <label className="wdr-sform__label">
-                                                Valeur
+                                                {t("service.form.rule.value")}
                                             </label>
                                             <Input
                                                 type="number"
@@ -1665,20 +1911,22 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         }),
                                                     )
                                                 }
-                                                placeholder="Ex : 15"
+                                                placeholder={t(
+                                                    "service.form.rule.value_placeholder",
+                                                )}
                                             />
                                         </div>
 
                                         <div className="wdr-sform__field">
                                             <label className="wdr-sform__label">
-                                                Priorite
+                                                {t(
+                                                    "service.form.rule.priority",
+                                                )}
                                             </label>
                                             <Input
                                                 type="number"
                                                 min={1}
-                                                value={
-                                                    pricingRuleForm.priority
-                                                }
+                                                value={pricingRuleForm.priority}
                                                 onChange={(e) =>
                                                     setPricingRuleForm(
                                                         (previous) => ({
@@ -1693,11 +1941,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     </div>
 
                                     {pricingRuleForm.ruleType ===
-                                        'SEASONAL' && (
+                                        "SEASONAL" && (
                                         <div className="wdr-sform__row">
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
-                                                    Debut
+                                                    {t(
+                                                        "service.form.rule.start",
+                                                    )}
                                                 </label>
                                                 <Input
                                                     type="date"
@@ -1718,7 +1968,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             </div>
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
-                                                    Fin
+                                                    {t("service.form.rule.end")}
                                                 </label>
                                                 <Input
                                                     type="date"
@@ -1741,11 +1991,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     )}
 
                                     {pricingRuleForm.ruleType ===
-                                        'DURATION' && (
+                                        "DURATION" && (
                                         <div className="wdr-sform__row">
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
-                                                    Unites minimales
+                                                    {t(
+                                                        "service.form.rule.min_units",
+                                                    )}
                                                 </label>
                                                 <Input
                                                     type="number"
@@ -1763,16 +2015,16 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                             }),
                                                         )
                                                     }
-                                                    placeholder="Ex : 7"
+                                                    placeholder={t(
+                                                        "service.form.rule.min_units_placeholder",
+                                                    )}
                                                 />
                                             </div>
                                         </div>
                                     )}
 
                                     <p className="wdr-sform__hint">
-                                        Les regles sont appliquees cote backend
-                                        au moment de la reservation. Le prix de
-                                        base reste le prix d appel.
+                                        {t("service.form.rule.backend_hint")}
                                     </p>
 
                                     <div className="wdr-sform__calendar-sync-actions">
@@ -1787,8 +2039,8 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             }
                                         >
                                             {createPricingRule.isPending
-                                                ? 'Ajout...'
-                                                : 'Ajouter la regle'}
+                                                ? t("service.form.rule.adding")
+                                                : t("service.form.rule.add")}
                                         </Button>
                                     </div>
 
@@ -1806,33 +2058,47 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                                     {rule.name}
                                                                 </span>
                                                                 <span>
-                                                                    {rule.ruleType}{' '}
-                                                                    ·{' '}
+                                                                    {
+                                                                        rule.ruleType
+                                                                    }{" "}
+                                                                    ·{" "}
                                                                     {rule.adjustmentType ===
-                                                                    'PERCENTAGE'
+                                                                    "PERCENTAGE"
                                                                         ? `${rule.adjustmentValue}%`
                                                                         : formatPrice(
                                                                               rule.adjustmentValue,
-                                                                              'EUR',
+                                                                              "EUR",
                                                                           )}
                                                                 </span>
                                                                 {rule.startDate &&
                                                                     rule.endDate && (
                                                                         <span>
-                                                                            {rule.startDate.toLocaleDateString()}{' '}
-                                                                            →{' '}
+                                                                            {rule.startDate.toLocaleDateString()}{" "}
+                                                                            →{" "}
                                                                             {rule.endDate.toLocaleDateString()}
                                                                         </span>
                                                                     )}
                                                                 {rule.minUnits && (
                                                                     <span>
-                                                                        {rule.minUnits}{' '}
-                                                                        unites minimum
+                                                                        {t(
+                                                                            "service.form.rule.min_units_display",
+                                                                        ).replace(
+                                                                            "{count}",
+                                                                            String(
+                                                                                rule.minUnits,
+                                                                            ),
+                                                                        )}
                                                                     </span>
                                                                 )}
                                                                 <span>
-                                                                    Priorite{' '}
-                                                                    {rule.priority}
+                                                                    {t(
+                                                                        "service.form.rule.priority_display",
+                                                                    ).replace(
+                                                                        "{priority}",
+                                                                        String(
+                                                                            rule.priority,
+                                                                        ),
+                                                                    )}
                                                                 </span>
                                                                 <div className="wdr-sform__image-actions">
                                                                     <button
@@ -1847,7 +2113,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                                             deletePricingRule.isPending
                                                                         }
                                                                     >
-                                                                        Supprimer
+                                                                        {t(
+                                                                            "service.form.delete",
+                                                                        )}
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -1857,59 +2125,76 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             </div>
                                         )}
                                 </>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
 
-                        <div className="wdr-sform__field">
-                            <label
-                                htmlFor="sf-payment"
-                                className="wdr-sform__label"
-                            >
-                                Mode de paiement
-                            </label>
-                            <Select
-                                id="sf-payment"
-                                options={PAYMENT_MODE_OPTIONS}
-                                value={form.paymentMode}
-                                onChange={(e) =>
-                                    setField(
-                                        'paymentMode',
-                                        e.target.value as PaymentMode,
-                                    )
-                                }
-                            />
-                            <p className="wdr-sform__hint">
-                                {PaymentModeDescriptions[form.paymentMode]}
-                            </p>
-                        </div>
+                        {!isExternalService && (
+                            <>
+                                <div className="wdr-sform__field">
+                                    <label
+                                        htmlFor="sf-payment"
+                                        className="wdr-sform__label"
+                                    >
+                                        {t("service.form.label.payment_mode")}
+                                    </label>
+                                    <Select
+                                        id="sf-payment"
+                                        options={PAYMENT_MODE_OPTIONS}
+                                        value={form.paymentMode}
+                                        onChange={(e) =>
+                                            setField(
+                                                "paymentMode",
+                                                e.target.value as PaymentMode,
+                                            )
+                                        }
+                                    />
+                                    <p className="wdr-sform__hint">
+                                        {PaymentModeDescriptions[
+                                            form.paymentMode
+                                        ]}
+                                    </p>
+                                </div>
 
-                        <div className="wdr-sform__field">
-                            <label
-                                htmlFor="sf-booking-mode"
-                                className="wdr-sform__label"
-                            >
-                                Mode de reservation
-                            </label>
-                            <Select
-                                id="sf-booking-mode"
-                                options={[
-                                    { value: 'REQUEST', label: 'Demande de reservation' },
-                                    { value: 'INSTANT', label: 'Instant booking' },
-                                ]}
-                                value={form.bookingMode}
-                                onChange={(e) =>
-                                    setField(
-                                        'bookingMode',
-                                        e.target.value as BookingMode,
-                                    )
-                                }
-                            />
-                        </div>
+                                <div className="wdr-sform__field">
+                                    <label
+                                        htmlFor="sf-booking-mode"
+                                        className="wdr-sform__label"
+                                    >
+                                        {t("service.form.label.booking_mode")}
+                                    </label>
+                                    <Select
+                                        id="sf-booking-mode"
+                                        options={[
+                                            {
+                                                value: "REQUEST",
+                                                label: t(
+                                                    "service.form.booking_mode.request",
+                                                ),
+                                            },
+                                            {
+                                                value: "INSTANT",
+                                                label: t(
+                                                    "service.form.booking_mode.instant",
+                                                ),
+                                            },
+                                        ]}
+                                        value={form.bookingMode}
+                                        onChange={(e) =>
+                                            setField(
+                                                "bookingMode",
+                                                e.target.value as BookingMode,
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </>
+                        )}
                     </fieldset>
 
                     <fieldset className="wdr-sform__fieldset">
                         <legend className="wdr-sform__legend">
-                            Medias & Tags
+                            {t("service.form.section.media")}
                         </legend>
 
                         <div className="wdr-sform__field">
@@ -1917,7 +2202,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 htmlFor="sf-image-upload"
                                 className="wdr-sform__label"
                             >
-                                Images du service{' '}
+                                {t("service.form.label.images")}{" "}
                                 <span aria-hidden="true">*</span>
                             </label>
                             <input
@@ -1932,12 +2217,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 disabled={uploadingImages || saving}
                             />
                             <p className="wdr-sform__hint">
-                                Téléverse une ou plusieurs images. La première
-                                image sera utilisée comme image principale.
+                                {t("service.form.images_hint")}
                             </p>
                             {uploadingImages && (
                                 <p className="wdr-sform__hint">
-                                    Téléversement en cours...
+                                    {t("service.form.images_uploading")}
                                 </p>
                             )}
                             {errors.imageUrls && (
@@ -1954,13 +2238,25 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         >
                                             <img
                                                 src={imageUrl}
-                                                alt={`Aperçu ${index + 1}`}
+                                                alt={t(
+                                                    "service.form.image.alt",
+                                                ).replace(
+                                                    "{index}",
+                                                    String(index + 1),
+                                                )}
                                             />
                                             <div className="wdr-sform__image-card-meta">
                                                 <span>
                                                     {index === 0
-                                                        ? 'Image principale'
-                                                        : `Image ${index + 1}`}
+                                                        ? t(
+                                                              "service.form.image.primary",
+                                                          )
+                                                        : t(
+                                                              "service.form.image.label",
+                                                          ).replace(
+                                                              "{index}",
+                                                              String(index + 1),
+                                                          )}
                                                 </span>
                                                 <div className="wdr-sform__image-actions">
                                                     {index !== 0 && (
@@ -1974,7 +2270,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                             }
                                                             disabled={saving}
                                                         >
-                                                            Couverture
+                                                            {t(
+                                                                "service.form.image.cover",
+                                                            )}
                                                         </button>
                                                     )}
                                                     <button
@@ -1983,7 +2281,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         onClick={() =>
                                                             moveImage(
                                                                 imageUrl,
-                                                                'left',
+                                                                "left",
                                                             )
                                                         }
                                                         disabled={
@@ -1999,7 +2297,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         onClick={() =>
                                                             moveImage(
                                                                 imageUrl,
-                                                                'right',
+                                                                "right",
                                                             )
                                                         }
                                                         disabled={
@@ -2016,11 +2314,15 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         type="button"
                                                         className="wdr-sform__image-remove"
                                                         onClick={() =>
-                                                            removeImage(imageUrl)
+                                                            removeImage(
+                                                                imageUrl,
+                                                            )
                                                         }
                                                         disabled={saving}
                                                     >
-                                                        Supprimer
+                                                        {t(
+                                                            "service.form.delete",
+                                                        )}
                                                     </button>
                                                 </div>
                                             </div>
@@ -2035,14 +2337,14 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 htmlFor="sf-video"
                                 className="wdr-sform__label"
                             >
-                                URL video
+                                {t("service.form.label.video")}
                             </label>
                             <Input
                                 id="sf-video"
                                 type="url"
                                 value={form.videoUrl}
                                 onChange={(e) =>
-                                    setField('videoUrl', e.target.value)
+                                    setField("videoUrl", e.target.value)
                                 }
                                 placeholder="https://..."
                             />
@@ -2053,18 +2355,18 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 htmlFor="sf-tags"
                                 className="wdr-sform__label"
                             >
-                                Tags
+                                {t("service.form.label.tags")}
                             </label>
                             <Input
                                 id="sf-tags"
                                 value={form.tags}
                                 onChange={(e) =>
-                                    setField('tags', e.target.value)
+                                    setField("tags", e.target.value)
                                 }
-                                placeholder="plongee, mer, debutant (separes par des virgules)"
+                                placeholder={t("service.form.tags_placeholder")}
                             />
                             <p className="wdr-sform__hint">
-                                Separez les tags par des virgules.
+                                {t("service.form.tags_hint")}
                             </p>
                         </div>
 
@@ -2076,7 +2378,10 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         id="sf-featured"
                                         checked={form.featured}
                                         onChange={(e) =>
-                                            setField('featured', e.target.checked)
+                                            setField(
+                                                "featured",
+                                                e.target.checked,
+                                            )
                                         }
                                         className="wdr-sform__checkbox"
                                     />
@@ -2084,164 +2389,159 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         htmlFor="sf-featured"
                                         className="wdr-sform__label wdr-sform__label--inline"
                                     >
-                                        Mettre en avant ce service
+                                        {t("service.form.featured")}
                                     </label>
                                 </div>
                             </div>
                         )}
                     </fieldset>
 
+                    {!isExternalService && (
                     <fieldset className="wdr-sform__fieldset">
-                            <legend className="wdr-sform__legend">
-                                Synchronisation iCal
-                            </legend>
+                        <legend className="wdr-sform__legend">
+                            {t("service.form.section.ical")}
+                        </legend>
 
-                            {!isEditing && (
-                                <p className="wdr-sform__hint">
-                                    Enregistrez d abord le service pour activer
-                                    l import/export iCal.
-                                </p>
-                            )}
+                        {!isEditing && (
+                            <p className="wdr-sform__hint">
+                                {t("service.form.ical.create_hint")}
+                            </p>
+                        )}
 
-                            {isEditing && !canUseIcalSync && (
-                                <p className="wdr-sform__hint">
-                                    iCal est reserve aux hebergements et aux
-                                    bateaux.
-                                </p>
-                            )}
+                        {isEditing && !canUseIcalSync && (
+                            <p className="wdr-sform__hint">
+                                {t("service.form.ical.unavailable_hint")}
+                            </p>
+                        )}
 
-                            {canUseIcalSync && (
-                                <div className="wdr-sform__calendar-sync">
-                                    <div className="wdr-sform__field">
-                                        <label
-                                            htmlFor="sf-ical-import"
-                                            className="wdr-sform__label"
-                                        >
-                                            URL du calendrier externe
-                                        </label>
-                                        <Input
-                                            id="sf-ical-import"
-                                            type="url"
-                                            value={calendarImportUrl}
-                                            onChange={(e) =>
-                                                setCalendarImportUrl(
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="https://..."
-                                        />
-                                        <p className="wdr-sform__hint">
-                                            Wandireo importe ce flux comme une
-                                            source de blocage pour eviter les
-                                            doubles reservations.
-                                        </p>
-                                    </div>
-
-                                    <div className="wdr-sform__field">
-                                        <label
-                                            htmlFor="sf-ical-export"
-                                            className="wdr-sform__label"
-                                        >
-                                            Lien export Wandireo
-                                        </label>
-                                        <Input
-                                            id="sf-ical-export"
-                                            value={
-                                                calendarSyncQuery.data
-                                                    ?.exportUrl ?? ''
-                                            }
-                                            readOnly
-                                            placeholder="Lien disponible apres chargement"
-                                        />
-                                        <p className="wdr-sform__hint">
-                                            Utilisez ce lien dans Airbnb,
-                                            Booking ou tout autre canal externe
-                                            pour bloquer les dates Wandireo.
-                                        </p>
-                                    </div>
-
-                                    <div className="wdr-sform__calendar-sync-meta">
-                                        <span>
-                                            Statut :{' '}
-                                            <strong>
-                                                {calendarSyncQuery.data
-                                                    ?.lastStatus ?? 'IDLE'}
-                                            </strong>
-                                        </span>
-                                        <span>
-                                            Derniere sync :{' '}
-                                            <strong>
-                                                {calendarSyncQuery.data
-                                                    ?.lastSyncedAt
-                                                    ? calendarSyncQuery.data.lastSyncedAt.toLocaleString()
-                                                    : 'Jamais'}
-                                            </strong>
-                                        </span>
-                                        <span>
-                                            Evenements importes :{' '}
-                                            <strong>
-                                                {calendarSyncQuery.data
-                                                    ?.importedEventsCount ?? 0}
-                                            </strong>
-                                        </span>
-                                    </div>
-
-                                    {calendarSyncQuery.data?.lastError && (
-                                        <p className="wdr-sform__error">
-                                            {calendarSyncQuery.data.lastError}
-                                        </p>
-                                    )}
-
-                                    <div className="wdr-sform__calendar-sync-actions">
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            onClick={() =>
-                                                void handleSaveCalendarSync()
-                                            }
-                                            disabled={
-                                                saveCalendarSync.isPending ||
-                                                runCalendarSync.isPending ||
-                                                saving
-                                            }
-                                        >
-                                            {saveCalendarSync.isPending
-                                                ? 'Enregistrement...'
-                                                : 'Enregistrer l URL'}
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            onClick={() =>
-                                                void handleRunCalendarSync()
-                                            }
-                                            disabled={
-                                                runCalendarSync.isPending ||
-                                                saveCalendarSync.isPending ||
-                                                !calendarImportUrl.trim()
-                                            }
-                                        >
-                                            {runCalendarSync.isPending
-                                                ? 'Synchronisation...'
-                                                : 'Synchroniser maintenant'}
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            onClick={() =>
-                                                void handleCopyExportUrl()
-                                            }
-                                            disabled={
-                                                !calendarSyncQuery.data
-                                                    ?.exportUrl
-                                            }
-                                        >
-                                            Copier le lien export
-                                        </Button>
-                                    </div>
+                        {canUseIcalSync && (
+                            <div className="wdr-sform__calendar-sync">
+                                <div className="wdr-sform__field">
+                                    <label
+                                        htmlFor="sf-ical-import"
+                                        className="wdr-sform__label"
+                                    >
+                                        {t("service.form.ical.import_url")}
+                                    </label>
+                                    <Input
+                                        id="sf-ical-import"
+                                        type="url"
+                                        value={calendarImportUrl}
+                                        onChange={(e) =>
+                                            setCalendarImportUrl(e.target.value)
+                                        }
+                                        placeholder="https://..."
+                                    />
+                                    <p className="wdr-sform__hint">
+                                        {t("service.form.ical.import_hint")}
+                                    </p>
                                 </div>
-                            )}
+
+                                <div className="wdr-sform__field">
+                                    <label
+                                        htmlFor="sf-ical-export"
+                                        className="wdr-sform__label"
+                                    >
+                                        {t("service.form.ical.export_url")}
+                                    </label>
+                                    <Input
+                                        id="sf-ical-export"
+                                        value={
+                                            calendarSyncQuery.data?.exportUrl ??
+                                            ""
+                                        }
+                                        readOnly
+                                        placeholder={t(
+                                            "service.form.ical.export_placeholder",
+                                        )}
+                                    />
+                                    <p className="wdr-sform__hint">
+                                        {t("service.form.ical.export_hint")}
+                                    </p>
+                                </div>
+
+                                <div className="wdr-sform__calendar-sync-meta">
+                                    <span>
+                                        {t("service.form.ical.status")}{" "}
+                                        <strong>
+                                            {calendarSyncQuery.data
+                                                ?.lastStatus ?? "IDLE"}
+                                        </strong>
+                                    </span>
+                                    <span>
+                                        {t("service.form.ical.last_sync")}{" "}
+                                        <strong>
+                                            {calendarSyncQuery.data
+                                                ?.lastSyncedAt
+                                                ? calendarSyncQuery.data.lastSyncedAt.toLocaleString()
+                                                : t("service.form.ical.never")}
+                                        </strong>
+                                    </span>
+                                    <span>
+                                        {t("service.form.ical.imported_events")}{" "}
+                                        <strong>
+                                            {calendarSyncQuery.data
+                                                ?.importedEventsCount ?? 0}
+                                        </strong>
+                                    </span>
+                                </div>
+
+                                {calendarSyncQuery.data?.lastError && (
+                                    <p className="wdr-sform__error">
+                                        {calendarSyncQuery.data.lastError}
+                                    </p>
+                                )}
+
+                                <div className="wdr-sform__calendar-sync-actions">
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={() =>
+                                            void handleSaveCalendarSync()
+                                        }
+                                        disabled={
+                                            saveCalendarSync.isPending ||
+                                            runCalendarSync.isPending ||
+                                            saving
+                                        }
+                                    >
+                                        {saveCalendarSync.isPending
+                                            ? t("service.form.ical.saving")
+                                            : t("service.form.ical.save_url")}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() =>
+                                            void handleRunCalendarSync()
+                                        }
+                                        disabled={
+                                            runCalendarSync.isPending ||
+                                            saveCalendarSync.isPending ||
+                                            !calendarImportUrl.trim()
+                                        }
+                                    >
+                                        {runCalendarSync.isPending
+                                            ? t("service.form.ical.syncing")
+                                            : t("service.form.ical.sync_now")}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() =>
+                                            void handleCopyExportUrl()
+                                        }
+                                        disabled={
+                                            !calendarSyncQuery.data?.exportUrl
+                                        }
+                                    >
+                                        {t("service.form.ical.copy_export")}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </fieldset>
+                    )}
 
                     <div className="wdr-sform__actions">
                         <Button
@@ -2250,13 +2550,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                             onClick={() =>
                                 navigate({
                                     name: adminMode
-                                        ? 'admin-services'
-                                        : 'partner-catalog',
+                                        ? "admin-services"
+                                        : "partner-catalog",
                                 })
                             }
                             disabled={saving}
                         >
-                            Annuler
+                            {t("service.form.actions.cancel")}
                         </Button>
                         <Button
                             type="submit"
@@ -2264,12 +2564,12 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                             disabled={saving || uploadingImages}
                         >
                             {saving
-                                ? 'Enregistrement...'
+                                ? t("service.form.actions.saving")
                                 : uploadingImages
-                                  ? 'Televersement...'
-                                : isEditing
-                                  ? 'Enregistrer les modifications'
-                                  : 'Creer le service'}
+                                  ? t("service.form.actions.uploading")
+                                  : isEditing
+                                    ? t("service.form.actions.save_changes")
+                                    : t("service.form.actions.create")}
                         </Button>
                     </div>
                 </div>
@@ -2284,7 +2584,7 @@ export const PartnerServiceFormPage: React.FC<PartnerServiceFormPageProps> = ({
 }) => {
     const isEditing = !!serviceId;
     const { service: existingService, isLoading } = useServiceData(
-        serviceId ?? '',
+        serviceId ?? "",
     );
 
     if (isEditing && isLoading) {
@@ -2293,7 +2593,7 @@ export const PartnerServiceFormPage: React.FC<PartnerServiceFormPageProps> = ({
 
     return (
         <PartnerServiceFormContent
-            key={existingService?.id ?? serviceId ?? 'new-service'}
+            key={existingService?.id ?? serviceId ?? "new-service"}
             serviceId={serviceId}
             existingService={existingService}
             adminMode={adminMode}

@@ -29,12 +29,19 @@ function asDate(value: unknown): Date | undefined {
 
 function normalizeCalendarSync(rawInput: unknown): ServiceCalendarSync {
     const raw = asRecord(rawInput);
+    const provider =
+        asString(raw.provider).toUpperCase() === 'FAREHARBOR'
+            ? 'FAREHARBOR'
+            : 'ICAL';
 
     return {
         id: asString(raw.id),
         serviceId: asString(raw.service_id ?? raw.serviceId),
-        provider: 'ICAL',
-        importUrl: asString(raw.import_url ?? raw.importUrl) || undefined,
+        provider,
+        importUrl:
+            provider === 'ICAL'
+                ? asString(raw.import_url ?? raw.importUrl) || undefined
+                : undefined,
         lastSyncedAt: asDate(raw.last_synced_at ?? raw.lastSyncedAt),
         lastStatus:
             (asString(raw.last_status ?? raw.lastStatus) as ServiceCalendarSync['lastStatus']) ||

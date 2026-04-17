@@ -1,6 +1,7 @@
 import { Link as InertiaLink } from '@inertiajs/react';
 import React from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { localizePath } from '@/lib/locale';
 import './Footer.css';
 
 interface FooterLinkItem {
@@ -15,7 +16,7 @@ interface FooterSection {
 
 interface SocialLink {
     id: 'whatsapp' | 'instagram' | 'tiktok';
-    label: string;
+    labelKey: string;
     href: string;
     icon: React.ReactNode;
 }
@@ -23,7 +24,7 @@ interface SocialLink {
 const SOCIAL_LINKS: SocialLink[] = [
     {
         id: 'whatsapp',
-        label: 'Contacter Wandireo sur WhatsApp',
+        labelKey: 'footer.social.whatsapp',
         href: 'https://wa.me/351928282231',
         icon: (
             <svg
@@ -40,7 +41,7 @@ const SOCIAL_LINKS: SocialLink[] = [
     },
     {
         id: 'instagram',
-        label: 'Instagram',
+        labelKey: 'footer.social.instagram',
         href: 'https://www.instagram.com/experiences.algarve?igsh=aWVndGNpanA4cGVh&utm_source=qr',
         icon: (
             <svg
@@ -62,7 +63,7 @@ const SOCIAL_LINKS: SocialLink[] = [
     },
     {
         id: 'tiktok',
-        label: 'TikTok',
+        labelKey: 'footer.social.tiktok',
         href: 'https://www.tiktok.com/@experiences.algarve?_r=1&_t=ZN-94paV1xX9B0',
         icon: (
             <svg
@@ -78,11 +79,11 @@ const SOCIAL_LINKS: SocialLink[] = [
     },
 ];
 
-const FooterLogo: React.FC = () => (
+const FooterLogo: React.FC<{ ariaLabel: string }> = ({ ariaLabel }) => (
     <InertiaLink
-        href="/"
+        href={localizePath('/') ?? '/'}
         className="wdr-footer__logo"
-        aria-label="Wandireo - Retour a l'accueil"
+        aria-label={ariaLabel}
     >
         <img
             src="/wandireo.png"
@@ -108,7 +109,7 @@ function FooterLink({ link }: { link: FooterLinkItem }) {
     }
 
     return (
-        <InertiaLink href={link.href} className="wdr-footer__link">
+        <InertiaLink href={localizePath(link.href) ?? link.href} className="wdr-footer__link">
             {link.label}
         </InertiaLink>
     );
@@ -147,7 +148,7 @@ export const Footer: React.FC = () => {
             links: [
                 { label: t('footer.help_center'), href: '/guide' },
                 { label: t('footer.whatsapp'), href: 'https://wa.me/351928282231' },
-                { label: 'FAQ', href: '/#faq' },
+                { label: t('footer.faq'), href: '/#faq' },
                 {
                     label: t('footer.booking_email'),
                     href: 'mailto:wandireo.bookings@gmail.com',
@@ -172,7 +173,7 @@ export const Footer: React.FC = () => {
             <div className="wdr-footer__inner">
                 <div className="wdr-footer__top">
                     <div className="wdr-footer__brand">
-                        <FooterLogo />
+                        <FooterLogo ariaLabel={t('footer.logo_aria')} />
                         <p className="wdr-footer__tagline">{t('footer.tagline')}</p>
                         <nav
                             className="wdr-footer__socials"
@@ -186,8 +187,8 @@ export const Footer: React.FC = () => {
                                     rel="noopener noreferrer"
                                     className="wdr-footer__social-link"
                                     data-social={social.id}
-                                    aria-label={social.label}
-                                    title={social.label}
+                                    aria-label={t(social.labelKey)}
+                                    title={t(social.labelKey)}
                                 >
                                     {social.icon}
                                 </a>
@@ -226,19 +227,19 @@ export const Footer: React.FC = () => {
                         aria-label={t('footer.legal')}
                     >
                         <InertiaLink
-                            href="/conditions-utilisation"
+                            href={localizePath('/conditions-utilisation') ?? '/conditions-utilisation'}
                             className="wdr-footer__link"
                         >
-                            CGU
+                            {t('footer.terms')}
                         </InertiaLink>
                         <InertiaLink
-                            href="/politique-de-confidentialite"
+                            href={localizePath('/politique-de-confidentialite') ?? '/politique-de-confidentialite'}
                             className="wdr-footer__link"
                         >
                             {t('footer.privacy')}
                         </InertiaLink>
                         <InertiaLink
-                            href="/mentions-legales"
+                            href={localizePath('/mentions-legales') ?? '/mentions-legales'}
                             className="wdr-footer__link"
                         >
                             {t('footer.legal_notice')}

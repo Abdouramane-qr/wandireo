@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\ServiceCalendarSyncController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\FareHarborCompanyController;
 use App\Http\Controllers\Api\ServicePricingRuleController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,7 @@ Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
 // ============================================================
 
 Route::get('/services',              [ServiceController::class, 'index']);
+Route::get('/search',                [ServiceController::class, 'search']);
 Route::get('/services/{id}',         [ServiceController::class, 'show']);
 Route::get('/services/{id}/calendar.ics', [ServiceCalendarSyncController::class, 'export']);
 
@@ -137,11 +139,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin-reviews',                     [ReviewController::class, 'adminList']);
         Route::patch('/admin-reviews/{id}',              [ReviewController::class, 'adminUpdate']);
         Route::delete('/admin-reviews/{id}',             [ReviewController::class, 'adminDestroy']);
+        Route::get('/fareharbor/companies',              [FareHarborCompanyController::class, 'index']);
+        Route::post('/fareharbor/companies',             [FareHarborCompanyController::class, 'store']);
+        Route::patch('/fareharbor/companies/{id}',       [FareHarborCompanyController::class, 'update']);
+        Route::post('/fareharbor/companies/{id}/partner-account', [FareHarborCompanyController::class, 'createPartnerAccount']);
+        Route::post('/fareharbor/companies/{id}/sync',   [FareHarborCompanyController::class, 'sync']);
+        Route::post('/fareharbor/companies/sync-all',    [FareHarborCompanyController::class, 'syncAll']);
     });
 
     // ── Upload (S3 pre-signe) — tout utilisateur authentifie ─────────────
     Route::post('/uploads/presign',               [UploadController::class, 'presign'])
         ->middleware('throttle:uploads');
     Route::post('/uploads/direct',                [UploadController::class, 'directUpload'])
+        ->name('uploads.direct')
         ->middleware('throttle:uploads');
 });

@@ -1,27 +1,30 @@
-import { Head, usePage } from '@inertiajs/react';
-import type { SeoData } from '@/types/seo';
+import { Head, usePage } from "@inertiajs/react";
+import type { SeoData } from "@/types/seo";
 
 interface PageProps {
+    [key: string]: unknown;
     name?: string;
     seo?: SeoData;
 }
 
 export function SeoHead({ seo }: { seo?: SeoData }) {
     const page = usePage<PageProps>();
-    const appName = page.props.name ?? 'Wandireo';
+    const appName = page.props.name ?? "Wandireo";
     const resolvedSeo = seo ?? page.props.seo ?? {};
     const title = resolvedSeo.title ?? appName;
     const description = resolvedSeo.description;
     const canonical = resolvedSeo.canonical;
     const image = resolvedSeo.image;
     const robots = resolvedSeo.robots;
-    const type = resolvedSeo.type ?? 'website';
+    const type = resolvedSeo.type ?? "website";
     const siteName = resolvedSeo.siteName ?? appName;
-    const twitterCard = resolvedSeo.twitterCard ?? 'summary_large_image';
+    const twitterCard = resolvedSeo.twitterCard ?? "summary_large_image";
 
     return (
         <Head title={title}>
-            {description ? <meta name="description" content={description} /> : null}
+            {description ? (
+                <meta name="description" content={description} />
+            ) : null}
             {robots ? <meta name="robots" content={robots} /> : null}
             {canonical ? <link rel="canonical" href={canonical} /> : null}
             <meta property="og:type" content={type} />

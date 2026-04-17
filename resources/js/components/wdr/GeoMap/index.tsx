@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import 'leaflet/dist/leaflet.css';
-import './GeoMap.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
+import "leaflet/dist/leaflet.css";
+import "./GeoMap.css";
 
 export interface GeoMapMarker {
     id: string;
@@ -18,12 +19,12 @@ interface GeoMapProps {
 }
 
 interface LeafletModules {
-    L: typeof import('leaflet');
-    MapContainer: typeof import('react-leaflet').MapContainer;
-    TileLayer: typeof import('react-leaflet').TileLayer;
-    Popup: typeof import('react-leaflet').Popup;
-    CircleMarker: typeof import('react-leaflet').CircleMarker;
-    useMap: typeof import('react-leaflet').useMap;
+    L: typeof import("leaflet");
+    MapContainer: typeof import("react-leaflet").MapContainer;
+    TileLayer: typeof import("react-leaflet").TileLayer;
+    Popup: typeof import("react-leaflet").Popup;
+    CircleMarker: typeof import("react-leaflet").CircleMarker;
+    useMap: typeof import("react-leaflet").useMap;
 }
 
 function FitBounds({
@@ -32,8 +33,8 @@ function FitBounds({
     leaflet,
 }: {
     markers: GeoMapMarker[];
-    useMapHook: LeafletModules['useMap'];
-    leaflet: LeafletModules['L'];
+    useMapHook: LeafletModules["useMap"];
+    leaflet: LeafletModules["L"];
 }) {
     const map = useMapHook();
 
@@ -69,8 +70,9 @@ function FitBounds({
 export const GeoMap: React.FC<GeoMapProps> = ({
     markers,
     height = 320,
-    className = '',
+    className = "",
 }) => {
+    const { t } = useTranslation();
     const [leafletModules, setLeafletModules] = useState<LeafletModules | null>(
         null,
     );
@@ -86,7 +88,7 @@ export const GeoMap: React.FC<GeoMapProps> = ({
     useEffect(() => {
         let isMounted = true;
 
-        void Promise.all([import('leaflet'), import('react-leaflet')]).then(
+        void Promise.all([import("leaflet"), import("react-leaflet")]).then(
             ([leaflet, reactLeaflet]) => {
                 if (!isMounted) {
                     return;
@@ -112,11 +114,13 @@ export const GeoMap: React.FC<GeoMapProps> = ({
         return null;
     }
 
+    const heightClassName =
+        height === 320 ? "wdr-geo-map--height-320" : "wdr-geo-map--height-320";
+
     if (!leafletModules) {
         return (
             <div
-                className={`wdr-geo-map ${className}`.trim()}
-                style={{ minHeight: `${height}px` }}
+                className={`wdr-geo-map ${heightClassName} ${className}`.trim()}
             />
         );
     }
@@ -125,10 +129,7 @@ export const GeoMap: React.FC<GeoMapProps> = ({
         leafletModules;
 
     return (
-        <div
-            className={`wdr-geo-map ${className}`.trim()}
-            style={{ minHeight: `${height}px` }}
-        >
+        <div className={`wdr-geo-map ${heightClassName} ${className}`.trim()}>
             <MapContainer
                 center={center}
                 zoom={12}
@@ -146,8 +147,8 @@ export const GeoMap: React.FC<GeoMapProps> = ({
                         center={[marker.latitude, marker.longitude]}
                         radius={10}
                         pathOptions={{
-                            color: '#0ea5a4',
-                            fillColor: '#f97316',
+                            color: "#0ea5a4",
+                            fillColor: "#f97316",
                             fillOpacity: 0.92,
                             weight: 3,
                         }}
@@ -155,14 +156,16 @@ export const GeoMap: React.FC<GeoMapProps> = ({
                         <Popup>
                             <div className="wdr-geo-map__popup">
                                 <strong>{marker.title}</strong>
-                                {marker.subtitle ? <p>{marker.subtitle}</p> : null}
+                                {marker.subtitle ? (
+                                    <p>{marker.subtitle}</p>
+                                ) : null}
                                 {marker.onSelect ? (
                                     <button
                                         type="button"
                                         className="wdr-geo-map__popup-action"
                                         onClick={marker.onSelect}
                                     >
-                                        Voir l&apos;offre
+                                        {t("map.view_offer")}
                                     </button>
                                 ) : null}
                             </div>

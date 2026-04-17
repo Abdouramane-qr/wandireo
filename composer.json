@@ -20,6 +20,7 @@
         "laravel/wayfinder": "^0.1.14",
         "predis/predis": "2.0",
         "sentry/sentry-laravel": "^4.0",
+        "spatie/laravel-translatable": "*",
         "stripe/stripe-php": "^11.0"
     },
     "require-dev": {

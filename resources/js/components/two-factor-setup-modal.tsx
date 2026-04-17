@@ -1,27 +1,27 @@
-import { Form } from '@inertiajs/react';
-import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { Check, Copy, ScanLine } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AlertError from '@/components/alert-error';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
+import { Form } from "@inertiajs/react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Check, Copy, ScanLine } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AlertError from "@/components/alert-error";
+import InputError from "@/components/input-error";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from '@/components/ui/input-otp';
-import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/hooks/use-appearance';
-import { useClipboard } from '@/hooks/use-clipboard';
-import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/routes/two-factor';
+} from "@/components/ui/input-otp";
+import { Spinner } from "@/components/ui/spinner";
+import { useAppearance } from "@/hooks/use-appearance";
+import { useClipboard } from "@/hooks/use-clipboard";
+import { OTP_MAX_LENGTH } from "@/hooks/use-two-factor-auth";
+import { confirm } from "@/routes/two-factor";
 
 function GridScanIcon() {
     return (
@@ -77,15 +77,9 @@ function TwoFactorSetupStep({
                             <div className="z-10 flex h-full w-full items-center justify-center p-5">
                                 {qrCodeSvg ? (
                                     <div
-                                        className="aspect-square w-full rounded-lg bg-white p-2 [&_svg]:size-full"
+                                        className={`aspect-square w-full rounded-lg bg-white p-2 [&_svg]:size-full ${resolvedAppearance === "dark" ? "invert brightness-150" : ""}`}
                                         dangerouslySetInnerHTML={{
                                             __html: qrCodeSvg,
-                                        }}
-                                        style={{
-                                            filter:
-                                                resolvedAppearance === 'dark'
-                                                    ? 'invert(1) brightness(1.5)'
-                                                    : undefined,
                                         }}
                                     />
                                 ) : (
@@ -104,7 +98,7 @@ function TwoFactorSetupStep({
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
                         <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                            ou saisissez le code manuellement
                         </span>
                     </div>
 
@@ -145,12 +139,12 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
-    const [code, setCode] = useState<string>('');
+    const [code, setCode] = useState<string>("");
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTimeout(() => {
-            pinInputContainerRef.current?.querySelector('input')?.focus();
+            pinInputContainerRef.current?.querySelector("input")?.focus();
         }, 0);
     }, []);
 
@@ -209,7 +203,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                Retour
                             </Button>
                             <Button
                                 type="submit"
@@ -218,7 +212,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                Confirmer
                             </Button>
                         </div>
                     </div>
@@ -261,27 +255,27 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-factor authentication enabled',
+                title: "Double authentification activée",
                 description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                    "La double authentification est désormais activée. Scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification.",
+                buttonText: "Fermer",
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify authentication code',
+                title: "Vérifier le code d'authentification",
                 description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                    "Saisissez le code à 6 chiffres affiché dans votre application d'authentification",
+                buttonText: "Continuer",
             };
         }
 
         return {
-            title: 'Enable two-factor authentication',
+            title: "Activer la double authentification",
             description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+                "Pour finaliser l'activation de la double authentification, scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification",
+            buttonText: "Continuer",
         };
     }, [twoFactorEnabled, showVerificationStep]);
 

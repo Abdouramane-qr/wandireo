@@ -1,125 +1,15 @@
 import { Link as InertiaLink } from '@inertiajs/react';
 import React, { useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import { Check, Globe, Monitor, Moon, Sun } from 'lucide-react';
+import { useAppearance } from '@/hooks/use-appearance';
+import { useTranslation } from '@/hooks/useTranslation';
+import { localizePath } from '@/lib/locale';
 import type { BaseUser } from '@/types/wdr-user';
 import { Button } from '../Button';
+import { LanguageSwitcher } from '../LanguageSwitcher';
+import { PUBLIC_NAV_ITEMS, isNavItemActive } from '../navigation';
 import './Sidebar.css';
-
-interface NavItem {
-    label: string;
-    href: string;
-    icon: React.ReactNode;
-}
-
-const CompassIcon = () => (
-    <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <circle cx="12" cy="12" r="10" />
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-    </svg>
-);
-
-const WavesIcon = () => (
-    <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
-        <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
-        <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
-    </svg>
-);
-
-const HotelIcon = () => (
-    <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-);
-
-const CarIcon = () => (
-    <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2" />
-        <circle cx="7.5" cy="17.5" r="2.5" />
-        <circle cx="17.5" cy="17.5" r="2.5" />
-    </svg>
-);
-
-const ActivityIcon = () => (
-    <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-    </svg>
-);
-
-const NAV_ITEMS: NavItem[] = [
-    { label: 'Destinations', href: '/recherche', icon: <CompassIcon /> },
-    {
-        label: 'Activités',
-        href: '/recherche?category=ACTIVITE',
-        icon: <ActivityIcon />,
-    },
-    {
-        label: 'Bateaux & Croisières',
-        href: '/recherche?category=BATEAU',
-        icon: <WavesIcon />,
-    },
-    {
-        label: 'Hébergements',
-        href: '/recherche?category=HEBERGEMENT',
-        icon: <HotelIcon />,
-    },
-    {
-        label: 'Location de voitures',
-        href: '/recherche?category=VOITURE',
-        icon: <CarIcon />,
-    },
-];
 
 const FOCUSABLE_SELECTORS = [
     'a[href]',
@@ -135,6 +25,7 @@ export interface SidebarProps {
     currentPath?: string;
     onLoginClick?: () => void;
     onRegisterClick?: () => void;
+    onLogoutClick?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -144,9 +35,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
     currentPath = '/',
     onLoginClick,
     onRegisterClick,
+    onLogoutClick,
 }) => {
     const sidebarRef = useRef<HTMLDivElement>(null);
     const previousFocusRef = useRef<Element | null>(null);
+    const { t } = useTranslation();
+    const { appearance, resolvedAppearance, updateAppearance } =
+        useAppearance();
+
+    const currentThemeIcon =
+        appearance === 'system' ? (
+            <Monitor size={16} />
+        ) : resolvedAppearance === 'dark' ? (
+            <Sun size={16} />
+        ) : (
+            <Moon size={16} />
+        );
 
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -217,10 +121,10 @@ return null;
     const userInitial = user ? user.firstName.charAt(0).toUpperCase() : '';
     const userRoleLabel =
         user?.role === 'PARTNER'
-            ? 'Partenaire'
+            ? t('sidebar.role.partner')
             : user?.role === 'ADMIN'
-              ? 'Administrateur'
-              : 'Voyageur';
+              ? t('sidebar.role.admin')
+              : t('sidebar.role.traveler');
 
     return ReactDOM.createPortal(
         <>
@@ -234,13 +138,13 @@ return null;
                 ref={sidebarRef}
                 className="wdr-sidebar"
                 role="navigation"
-                aria-label="Menu de navigation mobile"
+                aria-label={t('sidebar.mobile_nav')}
             >
                 <div className="wdr-sidebar__header">
                     <InertiaLink
-                        href="/"
+                        href={localizePath('/') ?? '/'}
                         className="wdr-sidebar__logo"
-                        aria-label="Wandireo - Retour a l'accueil"
+                        aria-label={t('sidebar.logo_aria')}
                         onClick={onClose}
                     >
                         <div
@@ -268,7 +172,7 @@ return null;
                     <button
                         className="wdr-sidebar__close-btn"
                         onClick={onClose}
-                        aria-label="Fermer le menu"
+                        aria-label={t('sidebar.close_menu')}
                         type="button"
                     >
                         <svg
@@ -290,16 +194,19 @@ return null;
                 <div className="wdr-sidebar__body">
                     <nav
                         className="wdr-sidebar__nav"
-                        aria-label="Categories de services"
+                        aria-label={t('sidebar.service_categories')}
                     >
-                        <p className="wdr-sidebar__nav-title">Decouvrir</p>
-                        {NAV_ITEMS.map((item) => {
-                            const isActive = currentPath === item.href;
+                        <p className="wdr-sidebar__nav-title">{t('sidebar.discover')}</p>
+                        {PUBLIC_NAV_ITEMS.map((item) => {
+                            const isActive = isNavItemActive(
+                                currentPath,
+                                item.href,
+                            );
 
                             return (
                                 <InertiaLink
                                     key={item.href}
-                                    href={item.href}
+                                    href={localizePath(item.href) ?? item.href}
                                     className={[
                                         'wdr-sidebar__nav-link',
                                         isActive
@@ -314,7 +221,7 @@ return null;
                                     <span className="wdr-sidebar__nav-icon">
                                         {item.icon}
                                     </span>
-                                    {item.label}
+                                    {t(item.labelKey)}
                                 </InertiaLink>
                             );
                         })}
@@ -324,22 +231,52 @@ return null;
 
                     <nav
                         className="wdr-sidebar__nav"
-                        aria-label="Liens supplementaires"
+                        aria-label={t('sidebar.additional_links')}
                     >
-                        <p className="wdr-sidebar__nav-title">Wandireo</p>
+                        <p className="wdr-sidebar__nav-title">{t('sidebar.brand')}</p>
+                        {user?.role === 'ADMIN' ? (
+                            <InertiaLink
+                                href={localizePath('/admin') ?? '/admin'}
+                                className="wdr-sidebar__nav-link"
+                                onClick={onClose}
+                            >
+                                {t('nav.admin')}
+                            </InertiaLink>
+                        ) : user?.role === 'PARTNER' ? (
+                            <>
+                                <InertiaLink
+                                    href={localizePath('/partenaire') ?? '/partenaire'}
+                                    className="wdr-sidebar__nav-link"
+                                    onClick={onClose}
+                                >
+                                    {t('header.dashboard')}
+                                </InertiaLink>
+                                <InertiaLink
+                                    href={
+                                        localizePath('/partenaire/catalogue') ??
+                                        '/partenaire/catalogue'
+                                    }
+                                    className="wdr-sidebar__nav-link"
+                                    onClick={onClose}
+                                >
+                                    {t('header.catalog')}
+                                </InertiaLink>
+                            </>
+                        ) : (
+                            <InertiaLink
+                                href={localizePath('/partenaire/inscription') ?? '/partenaire/inscription'}
+                                className="wdr-sidebar__nav-link"
+                                onClick={onClose}
+                            >
+                                {t('nav.become_partner')}
+                            </InertiaLink>
+                        )}
                         <InertiaLink
-                            href="/partenaire/inscription"
+                            href={localizePath('/guide') ?? '/guide'}
                             className="wdr-sidebar__nav-link"
                             onClick={onClose}
                         >
-                            Devenir Partenaire
-                        </InertiaLink>
-                        <InertiaLink
-                            href="/guide"
-                            className="wdr-sidebar__nav-link"
-                            onClick={onClose}
-                        >
-                            Centre d'aide
+                            {t('footer.help_center')}
                         </InertiaLink>
                         <a
                             href="https://wa.me/351928282231"
@@ -348,39 +285,127 @@ return null;
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            Nous contacter
+                            {t('sidebar.contact_us')}
                         </a>
                     </nav>
+
+                    <hr className="wdr-sidebar__divider" />
+
+                    <div className="wdr-sidebar__nav" aria-label={t('theme.change')}>
+                        <p className="wdr-sidebar__nav-title">{t('profile.preferences')}</p>
+                        <div className="wdr-sidebar__preferences">
+                            <div className="wdr-sidebar__preference-group">
+                                <span className="wdr-sidebar__preference-label">
+                                    <span className="wdr-sidebar__nav-icon">
+                                        {currentThemeIcon}
+                                    </span>
+                                    {t('theme.change')}
+                                </span>
+                                <div className="wdr-sidebar__theme-actions">
+                                    {(
+                                        [
+                                            ['light', t('theme.light')],
+                                            ['dark', t('theme.dark')],
+                                            ['system', t('theme.system')],
+                                        ] as const
+                                    ).map(([value, label]) => (
+                                        <button
+                                            key={value}
+                                            className={[
+                                                'wdr-sidebar__theme-chip',
+                                                appearance === value
+                                                    ? 'wdr-sidebar__theme-chip--active'
+                                                    : '',
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' ')}
+                                            onClick={() => updateAppearance(value)}
+                                            type="button"
+                                        >
+                                            <span>{label}</span>
+                                            {appearance === value ? (
+                                                <Check size={14} />
+                                            ) : null}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="wdr-sidebar__preference-group">
+                                <span className="wdr-sidebar__preference-label">
+                                    <span className="wdr-sidebar__nav-icon">
+                                        <Globe size={16} />
+                                    </span>
+                                    {t('language.change')}
+                                </span>
+                                <LanguageSwitcher className="wdr-sidebar__language-switcher" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="wdr-sidebar__footer">
                     {user ? (
-                        <div className="wdr-sidebar__user-info">
-                            {user.profilePicture ? (
-                                <img
-                                    src={user.profilePicture}
-                                    alt={`${user.firstName} ${user.lastName}`}
-                                    className="wdr-sidebar__user-avatar"
-                                    width="40"
-                                    height="40"
-                                />
-                            ) : (
-                                <div
-                                    className="wdr-sidebar__user-initial"
-                                    aria-hidden="true"
-                                >
-                                    {userInitial}
+                        <>
+                            <div className="wdr-sidebar__user-info">
+                                {user.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt={`${user.firstName} ${user.lastName}`}
+                                        className="wdr-sidebar__user-avatar"
+                                        width="40"
+                                        height="40"
+                                    />
+                                ) : (
+                                    <div
+                                        className="wdr-sidebar__user-initial"
+                                        aria-hidden="true"
+                                    >
+                                        {userInitial}
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="wdr-sidebar__user-name">
+                                        {user.firstName} {user.lastName}
+                                    </p>
+                                    <p className="wdr-sidebar__user-role">
+                                        {userRoleLabel}
+                                    </p>
                                 </div>
-                            )}
-                            <div>
-                                <p className="wdr-sidebar__user-name">
-                                    {user.firstName} {user.lastName}
-                                </p>
-                                <p className="wdr-sidebar__user-role">
-                                    {userRoleLabel}
-                                </p>
                             </div>
-                        </div>
+                            {user.role === 'CLIENT' ? (
+                                <>
+                                    <InertiaLink
+                                        href={localizePath('/mon-espace') ?? '/mon-espace'}
+                                        className="wdr-sidebar__nav-link"
+                                        onClick={onClose}
+                                    >
+                                        {t('header.dashboard')}
+                                    </InertiaLink>
+                                    <InertiaLink
+                                        href={
+                                            localizePath('/mes-reservations') ??
+                                            '/mes-reservations'
+                                        }
+                                        className="wdr-sidebar__nav-link"
+                                        onClick={onClose}
+                                    >
+                                        {t('partner.bookings.title')}
+                                    </InertiaLink>
+                                </>
+                            ) : null}
+                            {onLogoutClick ? (
+                                <Button
+                                    variant="ghost"
+                                    fullWidth
+                                    onClick={() => {
+                                        onClose();
+                                        onLogoutClick();
+                                    }}
+                                >
+                                    {t('nav.logout')}
+                                </Button>
+                            ) : null}
+                        </>
                     ) : (
                         <>
                             <Button
@@ -391,7 +416,7 @@ return null;
                                     onLoginClick?.();
                                 }}
                             >
-                                Connexion
+                                {t('nav.login')}
                             </Button>
                             <Button
                                 variant="ghost"
@@ -401,7 +426,7 @@ return null;
                                     onRegisterClick?.();
                                 }}
                             >
-                                Creer un compte
+                                {t('sidebar.create_account')}
                             </Button>
                         </>
                     )}

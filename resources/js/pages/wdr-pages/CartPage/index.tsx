@@ -10,19 +10,18 @@
  *   - Le CTA pour progresser vers la saisie des informations voyageur
  */
 
-import React from 'react';
-import { Button } from '@/components/wdr';
-import { useBooking  } from '@/context/BookingContext';
-import type {BookingDraft} from '@/context/BookingContext';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
+import React from "react";
+import { Button } from "@/components/wdr";
+import { useBooking } from "@/context/BookingContext";
+import type { BookingDraft } from "@/context/BookingContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
 import {
     ServiceCategoryLabels,
-    PaymentModeLabels,
-    PaymentModeDescriptions,
     PaymentModeNames,
-} from '@/types/service';
-import './CartPage.css';
+} from "@/types/service";
+import "./CartPage.css";
 
 // ============================================================
 // Helpers locaux
@@ -32,20 +31,33 @@ import './CartPage.css';
  * Libelle de la quantite selon la categorie de service.
  * Exemples : "2 participants", "3 jours", "5 nuits"
  */
-function buildQuantityLabel(draft: BookingDraft): string {
+function buildQuantityLabel(
+    draft: BookingDraft,
+    t: (key: string) => string,
+): string {
     const { service, units, participants } = draft;
 
     switch (service.category) {
-        case 'ACTIVITE':
+        case "ACTIVITE":
             return participants > 1
-                ? `${participants} participants`
-                : '1 participant';
-        case 'HEBERGEMENT':
-            return units > 1 ? `${units} nuits` : '1 nuit';
-        case 'BATEAU':
-        case 'VOITURE':
+                ? t("cart.quantity.participant_other").replace(
+                      "{count}",
+                      String(participants),
+                  )
+                : t("cart.quantity.participant_one");
+        case "HEBERGEMENT":
+            return units > 1
+                ? t("cart.quantity.night_other").replace(
+                      "{count}",
+                      String(units),
+                  )
+                : t("cart.quantity.night_one");
+        case "BATEAU":
+        case "VOITURE":
         default:
-            return units > 1 ? `${units} jours` : '1 jour';
+            return units > 1
+                ? t("cart.quantity.day_other").replace("{count}", String(units))
+                : t("cart.quantity.day_one");
     }
 }
 
@@ -53,11 +65,11 @@ function buildQuantityLabel(draft: BookingDraft): string {
  * Formate une date ISO YYYY-MM-DD en libelle long francais.
  * Exemple : "2026-06-15" -> "15 juin 2026"
  */
-function formatDateLong(isoDate: string): string {
-    return new Date(isoDate).toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
+function formatDateLong(isoDate: string, locale: string): string {
+    return new Date(isoDate).toLocaleDateString(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
     });
 }
 
@@ -108,16 +120,16 @@ const ShieldIcon: React.FC = () => (
 
 const EmptyCart: React.FC = () => {
     const { navigate } = useRouter();
+    const { t } = useTranslation();
 
     return (
         <div className="wdr-cart wdr-cart--empty">
             <div className="wdr-cart__empty-box">
                 <p className="wdr-cart__empty-message">
-                    Aucune reservation en cours. Veuillez selectionner un
-                    service depuis le catalogue.
+                    {t("cart.empty_message")}
                 </p>
-                <Button onClick={() => navigate({ name: 'home' })}>
-                    Retourner au catalogue
+                <Button onClick={() => navigate({ name: "home" })}>
+                    {t("cart.back_catalog")}
                 </Button>
             </div>
         </div>
@@ -131,16 +143,22 @@ const EmptyCart: React.FC = () => {
 export const CartPage: React.FC = () => {
     const { draft } = useBooking();
     const { navigate } = useRouter();
+    const { t, intlLocale } = useTranslation();
 
     // Acces direct par URL sans brouillon : renvoie vers l'accueil
     if (!draft) {
-return <EmptyCart />;
-}
+        return <EmptyCart />;
+    }
 
     const { service } = draft;
-    const thumbnail = service.images[0] ?? '';
-    const quantityLabel = buildQuantityLabel(draft);
+    const thumbnail = service.images[0] ?? "";
+    const quantityLabel = buildQuantityLabel(draft, t);
     const commissionPercent = Math.round(service.commissionRate * 100);
+    const paymentModeKey = draft.paymentMode.toLowerCase();
+    const paymentModeLabel = t(`cart.payment_mode.${paymentModeKey}.label`);
+    const paymentModeDescription = t(
+        `cart.payment_mode.${paymentModeKey}.description`,
+    );
 
     return (
         <div className="wdr-cart">
@@ -148,14 +166,14 @@ return <EmptyCart />;
                 {/* Fil d'Ariane des etapes */}
                 <nav
                     className="wdr-cart__steps"
-                    aria-label="Etapes de reservation"
+                    aria-label={t("cart.steps_aria")}
                 >
                     <ol className="wdr-cart__steps-list">
                         <li
                             className="wdr-cart__step wdr-cart__step--active"
                             aria-current="step"
                         >
-                            Panier
+                            {t("cart.step.cart")}
                         </li>
                         <li
                             className="wdr-cart__step wdr-cart__step--separator"
@@ -163,38 +181,41 @@ return <EmptyCart />;
                         >
                             &rsaquo;
                         </li>
-                        <li className="wdr-cart__step">Informations</li>
+                        <li className="wdr-cart__step">
+                            {t("cart.step.info")}
+                        </li>
                         <li
                             className="wdr-cart__step wdr-cart__step--separator"
                             aria-hidden="true"
                         >
                             &rsaquo;
                         </li>
-                        <li className="wdr-cart__step">Paiement</li>
+                        <li className="wdr-cart__step">
+                            {t("cart.step.payment")}
+                        </li>
                         <li
                             className="wdr-cart__step wdr-cart__step--separator"
                             aria-hidden="true"
                         >
                             &rsaquo;
                         </li>
-                        <li className="wdr-cart__step">Confirmation</li>
+                        <li className="wdr-cart__step">
+                            {t("cart.step.confirmation")}
+                        </li>
                     </ol>
                 </nav>
 
                 {/* Titre de la page */}
                 <header className="wdr-cart__header">
-                    <h1 className="wdr-cart__title">Votre panier</h1>
-                    <p className="wdr-cart__subtitle">
-                        Verifiez votre selection avant de saisir vos
-                        informations.
-                    </p>
+                    <h1 className="wdr-cart__title">{t("cart.title")}</h1>
+                    <p className="wdr-cart__subtitle">{t("cart.subtitle")}</p>
                 </header>
 
                 <div className="wdr-cart__layout">
                     {/* --- Colonne gauche : recap du service --- */}
                     <section
                         className="wdr-cart__service"
-                        aria-label="Service selectionne"
+                        aria-label={t("cart.service_aria")}
                     >
                         <div className="wdr-cart__service-card">
                             <img
@@ -215,7 +236,7 @@ return <EmptyCart />;
 
                                 <p className="wdr-cart__service-location">
                                     <LocationIcon />
-                                    {service.location.city},{' '}
+                                    {service.location.city},{" "}
                                     {service.location.country}
                                 </p>
 
@@ -232,7 +253,8 @@ return <EmptyCart />;
                                             {service.rating.toFixed(1)}
                                         </strong>
                                         <span className="wdr-cart__service-reviews">
-                                            ({service.reviewCount} avis)
+                                            ({service.reviewCount}{" "}
+                                            {t("cart.reviews")})
                                         </span>
                                     </div>
                                 )}
@@ -242,18 +264,28 @@ return <EmptyCart />;
                         {/* Detail de la selection */}
                         <div className="wdr-cart__selection">
                             <h3 className="wdr-cart__selection-title">
-                                Votre selection
+                                {t("cart.selection_title")}
                             </h3>
                             <dl className="wdr-cart__selection-grid">
                                 <div className="wdr-cart__selection-row">
-                                    <dt>Date{draft.dateTo ? 's' : ''}</dt>
+                                    <dt>
+                                        {draft.dateTo
+                                            ? t("cart.selection.dates_plural")
+                                            : t("cart.selection.dates")}
+                                    </dt>
                                     <dd>
-                                        {formatDateLong(draft.dateFrom)}
+                                        {formatDateLong(
+                                            draft.dateFrom,
+                                            intlLocale,
+                                        )}
                                         {draft.dateTo && (
                                             <>
-                                                {' '}
-                                                &rarr;{' '}
-                                                {formatDateLong(draft.dateTo)}
+                                                {" "}
+                                                &rarr;{" "}
+                                                {formatDateLong(
+                                                    draft.dateTo,
+                                                    intlLocale,
+                                                )}
                                             </>
                                         )}
                                     </dd>
@@ -261,31 +293,31 @@ return <EmptyCart />;
 
                                 {draft.timeSlot && (
                                     <div className="wdr-cart__selection-row">
-                                        <dt>Creneau</dt>
+                                        <dt>{t("cart.selection.time_slot")}</dt>
                                         <dd>{draft.timeSlot}</dd>
                                     </div>
                                 )}
 
                                 <div className="wdr-cart__selection-row">
-                                    <dt>Quantite</dt>
+                                    <dt>{t("cart.selection.quantity")}</dt>
                                     <dd>{quantityLabel}</dd>
                                 </div>
 
                                 <div className="wdr-cart__selection-row">
-                                    <dt>Destination</dt>
+                                    <dt>{t("cart.selection.destination")}</dt>
                                     <dd>
-                                        {service.location.city},{' '}
+                                        {service.location.city},{" "}
                                         {service.location.country}
                                     </dd>
                                 </div>
 
                                 {draft.selectedExtras.length > 0 && (
                                     <div className="wdr-cart__selection-row">
-                                        <dt>Extras</dt>
+                                        <dt>{t("cart.selection.extras")}</dt>
                                         <dd>
                                             {draft.selectedExtras
                                                 .map((extra) => extra.name)
-                                                .join(', ')}
+                                                .join(", ")}
                                         </dd>
                                     </div>
                                 )}
@@ -296,18 +328,18 @@ return <EmptyCart />;
                     {/* --- Colonne droite : decomposition des prix + CTA --- */}
                     <aside
                         className="wdr-cart__summary"
-                        aria-label="Recapitulatif et prix"
+                        aria-label={t("cart.summary_aria")}
                     >
                         <h3 className="wdr-cart__summary-title">
-                            Detail du prix
+                            {t("cart.summary_title")}
                         </h3>
 
                         {/* Badge mode de paiement */}
                         <div
-                            className={`wdr-cart__payment-mode-badge wdr-cart__payment-mode-badge--${draft.paymentMode.toLowerCase().replace(/_/g, '-')}`}
-                            title={PaymentModeDescriptions[draft.paymentMode]}
+                            className={`wdr-cart__payment-mode-badge wdr-cart__payment-mode-badge--${draft.paymentMode.toLowerCase().replace(/_/g, "-")}`}
+                            title={paymentModeDescription}
                         >
-                            {PaymentModeLabels[draft.paymentMode]}
+                            {paymentModeLabel}
                         </div>
 
                         <dl className="wdr-cart__price-breakdown">
@@ -317,7 +349,7 @@ return <EmptyCart />;
                                 <>
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Prix prestataire
+                                            {t("cart.price.partner")}
                                             <span className="wdr-cart__price-meta">
                                                 ({quantityLabel})
                                             </span>
@@ -333,7 +365,7 @@ return <EmptyCart />;
                                     {draft.extrasTotal > 0 && (
                                         <div className="wdr-cart__price-row">
                                             <dt className="wdr-cart__price-label">
-                                                Extras
+                                                {t("cart.price.extras")}
                                             </dt>
                                             <dd className="wdr-cart__price-value">
                                                 {formatPrice(
@@ -346,7 +378,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Frais de service Wandireo
+                                            {t("cart.price.fees")}
                                             <span className="wdr-cart__price-meta">
                                                 ({commissionPercent}%)
                                             </span>
@@ -366,7 +398,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row wdr-cart__price-row--total">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--total">
-                                            A regler sur place
+                                            {t("cart.price.onsite")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--total">
                                             {formatPrice(
@@ -378,10 +410,10 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--now">
-                                            Montant du maintenant
+                                            {t("cart.price.now")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--now">
-                                            0 &euro; (gratuit)
+                                            {t("cart.price.free")}
                                         </dd>
                                     </div>
                                 </>
@@ -391,7 +423,7 @@ return <EmptyCart />;
                                 <>
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Prix prestataire
+                                            {t("cart.price.partner")}
                                             <span className="wdr-cart__price-meta">
                                                 ({quantityLabel})
                                             </span>
@@ -407,7 +439,7 @@ return <EmptyCart />;
                                     {draft.extrasTotal > 0 && (
                                         <div className="wdr-cart__price-row">
                                             <dt className="wdr-cart__price-label">
-                                                Extras
+                                                {t("cart.price.extras")}
                                             </dt>
                                             <dd className="wdr-cart__price-value">
                                                 {formatPrice(
@@ -420,7 +452,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Frais de service Wandireo
+                                            {t("cart.price.fees")}
                                             <span className="wdr-cart__price-meta">
                                                 ({commissionPercent}%)
                                             </span>
@@ -440,7 +472,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row wdr-cart__price-row--total">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--total">
-                                            Total TTC
+                                            {t("cart.price.total")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--total">
                                             {formatPrice(
@@ -457,7 +489,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row wdr-cart__price-row--now">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--now">
-                                            A payer maintenant (en ligne)
+                                            {t("cart.price.pay_online")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--now">
                                             {formatPrice(
@@ -469,7 +501,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row wdr-cart__price-row--onsite">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--onsite">
-                                            A regler sur place
+                                            {t("cart.price.onsite")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--onsite">
                                             {formatPrice(
@@ -484,7 +516,7 @@ return <EmptyCart />;
                                 <>
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Prix prestataire
+                                            {t("cart.price.partner")}
                                             <span className="wdr-cart__price-meta">
                                                 ({quantityLabel})
                                             </span>
@@ -500,7 +532,7 @@ return <EmptyCart />;
                                     {draft.extrasTotal > 0 && (
                                         <div className="wdr-cart__price-row">
                                             <dt className="wdr-cart__price-label">
-                                                Extras
+                                                {t("cart.price.extras")}
                                             </dt>
                                             <dd className="wdr-cart__price-value">
                                                 {formatPrice(
@@ -513,7 +545,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row">
                                         <dt className="wdr-cart__price-label">
-                                            Frais de service Wandireo
+                                            {t("cart.price.fees")}
                                             <span className="wdr-cart__price-meta">
                                                 ({commissionPercent}%)
                                             </span>
@@ -533,7 +565,7 @@ return <EmptyCart />;
 
                                     <div className="wdr-cart__price-row wdr-cart__price-row--total">
                                         <dt className="wdr-cart__price-label wdr-cart__price-label--total">
-                                            Total TTC
+                                            {t("cart.price.total")}
                                         </dt>
                                         <dd className="wdr-cart__price-value wdr-cart__price-value--total">
                                             {formatPrice(
@@ -551,8 +583,8 @@ return <EmptyCart />;
                             <ShieldIcon />
                             {draft.paymentMode ===
                             PaymentModeNames.FULL_CASH_ON_SITE
-                                ? 'Réservation garantie. Paiement sur place en espèces.'
-                                : 'Paiement 100% sécurisé. Confirmation immédiate.'}
+                                ? t("cart.secure.cash")
+                                : t("cart.secure.online")}
                         </p>
 
                         {/* CTA principal */}
@@ -560,9 +592,9 @@ return <EmptyCart />;
                             variant="primary"
                             size="lg"
                             fullWidth
-                            onClick={() => navigate({ name: 'checkout' })}
+                            onClick={() => navigate({ name: "checkout" })}
                         >
-                            Continuer — Mes informations
+                            {t("cart.cta.continue")}
                         </Button>
 
                         {/* Retour a la fiche service */}
@@ -571,11 +603,11 @@ return <EmptyCart />;
                             size="md"
                             fullWidth
                             onClick={() =>
-                                navigate({ name: 'service', id: service.id })
+                                navigate({ name: "service", id: service.id })
                             }
                             className="wdr-cart__back-btn"
                         >
-                            Modifier la selection
+                            {t("cart.cta.edit")}
                         </Button>
                     </aside>
                 </div>

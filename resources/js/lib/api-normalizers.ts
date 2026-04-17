@@ -79,6 +79,19 @@ function asStringArray(value: unknown): string[] {
         : [];
 }
 
+function asLocalizedTextMap(value: unknown): Record<string, string> | undefined {
+    const record = asRecord(value);
+    const entries = Object.entries(record)
+        .map(([locale, translation]) => [locale, asString(translation)] as const)
+        .filter(([, translation]) => translation.trim() !== '');
+
+    if (entries.length === 0) {
+        return undefined;
+    }
+
+    return Object.fromEntries(entries);
+}
+
 function asDate(value: unknown): Date {
     if (value instanceof Date) {
         return value;
@@ -125,7 +138,17 @@ function normalizePaymentMode(value: unknown): PaymentMode {
 }
 
 function normalizeBookingMode(value: unknown): BookingMode {
-    return asString(value, 'REQUEST') === 'INSTANT' ? 'INSTANT' : 'REQUEST';
+    const candidate = asString(value, 'REQUEST');
+
+    if (candidate === 'INSTANT') {
+        return 'INSTANT';
+    }
+
+    if (candidate === 'EXTERNAL_REDIRECT') {
+        return 'EXTERNAL_REDIRECT';
+    }
+
+    return 'REQUEST';
 }
 
 function baseService(rawInput: unknown): {
@@ -134,7 +157,9 @@ function baseService(rawInput: unknown): {
     id: string;
     partnerId?: string;
     title: string;
+    titleTranslations?: Record<string, string>;
     description: string;
+    descriptionTranslations?: Record<string, string>;
     category: ServiceCategory;
     pricingUnit: ServicePricingUnit;
     partnerPrice: number;
@@ -156,6 +181,7 @@ function baseService(rawInput: unknown): {
     sourceType?: 'LOCAL' | 'EXTERNAL';
     sourceProvider?: string;
     sourceExternalId?: string;
+    isExternalRedirect?: boolean;
     lastSyncedAt?: Date;
     serviceCategoryId?: string;
     serviceSubcategoryId?: string;
@@ -182,6 +208,23 @@ function baseService(rawInput: unknown): {
     );
     const locationData = asRecord(raw.location);
     const coordinates = asRecord(locationData.coordinates);
+    const sourceType =
+        asString(raw.source_type ?? raw.sourceType, 'LOCAL') === 'EXTERNAL'
+            ? 'EXTERNAL'
+            : 'LOCAL';
+    const sourceProvider =
+        asString(raw.source_provider ?? raw.sourceProvider) || undefined;
+    const fareHarbor = asRecord(extra.fareharbor);
+    const bookingUrl = asString(
+        fareHarbor.bookingUrl ?? fareHarbor.booking_url,
+    );
+    const isExternalRedirect =
+        asBoolean(raw.is_external_redirect ?? raw.isExternalRedirect) ||
+        normalizeBookingMode(raw.booking_mode ?? raw.bookingMode) ===
+            'EXTERNAL_REDIRECT' ||
+        normalizePaymentMode(raw.payment_mode ?? raw.paymentMode) ===
+            PaymentModeNames.EXTERNAL_REDIRECT ||
+        bookingUrl === '__force_external_redirect__';
 
     return {
         raw,
@@ -189,7 +232,15 @@ function baseService(rawInput: unknown): {
         id: asString(raw.id),
         partnerId: asString(raw.partner_id ?? raw.partnerId) || undefined,
         title: asString(raw.title),
+        titleTranslations:
+            asLocalizedTextMap(
+                raw.title_translations ?? raw.titleTranslations,
+            ) || undefined,
         description: asString(raw.description),
+        descriptionTranslations:
+            asLocalizedTextMap(
+                raw.description_translations ?? raw.descriptionTranslations,
+            ) || undefined,
         category,
         pricingUnit: normalizePricingUnit(
             raw.pricing_unit ?? raw.pricingUnit,
@@ -211,15 +262,12 @@ function baseService(rawInput: unknown): {
         bookingMode: normalizeBookingMode(raw.booking_mode ?? raw.bookingMode),
         featured: asBoolean(raw.featured, false),
         videoUrl: asString(raw.video_url ?? raw.videoUrl) || undefined,
-        sourceType:
-            asString(raw.source_type ?? raw.sourceType, 'LOCAL') === 'EXTERNAL'
-                ? 'EXTERNAL'
-                : 'LOCAL',
-        sourceProvider:
-            asString(raw.source_provider ?? raw.sourceProvider) || undefined,
+        sourceType,
+        sourceProvider,
         sourceExternalId:
             asString(raw.source_external_id ?? raw.sourceExternalId) ||
             undefined,
+        isExternalRedirect,
         lastSyncedAt:
             raw.last_synced_at || raw.lastSyncedAt
                 ? asDate(raw.last_synced_at ?? raw.lastSyncedAt)
@@ -839,8 +887,20 @@ export function normalizeBlogPost(rawInput: unknown): BlogPost {
         id: asString(raw.id),
         slug: asString(raw.slug),
         title: asString(raw.title),
+        titleTranslations:
+            asLocalizedTextMap(
+                raw.title_translations ?? raw.titleTranslations,
+            ) || undefined,
         excerpt: asString(raw.excerpt),
+        excerptTranslations:
+            asLocalizedTextMap(
+                raw.excerpt_translations ?? raw.excerptTranslations,
+            ) || undefined,
         content: asString(raw.content),
+        contentTranslations:
+            asLocalizedTextMap(
+                raw.content_translations ?? raw.contentTranslations,
+            ) || undefined,
         coverImage: asString(raw.cover_image ?? raw.coverImage),
         authorId: asString(raw.author_id ?? raw.authorId),
         status: asString(raw.status, 'DRAFT') as BlogStatus,

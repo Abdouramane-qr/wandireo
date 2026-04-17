@@ -84,6 +84,54 @@
     margin-left: 0.1rem;
 }
 
+.wdr-editor__locale-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(248, 252, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 100%);
+}
+
+.wdr-editor__locale-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.wdr-editor__locale-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.wdr-editor__locale-tab {
+    border: 1px solid var(--border-light);
+    background: #fff;
+    color: var(--text-main);
+    border-radius: 999px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wdr-editor__locale-tab--active {
+    border-color: var(--primary);
+    background: rgba(0, 132, 255, 0.08);
+    color: var(--primary);
+}
+
+.wdr-editor__locale-hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
 .wdr-editor__error {
     font-size: 0.8125rem;
     color: #e5334b;

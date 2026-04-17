@@ -1,16 +1,17 @@
-import React from 'react';
-import { useRouter } from '@/hooks/useWdrRouter';
-import type { WdrRoute } from '@/hooks/useWdrRouter';
-import './AdminSectionNav.css';
+import React from "react";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import type { WdrRoute } from "@/hooks/useWdrRouter";
+import "./AdminSectionNav.css";
 
 type AdminNavSection =
-    | 'dashboard'
-    | 'users'
-    | 'services'
-    | 'structure'
-    | 'reviews'
-    | 'transactions'
-    | 'support';
+    | "dashboard"
+    | "users"
+    | "services"
+    | "structure"
+    | "reviews"
+    | "transactions"
+    | "support";
 
 interface AdminSectionNavProps {
     active: AdminNavSection;
@@ -139,80 +140,88 @@ const SupportIcon: React.FC = () => (
 
 const ITEMS: Array<{
     key: AdminNavSection;
-    label: string;
     route: WdrRoute;
     icon: React.ReactNode;
 }> = [
     {
-        key: 'dashboard',
-        label: 'Tableau de bord',
-        route: { name: 'admin-dashboard' },
+        key: "dashboard",
+        route: { name: "admin-dashboard" },
         icon: <ShieldIcon />,
     },
     {
-        key: 'users',
-        label: 'Utilisateurs',
-        route: { name: 'admin-users' },
+        key: "users",
+        route: { name: "admin-users" },
         icon: <UsersIcon />,
     },
     {
-        key: 'services',
-        label: 'Catalogue',
-        route: { name: 'admin-services' },
+        key: "services",
+        route: { name: "admin-services" },
         icon: <GridIcon />,
     },
     {
-        key: 'structure',
-        label: 'Structure',
-        route: { name: 'admin-service-structure' },
+        key: "structure",
+        route: { name: "admin-service-structure" },
         icon: <LayersIcon />,
     },
     {
-        key: 'reviews',
-        label: 'Avis',
-        route: { name: 'admin-reviews' },
+        key: "reviews",
+        route: { name: "admin-reviews" },
         icon: <StarIcon />,
     },
     {
-        key: 'transactions',
-        label: 'Transactions',
-        route: { name: 'admin-transactions' },
+        key: "transactions",
+        route: { name: "admin-transactions" },
         icon: <CreditCardIcon />,
     },
     {
-        key: 'support',
-        label: 'Support',
-        route: { name: 'admin-support' },
+        key: "support",
+        route: { name: "admin-support" },
         icon: <SupportIcon />,
     },
 ];
 
 export const AdminSectionNav: React.FC<AdminSectionNavProps> = ({ active }) => {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
+    const labels: Record<AdminNavSection, string> = {
+        dashboard: t("admin.nav.dashboard"),
+        users: t("admin.nav.users"),
+        services: t("admin.nav.services"),
+        structure: t("admin.nav.structure"),
+        reviews: t("admin.nav.reviews"),
+        transactions: t("admin.nav.transactions"),
+        support: t("admin.nav.support"),
+    };
 
     return (
-        <nav className="wdr-admin-nav" aria-label="Navigation administration">
+        <nav className="wdr-admin-nav" aria-label={t("admin.nav.aria")}>
             <div className="wdr-admin-nav__inner">
                 <div className="wdr-admin-nav__intro">
-                    <p className="wdr-admin-nav__eyebrow">Administration</p>
-                    <p className="wdr-admin-nav__title">Pilotage Wandireo</p>
+                    <p className="wdr-admin-nav__eyebrow">
+                        {t("admin.nav.eyebrow")}
+                    </p>
+                    <p className="wdr-admin-nav__title">
+                        {t("admin.nav.title")}
+                    </p>
                 </div>
                 {ITEMS.map((item) => (
                     <button
                         key={item.key}
                         type="button"
                         className={[
-                            'wdr-admin-nav__item',
+                            "wdr-admin-nav__item",
                             active === item.key
-                                ? 'wdr-admin-nav__item--active'
-                                : '',
+                                ? "wdr-admin-nav__item--active"
+                                : "",
                         ]
-                            .join(' ')
+                            .join(" ")
                             .trim()}
                         onClick={() => navigate(item.route)}
                     >
                         <span className="wdr-admin-nav__icon">{item.icon}</span>
-                        <span className="wdr-admin-nav__label">{item.label}</span>
+                        <span className="wdr-admin-nav__label">
+                            {labels[item.key]}
+                        </span>
                     </button>
                 ))}
             </div>

@@ -1,13 +1,16 @@
 .wdr-admin-structure {
     display: grid;
     gap: 1.5rem;
+    min-height: calc(100svh - 4.75rem);
+    background: var(--bg-subtle);
 }
 
 @media (min-width: 1180px) {
     .wdr-admin-structure {
-        grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
-        column-gap: 2rem;
+        grid-template-columns: 280px minmax(0, 1fr);
+        column-gap: 2.25rem;
         align-items: start;
+        padding-right: 2rem;
     }
 
     .wdr-admin-structure__hero {
@@ -16,22 +19,25 @@
 
     .wdr-admin-structure > .wdr-admin-nav {
         grid-column: 1;
-        grid-row: 2 / span 20;
-        margin-top: 0.5rem;
+        margin-top: 2rem;
+        position: sticky;
+        top: 7rem;
     }
 
     .wdr-admin-structure__layout {
         grid-column: 2;
+        margin-top: 2rem;
     }
 }
 
 .wdr-admin-structure__hero,
 .wdr-admin-structure__panel {
-    background: #fff;
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
     border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 30px -12px rgba(13, 59, 82, 0.12);
 }
+
 
 .wdr-admin-structure__hero {
     padding: 2rem;
@@ -46,7 +52,7 @@
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-size: 0.75rem;
-    color: #0f766e;
+    color: var(--secondary);
 }
 
 .wdr-admin-structure__hero h1 {
@@ -55,7 +61,7 @@
 
 .wdr-admin-structure__hero p {
     margin: 0;
-    color: #475569;
+    color: var(--text-muted);
 }
 
 .wdr-admin-structure__hero-actions,
@@ -104,7 +110,7 @@
 .wdr-admin-structure__description,
 .wdr-admin-structure__empty,
 .wdr-admin-structure__item span {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .wdr-admin-structure__category-list,
@@ -115,9 +121,9 @@
 
 .wdr-admin-structure__category-card,
 .wdr-admin-structure__item {
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    border: 1px solid var(--border-light);
     border-radius: 16px;
-    background: #f8fafc;
+    background: var(--bg-subtle);
 }
 
 .wdr-admin-structure__category-card {
@@ -128,14 +134,14 @@
 }
 
 .wdr-admin-structure__category-card--active {
-    border-color: #0f766e;
-    background: #ecfeff;
+    border-color: var(--secondary);
+    background: color-mix(in srgb, var(--secondary) 10%, var(--bg-elevated));
 }
 
 .wdr-admin-structure__category-card strong,
 .wdr-admin-structure__item strong {
     display: block;
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .wdr-admin-structure__item {
@@ -149,7 +155,7 @@
 .wdr-admin-structure__label {
     display: grid;
     gap: 0.4rem;
-    color: #0f172a;
+    color: var(--text-main);
     font-weight: 600;
     margin-top: 0.9rem;
 }
@@ -157,10 +163,12 @@
 .wdr-admin-structure__textarea {
     width: 100%;
     border-radius: 14px;
-    border: 1px solid rgba(15, 23, 42, 0.12);
+    border: 1px solid var(--border-light);
     padding: 0.85rem 1rem;
     font: inherit;
     resize: vertical;
+    background: var(--bg-elevated);
+    color: var(--text-main);
 }
 
 .wdr-admin-structure__check {
@@ -168,7 +176,7 @@
     align-items: center;
     gap: 0.6rem;
     margin-top: 0.9rem;
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .wdr-admin-structure__actions {
@@ -185,6 +193,11 @@
 }
 
 @media (max-width: 720px) {
+    .wdr-admin-structure {
+        min-height: calc(100svh - 4.25rem);
+        padding: 0 1rem 1rem;
+    }
+
     .wdr-admin-structure__hero,
     .wdr-admin-structure__item,
     .wdr-admin-structure__panel-header,
@@ -192,4 +205,26 @@
         flex-direction: column;
         align-items: stretch;
     }
+}
+
+:is(.dark) .wdr-admin-structure {
+    background: var(--bg-main);
+}
+
+:is(.dark) .wdr-admin-structure__hero,
+:is(.dark) .wdr-admin-structure__panel,
+:is(.dark) .wdr-admin-structure__category-card,
+:is(.dark) .wdr-admin-structure__item,
+:is(.dark) .wdr-admin-structure__textarea {
+    background: var(--bg-elevated);
+    border-color: var(--border-light);
+}
+
+:is(.dark) .wdr-admin-structure__category-card--active {
+    background: rgba(51, 184, 213, 0.1);
+    border-color: rgba(51, 184, 213, 0.3);
+}
+
+:is(.dark) .wdr-admin-structure__textarea::placeholder {
+    color: #8ca8b6;
 }

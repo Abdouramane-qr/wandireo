@@ -1,5 +1,6 @@
 .wdr-home {
     width: 100%;
+    overflow-x: clip;
 }
 
 .wdr-home__whatsapp-float {
@@ -39,6 +40,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
+    width: 100%;
 }
 
 .wdr-home__section {
@@ -108,14 +110,14 @@
             rgba(18, 140, 126, 0.58) 48%,
             rgba(255, 171, 39, 0.52) 100%
         ),
-        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80');
+        url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80");
     background-size: cover;
     background-position: center 60%;
     z-index: 0;
 }
 
 .wdr-home__hero-backdrop::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background-image:
@@ -137,6 +139,7 @@
     width: 100%;
     max-width: 920px;
     text-align: center;
+    min-width: 0;
 }
 
 .wdr-home__hero-title {
@@ -182,8 +185,11 @@
 .wdr-home__search-bar {
     display: flex;
     align-items: center;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f4fbff 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f4fbff 100%
+    );
     border: 1px solid rgba(255, 255, 255, 0.72);
     border-radius: 60px;
     box-shadow:
@@ -194,6 +200,7 @@
     width: 100%;
     max-width: 920px;
     margin: 0 auto;
+    min-width: 0;
 }
 
 .wdr-home__sfield {
@@ -234,6 +241,12 @@
     flex: 1;
 }
 
+.wdr-home__date-input-wrap {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
 .wdr-home__sfield-label {
     font-size: 0.6875rem;
     font-weight: 700;
@@ -266,9 +279,23 @@
 .wdr-home__sfield-input--date {
     color-scheme: light;
     cursor: pointer;
+    position: relative;
+    z-index: 1;
 }
 
-.wdr-home__sfield-input--date:not([value='']) {
+.wdr-home__date-placeholder {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.3;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.wdr-home__sfield-input--date:not([value=""]) {
     color: var(--text-main);
 }
 
@@ -350,8 +377,11 @@
     padding: 1rem 1rem 1rem 1.1rem;
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f4fbff 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f4fbff 100%
+    );
     color: var(--text-main);
     font-size: 0.9rem;
     font-weight: 600;
@@ -359,7 +389,7 @@
 }
 
 .wdr-home__highlight-item::before {
-    content: '';
+    content: "";
     width: 0.55rem;
     height: 0.55rem;
     border-radius: 999px;
@@ -394,8 +424,11 @@
     align-items: flex-start;
     gap: 0.5rem;
     padding: 1.5rem;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f2fbff 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f2fbff 100%
+    );
     border: 2px solid color-mix(in srgb, var(--primary) 14%, white);
     border-radius: var(--radius-lg);
     cursor: pointer;
@@ -409,8 +442,24 @@
     box-shadow: 0 16px 34px rgba(5, 31, 40, 0.08);
 }
 
+.wdr-home__category-card--activite {
+    --tile-color: var(--primary);
+}
+
+.wdr-home__category-card--bateau {
+    --tile-color: var(--success-dark);
+}
+
+.wdr-home__category-card--hebergement {
+    --tile-color: var(--warning-dark);
+}
+
+.wdr-home__category-card--voiture {
+    --tile-color: var(--brand-purple);
+}
+
 .wdr-home__category-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -483,12 +532,11 @@
     padding: 1.25rem;
     border: 1px solid rgba(6, 96, 120, 0.12);
     border-radius: 22px;
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.96) 0%,
-            rgba(241, 249, 249, 0.94) 100%
-        );
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(241, 249, 249, 0.94) 100%
+    );
     text-align: left;
     cursor: pointer;
     transition:
@@ -675,6 +723,11 @@
     .wdr-home__highlights {
         grid-template-columns: 1fr;
     }
+
+    .wdr-home__partner-cta-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 @media (max-width: 840px) {
@@ -699,7 +752,8 @@
         flex: none;
         width: 100%;
         border-radius: 10px;
-        padding: 0.625rem 1rem;
+        padding: 0.75rem 1rem;
+        min-height: 4rem;
     }
 
     .wdr-home__sdivider {
@@ -714,6 +768,14 @@
         border-radius: 10px;
         margin-left: 0;
         margin-top: 0.5rem;
+        min-height: 3rem;
+    }
+
+    .wdr-home__sfield-input {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        min-height: 1.5rem;
     }
 }
 
@@ -742,12 +804,31 @@
         width: 3.5rem;
         height: 3.5rem;
     }
+
+    .wdr-home__container {
+        padding: 0 1rem;
+    }
+
+    .wdr-home__section {
+        padding: 3rem 0;
+    }
+
+    .wdr-home__section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 @media (max-width: 600px) {
     .wdr-home__hero {
         min-height: auto;
         padding: 3.5rem 1.25rem 3rem;
+    }
+
+    .wdr-home__hero-geo {
+        width: 100%;
+        justify-content: center;
+        border-radius: 18px;
     }
 }
 
@@ -776,12 +857,19 @@
 }
 
 .dark .wdr-home__search-bar {
-    background:
-        linear-gradient(180deg, rgba(9, 29, 39, 0.96) 0%, rgba(12, 38, 50, 0.94) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(9, 29, 39, 0.96) 0%,
+        rgba(12, 38, 50, 0.94) 100%
+    );
     border-color: rgba(117, 217, 226, 0.18);
     box-shadow:
         0 24px 54px rgba(0, 0, 0, 0.34),
         0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.dark .wdr-home__date-placeholder {
+    color: rgba(226, 239, 243, 0.78);
 }
 
 .dark .wdr-home__sfield:focus-within {
@@ -790,8 +878,11 @@
 
 .dark .wdr-home__category-card,
 .dark .wdr-home__highlight-item {
-    background:
-        linear-gradient(180deg, rgba(10, 31, 41, 0.96) 0%, rgba(9, 26, 35, 0.96) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(10, 31, 41, 0.96) 0%,
+        rgba(9, 26, 35, 0.96) 100%
+    );
     border-color: rgba(117, 217, 226, 0.14);
     box-shadow: 0 20px 38px rgba(0, 0, 0, 0.24);
 }

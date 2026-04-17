@@ -1,34 +1,34 @@
-import { useQueryClient } from '@tanstack/react-query';
-import React, { useMemo, useState } from 'react';
-import { blogApi } from '@/api/blog';
-import { Breadcrumb, Button, useToast } from '@/components/wdr';
-import { useBlogPostsData } from '@/hooks/useBlogData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { BlogStatusNames } from '@/types/blog';
-import type { BlogStatus } from '@/types/blog';
-import './AdminBlogPage.css';
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useMemo, useState } from "react";
+import { blogApi } from "@/api/blog";
+import { Breadcrumb, Button, useToast } from "@/components/wdr";
+import { useBlogPostsData } from "@/hooks/useBlogData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { BlogStatusNames } from "@/types/blog";
+import type { BlogStatus } from "@/types/blog";
+import "./AdminBlogPage.css";
 
 function formatDate(date: Date | null, intlLocale: string): string {
     if (!date) {
-        return '-';
+        return "-";
     }
 
     return new Intl.DateTimeFormat(intlLocale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
+        year: "numeric",
+        month: "short",
+        day: "numeric",
     }).format(date);
 }
 
 function slugify(title: string): string {
     return title
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s-]/g, '')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
         .trim()
-        .replace(/\s+/g, '-');
+        .replace(/\s+/g, "-");
 }
 
 export const AdminBlogPage: React.FC = () => {
@@ -37,13 +37,13 @@ export const AdminBlogPage: React.FC = () => {
     const { t, intlLocale } = useTranslation();
     const queryClient = useQueryClient();
     const { posts } = useBlogPostsData({ status: undefined, limit: 100 });
-    const [filter, setFilter] = useState<BlogStatus | 'ALL'>('ALL');
+    const [filter, setFilter] = useState<BlogStatus | "ALL">("ALL");
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [busyId, setBusyId] = useState<string | null>(null);
 
     const filtered = useMemo(
         () =>
-            filter === 'ALL'
+            filter === "ALL"
                 ? posts
                 : posts.filter((post) => post.status === filter),
         [filter, posts],
@@ -57,7 +57,7 @@ export const AdminBlogPage: React.FC = () => {
     ).length;
 
     async function refreshBlogQueries(): Promise<void> {
-        await queryClient.invalidateQueries({ queryKey: ['blog'] });
+        await queryClient.invalidateQueries({ queryKey: ["blog"] });
     }
 
     async function toggleStatus(id: string): Promise<void> {
@@ -79,11 +79,11 @@ export const AdminBlogPage: React.FC = () => {
             await refreshBlogQueries();
             success(
                 nextStatus === BlogStatusNames.PUBLISHED
-                    ? t('admin.blog.toast.publish')
-                    : t('admin.blog.toast.unpublish'),
+                    ? t("admin.blog.toast.publish")
+                    : t("admin.blog.toast.unpublish"),
             );
         } catch {
-            error(t('admin.blog.toast.status_error'));
+            error(t("admin.blog.toast.status_error"));
         } finally {
             setBusyId(null);
         }
@@ -96,9 +96,9 @@ export const AdminBlogPage: React.FC = () => {
             await blogApi.delete(id);
             await refreshBlogQueries();
             setDeleteConfirmId(null);
-            success(t('admin.blog.toast.delete_success'));
+            success(t("admin.blog.toast.delete_success"));
         } catch {
-            error(t('admin.blog.toast.delete_error'));
+            error(t("admin.blog.toast.delete_error"));
         } finally {
             setBusyId(null);
         }
@@ -110,14 +110,15 @@ export const AdminBlogPage: React.FC = () => {
                 <Breadcrumb
                     items={[
                         {
-                            label: t('admin.blog.home'),
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("admin.blog.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
                         {
-                            label: t('admin.blog.admin'),
-                            onClick: () => navigate({ name: 'admin-dashboard' }),
+                            label: t("admin.blog.admin"),
+                            onClick: () =>
+                                navigate({ name: "admin-dashboard" }),
                         },
-                        { label: t('nav.blog') },
+                        { label: t("nav.blog") },
                     ]}
                 />
             </div>
@@ -126,20 +127,20 @@ export const AdminBlogPage: React.FC = () => {
                 <div className="wdr-ablog__header-inner">
                     <div className="wdr-ablog__header-text">
                         <h1 className="wdr-ablog__title">
-                            {t('admin.blog.title')}
+                            {t("admin.blog.title")}
                         </h1>
                         <p className="wdr-ablog__subtitle">
-                            <strong>{publishedCount}</strong>{' '}
-                            {t('admin.blog.published').toLowerCase()} &middot;{' '}
-                            <strong>{draftCount}</strong>{' '}
-                            {t('admin.blog.drafts').toLowerCase()}
+                            <strong>{publishedCount}</strong>{" "}
+                            {t("admin.blog.published").toLowerCase()} &middot;{" "}
+                            <strong>{draftCount}</strong>{" "}
+                            {t("admin.blog.drafts").toLowerCase()}
                         </p>
                     </div>
                     <Button
                         variant="primary"
-                        onClick={() => navigate({ name: 'admin-blog-editor' })}
+                        onClick={() => navigate({ name: "admin-blog-editor" })}
                     >
-                        + {t('admin.blog.new')}
+                        + {t("admin.blog.new")}
                     </Button>
                 </div>
             </div>
@@ -148,7 +149,7 @@ export const AdminBlogPage: React.FC = () => {
                 <div className="wdr-ablog__filters-inner">
                     {(
                         [
-                            'ALL',
+                            "ALL",
                             BlogStatusNames.PUBLISHED,
                             BlogStatusNames.DRAFT,
                         ] as const
@@ -156,14 +157,14 @@ export const AdminBlogPage: React.FC = () => {
                         <button
                             key={value}
                             type="button"
-                            className={`wdr-ablog__filter-btn ${filter === value ? 'wdr-ablog__filter-btn--active' : ''}`}
+                            className={`wdr-ablog__filter-btn ${filter === value ? "wdr-ablog__filter-btn--active" : ""}`}
                             onClick={() => setFilter(value)}
                         >
-                            {value === 'ALL'
-                                ? `${t('admin.blog.all')} (${posts.length})`
+                            {value === "ALL"
+                                ? `${t("admin.blog.all")} (${posts.length})`
                                 : value === BlogStatusNames.PUBLISHED
-                                  ? `${t('admin.blog.published')} (${publishedCount})`
-                                  : `${t('admin.blog.drafts')} (${draftCount})`}
+                                  ? `${t("admin.blog.published")} (${publishedCount})`
+                                  : `${t("admin.blog.drafts")} (${draftCount})`}
                         </button>
                     ))}
                 </div>
@@ -173,7 +174,7 @@ export const AdminBlogPage: React.FC = () => {
                 <div className="wdr-ablog__inner">
                     {filtered.length === 0 ? (
                         <p className="wdr-ablog__empty">
-                            {t('admin.blog.empty')}
+                            {t("admin.blog.empty")}
                         </p>
                     ) : (
                         <div className="wdr-ablog__table-wrapper">
@@ -181,20 +182,20 @@ export const AdminBlogPage: React.FC = () => {
                                 <thead>
                                     <tr>
                                         <th scope="col">
-                                            {t('admin.blog.column.title')}
+                                            {t("admin.blog.column.title")}
                                         </th>
                                         <th scope="col">
-                                            {t('admin.blog.column.status')}
+                                            {t("admin.blog.column.status")}
                                         </th>
                                         <th scope="col">
-                                            {t('admin.blog.column.tags')}
+                                            {t("admin.blog.column.tags")}
                                         </th>
                                         <th scope="col">
-                                            {t('admin.blog.column.date')}
+                                            {t("admin.blog.column.date")}
                                         </th>
                                         <th scope="col">
                                             <span className="sr-only">
-                                                {t('support.ticket_actions')}
+                                                {t("support.ticket_actions")}
                                             </span>
                                         </th>
                                     </tr>
@@ -232,10 +233,10 @@ export const AdminBlogPage: React.FC = () => {
                                                     {post.status ===
                                                     BlogStatusNames.PUBLISHED
                                                         ? t(
-                                                              'admin.blog.status.published',
+                                                              "admin.blog.status.published",
                                                           )
                                                         : t(
-                                                              'admin.blog.status.draft',
+                                                              "admin.blog.status.draft",
                                                           )}
                                                 </span>
                                             </td>
@@ -262,7 +263,9 @@ export const AdminBlogPage: React.FC = () => {
                                                     )
                                                 ) : (
                                                     <span className="wdr-ablog__draft-date">
-                                                        {t('admin.blog.updated')}{' '}
+                                                        {t(
+                                                            "admin.blog.updated",
+                                                        )}{" "}
                                                         {formatDate(
                                                             post.updatedAt,
                                                             intlLocale,
@@ -278,7 +281,7 @@ export const AdminBlogPage: React.FC = () => {
                                                         size="sm"
                                                         onClick={() =>
                                                             navigate({
-                                                                name: 'admin-blog-editor',
+                                                                name: "admin-blog-editor",
                                                                 postId: post.id,
                                                             })
                                                         }
@@ -286,7 +289,7 @@ export const AdminBlogPage: React.FC = () => {
                                                             busyId === post.id
                                                         }
                                                     >
-                                                        {t('admin.blog.edit')}
+                                                        {t("admin.blog.edit")}
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
@@ -303,10 +306,10 @@ export const AdminBlogPage: React.FC = () => {
                                                         {post.status ===
                                                         BlogStatusNames.PUBLISHED
                                                             ? t(
-                                                                  'admin.blog.unpublish',
+                                                                  "admin.blog.unpublish",
                                                               )
                                                             : t(
-                                                                  'admin.blog.publish',
+                                                                  "admin.blog.publish",
                                                               )}
                                                     </Button>
                                                     {deleteConfirmId ===
@@ -314,7 +317,7 @@ export const AdminBlogPage: React.FC = () => {
                                                         <div className="wdr-ablog__delete-confirm">
                                                             <span>
                                                                 {t(
-                                                                    'admin.blog.confirm',
+                                                                    "admin.blog.confirm",
                                                                 )}
                                                             </span>
                                                             <button
@@ -331,7 +334,7 @@ export const AdminBlogPage: React.FC = () => {
                                                                 }
                                                             >
                                                                 {t(
-                                                                    'admin.blog.yes',
+                                                                    "admin.blog.yes",
                                                                 )}
                                                             </button>
                                                             <button
@@ -348,7 +351,7 @@ export const AdminBlogPage: React.FC = () => {
                                                                 }
                                                             >
                                                                 {t(
-                                                                    'admin.blog.no',
+                                                                    "admin.blog.no",
                                                                 )}
                                                             </button>
                                                         </div>
@@ -361,7 +364,7 @@ export const AdminBlogPage: React.FC = () => {
                                                                     post.id,
                                                                 )
                                                             }
-                                                            aria-label={`${t('admin.blog.delete_aria')} "${post.title}"`}
+                                                            aria-label={`${t("admin.blog.delete_aria")} "${post.title}"`}
                                                             disabled={
                                                                 busyId ===
                                                                 post.id

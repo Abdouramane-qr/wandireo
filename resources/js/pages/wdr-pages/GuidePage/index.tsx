@@ -1,8 +1,8 @@
-import React from 'react';
-import { Breadcrumb, Button } from '@/components/wdr';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import './GuidePage.css';
+import React from "react";
+import { Breadcrumb, Button } from "@/components/wdr";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import "./GuidePage.css";
 
 interface GuideStep {
     id: string;
@@ -19,11 +19,17 @@ interface GuidePanel {
     bullets: string[];
     ctaLabel: string;
     ctaRoute:
-        | { name: 'search'; query?: string; category?: string; dateFrom?: string; dateTo?: string }
-        | { name: 'dashboard' }
-        | { name: 'partner-dashboard' }
-        | { name: 'admin-dashboard' }
-        | { name: 'partner-register' };
+        | {
+              name: "search";
+              query?: string;
+              category?: string;
+              dateFrom?: string;
+              dateTo?: string;
+          }
+        | { name: "dashboard" }
+        | { name: "partner-dashboard" }
+        | { name: "admin-dashboard" }
+        | { name: "partner-register" };
 }
 
 export const GuidePage: React.FC = () => {
@@ -32,67 +38,67 @@ export const GuidePage: React.FC = () => {
 
     const steps: GuideStep[] = [
         {
-            id: 'discover',
-            number: '01',
-            title: 'Recherchez par verticale',
-            text: 'La home et la recherche publique permettent de filtrer par destination, dates et type de service: activites, bateaux, voitures ou hebergements.',
+            id: "discover",
+            number: "01",
+            title: t("guide.step.discover.title"),
+            text: t("guide.step.discover.text"),
         },
         {
-            id: 'compare',
-            number: '02',
-            title: 'Comparez les fiches',
-            text: 'Chaque service presente ses points forts, prix, extras, informations pratiques, disponibilites et avis afin de prendre une decision rapidement.',
+            id: "compare",
+            number: "02",
+            title: t("guide.step.compare.title"),
+            text: t("guide.step.compare.text"),
         },
         {
-            id: 'book',
-            number: '03',
-            title: 'Reservez sans friction',
-            text: 'Le panier, le paiement et la confirmation conservent les informations utiles. Selon le service, le reglement peut se faire en ligne, partiellement en ligne ou sur place.',
+            id: "book",
+            number: "03",
+            title: t("guide.step.book.title"),
+            text: t("guide.step.book.text"),
         },
     ];
 
     const panels: GuidePanel[] = [
         {
-            id: 'traveler',
-            eyebrow: 'Voyageur',
-            title: 'Parcours client',
-            text: 'Apres inscription ou connexion, vous revenez sur la home publique connecte. Vous pouvez rechercher, ajouter des favoris, reserver puis suivre votre historique et votre profil.',
+            id: "traveler",
+            eyebrow: t("guide.panel.traveler.eyebrow"),
+            title: t("guide.panel.traveler.title"),
+            text: t("guide.panel.traveler.text"),
             bullets: [
-                'Home publique + recherche unifiee',
-                'Favoris et detail service',
-                'Panier, paiement et confirmation',
-                'Dashboard client, profil et reservations',
+                t("guide.panel.traveler.bullet_1"),
+                t("guide.panel.traveler.bullet_2"),
+                t("guide.panel.traveler.bullet_3"),
+                t("guide.panel.traveler.bullet_4"),
             ],
-            ctaLabel: 'Explorer la recherche',
-            ctaRoute: { name: 'search' },
+            ctaLabel: t("guide.panel.traveler.cta"),
+            ctaRoute: { name: "search" },
         },
         {
-            id: 'partner',
-            eyebrow: 'Partenaire',
-            title: 'Parcours partenaire',
-            text: "Les partenaires validés accedent a leur dashboard, au catalogue, aux reservations et a leur profil. La creation de service suit la structure admin et peut maintenant etre geree proprement avec images et edition pre-remplie.",
+            id: "partner",
+            eyebrow: t("guide.panel.partner.eyebrow"),
+            title: t("guide.panel.partner.title"),
+            text: t("guide.panel.partner.text"),
             bullets: [
-                'Validation du compte et contrat',
-                'Dashboard partenaire et reservations',
-                'Catalogue et formulaire service',
-                'Profil partenaire et suivi commercial',
+                t("guide.panel.partner.bullet_1"),
+                t("guide.panel.partner.bullet_2"),
+                t("guide.panel.partner.bullet_3"),
+                t("guide.panel.partner.bullet_4"),
             ],
-            ctaLabel: 'Devenir partenaire',
-            ctaRoute: { name: 'partner-register' },
+            ctaLabel: t("guide.panel.partner.cta"),
+            ctaRoute: { name: "partner-register" },
         },
         {
-            id: 'admin',
-            eyebrow: 'Administration',
-            title: 'Pilotage global',
-            text: "L'admin centralise les utilisateurs, services, structure, avis, transactions, blog et support. Les surfaces critiques ont ete reprises pour rester lisibles et coherentes en mode clair comme en mode sombre.",
+            id: "admin",
+            eyebrow: t("guide.panel.admin.eyebrow"),
+            title: t("guide.panel.admin.title"),
+            text: t("guide.panel.admin.text"),
             bullets: [
-                'Utilisateurs et roles',
-                'Catalogue services et structure',
-                'Avis, transactions et support',
-                'Blog, publication et moderation',
+                t("guide.panel.admin.bullet_1"),
+                t("guide.panel.admin.bullet_2"),
+                t("guide.panel.admin.bullet_3"),
+                t("guide.panel.admin.bullet_4"),
             ],
-            ctaLabel: 'Aller au dashboard admin',
-            ctaRoute: { name: 'admin-dashboard' },
+            ctaLabel: t("guide.panel.admin.cta"),
+            ctaRoute: { name: "admin-dashboard" },
         },
     ];
 
@@ -102,10 +108,10 @@ export const GuidePage: React.FC = () => {
                 <Breadcrumb
                     items={[
                         {
-                            label: t('nav.home'),
-                            onClick: () => navigate({ name: 'home' }),
+                            label: t("nav.home"),
+                            onClick: () => navigate({ name: "home" }),
                         },
-                        { label: t('footer.help_center') },
+                        { label: t("footer.help_center") },
                     ]}
                 />
             </div>
@@ -113,41 +119,40 @@ export const GuidePage: React.FC = () => {
             <section className="wdr-guide__hero">
                 <div className="wdr-guide__hero-inner">
                     <div className="wdr-guide__hero-copy">
-                        <p className="wdr-guide__eyebrow">Guide Wandireo</p>
+                        <p className="wdr-guide__eyebrow">
+                            {t("guide.hero.eyebrow")}
+                        </p>
                         <h1 className="wdr-guide__title">
-                            Une page claire pour comprendre la plateforme sans
-                            chercher partout
+                            {t("guide.hero.title")}
                         </h1>
                         <p className="wdr-guide__subtitle">
-                            Ce guide resume les parcours principaux, les zones
-                            utiles et les bons points d&apos;entree pour les
-                            voyageurs, partenaires et administrateurs.
+                            {t("guide.hero.subtitle")}
                         </p>
                         <div className="wdr-guide__hero-actions">
                             <Button
                                 variant="primary"
-                                onClick={() => navigate({ name: 'search' })}
+                                onClick={() => navigate({ name: "search" })}
                             >
-                                Commencer par la recherche
+                                {t("guide.hero.cta_search")}
                             </Button>
                             <Button
                                 variant="ghost"
-                                onClick={() => navigate({ name: 'blog' })}
+                                onClick={() => navigate({ name: "blog" })}
                             >
-                                Voir le blog
+                                {t("guide.hero.cta_blog")}
                             </Button>
                         </div>
                     </div>
 
                     <div className="wdr-guide__hero-card">
                         <p className="wdr-guide__hero-card-label">
-                            Ce que vous retrouvez ici
+                            {t("guide.hero.card_label")}
                         </p>
                         <ul className="wdr-guide__hero-list">
-                            <li>Parcours client, partenaire et admin</li>
-                            <li>Fonctionnement de la recherche et de la reservation</li>
-                            <li>Acces utiles selon votre role</li>
-                            <li>Repere rapide pour les modules blog et support</li>
+                            <li>{t("guide.hero.card_item_1")}</li>
+                            <li>{t("guide.hero.card_item_2")}</li>
+                            <li>{t("guide.hero.card_item_3")}</li>
+                            <li>{t("guide.hero.card_item_4")}</li>
                         </ul>
                     </div>
                 </div>
@@ -157,10 +162,10 @@ export const GuidePage: React.FC = () => {
                 <div className="wdr-guide__section-inner">
                     <div className="wdr-guide__section-head">
                         <p className="wdr-guide__section-kicker">
-                            Parcours principal
+                            {t("guide.main.kicker")}
                         </p>
                         <h2 className="wdr-guide__section-title">
-                            Comment utiliser Wandireo en 3 etapes
+                            {t("guide.main.title")}
                         </h2>
                     </div>
 
@@ -186,10 +191,10 @@ export const GuidePage: React.FC = () => {
                 <div className="wdr-guide__section-inner">
                     <div className="wdr-guide__section-head">
                         <p className="wdr-guide__section-kicker">
-                            Par profil
+                            {t("guide.profile.kicker")}
                         </p>
                         <h2 className="wdr-guide__section-title">
-                            Les bons acces selon votre usage
+                            {t("guide.profile.title")}
                         </h2>
                     </div>
 
@@ -229,45 +234,29 @@ export const GuidePage: React.FC = () => {
                 <div className="wdr-guide__section-inner">
                     <div className="wdr-guide__section-head">
                         <p className="wdr-guide__section-kicker">
-                            Repères utiles
+                            {t("guide.facts.kicker")}
                         </p>
                         <h2 className="wdr-guide__section-title">
-                            Points importants a connaitre
+                            {t("guide.facts.title")}
                         </h2>
                     </div>
 
                     <div className="wdr-guide__facts">
                         <article className="wdr-guide__fact">
-                            <h3>Recherche unique</h3>
-                            <p>
-                                Toutes les verticales passent par une meme
-                                entree `/recherche`, avec filtres et cartes
-                                adaptes au type de service.
-                            </p>
+                            <h3>{t("guide.fact.search.title")}</h3>
+                            <p>{t("guide.fact.search.text")}</p>
                         </article>
                         <article className="wdr-guide__fact">
-                            <h3>Theme public</h3>
-                            <p>
-                                Le site public prend en charge `light`, `dark`
-                                et `system`, avec une palette alignee sur
-                                l&apos;identite Wandireo.
-                            </p>
+                            <h3>{t("guide.fact.theme.title")}</h3>
+                            <p>{t("guide.fact.theme.text")}</p>
                         </article>
                         <article className="wdr-guide__fact">
-                            <h3>Blog et support</h3>
-                            <p>
-                                Le blog est public avec edition admin. Le
-                                support V1 reste admin-only pour le suivi
-                                interne.
-                            </p>
+                            <h3>{t("guide.fact.support.title")}</h3>
+                            <p>{t("guide.fact.support.text")}</p>
                         </article>
                         <article className="wdr-guide__fact">
-                            <h3>Services et images</h3>
-                            <p>
-                                Le flux d&apos;upload local et l&apos;edition de
-                                service ont ete stabilises afin d&apos;afficher
-                                correctement les images cote public.
-                            </p>
+                            <h3>{t("guide.fact.services.title")}</h3>
+                            <p>{t("guide.fact.services.text")}</p>
                         </article>
                     </div>
                 </div>
@@ -277,24 +266,26 @@ export const GuidePage: React.FC = () => {
                 <div className="wdr-guide__cta-inner">
                     <div>
                         <p className="wdr-guide__section-kicker">
-                            Besoin d&apos;aller plus vite
+                            {t("guide.cta.kicker")}
                         </p>
                         <h2 className="wdr-guide__cta-title">
-                            Choisissez votre point d&apos;entree
+                            {t("guide.cta.title")}
                         </h2>
                     </div>
                     <div className="wdr-guide__cta-actions">
                         <Button
                             variant="primary"
-                            onClick={() => navigate({ name: 'search' })}
+                            onClick={() => navigate({ name: "search" })}
                         >
-                            Ouvrir la recherche
+                            {t("guide.cta.search")}
                         </Button>
                         <Button
                             variant="ghost"
-                            onClick={() => navigate({ name: 'partner-register' })}
+                            onClick={() =>
+                                navigate({ name: "partner-register" })
+                            }
                         >
-                            Ouvrir l&apos;espace partenaire
+                            {t("guide.cta.partner")}
                         </Button>
                     </div>
                 </div>

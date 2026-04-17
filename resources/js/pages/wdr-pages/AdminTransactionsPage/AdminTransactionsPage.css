@@ -18,9 +18,10 @@
 @media (min-width: 1180px) {
     .wdr-admin-tx {
         display: grid;
-        grid-template-columns: minmax(250px, 280px) minmax(0, 1fr);
+        grid-template-columns: 280px minmax(0, 1fr);
         column-gap: 2.25rem;
         align-items: start;
+        padding-right: 2rem;
     }
 
     .wdr-admin-tx__hero {
@@ -30,11 +31,13 @@
     .wdr-admin-tx > .wdr-admin-nav {
         grid-column: 1;
         margin-top: 2rem;
+        position: sticky;
+        top: 7rem;
     }
 
     .wdr-admin-tx__body {
         grid-column: 2;
-        margin: 2rem 2rem 0 0;
+        margin: 2rem 0 0 0;
         max-width: none;
     }
 }
@@ -46,7 +49,7 @@
 .wdr-admin-tx__hero {
     background: linear-gradient(135deg, #1a1a2e 0%, var(--brand-purple) 100%);
     color: var(--text-light);
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
 }
 
 .wdr-admin-tx__hero-content {
@@ -81,64 +84,17 @@
 }
 
 /* ============================================================
-   Navigation admin
-   ============================================================ */
-
-.wdr-admin-tx__nav {
-    background: #ffffff;
-    border-bottom: 1px solid var(--border-light);
-    position: sticky;
-    top: 0;
-    z-index: var(--z-header);
-}
-
-.wdr-admin-tx__nav-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    display: flex;
-    padding: 0 1.5rem;
-}
-
-.wdr-admin-tx__nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    transition:
-        color var(--transition-base),
-        border-color var(--transition-base);
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__nav-item:hover {
-    color: var(--brand-purple);
-}
-
-.wdr-admin-tx__nav-item--active {
-    color: var(--brand-purple);
-    border-bottom-color: var(--brand-purple);
-    font-weight: 600;
-}
-
-/* ============================================================
    Corps
    ============================================================ */
 
 .wdr-admin-tx__body {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2rem 1.75rem;
+    padding: 2rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1.75rem;
+    gap: 2rem;
+    min-width: 0;
 }
+
 
 /* ============================================================
    Bannière formule
@@ -439,6 +395,14 @@
    ============================================================ */
 
 @media (max-width: 768px) {
+    .wdr-admin-tx {
+        min-height: calc(100svh - 4.25rem);
+    }
+
+    .wdr-admin-tx__body {
+        padding: 1.5rem 1rem;
+    }
+
     .wdr-admin-tx__nav-item {
         padding: 0.75rem 0.6rem;
         font-size: 0.78rem;
@@ -453,6 +417,10 @@
         align-items: flex-start;
     }
 
+    .wdr-admin-tx__filters > * {
+        width: 100%;
+    }
+
     .wdr-admin-tx__filter-count {
         margin-left: 0;
     }
@@ -462,4 +430,58 @@
     .wdr-admin-tx__totals {
         grid-template-columns: 1fr;
     }
+}
+
+:is(.dark) .wdr-admin-tx {
+    background-color: var(--bg-main);
+}
+
+:is(.dark) .wdr-admin-tx__formula-banner {
+    background: rgba(76, 159, 255, 0.12);
+    border-color: rgba(76, 159, 255, 0.24);
+    color: #a9cfff;
+}
+
+:is(.dark) .wdr-admin-tx__filter-select {
+    background:
+        linear-gradient(180deg, rgba(21, 50, 67, 0.98) 0%, rgba(16, 42, 56, 0.98) 100%);
+    color: var(--text-main);
+    border-color: rgba(117, 217, 226, 0.18);
+}
+
+:is(.dark) .wdr-admin-tx__table th {
+    color: var(--text-soft);
+}
+
+:is(.dark) .wdr-admin-tx__table tbody tr:hover td {
+    background-color: var(--bg-soft);
+}
+
+:is(.dark) .wdr-admin-tx__rate-badge {
+    background: rgba(140, 116, 255, 0.16);
+    color: #dacdff;
+}
+
+:is(.dark) .wdr-admin-tx__stripe-id {
+    background: rgba(51, 184, 213, 0.14);
+    border-color: rgba(51, 184, 213, 0.24);
+    color: var(--primary);
+}
+
+:is(.dark) .wdr-admin-tx__status--confirmed,
+:is(.dark) .wdr-admin-tx__status--payment-paid {
+    background: rgba(73, 192, 129, 0.16);
+    color: #9de5bc;
+}
+
+:is(.dark) .wdr-admin-tx__status--pending,
+:is(.dark) .wdr-admin-tx__status--payment-pending {
+    background: rgba(245, 191, 66, 0.16);
+    color: #ffd77a;
+}
+
+:is(.dark) .wdr-admin-tx__status--cancelled,
+:is(.dark) .wdr-admin-tx__status--payment-refunded {
+    background: rgba(221, 92, 75, 0.16);
+    color: #ffb2a8;
 }

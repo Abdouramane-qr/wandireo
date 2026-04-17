@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Input } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { useTranslation } from '@/hooks/useTranslation';
-import './LoginPage.css';
+import React, { useEffect, useState } from "react";
+import { Button, Input } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { useTranslation } from "@/hooks/useTranslation";
+import "./LoginPage.css";
 
 export const LoginPage: React.FC = () => {
     const { navigate } = useRouter();
     const { login, currentUser } = useUser();
     const { t } = useTranslation();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -21,12 +21,12 @@ export const LoginPage: React.FC = () => {
             return;
         }
 
-        if (currentUser.role === 'PARTNER') {
-            navigate({ name: 'partner-dashboard' });
-        } else if (currentUser.role === 'ADMIN') {
-            navigate({ name: 'admin-dashboard' });
+        if (currentUser.role === "PARTNER") {
+            navigate({ name: "partner-dashboard" });
+        } else if (currentUser.role === "ADMIN") {
+            navigate({ name: "admin-dashboard" });
         } else {
-            navigate({ name: 'home' });
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -36,10 +36,10 @@ export const LoginPage: React.FC = () => {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        setError('');
+        setError("");
 
         if (!email.trim() || !password) {
-            setError(t('auth.login.error.required'));
+            setError(t("auth.login.error.required"));
             return;
         }
 
@@ -48,7 +48,7 @@ export const LoginPage: React.FC = () => {
         setIsLoading(false);
 
         if (!success) {
-            setError(t('auth.login.error.invalid'));
+            setError(t("auth.login.error.invalid"));
         }
     };
 
@@ -58,9 +58,7 @@ export const LoginPage: React.FC = () => {
             className="wdr-login__eye-btn"
             onClick={() => setShowPassword((value) => !value)}
             aria-label={
-                showPassword
-                    ? t('auth.password.hide')
-                    : t('auth.password.show')
+                showPassword ? t("auth.password.hide") : t("auth.password.show")
             }
         >
             <svg
@@ -93,9 +91,11 @@ export const LoginPage: React.FC = () => {
         <div className="wdr-login">
             <div className="wdr-login__card">
                 <div className="wdr-login__header">
-                    <h1 className="wdr-login__title">{t('auth.login.title')}</h1>
+                    <h1 className="wdr-login__title">
+                        {t("auth.login.title")}
+                    </h1>
                     <p className="wdr-login__subtitle">
-                        {t('auth.login.subtitle')}
+                        {t("auth.login.subtitle")}
                     </p>
                 </div>
 
@@ -105,18 +105,18 @@ export const LoginPage: React.FC = () => {
                     noValidate
                 >
                     <Input
-                        label={t('auth.login.email')}
+                        label={t("auth.login.email")}
                         type="email"
-                        placeholder={t('auth.login.email_placeholder')}
+                        placeholder={t("auth.login.email_placeholder")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         autoComplete="email"
                     />
                     <Input
-                        label={t('auth.login.password')}
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder={t('auth.login.password_placeholder')}
+                        label={t("auth.login.password")}
+                        type={showPassword ? "text" : "password"}
+                        placeholder={t("auth.login.password_placeholder")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -128,9 +128,9 @@ export const LoginPage: React.FC = () => {
                     <button
                         type="button"
                         className="wdr-login__forgot"
-                        onClick={() => navigate({ name: 'forgot-password' })}
+                        onClick={() => navigate({ name: "forgot-password" })}
                     >
-                        {t('auth.login.forgot')}
+                        {t("auth.login.forgot")}
                     </button>
 
                     <Button
@@ -139,29 +139,31 @@ export const LoginPage: React.FC = () => {
                         fullWidth
                         loading={isLoading}
                     >
-                        {t('auth.login.submit')}
+                        {t("auth.login.submit")}
                     </Button>
                 </form>
 
                 <div className="wdr-login__footer">
                     <p className="wdr-login__register-text">
-                        {t('auth.login.no_account')}{' '}
+                        {t("auth.login.no_account")}{" "}
                         <button
                             type="button"
                             className="wdr-login__link"
-                            onClick={() => navigate({ name: 'register' })}
+                            onClick={() => navigate({ name: "register" })}
                         >
-                            {t('auth.login.create_account')}
+                            {t("auth.login.create_account")}
                         </button>
                     </p>
                     <p className="wdr-login__register-text">
-                        {t('auth.login.partner_prompt')}{' '}
+                        {t("auth.login.partner_prompt")}{" "}
                         <button
                             type="button"
                             className="wdr-login__link"
-                            onClick={() => navigate({ name: 'partner-register' })}
+                            onClick={() =>
+                                navigate({ name: "partner-register" })
+                            }
                         >
-                            {t('auth.login.partner_cta')}
+                            {t("auth.login.partner_cta")}
                         </button>
                     </p>
                 </div>

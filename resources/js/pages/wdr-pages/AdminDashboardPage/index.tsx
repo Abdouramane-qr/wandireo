@@ -22,18 +22,19 @@
  *               => wandireoFee = totalPrice - partnerNet
  */
 
-import React, { useEffect, useMemo } from 'react';
-import { AdminSectionNav, Button } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useAnalyticsFunnelData } from '@/hooks/useAnalyticsData';
-import { useAdminBookingsData } from '@/hooks/useBookingsData';
-import { useAdminReviewsData } from '@/hooks/useReviewsData';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useAdminUsersData } from '@/hooks/useUsersData';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { BookingStatusNames } from '@/types/booking';
-import './AdminDashboardPage.css';
+import React, { useEffect, useMemo } from "react";
+import { AdminSectionNav, Button } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useAnalyticsFunnelData } from "@/hooks/useAnalyticsData";
+import { useAdminBookingsData } from "@/hooks/useBookingsData";
+import { useAdminReviewsData } from "@/hooks/useReviewsData";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAdminUsersData } from "@/hooks/useUsersData";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames } from "@/types/booking";
+import "./AdminDashboardPage.css";
 
 // ============================================================
 // Icones SVG
@@ -158,28 +159,28 @@ function calcCommission(totalPrice: number, commissionRate: number): number {
     return (totalPrice * commissionRate) / (1 + commissionRate);
 }
 
-function getStatusLabel(status: string): string {
+function getStatusLabel(status: string, t: (key: string) => string): string {
     if (status === BookingStatusNames.CONFIRMED) {
-return 'Confirmée';
-}
+        return t("admin.dashboard.status.confirmed");
+    }
 
     if (status === BookingStatusNames.PENDING) {
-return 'En attente';
-}
+        return t("admin.dashboard.status.pending");
+    }
 
-    return 'Annulée';
+    return t("admin.dashboard.status.cancelled");
 }
 
 function getStatusClass(status: string): string {
     if (status === BookingStatusNames.CONFIRMED) {
-return 'confirmed';
-}
+        return "confirmed";
+    }
 
     if (status === BookingStatusNames.PENDING) {
-return 'pending';
-}
+        return "pending";
+    }
 
-    return 'cancelled';
+    return "cancelled";
 }
 
 // ============================================================
@@ -189,32 +190,33 @@ return 'pending';
 export const AdminDashboardPage: React.FC = () => {
     const { currentUser, logout } = useUser();
     const { navigate } = useRouter();
+    const { t, intlLocale } = useTranslation();
 
     // Hooks appelés avant tout retour conditionnel
     const { bookings } = useAdminBookingsData();
     const { users } = useAdminUsersData();
     const { services } = useServicesData({ adminAll: true, limit: 300 });
-    const { reviews } = useAdminReviewsData({ status: 'PENDING' });
+    const { reviews } = useAdminReviewsData({ status: "PENDING" });
     const { data: funnel } = useAnalyticsFunnelData(30);
 
     // Sources de données effectives (API prioritaire, fallback mock)
-    const allPartners = users.filter((u) => u.role === 'PARTNER');
-    const allClients = users.filter((u) => u.role === 'CLIENT');
+    const allPartners = users.filter((u) => u.role === "PARTNER");
+    const allClients = users.filter((u) => u.role === "CLIENT");
 
     // --- Guard : accès réservé aux ADMIN ---
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
 
             return;
         }
 
-        if (currentUser.role !== 'ADMIN') {
-            navigate({ name: 'dashboard' });
+        if (currentUser.role !== "ADMIN") {
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
-    if (!currentUser || currentUser.role !== 'ADMIN') {
+    if (!currentUser || currentUser.role !== "ADMIN") {
         return null;
     }
 
@@ -222,7 +224,6 @@ export const AdminDashboardPage: React.FC = () => {
     // Calcul des métriques globales
     // ============================================================
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const metrics = useMemo(() => {
         const confirmedBookings = bookings.filter(
             (b) => b.status === BookingStatusNames.CONFIRMED,
@@ -237,8 +238,8 @@ export const AdminDashboardPage: React.FC = () => {
             const partner = allPartners.find((p) => p.id === b.partnerId);
 
             if (!partner) {
-return sum;
-}
+                return sum;
+            }
 
             return (
                 sum +
@@ -262,15 +263,15 @@ return sum;
             partnersCount: allPartners.length,
             clientsCount: allClients.length,
             approvedPartnersCount: allPartners.filter(
-                (partner) => partner.partnerStatus === 'APPROVED',
+                (partner) => partner.partnerStatus === "APPROVED",
             ).length,
-            activeServicesCount: services.filter((service) => service.isAvailable)
-                .length,
+            activeServicesCount: services.filter(
+                (service) => service.isAvailable,
+            ).length,
             pendingReviewsCount: reviews.length,
         };
     }, [bookings, allPartners, allClients, reviews.length, services]);
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const recentBookings = useMemo(
         () =>
             [...bookings]
@@ -289,25 +290,25 @@ return sum;
                 <div className="wdr-admin-dash__hero-content">
                     <div className="wdr-admin-dash__hero-text">
                         <p className="wdr-admin-dash__hero-badge">
-                            Espace Administration
+                            {t("admin.dashboard.badge")}
                         </p>
                         <h1 className="wdr-admin-dash__hero-title">
-                            Tableau de bord <span>Wandireo</span>
+                            {t("admin.dashboard.title")} <span>Wandireo</span>
                         </h1>
                         <p className="wdr-admin-dash__hero-subtitle">
-                            Vue globale de la plateforme —{' '}
-                            {new Date().toLocaleDateString('fr-FR', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
+                            {t("admin.dashboard.subtitle")}{" "}
+                            {new Date().toLocaleDateString(intlLocale, {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
                             })}
                         </p>
                     </div>
                     <div className="wdr-admin-dash__hero-right">
                         <div
                             className="wdr-admin-dash__hero-avatar"
-                            aria-label="Initiales de l'administrateur"
+                            aria-label={t("admin.dashboard.avatar_label")}
                         >
                             {adminInitials}
                         </div>
@@ -320,10 +321,10 @@ return sum;
                             className="wdr-admin-dash__logout-btn"
                             onClick={() => {
                                 logout();
-                                navigate({ name: 'home' });
+                                navigate({ name: "home" });
                             }}
                         >
-                            Déconnexion
+                            {t("admin.dashboard.logout")}
                         </Button>
                     </div>
                 </div>
@@ -337,7 +338,7 @@ return sum;
                 {/* ---- Métriques globales ---- */}
                 <section
                     className="wdr-admin-dash__metrics"
-                    aria-label="Métriques globales"
+                    aria-label={t("admin.dashboard.metrics_aria")}
                 >
                     <div className="wdr-admin-dash__metric-card wdr-admin-dash__metric-card--primary">
                         <div className="wdr-admin-dash__metric-icon">
@@ -345,13 +346,13 @@ return sum;
                         </div>
                         <div className="wdr-admin-dash__metric-info">
                             <span className="wdr-admin-dash__metric-label">
-                                Volume d'affaires
+                                {t("admin.dashboard.metric.volume")}
                             </span>
                             <span className="wdr-admin-dash__metric-value">
-                                {formatPrice(metrics.totalVolume, 'EUR')}
+                                {formatPrice(metrics.totalVolume, "EUR")}
                             </span>
                             <span className="wdr-admin-dash__metric-sub">
-                                Réservations confirmées
+                                {t("admin.dashboard.metric.volume_sub")}
                             </span>
                         </div>
                     </div>
@@ -362,14 +363,18 @@ return sum;
                         </div>
                         <div className="wdr-admin-dash__metric-info">
                             <span className="wdr-admin-dash__metric-label">
-                                Commissions perçues
+                                {t("admin.dashboard.metric.commissions")}
                             </span>
                             <span className="wdr-admin-dash__metric-value">
-                                {formatPrice(metrics.totalCommissions, 'EUR')}
+                                {formatPrice(metrics.totalCommissions, "EUR")}
                             </span>
                             <span className="wdr-admin-dash__metric-sub">
-                                Sur {metrics.confirmedBookingsCount}{' '}
-                                réservation(s) confirmée(s)
+                                {t(
+                                    "admin.dashboard.metric.commissions_sub",
+                                ).replace(
+                                    "{count}",
+                                    String(metrics.confirmedBookingsCount),
+                                )}
                             </span>
                         </div>
                     </div>
@@ -380,13 +385,13 @@ return sum;
                         </div>
                         <div className="wdr-admin-dash__metric-info">
                             <span className="wdr-admin-dash__metric-label">
-                                En attente
+                                {t("admin.dashboard.metric.pending")}
                             </span>
                             <span className="wdr-admin-dash__metric-value">
                                 {metrics.pendingCount}
                             </span>
                             <span className="wdr-admin-dash__metric-sub">
-                                Réservation(s) en cours de traitement
+                                {t("admin.dashboard.metric.pending_sub")}
                             </span>
                         </div>
                     </div>
@@ -397,14 +402,21 @@ return sum;
                         </div>
                         <div className="wdr-admin-dash__metric-info">
                             <span className="wdr-admin-dash__metric-label">
-                                Comptes actifs
+                                {t("admin.dashboard.metric.accounts")}
                             </span>
                             <span className="wdr-admin-dash__metric-value">
                                 {metrics.clientsCount + metrics.partnersCount}
                             </span>
                             <span className="wdr-admin-dash__metric-sub">
-                                {metrics.clientsCount} client(s) ·{' '}
-                                {metrics.partnersCount} partenaire(s)
+                                {t("admin.dashboard.metric.accounts_sub")
+                                    .replace(
+                                        "{clients}",
+                                        String(metrics.clientsCount),
+                                    )
+                                    .replace(
+                                        "{partners}",
+                                        String(metrics.partnersCount),
+                                    )}
                             </span>
                         </div>
                     </div>
@@ -415,13 +427,21 @@ return sum;
                         </div>
                         <div className="wdr-admin-dash__metric-info">
                             <span className="wdr-admin-dash__metric-label">
-                                Catalogue actif
+                                {t("admin.dashboard.metric.catalog")}
                             </span>
                             <span className="wdr-admin-dash__metric-value">
                                 {metrics.activeServicesCount}
                             </span>
                             <span className="wdr-admin-dash__metric-sub">
-                                {metrics.approvedPartnersCount} partenaire(s) valides · {metrics.pendingReviewsCount} avis en attente
+                                {t("admin.dashboard.metric.catalog_sub")
+                                    .replace(
+                                        "{partners}",
+                                        String(metrics.approvedPartnersCount),
+                                    )
+                                    .replace(
+                                        "{reviews}",
+                                        String(metrics.pendingReviewsCount),
+                                    )}
                             </span>
                         </div>
                     </div>
@@ -430,62 +450,74 @@ return sum;
                 <section className="wdr-admin-dash__recent">
                     <div className="wdr-admin-dash__section-header">
                         <h2 className="wdr-admin-dash__section-title">
-                            Funnel produit
+                            {t("admin.dashboard.funnel.title")}
                         </h2>
                     </div>
                     <div className="wdr-admin-dash__metrics">
                         <div className="wdr-admin-dash__metric-card wdr-admin-dash__metric-card--neutral">
                             <div className="wdr-admin-dash__metric-info">
                                 <span className="wdr-admin-dash__metric-label">
-                                    Recherches
+                                    {t("admin.dashboard.funnel.searches")}
                                 </span>
                                 <span className="wdr-admin-dash__metric-value">
                                     {funnel?.searchCount ?? 0}
                                 </span>
                                 <span className="wdr-admin-dash__metric-sub">
-                                    30 derniers jours
+                                    {t("admin.dashboard.funnel.last_30_days")}
                                 </span>
                             </div>
                         </div>
                         <div className="wdr-admin-dash__metric-card wdr-admin-dash__metric-card--neutral">
                             <div className="wdr-admin-dash__metric-info">
                                 <span className="wdr-admin-dash__metric-label">
-                                    Vues fiche
+                                    {t("admin.dashboard.funnel.views")}
                                 </span>
                                 <span className="wdr-admin-dash__metric-value">
                                     {funnel?.serviceViewCount ?? 0}
                                 </span>
                                 <span className="wdr-admin-dash__metric-sub">
-                                    {funnel?.searchToViewRate ?? 0}% depuis la
-                                    recherche
+                                    {t(
+                                        "admin.dashboard.funnel.views_sub",
+                                    ).replace(
+                                        "{rate}",
+                                        String(funnel?.searchToViewRate ?? 0),
+                                    )}
                                 </span>
                             </div>
                         </div>
                         <div className="wdr-admin-dash__metric-card wdr-admin-dash__metric-card--neutral">
                             <div className="wdr-admin-dash__metric-info">
                                 <span className="wdr-admin-dash__metric-label">
-                                    Debuts de reservation
+                                    {t("admin.dashboard.funnel.starts")}
                                 </span>
                                 <span className="wdr-admin-dash__metric-value">
                                     {funnel?.bookingStartedCount ?? 0}
                                 </span>
                                 <span className="wdr-admin-dash__metric-sub">
-                                    {funnel?.viewToStartRate ?? 0}% depuis la
-                                    fiche
+                                    {t(
+                                        "admin.dashboard.funnel.starts_sub",
+                                    ).replace(
+                                        "{rate}",
+                                        String(funnel?.viewToStartRate ?? 0),
+                                    )}
                                 </span>
                             </div>
                         </div>
                         <div className="wdr-admin-dash__metric-card wdr-admin-dash__metric-card--success">
                             <div className="wdr-admin-dash__metric-info">
                                 <span className="wdr-admin-dash__metric-label">
-                                    Reservations confirmees
+                                    {t("admin.dashboard.funnel.confirmed")}
                                 </span>
                                 <span className="wdr-admin-dash__metric-value">
                                     {funnel?.bookingConfirmedCount ?? 0}
                                 </span>
                                 <span className="wdr-admin-dash__metric-sub">
-                                    {funnel?.startToConfirmRate ?? 0}% depuis le
-                                    checkout
+                                    {t(
+                                        "admin.dashboard.funnel.confirmed_sub",
+                                    ).replace(
+                                        "{rate}",
+                                        String(funnel?.startToConfirmRate ?? 0),
+                                    )}
                                 </span>
                             </div>
                         </div>
@@ -495,49 +527,64 @@ return sum;
                 {/* ---- Accès rapides ---- */}
                 <section className="wdr-admin-dash__shortcuts">
                     <h2 className="wdr-admin-dash__section-title">
-                        Accès rapides
+                        {t("admin.dashboard.shortcuts.title")}
                     </h2>
                     <div className="wdr-admin-dash__shortcuts-grid">
                         <button
                             className="wdr-admin-dash__shortcut"
-                            onClick={() => navigate({ name: 'admin-users' })}
+                            onClick={() => navigate({ name: "admin-users" })}
                         >
                             <UsersIcon />
-                            <span>Gérer les partenaires</span>
+                            <span>
+                                {t("admin.dashboard.shortcuts.partners")}
+                            </span>
                             <small>
-                                Validation · Suspension · Stripe Connect
+                                {t("admin.dashboard.shortcuts.partners_sub")}
                             </small>
                         </button>
                         <button
                             className="wdr-admin-dash__shortcut"
-                            onClick={() => navigate({ name: 'admin-services' })}
+                            onClick={() => navigate({ name: "admin-services" })}
                         >
                             <GridIcon />
-                            <span>Modérer le catalogue</span>
+                            <span>
+                                {t("admin.dashboard.shortcuts.catalog")}
+                            </span>
                             <small>
-                                Activer · Désactiver · Filtrer par catégorie
+                                {t("admin.dashboard.shortcuts.catalog_sub")}
                             </small>
                         </button>
                         <button
                             className="wdr-admin-dash__shortcut"
                             onClick={() =>
-                                navigate({ name: 'admin-transactions' })
+                                navigate({ name: "admin-transactions" })
                             }
                         >
                             <CreditCardIcon />
-                            <span>Superviser les transactions</span>
+                            <span>
+                                {t("admin.dashboard.shortcuts.transactions")}
+                            </span>
                             <small>
-                                Commissions · Flux financiers · Stripe
+                                {t(
+                                    "admin.dashboard.shortcuts.transactions_sub",
+                                )}
                             </small>
                         </button>
                         <button
                             className="wdr-admin-dash__shortcut"
-                            onClick={() => navigate({ name: 'admin-reviews' })}
+                            onClick={() => navigate({ name: "admin-reviews" })}
                         >
                             <ShieldIcon />
-                            <span>Modérer les avis</span>
+                            <span>
+                                {t("admin.dashboard.shortcuts.reviews")}
+                            </span>
                             <small>
-                                {metrics.pendingReviewsCount} avis en attente
+                                {t(
+                                    "admin.dashboard.shortcuts.reviews_sub",
+                                ).replace(
+                                    "{count}",
+                                    String(metrics.pendingReviewsCount),
+                                )}
                             </small>
                         </button>
                     </div>
@@ -547,31 +594,41 @@ return sum;
                 <section className="wdr-admin-dash__recent">
                     <div className="wdr-admin-dash__section-header">
                         <h2 className="wdr-admin-dash__section-title">
-                            Réservations récentes
+                            {t("admin.dashboard.recent.title")}
                         </h2>
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() =>
-                                navigate({ name: 'admin-transactions' })
+                                navigate({ name: "admin-transactions" })
                             }
                         >
-                            Voir tout
+                            {t("admin.dashboard.recent.view_all")}
                         </Button>
                     </div>
                     <div className="wdr-admin-dash__table-wrapper">
                         <table
                             className="wdr-admin-dash__table"
-                            aria-label="Réservations récentes"
+                            aria-label={t("admin.dashboard.recent.aria")}
                         >
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
-                                    <th scope="col">Client</th>
-                                    <th scope="col">Partenaire</th>
-                                    <th scope="col">Montant</th>
-                                    <th scope="col">Commission</th>
-                                    <th scope="col">Statut</th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.client")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.partner")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.amount")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.commission")}
+                                    </th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.status")}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -621,7 +678,7 @@ return sum;
                                                           commission,
                                                           booking.currency,
                                                       )
-                                                    : '—'}
+                                                    : "—"}
                                             </td>
                                             <td>
                                                 <span
@@ -629,6 +686,7 @@ return sum;
                                                 >
                                                     {getStatusLabel(
                                                         booking.status,
+                                                        t,
                                                     )}
                                                 </span>
                                             </td>

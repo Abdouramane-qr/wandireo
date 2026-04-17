@@ -21,6 +21,8 @@ export function sanitizeHtml(html: string): string {
             'blockquote',
             'img',
         ],
-        ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel'],
+        ALLOWED_ATTR: ['href', 'src', 'alt', 'rel'],
+        ALLOWED_URI_REGEXP:
+            /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
     });
 }

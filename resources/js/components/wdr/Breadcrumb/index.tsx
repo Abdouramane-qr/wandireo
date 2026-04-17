@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import './Breadcrumb.css';
 
 export interface BreadcrumbItem {
@@ -38,13 +39,15 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     items,
     className = '',
 }) => {
+    const { t } = useTranslation();
+
     if (items.length === 0) {
 return null;
 }
 
     return (
         <nav
-            aria-label="Fil d'Ariane"
+            aria-label={t('common.breadcrumb_aria')}
             className={`wdr-breadcrumb ${className}`.trim()}
         >
             <ol className="wdr-breadcrumb__list">

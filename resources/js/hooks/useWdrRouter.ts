@@ -45,6 +45,7 @@
  */
 
 import { router } from '@inertiajs/react';
+import { localizePath } from '@/lib/locale';
 
 // ─── Types (repris du router hash original) ───────────────────────────────────
 
@@ -213,7 +214,7 @@ interface RouterValue {
 
 export function useRouter(): RouterValue {
     const navigate = (wdrRoute: WdrRoute): void => {
-        const url = resolveUrl(wdrRoute);
+        const url = localizePath(resolveUrl(wdrRoute)) ?? resolveUrl(wdrRoute);
         router.visit(url);
     };
 

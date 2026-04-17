@@ -15,17 +15,17 @@
  *         et vers l'espace client si l'utilisateur n'est pas un PARTNER.
  */
 
-import React, { useEffect, useMemo } from 'react';
-import { Button } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { usePartnerBookingsData } from '@/hooks/useBookingsData';
-import { usePartnerApprovalGuard } from '@/hooks/usePartnerApprovalGuard';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { BookingStatusNames } from '@/types/booking';
-import './PartnerDashboardPage.css';
+import React, { useEffect, useMemo } from "react";
+import { Button } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { usePartnerBookingsData } from "@/hooks/useBookingsData";
+import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames } from "@/types/booking";
+import "./PartnerDashboardPage.css";
 
 // ============================================================
 // Icones SVG internes
@@ -161,33 +161,33 @@ const ArrowRightIcon: React.FC = () => (
 // Utilitaires
 // ============================================================
 
-function formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
+function formatDate(date: Date, intlLocale: string): string {
+    return new Intl.DateTimeFormat(intlLocale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
     }).format(date);
 }
 
-function formatDateShort(date: Date): string {
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
+function formatDateShort(date: Date, intlLocale: string): string {
+    return new Intl.DateTimeFormat(intlLocale, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
     }).format(date);
 }
 
 /**
  * Retourne le libelle lisible d'un statut de reservation.
  */
-function statusLabel(status: string): string {
+function statusLabel(status: string, t: (key: string) => string): string {
     switch (status) {
         case BookingStatusNames.CONFIRMED:
-            return 'Confirmee';
+            return t("partner.dashboard.status.confirmed");
         case BookingStatusNames.PENDING:
-            return 'En attente';
+            return t("partner.dashboard.status.pending");
         case BookingStatusNames.CANCELLED:
-            return 'Annulee';
+            return t("partner.dashboard.status.cancelled");
         default:
             return status;
     }
@@ -202,21 +202,21 @@ export const PartnerDashboardPage: React.FC = () => {
     const { navigate } = useRouter();
     const { isBlocked } = usePartnerApprovalGuard();
     const { t, intlLocale } = useTranslation();
-    const partnerUser = currentUser?.role === 'PARTNER' ? currentUser : null;
+    const partnerUser = currentUser?.role === "PARTNER" ? currentUser : null;
 
     // Hooks avant retours conditionnels
-    const { bookings } = usePartnerBookingsData(currentUser?.id ?? '');
+    const { bookings } = usePartnerBookingsData(currentUser?.id ?? "");
     const { services } = useServicesData();
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
 
             return;
         }
 
-        if (currentUser.role !== 'PARTNER') {
-            navigate({ name: 'dashboard' });
+        if (currentUser.role !== "PARTNER") {
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -226,7 +226,7 @@ export const PartnerDashboardPage: React.FC = () => {
 
     /* Toutes les reservations appartenant a ce partenaire */
     const partnerBookings = useMemo(
-        () => bookings.filter((b) => b.partnerId === (partnerUser?.id ?? '')),
+        () => bookings.filter((b) => b.partnerId === (partnerUser?.id ?? "")),
         [bookings, partnerUser?.id],
     );
 
@@ -266,7 +266,7 @@ export const PartnerDashboardPage: React.FC = () => {
     const activeServicesCount = useMemo(
         () =>
             services.filter(
-                (s) => s.partnerId === (partnerUser?.id ?? '') && s.isAvailable,
+                (s) => s.partnerId === (partnerUser?.id ?? "") && s.isAvailable,
             ).length,
         [services, partnerUser?.id],
     );
@@ -287,14 +287,14 @@ export const PartnerDashboardPage: React.FC = () => {
     );
 
     /* Guard : attend la redirection si non authentifie ou mauvais role */
-    if (isBlocked || !currentUser || currentUser.role !== 'PARTNER') {
+    if (isBlocked || !currentUser || currentUser.role !== "PARTNER") {
         return null;
     }
 
     const partnerSince = new Intl.DateTimeFormat(intlLocale, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
+        day: "numeric",
+        month: "long",
+        year: "numeric",
     }).format(currentUser.createdAt);
     const initials =
         currentUser.firstName.charAt(0).toUpperCase() +
@@ -305,19 +305,19 @@ export const PartnerDashboardPage: React.FC = () => {
             {/* ---- Hero ---- */}
             <section
                 className="wdr-partner-dash__hero"
-                aria-label={t('partner.dashboard.title')}
+                aria-label={t("partner.dashboard.title")}
             >
                 <div className="wdr-partner-dash__hero-content">
                     <div className="wdr-partner-dash__hero-text">
                         <p className="wdr-partner-dash__hero-greeting">
-                            {t('partner.dashboard.title')}
+                            {t("partner.dashboard.title")}
                         </p>
                         <h1 className="wdr-partner-dash__hero-title">
                             <span>{currentUser.companyName}</span>
                         </h1>
                         <p className="wdr-partner-dash__hero-since">
-                            {t('partner.dashboard.member_since').replace(
-                                '{date}',
+                            {t("partner.dashboard.member_since").replace(
+                                "{date}",
                                 partnerSince,
                             )}
                         </p>
@@ -326,7 +326,10 @@ export const PartnerDashboardPage: React.FC = () => {
                     <div className="wdr-partner-dash__hero-right">
                         <div
                             className="wdr-partner-dash__hero-avatar"
-                            aria-label={`Initiales de ${currentUser.companyName}`}
+                            aria-label={t("partner.dashboard.avatar_label").replace(
+                                "{company}",
+                                currentUser.companyName,
+                            )}
                         >
                             {initials}
                         </div>
@@ -336,7 +339,7 @@ export const PartnerDashboardPage: React.FC = () => {
                             onClick={logout}
                             className="wdr-partner-dash__logout-btn"
                         >
-                            {t('nav.logout')}
+                            {t("nav.logout")}
                         </Button>
                     </div>
                 </div>
@@ -346,7 +349,7 @@ export const PartnerDashboardPage: React.FC = () => {
                 {/* ---- Bandeau de statistiques ---- */}
                 <section
                     className="wdr-partner-dash__stats"
-                    aria-label={t('partner.dashboard.stats')}
+                    aria-label={t("partner.dashboard.stats")}
                 >
                     <div className="wdr-partner-dash__stat-card wdr-partner-dash__stat-card--revenue">
                         <div className="wdr-partner-dash__stat-icon">
@@ -354,10 +357,10 @@ export const PartnerDashboardPage: React.FC = () => {
                         </div>
                         <div className="wdr-partner-dash__stat-data">
                             <span className="wdr-partner-dash__stat-value">
-                                {formatPrice(currentUser.totalSales, 'EUR')}
+                                {formatPrice(currentUser.totalSales, "EUR")}
                             </span>
                             <span className="wdr-partner-dash__stat-label">
-                                {t('partner.dashboard.revenue_total')}
+                                {t("partner.dashboard.revenue_total")}
                             </span>
                         </div>
                     </div>
@@ -368,10 +371,10 @@ export const PartnerDashboardPage: React.FC = () => {
                         </div>
                         <div className="wdr-partner-dash__stat-data">
                             <span className="wdr-partner-dash__stat-value">
-                                {formatPrice(monthlyRevenue, 'EUR')}
+                                {formatPrice(monthlyRevenue, "EUR")}
                             </span>
                             <span className="wdr-partner-dash__stat-label">
-                                {t('partner.dashboard.revenue_month')}
+                                {t("partner.dashboard.revenue_month")}
                             </span>
                         </div>
                     </div>
@@ -386,9 +389,9 @@ export const PartnerDashboardPage: React.FC = () => {
                             </span>
                             <span className="wdr-partner-dash__stat-label">
                                 {monthlyBookings.length === 1
-                                    ? t('partner.dashboard.bookings_month_one')
+                                    ? t("partner.dashboard.bookings_month_one")
                                     : t(
-                                          'partner.dashboard.bookings_month_other',
+                                          "partner.dashboard.bookings_month_other",
                                       )}
                             </span>
                         </div>
@@ -404,14 +407,16 @@ export const PartnerDashboardPage: React.FC = () => {
                             </span>
                             <span className="wdr-partner-dash__stat-label">
                                 {pendingCount === 1
-                                    ? t('partner.dashboard.pending_one')
-                                    : t('partner.dashboard.pending_other')}
+                                    ? t("partner.dashboard.pending_one")
+                                    : t("partner.dashboard.pending_other")}
                             </span>
                         </div>
                         {pendingCount > 0 && (
                             <span
                                 className="wdr-partner-dash__stat-badge"
-                                aria-label={t('partner.dashboard.action_required')}
+                                aria-label={t(
+                                    "partner.dashboard.action_required",
+                                )}
                             >
                                 {pendingCount}
                             </span>
@@ -422,35 +427,35 @@ export const PartnerDashboardPage: React.FC = () => {
                 {/* ---- Acces rapides ---- */}
                 <section
                     className="wdr-partner-dash__shortcuts"
-                    aria-label={t('partner.dashboard.shortcuts')}
+                    aria-label={t("partner.dashboard.shortcuts")}
                 >
                     <h2 className="wdr-partner-dash__section-title">
-                        {t('partner.dashboard.management')}
+                        {t("partner.dashboard.management")}
                     </h2>
                     <div className="wdr-partner-dash__shortcut-grid">
                         <button
                             type="button"
                             className="wdr-partner-dash__shortcut-card"
                             onClick={() =>
-                                navigate({ name: 'partner-catalog' })
+                                navigate({ name: "partner-catalog" })
                             }
-                            aria-label="Acceder a la gestion du catalogue"
+                            aria-label={t("partner.dashboard.catalog_aria")}
                         >
                             <div className="wdr-partner-dash__shortcut-icon">
                                 <ListIcon />
                             </div>
                             <div className="wdr-partner-dash__shortcut-text">
                                 <span className="wdr-partner-dash__shortcut-title">
-                                    {t('partner.dashboard.catalog')}
+                                    {t("partner.dashboard.catalog")}
                                 </span>
                                 <span className="wdr-partner-dash__shortcut-sub">
-                                    {activeServicesCount}{' '}
+                                    {activeServicesCount}{" "}
                                     {activeServicesCount === 1
                                         ? t(
-                                              'partner.dashboard.active_service_one',
+                                              "partner.dashboard.active_service_one",
                                           )
                                         : t(
-                                              'partner.dashboard.active_service_other',
+                                              "partner.dashboard.active_service_other",
                                           )}
                                 </span>
                             </div>
@@ -460,45 +465,48 @@ export const PartnerDashboardPage: React.FC = () => {
                         <button
                             type="button"
                             className={[
-                                'wdr-partner-dash__shortcut-card',
+                                "wdr-partner-dash__shortcut-card",
                                 pendingCount > 0
-                                    ? 'wdr-partner-dash__shortcut-card--alert'
-                                    : '',
+                                    ? "wdr-partner-dash__shortcut-card--alert"
+                                    : "",
                             ]
-                                .join(' ')
+                                .join(" ")
                                 .trim()}
                             onClick={() =>
-                                navigate({ name: 'partner-bookings' })
+                                navigate({ name: "partner-bookings" })
                             }
-                            aria-label="Acceder a la gestion des reservations"
+                            aria-label={t("partner.dashboard.bookings_aria")}
                         >
                             <div className="wdr-partner-dash__shortcut-icon">
                                 <CheckCircleIcon />
                             </div>
                             <div className="wdr-partner-dash__shortcut-text">
                                 <span className="wdr-partner-dash__shortcut-title">
-                                    {t('partner.dashboard.reservations')}
+                                    {t("partner.dashboard.reservations")}
                                 </span>
                                 <span className="wdr-partner-dash__shortcut-sub">
                                     {pendingCount > 0
                                         ? (pendingCount === 1
                                               ? t(
-                                                    'partner.dashboard.process_one',
+                                                    "partner.dashboard.process_one",
                                                 )
                                               : t(
-                                                    'partner.dashboard.process_other',
+                                                    "partner.dashboard.process_other",
                                                 )
                                           ).replace(
-                                              '{count}',
+                                              "{count}",
                                               String(pendingCount),
                                           )
-                                        : t('partner.dashboard.up_to_date')}
+                                        : t("partner.dashboard.up_to_date")}
                                 </span>
                             </div>
                             {pendingCount > 0 && (
                                 <span
                                     className="wdr-partner-dash__shortcut-badge"
-                                    aria-label={`${pendingCount} demandes en attente`}
+                                    aria-label={t("partner.dashboard.pending_badge").replace(
+                                        "{count}",
+                                        String(pendingCount),
+                                    )}
                                 >
                                     {pendingCount}
                                 </span>
@@ -511,20 +519,20 @@ export const PartnerDashboardPage: React.FC = () => {
                 {/* ---- Activite recente ---- */}
                 <section
                     className="wdr-partner-dash__section"
-                    aria-label={t('partner.dashboard.recent')}
+                    aria-label={t("partner.dashboard.recent")}
                 >
                     <div className="wdr-partner-dash__section-header">
                         <h2 className="wdr-partner-dash__section-title">
-                            {t('partner.dashboard.recent')}
+                            {t("partner.dashboard.recent")}
                         </h2>
                         <button
                             type="button"
                             className="wdr-partner-dash__section-link"
                             onClick={() =>
-                                navigate({ name: 'partner-bookings' })
+                                navigate({ name: "partner-bookings" })
                             }
                         >
-                            {t('partner.dashboard.see_all')}
+                            {t("partner.dashboard.see_all")}
                             <ArrowRightIcon />
                         </button>
                     </div>
@@ -542,7 +550,7 @@ export const PartnerDashboardPage: React.FC = () => {
                                                 booking.serviceId}
                                         </span>
                                         <span className="wdr-partner-dash__activity-date">
-                                            {formatDateShort(booking.createdAt)}
+                                            {formatDateShort(booking.createdAt, intlLocale)}
                                         </span>
                                     </div>
                                     <div className="wdr-partner-dash__activity-footer">
@@ -554,11 +562,11 @@ export const PartnerDashboardPage: React.FC = () => {
                                         </span>
                                         <span
                                             className={[
-                                                'wdr-partner-dash__activity-status',
+                                                "wdr-partner-dash__activity-status",
                                                 `wdr-partner-dash__activity-status--${booking.status.toLowerCase()}`,
-                                            ].join(' ')}
+                                            ].join(" ")}
                                         >
-                                            {statusLabel(booking.status)}
+                                            {statusLabel(booking.status, t)}
                                         </span>
                                     </div>
                                 </li>
@@ -566,7 +574,7 @@ export const PartnerDashboardPage: React.FC = () => {
                         </ul>
                     ) : (
                         <p className="wdr-partner-dash__empty">
-                            {t('partner.dashboard.empty')}
+                            {t("partner.dashboard.empty")}
                         </p>
                     )}
                 </section>

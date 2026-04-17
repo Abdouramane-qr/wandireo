@@ -121,6 +121,7 @@
     grid-template-columns: 1fr 360px;
     gap: 2rem;
     align-items: start;
+    min-width: 0;
 }
 
 @media (max-width: 900px) {
@@ -171,6 +172,7 @@
 
 .wdr-confirm__service-info {
     flex: 1;
+    min-width: 0;
 }
 
 .wdr-confirm__service-category {
@@ -260,7 +262,13 @@
     flex-direction: column;
     gap: 1.5rem;
     position: sticky;
-    top: 1.5rem;
+    top: 5.75rem;
+}
+
+@media (max-width: 900px) {
+    .wdr-confirm__aside {
+        position: static;
+    }
 }
 
 /* Carte de paiement */
@@ -289,6 +297,31 @@
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .wdr-confirm {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .wdr-confirm__hero,
+    .wdr-confirm__price-card,
+    .wdr-confirm__next-steps,
+    .wdr-confirm__info-block,
+    .wdr-confirm__service-card {
+        padding: 1rem;
+    }
+
+    .wdr-confirm__reference,
+    .wdr-confirm__info-row,
+    .wdr-confirm__price-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wdr-confirm__info-row dd {
+        text-align: left;
+    }
 }
 
 .wdr-confirm__price-row dt {

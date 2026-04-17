@@ -3,27 +3,27 @@
  * @description Page des favoris utilisateur.
  */
 
-import React, { useMemo, useState } from 'react';
-import { favoritesApi } from '@/api/favorites';
-import { Breadcrumb, EmptyState, ServiceCard } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { useFavoritesData } from '@/hooks/useFavoritesData';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { toServiceCardData } from '@/lib/serviceAdapter';
-import './FavoritesPage.css';
+import React, { useMemo, useState } from "react";
+import { favoritesApi } from "@/api/favorites";
+import { Breadcrumb, EmptyState, ServiceCard } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { useFavoritesData } from "@/hooks/useFavoritesData";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { toServiceCardData } from "@/lib/serviceAdapter";
+import "./FavoritesPage.css";
 
 export const FavoritesPage: React.FC = () => {
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const { t } = useTranslation();
-    const { favorites } = useFavoritesData(currentUser?.id ?? '');
+    const { favorites } = useFavoritesData(currentUser?.id ?? "");
     const { services } = useServicesData();
     const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
     const favoriteServiceIds = useMemo(() => {
-        if (!currentUser || currentUser.role !== 'CLIENT') {
+        if (!currentUser || currentUser.role !== "CLIENT") {
             return [];
         }
 
@@ -58,8 +58,8 @@ export const FavoritesPage: React.FC = () => {
 
     const countLabel =
         favoriteServices.length === 1
-            ? t('favorites.count_one')
-            : t('favorites.count_other');
+            ? t("favorites.count_one")
+            : t("favorites.count_other");
 
     return (
         <div className="wdr-favs">
@@ -68,13 +68,13 @@ export const FavoritesPage: React.FC = () => {
                     <Breadcrumb
                         items={[
                             {
-                                label: t('nav.home'),
-                                onClick: () => navigate({ name: 'home' }),
+                                label: t("nav.home"),
+                                onClick: () => navigate({ name: "home" }),
                             },
-                            { label: t('favorites.title') },
+                            { label: t("favorites.title") },
                         ]}
                     />
-                    <h1 className="wdr-favs__title">{t('favorites.title')}</h1>
+                    <h1 className="wdr-favs__title">{t("favorites.title")}</h1>
                     {favoriteServices.length > 0 && (
                         <p className="wdr-favs__count">
                             {favoriteServices.length} {countLabel}
@@ -87,16 +87,16 @@ export const FavoritesPage: React.FC = () => {
                 <div className="wdr-favs__inner">
                     {favoriteServices.length === 0 ? (
                         <EmptyState
-                            title={t('favorites.empty_title')}
-                            description={t('favorites.empty_desc')}
-                            actionLabel={t('favorites.discover')}
+                            title={t("favorites.empty_title")}
+                            description={t("favorites.empty_desc")}
+                            actionLabel={t("favorites.discover")}
                             onAction={() =>
                                 navigate({
-                                    name: 'search',
-                                    query: '',
-                                    category: '',
-                                    dateFrom: '',
-                                    dateTo: '',
+                                    name: "search",
+                                    query: "",
+                                    category: "",
+                                    dateFrom: "",
+                                    dateTo: "",
                                 })
                             }
                         />
@@ -111,7 +111,7 @@ export const FavoritesPage: React.FC = () => {
                                         service={service}
                                         variant="default"
                                         onBookClick={(id) =>
-                                            navigate({ name: 'service', id })
+                                            navigate({ name: "service", id })
                                         }
                                     />
                                     <button
@@ -119,8 +119,8 @@ export const FavoritesPage: React.FC = () => {
                                         className="wdr-favs__remove-btn"
                                         onClick={() => handleRemove(service.id)}
                                         aria-label={t(
-                                            'favorites.remove_aria',
-                                        ).replace('{title}', service.title)}
+                                            "favorites.remove_aria",
+                                        ).replace("{title}", service.title)}
                                     >
                                         <svg
                                             width="14"
@@ -145,7 +145,7 @@ export const FavoritesPage: React.FC = () => {
                                                 y2="18"
                                             />
                                         </svg>
-                                        {t('favorites.remove')}
+                                        {t("favorites.remove")}
                                     </button>
                                 </div>
                             ))}

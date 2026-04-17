@@ -42,7 +42,20 @@ export const authApi = {
             .post<{ message: string }>('/auth/register-partner', data)
             .then((r) => r.data),
 
-    logout: () => api.delete('/auth/logout').then((r) => r.data),
+    refresh: (refreshToken: string) =>
+        api
+            .post<Pick<AuthResponse, 'accessToken' | 'refreshToken'>>(
+                '/auth/refresh',
+                { refreshToken },
+            )
+            .then((r) => r.data),
+
+    logout: (refreshToken?: string) =>
+        api
+            .delete('/auth/logout', {
+                data: refreshToken ? { refreshToken } : undefined,
+            })
+            .then((r) => r.data),
 
     me: () => api.get<User>('/users/me').then((r) => r.data),
 

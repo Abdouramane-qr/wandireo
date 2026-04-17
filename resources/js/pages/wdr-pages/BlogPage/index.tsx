@@ -3,20 +3,20 @@
  * @description Liste paginée des articles de blog publiés, filtrables par tag.
  */
 
-import React, { useMemo, useState } from 'react';
-import { BlogCard, EmptyState, Pagination } from '@/components/wdr';
-import { useBlogPostsData } from '@/hooks/useBlogData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { BlogStatusNames } from '@/types/blog';
-import './BlogPage.css';
+import React, { useMemo, useState } from "react";
+import { BlogCard, EmptyState, Pagination } from "@/components/wdr";
+import { useBlogPostsData } from "@/hooks/useBlogData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { BlogStatusNames } from "@/types/blog";
+import "./BlogPage.css";
 
 const PAGE_SIZE = 6;
 
 export const BlogPage: React.FC = () => {
     const { t } = useTranslation();
     const { navigate } = useRouter();
-    const [activeTag, setActiveTag] = useState('');
+    const [activeTag, setActiveTag] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
     const { posts: published } = useBlogPostsData({
@@ -45,12 +45,12 @@ export const BlogPage: React.FC = () => {
     );
 
     const handleTagClick = (tag: string) => {
-        setActiveTag((prev) => (prev === tag ? '' : tag));
+        setActiveTag((prev) => (prev === tag ? "" : tag));
         setCurrentPage(1);
     };
 
     const handlePostClick = (slug: string) => {
-        navigate({ name: 'blog-post', slug });
+        navigate({ name: "blog-post", slug });
     };
 
     return (
@@ -58,10 +58,8 @@ export const BlogPage: React.FC = () => {
             {/* En-tête */}
             <div className="wdr-blog__hero">
                 <div className="wdr-blog__hero-inner">
-                    <h1 className="wdr-blog__title">{t('blog.title')}</h1>
-                    <p className="wdr-blog__subtitle">
-                        {t('blog.subtitle')}
-                    </p>
+                    <h1 className="wdr-blog__title">{t("blog.title")}</h1>
+                    <p className="wdr-blog__subtitle">{t("blog.subtitle")}</p>
                 </div>
             </div>
 
@@ -71,20 +69,20 @@ export const BlogPage: React.FC = () => {
                     <div
                         className="wdr-blog__tags"
                         role="group"
-                        aria-label="Filtrer par thème"
+                        aria-label={t("blog.filter_tags")}
                     >
                         <button
                             type="button"
-                            className={`wdr-blog__tag-btn ${activeTag === '' ? 'wdr-blog__tag-btn--active' : ''}`}
-                            onClick={() => handleTagClick('')}
+                            className={`wdr-blog__tag-btn ${activeTag === "" ? "wdr-blog__tag-btn--active" : ""}`}
+                            onClick={() => handleTagClick("")}
                         >
-                            {t('blog.all_posts')}
+                            {t("blog.all_posts")}
                         </button>
                         {allTags.map((tag) => (
                             <button
                                 key={tag}
                                 type="button"
-                                className={`wdr-blog__tag-btn ${activeTag === tag ? 'wdr-blog__tag-btn--active' : ''}`}
+                                className={`wdr-blog__tag-btn ${activeTag === tag ? "wdr-blog__tag-btn--active" : ""}`}
                                 onClick={() => handleTagClick(tag)}
                                 aria-pressed={activeTag === tag}
                             >
@@ -97,10 +95,10 @@ export const BlogPage: React.FC = () => {
                 {/* Résultats */}
                 {paginated.length === 0 ? (
                     <EmptyState
-                        title={t('blog.no_posts')}
-                        description={t('blog.no_posts_desc')}
-                        actionLabel={t('blog.all_posts')}
-                        onAction={() => handleTagClick('')}
+                        title={t("blog.no_posts")}
+                        description={t("blog.no_posts_desc")}
+                        actionLabel={t("blog.all_posts")}
+                        onAction={() => handleTagClick("")}
                     />
                 ) : (
                     <>
@@ -119,7 +117,7 @@ export const BlogPage: React.FC = () => {
                             totalPages={totalPages}
                             onPageChange={(p) => {
                                 setCurrentPage(p);
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                             className="wdr-blog__pagination"
                         />

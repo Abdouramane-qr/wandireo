@@ -49,4 +49,12 @@ return [
         ),
     ],
 
+    'fareharbor' => [
+        'base_url' => env('FAREHARBOR_BASE_URL', 'https://fareharbor.com/api/v1'),
+        'timeout' => env('FAREHARBOR_TIMEOUT', 15),
+        'autosync_enabled' => env('FAREHARBOR_AUTOSYNC_ENABLED', false),
+        'autosync_frequency' => env('FAREHARBOR_AUTOSYNC_FREQUENCY', 'hourly'),
+        'autosync_timezone' => env('FAREHARBOR_AUTOSYNC_TIMEZONE', 'UTC'),
+    ],
+
 ];

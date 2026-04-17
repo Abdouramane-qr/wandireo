@@ -24,4 +24,28 @@ class DashboardTest extends TestCase
         $response = $this->get(route('dashboard'));
         $response->assertOk();
     }
+
+    public function test_approved_partners_can_visit_the_partner_dashboard()
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+
+        $response = $this->actingAs($partner)->get(route('partner.dashboard'));
+
+        $response->assertOk();
+    }
+
+    public function test_pending_partners_can_visit_the_pending_page()
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'PENDING',
+        ]);
+
+        $response = $this->actingAs($partner)->get(route('partner.pending'));
+
+        $response->assertOk();
+    }
 }

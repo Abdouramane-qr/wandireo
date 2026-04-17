@@ -1,20 +1,27 @@
 // Components
-import { Form, Head } from '@inertiajs/react';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { logout } from '@/routes';
-import { send } from '@/routes/verification';
+import { Form, Head, setLayoutProps } from "@inertiajs/react";
+import TextLink from "@/components/text-link";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { useTranslation } from "@/hooks/useTranslation";
+import { logout } from "@/routes";
+import { send } from "@/routes/verification";
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const { t } = useTranslation();
+
+    setLayoutProps({
+        title: t("auth.verify_email.title"),
+        description: t("auth.verify_email.description"),
+    });
+
     return (
         <>
-            <Head title="Email verification" />
+            <Head title={t("auth.verify_email.page_title")} />
 
-            {status === 'verification-link-sent' && (
+            {status === "verification-link-sent" && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                    {t("auth.verify_email.sent")}
                 </div>
             )}
 
@@ -23,14 +30,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     <>
                         <Button disabled={processing} variant="secondary">
                             {processing && <Spinner />}
-                            Resend verification email
+                            {t("auth.verify_email.resend")}
                         </Button>
 
                         <TextLink
                             href={logout()}
                             className="mx-auto block text-sm"
                         >
-                            Log out
+                            {t("auth.verify_email.logout")}
                         </TextLink>
                     </>
                 )}
@@ -38,9 +45,3 @@ export default function VerifyEmail({ status }: { status?: string }) {
         </>
     );
 }
-
-VerifyEmail.layout = {
-    title: 'Verify email',
-    description:
-        'Please verify your email address by clicking on the link we just emailed to you.',
-};

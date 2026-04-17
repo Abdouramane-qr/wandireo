@@ -8,6 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { BookingProvider } from '@/context/BookingContext';
 import { UserProvider } from '@/context/UserContext';
 import { initializeTheme } from '@/hooks/use-appearance';
+import '@/hooks/useTranslation';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';

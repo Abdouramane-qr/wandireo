@@ -1,9 +1,11 @@
-export type CalendarSyncStatus = 'IDLE' | 'SUCCESS' | 'FAILED';
+export type CalendarSyncProvider = 'ICAL' | 'FAREHARBOR';
+
+export type CalendarSyncStatus = 'IDLE' | 'SYNCING' | 'SUCCESS' | 'FAILED';
 
 export interface ServiceCalendarSync {
     id: string;
     serviceId: string;
-    provider: 'ICAL';
+    provider: CalendarSyncProvider;
     importUrl?: string;
     lastSyncedAt?: Date;
     lastStatus: CalendarSyncStatus;

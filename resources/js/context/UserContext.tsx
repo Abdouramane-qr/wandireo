@@ -6,6 +6,7 @@ import React, {
     useMemo,
     useState,
 } from 'react';
+import { localizePath } from '@/lib/locale';
 import { normalizeUser } from '@/lib/api-normalizers';
 import type { Auth } from '@/types/auth';
 import type { AdminUser, ClientUser, PartnerUser } from '@/types/wdr-user';
@@ -44,7 +45,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
             const success = await new Promise<boolean>((resolve) => {
                 router.post(
-                    '/connexion',
+                    localizePath('/connexion') ?? '/connexion',
                     {
                         email,
                         password,

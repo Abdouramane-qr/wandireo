@@ -1,109 +1,41 @@
-import React, { useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { BlogCard, Button, ServiceCard } from '@/components/wdr';
-import { favoritesApi } from '@/api/favorites';
-import { useFavoritesData } from '@/hooks/useFavoritesData';
-import { useBlogPostsData } from '@/hooks/useBlogData';
-import { useGeoContext } from '@/hooks/useGeoContext';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { useUser } from '@/context/UserContext';
-import { todayISO } from '@/lib/formatters';
-import { toServiceCardData } from '@/lib/serviceAdapter';
-import { BlogStatusNames } from '@/types/blog';
-import './HomePage.css';
+import React, { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { BlogCard, Button, ServiceCard } from "@/components/wdr";
+import { SearchBar } from "@/components/Search/SearchBar";
+import { favoritesApi } from "@/api/favorites";
+import { useFavoritesData } from "@/hooks/useFavoritesData";
+import { useBlogPostsData } from "@/hooks/useBlogData";
+import { useGeoContext } from "@/hooks/useGeoContext";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { useUser } from "@/context/UserContext";
+import { todayISO } from "@/lib/formatters";
+import { toServiceCardData } from "@/lib/serviceAdapter";
+import { BlogStatusNames } from "@/types/blog";
+import "./HomePage.css";
 
 const ALGARVE_CITIES = [
-    'Lagos',
-    'Alvor',
-    'Portimão',
-    'Silves',
-    'Benagil',
-    'Armação de Pêra',
-    'Vilamoura',
-    'Albufeira',
+    "Lagos",
+    "Alvor",
+    "Portimão",
+    "Silves",
+    "Benagil",
+    "Armação de Pêra",
+    "Vilamoura",
+    "Albufeira",
 ];
 
 const DESTINATION_CARDS = [
-    'Lagos',
-    'Alvor',
-    'Portimão',
-    'Silves',
-    'Benagil',
-    'Armação de Pera',
-    'Vilamoura',
-    'Albufeira',
+    "Lagos",
+    "Alvor",
+    "Portimão",
+    "Silves",
+    "Benagil",
+    "Armação de Pêra",
+    "Vilamoura",
+    "Albufeira",
 ];
-
-const SearchIcon: React.FC = () => (
-    <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-);
-
-const MapPinIcon: React.FC = () => (
-    <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-        <circle cx="12" cy="10" r="3" />
-    </svg>
-);
-
-const CalendarIcon: React.FC = () => (
-    <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-);
-
-const CategoryIcon: React.FC = () => (
-    <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-    >
-        <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-    </svg>
-);
 
 const WhatsAppIcon: React.FC = () => (
     <svg
@@ -124,14 +56,14 @@ export const HomePage: React.FC = () => {
     const { currentUser } = useUser();
     const queryClient = useQueryClient();
     const geoContext = useGeoContext();
-    const [query, setQuery] = useState('');
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
-    const [category, setCategory] = useState('');
+    const [query, setQuery] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [category, setCategory] = useState("");
 
     const today = todayISO();
     const { services } = useServicesData();
-    const { favorites } = useFavoritesData(currentUser?.id ?? '');
+    const { favorites } = useFavoritesData(currentUser?.id ?? "");
     const { posts: allPosts } = useBlogPostsData({
         status: BlogStatusNames.PUBLISHED,
     });
@@ -143,26 +75,26 @@ export const HomePage: React.FC = () => {
 
     const categoryOptions = useMemo(
         () => [
-            { value: '', label: t('home.category.all') },
-            { value: 'ACTIVITE', label: t('home.category.activity') },
-            { value: 'BATEAU', label: t('home.category.boat') },
+            { value: "", label: t("home.category.all") },
+            { value: "ACTIVITE", label: t("home.category.activity") },
+            { value: "BATEAU", label: t("home.category.boat") },
             {
-                value: 'HEBERGEMENT',
-                label: t('home.category.accommodation'),
+                value: "HEBERGEMENT",
+                label: t("home.category.accommodation"),
             },
-            { value: 'VOITURE', label: t('home.category.car') },
+            { value: "VOITURE", label: t("home.category.car") },
         ],
         [t],
     );
 
     const highlights = useMemo(
         () => [
-            t('home.highlight.1'),
-            t('home.highlight.2'),
-            t('home.highlight.3'),
-            t('home.highlight.4'),
-            t('home.highlight.5'),
-            t('home.highlight.6'),
+            t("home.highlight.1"),
+            t("home.highlight.2"),
+            t("home.highlight.3"),
+            t("home.highlight.4"),
+            t("home.highlight.5"),
+            t("home.highlight.6"),
         ],
         [t],
     );
@@ -189,37 +121,45 @@ export const HomePage: React.FC = () => {
                 extraCities.set(service.location.country, new Set());
             }
 
-            extraCities.get(service.location.country)?.add(service.location.city);
+            extraCities
+                .get(service.location.country)
+                ?.add(service.location.city);
         }
 
         return [
-            { country: 'Algarve', cities: ALGARVE_CITIES },
+            { country: "Algarve", cities: ALGARVE_CITIES },
             ...Array.from(extraCities.entries())
-                .sort(([a], [b]) => a.localeCompare(b, 'fr'))
+                .sort(([a], [b]) => a.localeCompare(b, "fr"))
                 .map(([country, cities]) => ({
                     country,
                     cities: Array.from(cities).sort((a, b) =>
-                        a.localeCompare(b, 'fr'),
+                        a.localeCompare(b, "fr"),
                     ),
                 })),
         ].sort((a, b) => {
-            if (a.country === 'Algarve') {
+            if (a.country === "Algarve") {
                 return -1;
             }
 
-            if (b.country === 'Algarve') {
+            if (b.country === "Algarve") {
                 return 1;
             }
 
-            if (geoContext.countryName && a.country === geoContext.countryName) {
+            if (
+                geoContext.countryName &&
+                a.country === geoContext.countryName
+            ) {
                 return -1;
             }
 
-            if (geoContext.countryName && b.country === geoContext.countryName) {
+            if (
+                geoContext.countryName &&
+                b.country === geoContext.countryName
+            ) {
                 return 1;
             }
 
-            return a.country.localeCompare(b.country, 'fr');
+            return a.country.localeCompare(b.country, "fr");
         });
     }, [geoContext.countryName, services]);
 
@@ -242,28 +182,28 @@ export const HomePage: React.FC = () => {
         () =>
             [
                 {
-                    value: 'ACTIVITE',
-                    label: t('home.tile.activities'),
-                    description: t('home.tile.activities_desc'),
-                    colorVar: '--primary',
+                    value: "ACTIVITE",
+                    label: t("home.tile.activities"),
+                    description: t("home.tile.activities_desc"),
+                    colorVar: "--primary",
                 },
                 {
-                    value: 'BATEAU',
-                    label: t('home.tile.boats'),
-                    description: t('home.tile.boats_desc'),
-                    colorVar: '--brand-purple',
+                    value: "BATEAU",
+                    label: t("home.tile.boats"),
+                    description: t("home.tile.boats_desc"),
+                    colorVar: "--brand-purple",
                 },
                 {
-                    value: 'HEBERGEMENT',
-                    label: t('home.tile.accommodations'),
-                    description: t('home.tile.accommodations_desc'),
-                    colorVar: '--accent',
+                    value: "HEBERGEMENT",
+                    label: t("home.tile.accommodations"),
+                    description: t("home.tile.accommodations_desc"),
+                    colorVar: "--accent",
                 },
                 {
-                    value: 'VOITURE',
-                    label: t('home.tile.cars'),
-                    description: t('home.tile.cars_desc'),
-                    colorVar: '--secondary',
+                    value: "VOITURE",
+                    label: t("home.tile.cars"),
+                    description: t("home.tile.cars_desc"),
+                    colorVar: "--secondary",
                 },
             ].map((tile) => ({
                 ...tile,
@@ -277,7 +217,7 @@ export const HomePage: React.FC = () => {
     const handleSearch = (event: React.FormEvent) => {
         event.preventDefault();
         navigate({
-            name: 'search',
+            name: "search",
             query: query.trim(),
             category,
             dateFrom,
@@ -286,8 +226,8 @@ export const HomePage: React.FC = () => {
     };
 
     const handleFavoriteToggle = async (serviceId: string) => {
-        if (!currentUser || currentUser.role !== 'CLIENT') {
-            navigate({ name: 'login' });
+        if (!currentUser || currentUser.role !== "CLIENT") {
+            navigate({ name: "login" });
 
             return;
         }
@@ -299,7 +239,7 @@ export const HomePage: React.FC = () => {
         }
 
         await queryClient.invalidateQueries({
-            queryKey: ['favorites', currentUser.id],
+            queryKey: ["favorites", currentUser.id],
         });
     };
 
@@ -307,21 +247,22 @@ export const HomePage: React.FC = () => {
         <div className="wdr-home">
             <section
                 className="wdr-home__hero"
-                aria-label="Rechercher un service"
+                aria-label={t("home.hero_aria")}
             >
                 <div className="wdr-home__hero-backdrop" aria-hidden="true" />
 
                 <div className="wdr-home__hero-content">
                     <h1 className="wdr-home__hero-title">
-                        {t('home.hero_title')}
+                        {t("home.hero_title")}
                     </h1>
                     <p className="wdr-home__hero-subtitle">
-                        {t('home.hero_subtitle')}
+                        {t("home.hero_subtitle")}
                     </p>
 
                     {geoContext.countryName && (
                         <p className="wdr-home__hero-geo">
-                            {geoContext.countryName} • {geoContext.suggestedCurrency}
+                            {geoContext.countryName} •{" "}
+                            {geoContext.suggestedCurrency}
                         </p>
                     )}
 
@@ -331,152 +272,38 @@ export const HomePage: React.FC = () => {
                             size="lg"
                             onClick={() =>
                                 navigate({
-                                    name: 'search',
-                                    query: '',
-                                    category: '',
-                                    dateFrom: '',
-                                    dateTo: '',
+                                    name: "search",
+                                    query: "",
+                                    category: "",
+                                    dateFrom: "",
+                                    dateTo: "",
                                 })
                             }
                         >
-                            {t('home.hero_cta')}
+                            {t("home.hero_cta")}
                         </Button>
                     </div>
 
-                    <form
-                        className="wdr-home__search-bar"
+                    <SearchBar
+                        query={query}
+                        dateFrom={dateFrom}
+                        dateTo={dateTo}
+                        category={category}
+                        today={today}
+                        destinationOptions={destinationOptions}
+                        categoryOptions={categoryOptions}
+                        onQueryChange={setQuery}
+                        onDateFromChange={(value) => {
+                            setDateFrom(value);
+
+                            if (dateTo && dateTo < value) {
+                                setDateTo("");
+                            }
+                        }}
+                        onDateToChange={setDateTo}
+                        onCategoryChange={setCategory}
                         onSubmit={handleSearch}
-                        role="search"
-                        aria-label={t('home.search_aria')}
-                    >
-                        <div className="wdr-home__sfield">
-                            <span className="wdr-home__sfield-icon">
-                                <MapPinIcon />
-                            </span>
-                            <div className="wdr-home__sfield-body">
-                                <span className="wdr-home__sfield-label">
-                                    {t('home.destination')}
-                                </span>
-                                <select
-                                    className="wdr-home__sfield-input wdr-home__sfield-select"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    aria-label={t('home.destination')}
-                                >
-                                    <option value="">{t('search.all_destinations')}</option>
-                                    {destinationOptions.map(
-                                        ({ country, cities }) => (
-                                            <optgroup
-                                                key={country}
-                                                label={country}
-                                            >
-                                                {cities.map((city) => (
-                                                    <option
-                                                        key={city}
-                                                        value={city}
-                                                    >
-                                                        {city}
-                                                    </option>
-                                                ))}
-                                            </optgroup>
-                                        ),
-                                    )}
-                                </select>
-                            </div>
-                        </div>
-
-                        <span
-                            className="wdr-home__sdivider"
-                            aria-hidden="true"
-                        />
-
-                        <div className="wdr-home__sfield wdr-home__sfield--date">
-                            <span className="wdr-home__sfield-icon">
-                                <CalendarIcon />
-                            </span>
-                            <div className="wdr-home__sfield-body">
-                                <span className="wdr-home__sfield-label">
-                                    {t('home.departure')}
-                                </span>
-                                <input
-                                    type="date"
-                                    className="wdr-home__sfield-input wdr-home__sfield-input--date"
-                                    value={dateFrom}
-                                    min={today}
-                                    onChange={(e) => {
-                                        setDateFrom(e.target.value);
-
-                                        if (dateTo && dateTo < e.target.value) {
-                                            setDateTo('');
-                                        }
-                                    }}
-                                    aria-label={t('search.date_from')}
-                                />
-                            </div>
-                        </div>
-
-                        <span
-                            className="wdr-home__sdivider"
-                            aria-hidden="true"
-                        />
-
-                        <div className="wdr-home__sfield wdr-home__sfield--date">
-                            <span className="wdr-home__sfield-icon">
-                                <CalendarIcon />
-                            </span>
-                            <div className="wdr-home__sfield-body">
-                                <span className="wdr-home__sfield-label">
-                                    {t('home.return')}
-                                </span>
-                                <input
-                                    type="date"
-                                    className="wdr-home__sfield-input wdr-home__sfield-input--date"
-                                    value={dateTo}
-                                    min={dateFrom || today}
-                                    onChange={(e) => setDateTo(e.target.value)}
-                                    aria-label={t('search.date_to')}
-                                />
-                            </div>
-                        </div>
-
-                        <span
-                            className="wdr-home__sdivider"
-                            aria-hidden="true"
-                        />
-
-                        <div className="wdr-home__sfield wdr-home__sfield--cat">
-                            <span className="wdr-home__sfield-icon">
-                                <CategoryIcon />
-                            </span>
-                            <div className="wdr-home__sfield-body">
-                                <span className="wdr-home__sfield-label">
-                                    {t('home.category')}
-                                </span>
-                                <select
-                                    className="wdr-home__sfield-input wdr-home__sfield-select"
-                                    value={category}
-                                    onChange={(e) =>
-                                        setCategory(e.target.value)
-                                    }
-                                    aria-label={t('home.category')}
-                                >
-                                    {categoryOptions.map((option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <button type="submit" className="wdr-home__search-btn">
-                            <SearchIcon />
-                            <span>{t('home.search')}</span>
-                        </button>
-                    </form>
+                    />
                 </div>
             </section>
 
@@ -491,10 +318,10 @@ export const HomePage: React.FC = () => {
                                 id="intro-heading"
                                 className="wdr-home__section-title"
                             >
-                                {t('home.intro_title')}
+                                {t("home.intro_title")}
                             </h2>
                             <p className="wdr-home__intro-text">
-                                {t('home.intro_text')}
+                                {t("home.intro_text")}
                             </p>
                         </div>
                         <ul className="wdr-home__highlights" role="list">
@@ -521,22 +348,22 @@ export const HomePage: React.FC = () => {
                             id="featured-heading"
                             className="wdr-home__section-title"
                         >
-                            {t('home.featured_title')}
+                            {t("home.featured_title")}
                         </h2>
                         <button
                             className="wdr-home__see-all"
                             onClick={() =>
                                 navigate({
-                                    name: 'search',
-                                    query: '',
-                                    category: '',
-                                    dateFrom: '',
-                                    dateTo: '',
+                                    name: "search",
+                                    query: "",
+                                    category: "",
+                                    dateFrom: "",
+                                    dateTo: "",
                                 })
                             }
                             type="button"
                         >
-                            {t('home.see_all')}
+                            {t("home.see_all")}
                         </button>
                     </div>
 
@@ -549,7 +376,7 @@ export const HomePage: React.FC = () => {
                                 isFavorite={favoriteServiceIds.has(service.id)}
                                 onFavoriteToggle={handleFavoriteToggle}
                                 onBookClick={(serviceId) =>
-                                    navigate({ name: 'service', id: serviceId })
+                                    navigate({ name: "service", id: serviceId })
                                 }
                             />
                         ))}
@@ -568,14 +395,14 @@ export const HomePage: React.FC = () => {
                                 id="blog-heading"
                                 className="wdr-home__section-title"
                             >
-                                {t('home.latest_posts')}
+                                {t("home.latest_posts")}
                             </h2>
                             <button
                                 className="wdr-home__see-all"
-                                onClick={() => navigate({ name: 'blog' })}
+                                onClick={() => navigate({ name: "blog" })}
                                 type="button"
                             >
-                                {t('home.see_all')}
+                                {t("home.see_all")}
                             </button>
                         </div>
                         <div className="wdr-home__blog-grid">
@@ -584,7 +411,7 @@ export const HomePage: React.FC = () => {
                                     key={post.id}
                                     post={post}
                                     onClick={(slug) =>
-                                        navigate({ name: 'blog-post', slug })
+                                        navigate({ name: "blog-post", slug })
                                     }
                                 />
                             ))}
@@ -602,36 +429,33 @@ export const HomePage: React.FC = () => {
                         id="categories-heading"
                         className="wdr-home__section-title"
                     >
-                        {t('home.main_categories')}
+                        {t("home.main_categories")}
                     </h2>
 
                     <div className="wdr-home__category-grid">
                         {categoryTiles.map((tile) => (
                             <button
                                 key={tile.value}
-                                className="wdr-home__category-card"
-                                style={
-                                    {
-                                        '--tile-color': `var(${tile.colorVar})`,
-                                    } as React.CSSProperties
-                                }
+                                className={`wdr-home__category-card wdr-home__category-card--${tile.value.toLowerCase()}`}
                                 onClick={() =>
                                     navigate({
-                                        name: 'search',
-                                        query: '',
+                                        name: "search",
+                                        query: "",
                                         category: tile.value,
-                                        dateFrom: '',
-                                        dateTo: '',
+                                        dateFrom: "",
+                                        dateTo: "",
                                     })
                                 }
                                 type="button"
-                                aria-label={`${t('home.hero_cta')} ${tile.label}`}
+                                aria-label={t(
+                                    "home.category_card_aria",
+                                ).replace("{category}", tile.label)}
                             >
                                 <span className="wdr-home__category-count">
-                                    {tile.count}{' '}
+                                    {tile.count}{" "}
                                     {tile.count > 1
-                                        ? t('home.count.experience_other')
-                                        : t('home.count.experience_one')}
+                                        ? t("home.count.experience_other")
+                                        : t("home.count.experience_one")}
                                 </span>
                                 <h3 className="wdr-home__category-name">
                                     {tile.label}
@@ -661,22 +485,22 @@ export const HomePage: React.FC = () => {
                             id="destinations-heading"
                             className="wdr-home__section-title"
                         >
-                            {t('home.destinations_title')}
+                            {t("home.destinations_title")}
                         </h2>
                         <button
                             className="wdr-home__see-all"
                             onClick={() =>
                                 navigate({
-                                    name: 'search',
-                                    query: '',
-                                    category: '',
-                                    dateFrom: '',
-                                    dateTo: '',
+                                    name: "search",
+                                    query: "",
+                                    category: "",
+                                    dateFrom: "",
+                                    dateTo: "",
                                 })
                             }
                             type="button"
                         >
-                            {t('home.explore_region')}
+                            {t("home.explore_region")}
                         </button>
                     </div>
 
@@ -688,11 +512,11 @@ export const HomePage: React.FC = () => {
                                 className="wdr-home__destination-card"
                                 onClick={() =>
                                     navigate({
-                                        name: 'search',
+                                        name: "search",
                                         query: city,
-                                        category: '',
-                                        dateFrom: '',
-                                        dateTo: '',
+                                        category: "",
+                                        dateFrom: "",
+                                        dateTo: "",
                                     })
                                 }
                             >
@@ -703,7 +527,7 @@ export const HomePage: React.FC = () => {
                                     {city}
                                 </h3>
                                 <p className="wdr-home__destination-copy">
-                                    {t('home.destination_copy')} {city}.
+                                    {t("home.destination_copy")} {city}.
                                 </p>
                             </button>
                         ))}
@@ -720,12 +544,12 @@ export const HomePage: React.FC = () => {
                         id="how-it-works-heading"
                         className="wdr-home__section-title"
                     >
-                        {t('home.how_it_works')}
+                        {t("home.how_it_works")}
                     </h2>
 
                     <ol
                         className="wdr-home__steps"
-                        aria-label={t('home.steps_aria')}
+                        aria-label={t("home.steps_aria")}
                     >
                         <li className="wdr-home__step">
                             <div
@@ -734,9 +558,11 @@ export const HomePage: React.FC = () => {
                             >
                                 01
                             </div>
-                            <h3 className="wdr-home__step-title">{t('home.step1_title')}</h3>
+                            <h3 className="wdr-home__step-title">
+                                {t("home.step1_title")}
+                            </h3>
                             <p className="wdr-home__step-desc">
-                                {t('home.step1_desc')}
+                                {t("home.step1_desc")}
                             </p>
                         </li>
 
@@ -747,9 +573,11 @@ export const HomePage: React.FC = () => {
                             >
                                 02
                             </div>
-                            <h3 className="wdr-home__step-title">{t('home.step2_title')}</h3>
+                            <h3 className="wdr-home__step-title">
+                                {t("home.step2_title")}
+                            </h3>
                             <p className="wdr-home__step-desc">
-                                {t('home.step2_desc')}
+                                {t("home.step2_desc")}
                             </p>
                         </li>
 
@@ -760,9 +588,11 @@ export const HomePage: React.FC = () => {
                             >
                                 03
                             </div>
-                            <h3 className="wdr-home__step-title">{t('home.step3_title')}</h3>
+                            <h3 className="wdr-home__step-title">
+                                {t("home.step3_title")}
+                            </h3>
                             <p className="wdr-home__step-desc">
-                                {t('home.step3_desc')}
+                                {t("home.step3_desc")}
                             </p>
                         </li>
                     </ol>
@@ -776,8 +606,11 @@ export const HomePage: React.FC = () => {
             >
                 <div className="wdr-home__container">
                     <div className="wdr-home__section-header">
-                        <h2 id="faq-heading" className="wdr-home__section-title">
-                            {t('home.faq_title')}
+                        <h2
+                            id="faq-heading"
+                            className="wdr-home__section-title"
+                        >
+                            {t("home.faq_title")}
                         </h2>
                     </div>
 
@@ -801,25 +634,23 @@ export const HomePage: React.FC = () => {
 
             <section
                 className="wdr-home__partner-cta"
-                aria-label={t('home.partner_aria')}
+                aria-label={t("home.partner_aria")}
             >
                 <div className="wdr-home__container wdr-home__partner-cta-inner">
                     <div>
                         <h2 className="wdr-home__partner-title">
-                            {t('home.partner_title')}
+                            {t("home.partner_title")}
                         </h2>
                         <p className="wdr-home__partner-desc">
-                            {t('home.partner_desc')}
+                            {t("home.partner_desc")}
                         </p>
                     </div>
                     <Button
                         variant="secondary"
                         size="lg"
-                        onClick={() =>
-                            navigate({ name: 'partner-register' })
-                        }
+                        onClick={() => navigate({ name: "partner-register" })}
                     >
-                        {t('home.partner_cta')}
+                        {t("home.partner_cta")}
                     </Button>
                 </div>
             </section>
@@ -829,8 +660,8 @@ export const HomePage: React.FC = () => {
                 className="wdr-home__whatsapp-float"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t('home.whatsapp_aria')}
-                title={t('home.whatsapp_title')}
+                aria-label={t("home.whatsapp_aria")}
+                title={t("home.whatsapp_title")}
             >
                 <WhatsAppIcon />
             </a>

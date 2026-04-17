@@ -9,25 +9,349 @@
  *   4. Section "Services similaires" (meme categorie)
  */
 
-import { useQueryClient } from '@tanstack/react-query';
-import React, { useMemo, useState } from 'react';
-import { favoritesApi } from '@/api/favorites';
-import { Button, EmptyState, GeoMap, ReviewCard, ServiceCard } from '@/components/wdr';
-import { useToast } from '@/components/wdr';
-import { useBooking } from '@/context/BookingContext';
-import { useUser } from '@/context/UserContext';
-import { useAvailabilityData } from '@/hooks/useAvailabilityData';
-import { useFavoritesData } from '@/hooks/useFavoritesData';
-import { useReviewsData } from '@/hooks/useReviewsData';
-import { useServiceStructureData } from '@/hooks/useServiceStructureData';
-import { useServiceData, useServicesData } from '@/hooks/useServicesData';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice, calcDays, todayISO } from '@/lib/formatters';
-import { toServiceCardData } from '@/lib/serviceAdapter';
-import type { Service } from '@/types/service';
-import { ServiceCategoryLabels } from '@/types/service';
-import './ServiceDetailPage.css';
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useMemo, useState } from "react";
+import { favoritesApi } from "@/api/favorites";
+import {
+    Button,
+    EmptyState,
+    GeoMap,
+    ReviewCard,
+    ServiceCard,
+} from "@/components/wdr";
+import { useToast } from "@/components/wdr";
+import { useBooking } from "@/context/BookingContext";
+import { useUser } from "@/context/UserContext";
+import { useAvailabilityData } from "@/hooks/useAvailabilityData";
+import { useFavoritesData } from "@/hooks/useFavoritesData";
+import { useReviewsData } from "@/hooks/useReviewsData";
+import { useServiceStructureData } from "@/hooks/useServiceStructureData";
+import { useServiceData, useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice, calcDays, todayISO } from "@/lib/formatters";
+import { toServiceCardData } from "@/lib/serviceAdapter";
+import { stripMarkdownToText } from "@/lib/textSanitizers";
+import type { Service } from "@/types/service";
+import NotFoundPage from "../NotFoundPage";
+import "./ServiceDetailPage.css";
+
+function toPositiveNumber(value: unknown): number | undefined {
+    if (typeof value === "number" && value > 0) {
+        return value;
+    }
+
+    if (typeof value === "string" && value.trim() !== "") {
+        const parsed = Number(value);
+
+        if (!Number.isNaN(parsed) && parsed > 0) {
+            return parsed;
+        }
+    }
+
+    return undefined;
+}
+
+function getFareHarborPriceStatus(service: Service): string | undefined {
+    const fareHarbor = service.extraData?.fareharbor;
+    const explicitStatus = fareHarbor?.priceStatus;
+
+    if (
+        explicitStatus === "KNOWN" ||
+        explicitStatus === "DEPOSIT_ONLY" ||
+        explicitStatus === "UNKNOWN"
+    ) {
+        return explicitStatus;
+    }
+
+    const rawDepositRequired =
+        fareHarbor?.isDepositRequired ??
+        (fareHarbor?.raw &&
+        typeof fareHarbor.raw === "object" &&
+        fareHarbor.raw !== null
+            ? (fareHarbor.raw as Record<string, unknown>).is_deposit_required
+            : undefined);
+    const isDepositRequired =
+        rawDepositRequired === true || rawDepositRequired === "true";
+
+    if (service.clientPrice > 0) {
+        return "KNOWN";
+    }
+
+    if (
+        isDepositRequired &&
+        typeof getFareHarborDepositAmount(service) === "number"
+    ) {
+        return "DEPOSIT_ONLY";
+    }
+
+    return undefined;
+}
+
+function getFareHarborDepositAmount(service: Service): number | undefined {
+    const fareHarbor = service.extraData?.fareharbor;
+    const depositAmount = toPositiveNumber(fareHarbor?.depositAmount);
+
+    if (depositAmount !== undefined) {
+        return depositAmount;
+    }
+
+    const depositAmountEur = toPositiveNumber(fareHarbor?.depositAmountEur);
+
+    if (depositAmountEur !== undefined) {
+        return depositAmountEur;
+    }
+
+    const rawDepositOffset =
+        fareHarbor?.raw &&
+        typeof fareHarbor.raw === "object" &&
+        fareHarbor.raw !== null
+            ? toPositiveNumber(
+                  (fareHarbor.raw as Record<string, unknown>).deposit_offset,
+              )
+            : undefined;
+
+    return rawDepositOffset !== undefined
+        ? +(rawDepositOffset / 100).toFixed(2)
+        : undefined;
+}
+
+function getFareHarborDepositCurrency(service: Service): string {
+    return service.extraData?.fareharbor?.processorCurrency || service.currency;
+}
+
+function cleanRichText(value: string): string {
+    return stripMarkdownToText(value)
+        .replace(/^\s*[-*+]\s+/gm, "• ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+}
+
+function renderInlineMarkdown(text: string): React.ReactNode[] {
+    const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g);
+
+    return tokens.filter(Boolean).map((token, index) => {
+        if (token.startsWith("`") && token.endsWith("`")) {
+            return (
+                <code key={index} className="wdr-detail__inline-code">
+                    {token.slice(1, -1)}
+                </code>
+            );
+        }
+
+        if (token.startsWith("**") && token.endsWith("**")) {
+            return <strong key={index}>{token.slice(2, -2)}</strong>;
+        }
+
+        if (token.startsWith("*") && token.endsWith("*")) {
+            return <em key={index}>{token.slice(1, -1)}</em>;
+        }
+
+        return <React.Fragment key={index}>{token}</React.Fragment>;
+    });
+}
+
+function renderDescriptionBlocks(value: string): React.ReactNode[] {
+    const lines = value.replace(/\r\n/g, "\n").split("\n");
+    const blocks: React.ReactNode[] = [];
+    let index = 0;
+
+    while (index < lines.length) {
+        const currentLine = lines[index].trim();
+
+        if (!currentLine) {
+            index += 1;
+            continue;
+        }
+
+        const headingMatch = currentLine.match(/^(#{1,6})\s*(.+)$/);
+        if (headingMatch) {
+            const level = headingMatch[1].length;
+
+            blocks.push(
+                <div
+                    key={`heading-${index}`}
+                    className={`wdr-detail__description-heading wdr-detail__description-heading--h${level}`}
+                >
+                    {renderInlineMarkdown(headingMatch[2].trim())}
+                </div>,
+            );
+            index += 1;
+            continue;
+        }
+
+        if (/^[-*]\s+/.test(currentLine)) {
+            const items: React.ReactNode[] = [];
+
+            while (
+                index < lines.length &&
+                /^[-*]\s+/.test(lines[index].trim())
+            ) {
+                items.push(
+                    <li key={`ul-item-${index}`}>
+                        {renderInlineMarkdown(
+                            lines[index].trim().replace(/^[-*]\s+/, ""),
+                        )}
+                    </li>,
+                );
+                index += 1;
+            }
+
+            blocks.push(
+                <ul
+                    key={`ul-${index}`}
+                    className="wdr-detail__description-list"
+                >
+                    {items}
+                </ul>,
+            );
+            continue;
+        }
+
+        if (/^\d+\.\s+/.test(currentLine)) {
+            const items: React.ReactNode[] = [];
+
+            while (
+                index < lines.length &&
+                /^\d+\.\s+/.test(lines[index].trim())
+            ) {
+                items.push(
+                    <li key={`ol-item-${index}`}>
+                        {renderInlineMarkdown(
+                            lines[index].trim().replace(/^\d+\.\s+/, ""),
+                        )}
+                    </li>,
+                );
+                index += 1;
+            }
+
+            blocks.push(
+                <ol
+                    key={`ol-${index}`}
+                    className="wdr-detail__description-list"
+                >
+                    {items}
+                </ol>,
+            );
+            continue;
+        }
+
+        if (/^>\s?/.test(currentLine)) {
+            const quoteLines: string[] = [];
+
+            while (index < lines.length && /^>\s?/.test(lines[index].trim())) {
+                quoteLines.push(lines[index].trim().replace(/^>\s?/, ""));
+                index += 1;
+            }
+
+            blocks.push(
+                <blockquote
+                    key={`quote-${index}`}
+                    className="wdr-detail__description-quote"
+                >
+                    {renderInlineMarkdown(quoteLines.join(" "))}
+                </blockquote>,
+            );
+            continue;
+        }
+
+        const paragraphLines: string[] = [];
+
+        while (index < lines.length) {
+            const line = lines[index].trim();
+
+            if (
+                !line ||
+                /^(#{1,6})\s*/.test(line) ||
+                /^[-*]\s+/.test(line) ||
+                /^\d+\.\s+/.test(line) ||
+                /^>\s?/.test(line)
+            ) {
+                break;
+            }
+
+            paragraphLines.push(line);
+            index += 1;
+        }
+
+        const paragraph = cleanRichText(paragraphLines.join("\n"));
+
+        if (paragraph) {
+            blocks.push(
+                <p
+                    key={`paragraph-${index}`}
+                    className="wdr-detail__description-block"
+                >
+                    {renderInlineMarkdown(paragraph)}
+                </p>,
+            );
+        }
+    }
+
+    return blocks;
+}
+
+function getLocationLabel(service: Service): string {
+    return [service.location.city, service.location.country]
+        .filter((value) => Boolean(value && value.trim()))
+        .join(", ");
+}
+
+function getCategoryLabel(
+    category: Service["category"],
+    locale: string,
+): string {
+    switch (category) {
+        case "ACTIVITE":
+            return locale === "en"
+                ? "Activity"
+                : locale === "pt"
+                  ? "Atividade"
+                  : locale === "es"
+                    ? "Actividad"
+                    : locale === "it"
+                      ? "Attivita"
+                      : locale === "de"
+                        ? "Aktivitat"
+                        : "Activité";
+        case "BATEAU":
+            return locale === "en"
+                ? "Boat"
+                : locale === "pt"
+                  ? "Barco"
+                  : locale === "es"
+                    ? "Barco"
+                    : locale === "it"
+                      ? "Barca"
+                      : locale === "de"
+                        ? "Boot"
+                        : "Bateau";
+        case "HEBERGEMENT":
+            return locale === "en"
+                ? "Stay"
+                : locale === "pt"
+                  ? "Alojamento"
+                  : locale === "es"
+                    ? "Alojamiento"
+                    : locale === "it"
+                      ? "Alloggio"
+                      : locale === "de"
+                        ? "Unterkunft"
+                        : "Hébergement";
+        case "VOITURE":
+            return locale === "en"
+                ? "Car"
+                : locale === "pt"
+                  ? "Carro"
+                  : locale === "es"
+                    ? "Coche"
+                    : locale === "it"
+                      ? "Auto"
+                      : locale === "de"
+                        ? "Auto"
+                        : "Voiture";
+    }
+}
 
 // ============================================================
 // Sous-composants de la galerie d'images
@@ -46,7 +370,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title }) => {
     const prev = () => setSelectedIndex((i) => (i - 1 + total) % total);
     const next = () => setSelectedIndex((i) => (i + 1) % total);
 
-    const selected = images[selectedIndex] ?? '';
+    const selected = images[selectedIndex] ?? "";
 
     return (
         <div className="wdr-detail__gallery">
@@ -75,7 +399,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title }) => {
                             type="button"
                             className="wdr-detail__gallery-btn wdr-detail__gallery-btn--prev"
                             onClick={prev}
-                            aria-label={t('service.gallery_prev')}
+                            aria-label={t("service.gallery_prev")}
                         >
                             <svg
                                 width="20"
@@ -94,7 +418,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title }) => {
                             type="button"
                             className="wdr-detail__gallery-btn wdr-detail__gallery-btn--next"
                             onClick={next}
-                            aria-label={t('service.gallery_next')}
+                            aria-label={t("service.gallery_next")}
                         >
                             <svg
                                 width="20"
@@ -118,18 +442,18 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title }) => {
                 <div
                     className="wdr-detail__gallery-thumbs"
                     role="tablist"
-                    aria-label={t('service.gallery_thumbs')}
+                    aria-label={t("service.gallery_thumbs")}
                 >
                     {images.map((src, idx) => (
                         <button
                             key={src}
                             type="button"
                             role="tab"
-                            className={`wdr-detail__gallery-thumb ${idx === selectedIndex ? 'wdr-detail__gallery-thumb--active' : ''}`}
+                            className={`wdr-detail__gallery-thumb ${idx === selectedIndex ? "wdr-detail__gallery-thumb--active" : ""}`}
                             onClick={() => setSelectedIndex(idx)}
                             aria-selected={idx === selectedIndex}
-                            aria-label={t('service.gallery_show_photo').replace(
-                                '{index}',
+                            aria-label={t("service.gallery_show_photo").replace(
+                                "{index}",
                                 String(idx + 1),
                             )}
                         >
@@ -148,7 +472,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title }) => {
 
 interface CheckListProps {
     items: string[];
-    type: 'included' | 'excluded';
+    type: "included" | "excluded";
 }
 
 const CheckList: React.FC<CheckListProps> = ({ items, type }) => (
@@ -167,7 +491,7 @@ const CheckList: React.FC<CheckListProps> = ({ items, type }) => (
                     strokeLinejoin="round"
                     aria-hidden="true"
                 >
-                    {type === 'included' ? (
+                    {type === "included" ? (
                         <polyline points="20 6 9 17 4 12" />
                     ) : (
                         <>
@@ -196,16 +520,16 @@ const StarRating: React.FC<{ rating: number; count: number }> = ({
     return (
         <div
             className="wdr-detail__rating"
-            aria-label={t('service.rating_label')
-                .replace('{rating}', rating.toFixed(1))
-                .replace('{count}', String(count))}
+            aria-label={t("service.rating_label")
+                .replace("{rating}", rating.toFixed(1))
+                .replace("{count}", String(count))}
         >
             {Array.from({ length: 5 }, (_, i) => (
                 <svg
                     key={i}
-                    className={`wdr-detail__star ${i < filled ? 'wdr-detail__star--filled' : 'wdr-detail__star--empty'}`}
+                    className={`wdr-detail__star ${i < filled ? "wdr-detail__star--filled" : "wdr-detail__star--empty"}`}
                     viewBox="0 0 24 24"
-                    fill={i < filled ? 'currentColor' : 'none'}
+                    fill={i < filled ? "currentColor" : "none"}
                     stroke="currentColor"
                     strokeWidth={i < filled ? 0 : 1.5}
                     width="18"
@@ -219,7 +543,7 @@ const StarRating: React.FC<{ rating: number; count: number }> = ({
                 {rating.toFixed(1)}
             </span>
             <span className="wdr-detail__rating-count">
-                {t('service.reviews_count').replace('{count}', String(count))}
+                {t("service.reviews_count").replace("{count}", String(count))}
             </span>
         </div>
     );
@@ -236,7 +560,7 @@ interface BookingPanelProps {
         name: string;
         description?: string;
         defaultPrice: number;
-        inputType: 'CHECKBOX' | 'REQUIRED';
+        inputType: "CHECKBOX" | "REQUIRED";
     }>;
 }
 
@@ -246,25 +570,44 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
 }) => {
     const { error } = useToast();
     const { navigate } = useRouter();
+    const { currentUser } = useUser();
     const { initDraft } = useBooking();
     const { t } = useTranslation();
     const today = todayISO();
+    const priceStatus = getFareHarborPriceStatus(service);
+    const depositAmount = getFareHarborDepositAmount(service);
+    const depositCurrency = getFareHarborDepositCurrency(service);
+    const showImportedPriceFallback = service.clientPrice <= 0;
+    const showDepositOnlyPrice =
+        priceStatus === "DEPOSIT_ONLY" &&
+        typeof depositAmount === "number" &&
+        depositAmount > 0;
+    const depositDisplay = showDepositOnlyPrice
+        ? formatPrice(depositAmount, depositCurrency)
+        : "";
+    const depositOnlySummary = showDepositOnlyPrice
+        ? t("service.external_deposit_only_summary").replace(
+              "{amount}",
+              depositDisplay,
+          )
+        : "";
+    const canReserve = !showImportedPriceFallback;
 
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
-    const [timeSlot, setTimeSlot] = useState('');
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [timeSlot, setTimeSlot] = useState("");
     const [selectedOptionalExtraIds, setSelectedOptionalExtraIds] = useState<
         string[]
     >([]);
     const [participants, setParticipants] = useState(
-        service.category === 'ACTIVITE' ? service.minParticipants : 1,
+        service.category === "ACTIVITE" ? service.minParticipants : 1,
     );
     const requiredExtras = useMemo(
-        () => serviceExtras.filter((extra) => extra.inputType === 'REQUIRED'),
+        () => serviceExtras.filter((extra) => extra.inputType === "REQUIRED"),
         [serviceExtras],
     );
     const optionalExtras = useMemo(
-        () => serviceExtras.filter((extra) => extra.inputType === 'CHECKBOX'),
+        () => serviceExtras.filter((extra) => extra.inputType === "CHECKBOX"),
         [serviceExtras],
     );
     const selectedBaseExtras = useMemo(
@@ -297,10 +640,9 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
         [selectedBaseExtras],
     );
     const extrasCommissionTotal = 0;
-    const extrasTotal = +selectedExtras.reduce(
-        (sum, extra) => sum + extra.totalPrice,
-        0,
-    ).toFixed(2);
+    const extrasTotal = +selectedExtras
+        .reduce((sum, extra) => sum + extra.totalPrice, 0)
+        .toFixed(2);
 
     const toggleOptionalExtra = (extraId: string) => {
         setSelectedOptionalExtraIds((current) =>
@@ -318,7 +660,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
      *   VOITURE      : clientPrice * jours
      */
     const totalPrice = useMemo(() => {
-        if (service.category === 'ACTIVITE') {
+        if (service.category === "ACTIVITE") {
             return service.clientPrice * participants + extrasTotal;
         }
 
@@ -334,46 +676,58 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
     /** Libelle de l'unite de prix */
     const priceUnitLabel = useMemo(() => {
         switch (service.pricingUnit) {
-            case 'PAR_PERSONNE':
-                return '/ pers.';
-            case 'PAR_GROUPE':
-                return '/ groupe';
-            case 'PAR_JOUR':
-                return '/ jour';
-            case 'PAR_NUIT':
-                return '/ nuit';
-            case 'PAR_SEMAINE':
-                return '/ semaine';
-            case 'PAR_DEMI_JOURNEE':
-                return '/ demi-journee';
+            case "PAR_PERSONNE":
+                return t("service.pricing_unit.person");
+            case "PAR_GROUPE":
+                return t("service.pricing_unit.group");
+            case "PAR_JOUR":
+                return t("service.pricing_unit.day");
+            case "PAR_NUIT":
+                return t("service.pricing_unit.night");
+            case "PAR_SEMAINE":
+                return t("service.pricing_unit.week");
+            case "PAR_DEMI_JOURNEE":
+                return t("service.pricing_unit.half_day");
             default:
-                return '';
+                return "";
         }
-    }, [service.pricingUnit]);
+    }, [service.pricingUnit, t]);
 
     /** Validation simple avant soumission */
     const handleReserve = () => {
-        if (service.category === 'ACTIVITE') {
+        if (!currentUser || currentUser.role !== "CLIENT") {
+            navigate({ name: "login" });
+
+            return;
+        }
+
+        if (!canReserve) {
+            error(t("service.external_price_unavailable"));
+
+            return;
+        }
+
+        if (service.category === "ACTIVITE") {
             if (!dateFrom) {
-                error(t('service.booking.error.select_date'));
+                error(t("service.booking.error.select_date"));
 
                 return;
             }
 
             if (!timeSlot && service.schedule.startTimes.length > 0) {
-                error(t('service.booking.error.select_slot'));
+                error(t("service.booking.error.select_slot"));
 
                 return;
             }
         } else {
             if (!dateFrom || !dateTo) {
-                error(t('service.booking.error.select_dates'));
+                error(t("service.booking.error.select_dates"));
 
                 return;
             }
 
             if (daysCount <= 0) {
-                error(t('service.booking.error.invalid_dates'));
+                error(t("service.booking.error.invalid_dates"));
 
                 return;
             }
@@ -395,7 +749,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
          *   => partnerTotal + commissionTotal = clientTotal  ✓
          */
         const units =
-            service.category === 'ACTIVITE' ? participants : daysCount;
+            service.category === "ACTIVITE" ? participants : daysCount;
 
         const partnerTotal = service.partnerPrice * units + extrasPartnerTotal;
         const commissionTotal =
@@ -406,10 +760,10 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
         let amountDueOnline: number;
         let amountDueOnSite: number;
 
-        if (service.paymentMode === 'FULL_CASH_ON_SITE') {
+        if (service.paymentMode === "FULL_CASH_ON_SITE") {
             amountDueOnline = 0;
             amountDueOnSite = clientTotal;
-        } else if (service.paymentMode === 'COMMISSION_ONLINE_REST_ON_SITE') {
+        } else if (service.paymentMode === "COMMISSION_ONLINE_REST_ON_SITE") {
             amountDueOnline = commissionTotal;
             amountDueOnSite = partnerTotal;
         } else {
@@ -436,20 +790,64 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
             extrasTotal,
         });
 
-        navigate({ name: 'cart' });
+        navigate({ name: "cart" });
     };
 
     return (
         <div className="wdr-detail__booking-panel">
             {/* Prix de base */}
             <div className="wdr-detail__booking-price">
-                <span className="wdr-detail__booking-amount">
-                    {formatPrice(service.clientPrice, service.currency)}
-                </span>
-                <span className="wdr-detail__booking-unit">
-                    {priceUnitLabel}
-                </span>
+                {showDepositOnlyPrice ? (
+                    <>
+                        <span className="wdr-detail__booking-label-chip">
+                            {t("service.external_price_total_label")}
+                        </span>
+                        <span className="wdr-detail__booking-amount wdr-detail__booking-amount--external">
+                            {t("service.external_price_total_unknown")}
+                        </span>
+                    </>
+                ) : showImportedPriceFallback ? (
+                    <>
+                        <span className="wdr-detail__booking-label-chip">
+                            {t("service.external_price_label")}
+                        </span>
+                        <span className="wdr-detail__booking-amount wdr-detail__booking-amount--external">
+                            {t("service.external_price_unavailable")}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <span className="wdr-detail__booking-amount">
+                            {formatPrice(service.clientPrice, service.currency)}
+                        </span>
+                        <span className="wdr-detail__booking-unit">
+                            {priceUnitLabel}
+                        </span>
+                    </>
+                )}
             </div>
+
+            {showDepositOnlyPrice && (
+                    <div className="wdr-detail__booking-external-meta">
+                        <div className="wdr-detail__booking-external-row">
+                            <span className="wdr-detail__booking-external-label">
+                                {t("service.deposit")}
+                            </span>
+                        <strong className="wdr-detail__booking-external-value">
+                            {depositDisplay}
+                        </strong>
+                        </div>
+                        <p className="wdr-detail__booking-external-note">
+                            {depositOnlySummary}
+                        </p>
+                        <p className="wdr-detail__booking-external-note">
+                            {t("service.external_price_not_provided")}
+                        </p>
+                        <p className="wdr-detail__booking-external-note">
+                            {t("service.external_price_confirmed_partner")}
+                        </p>
+                </div>
+            )}
 
             {/* Note rapide */}
             {service.rating !== undefined && (
@@ -462,8 +860,8 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                     </span>
                     <strong>{service.rating.toFixed(1)}</strong>
                     <span>
-                        {t('service.reviews_count').replace(
-                            '{count}',
+                        {t("service.reviews_count").replace(
+                            "{count}",
                             String(service.reviewCount),
                         )}
                     </span>
@@ -474,7 +872,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
 
             {/* Formulaire : champs selon la categorie */}
             <div className="wdr-detail__booking-form">
-                {service.category === 'ACTIVITE' ? (
+                {service.category === "ACTIVITE" ? (
                     <>
                         {/* Date de l'activite */}
                         <div className="wdr-detail__booking-field">
@@ -482,7 +880,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                 htmlFor="booking-date"
                                 className="wdr-detail__booking-label"
                             >
-                                {t('service.booking.date_activity')}
+                                {t("service.booking.date_activity")}
                             </label>
                             <input
                                 id="booking-date"
@@ -501,7 +899,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                     htmlFor="booking-time"
                                     className="wdr-detail__booking-label"
                                 >
-                                    {t('service.booking.time_slot')}
+                                    {t("service.booking.time_slot")}
                                 </label>
                                 <select
                                     id="booking-time"
@@ -512,7 +910,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                     }
                                 >
                                     <option value="">
-                                        {t('service.booking.choose_slot')}
+                                        {t("service.booking.choose_slot")}
                                     </option>
                                     {service.schedule.startTimes.map((t) => (
                                         <option key={t} value={t}>
@@ -529,13 +927,13 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                 htmlFor="booking-participants"
                                 className="wdr-detail__booking-label"
                             >
-                                {t('service.booking.participants')
+                                {t("service.booking.participants")
                                     .replace(
-                                        '{min}',
+                                        "{min}",
                                         String(service.minParticipants),
                                     )
                                     .replace(
-                                        '{max}',
+                                        "{max}",
                                         String(service.maxParticipants),
                                     )}
                             </label>
@@ -552,7 +950,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                         )
                                     }
                                     aria-label={t(
-                                        'service.booking.decrease_participants',
+                                        "service.booking.decrease_participants",
                                     )}
                                     disabled={
                                         participants <= service.minParticipants
@@ -579,7 +977,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                         )
                                     }
                                     aria-label={t(
-                                        'service.booking.increase_participants',
+                                        "service.booking.increase_participants",
                                     )}
                                     disabled={
                                         participants >= service.maxParticipants
@@ -598,9 +996,9 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                 htmlFor="booking-checkin"
                                 className="wdr-detail__booking-label"
                             >
-                                {service.category === 'HEBERGEMENT'
-                                    ? t('service.check_in')
-                                    : t('service.booking.pickup')}
+                                {service.category === "HEBERGEMENT"
+                                    ? t("service.check_in")
+                                    : t("service.booking.pickup")}
                             </label>
                             <input
                                 id="booking-checkin"
@@ -612,8 +1010,8 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                                     setDateFrom(e.target.value);
 
                                     if (dateTo && dateTo <= e.target.value) {
-setDateTo('');
-}
+                                        setDateTo("");
+                                    }
                                 }}
                             />
                         </div>
@@ -623,9 +1021,9 @@ setDateTo('');
                                 htmlFor="booking-checkout"
                                 className="wdr-detail__booking-label"
                             >
-                                {service.category === 'HEBERGEMENT'
-                                    ? t('service.check_out')
-                                    : t('service.booking.return')}
+                                {service.category === "HEBERGEMENT"
+                                    ? t("service.check_out")
+                                    : t("service.booking.return")}
                             </label>
                             <input
                                 id="booking-checkout"
@@ -643,14 +1041,14 @@ setDateTo('');
                                 className="wdr-detail__booking-duration"
                                 aria-live="polite"
                             >
-                                {daysCount}{' '}
-                                {service.category === 'HEBERGEMENT'
+                                {daysCount}{" "}
+                                {service.category === "HEBERGEMENT"
                                     ? daysCount === 1
-                                        ? t('service.booking.night_one')
-                                        : t('service.booking.night_other')
+                                        ? t("service.booking.night_one")
+                                        : t("service.booking.night_other")
                                     : daysCount === 1
-                                      ? t('service.booking.day_one')
-                                      : t('service.booking.day_other')}
+                                      ? t("service.booking.day_one")
+                                      : t("service.booking.day_other")}
                             </p>
                         )}
                     </>
@@ -659,7 +1057,7 @@ setDateTo('');
                 {serviceExtras.length > 0 && (
                     <div className="wdr-detail__booking-field">
                         <label className="wdr-detail__booking-label">
-                            {t('service.booking.extras')}
+                            {t("service.booking.extras")}
                         </label>
                         <div className="wdr-detail__booking-extras">
                             {requiredExtras.map((extra) => (
@@ -672,7 +1070,7 @@ setDateTo('');
                                         {extra.name}
                                         {extra.description
                                             ? ` - ${extra.description}`
-                                            : ''}
+                                            : ""}
                                     </span>
                                     <strong>
                                         {formatPrice(
@@ -701,7 +1099,7 @@ setDateTo('');
                                         {extra.name}
                                         {extra.description
                                             ? ` - ${extra.description}`
-                                            : ''}
+                                            : ""}
                                     </span>
                                     <strong>
                                         {formatPrice(
@@ -721,7 +1119,7 @@ setDateTo('');
 
             {/* Total */}
             <div className="wdr-detail__booking-total">
-                <span>{t('service.booking.total')}</span>
+                <span>{t("service.booking.total")}</span>
                 <strong className="wdr-detail__booking-total-amount">
                     {formatPrice(totalPrice, service.currency)}
                 </strong>
@@ -732,13 +1130,14 @@ setDateTo('');
                 variant="primary"
                 size="lg"
                 fullWidth
+                disabled={!canReserve}
                 onClick={handleReserve}
             >
-                {t('service.booking.reserve')}
+                {t("service.booking.reserve")}
             </Button>
 
             <p className="wdr-detail__booking-note">
-                {t('service.booking.note')}
+                {t("service.booking.note")}
             </p>
         </div>
     );
@@ -750,28 +1149,33 @@ setDateTo('');
 
 interface ServiceDetailPageProps {
     id: string;
+    serviceExists?: boolean;
 }
 
-export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({ id }) => {
+export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
+    id,
+    serviceExists,
+}) => {
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const queryClient = useQueryClient();
-    const { t, intlLocale } = useTranslation();
+    const { t, intlLocale, locale } = useTranslation();
 
-    const { service: apiService } = useServiceData(id);
+    const { service: apiService, isLoading, isFetched, isNotFound } =
+        useServiceData(id);
     const service = apiService ?? null;
     const { services } = useServicesData(
         service ? { category: service.category } : undefined,
     );
     const { favorites } = useFavoritesData(
-        currentUser?.role === 'CLIENT' ? currentUser.id : '',
+        currentUser?.role === "CLIENT" ? currentUser.id : "",
     );
 
     // Services similaires (meme categorie, maximum 3)
     const similarServices = useMemo(() => {
         if (!service) {
-return [];
-}
+            return [];
+        }
 
         return services
             .filter(
@@ -785,7 +1189,7 @@ return [];
     const { availabilities } = useAvailabilityData(id);
     const { categories: structureCategories } = useServiceStructureData();
     const isFavorite = useMemo(() => {
-        if (!currentUser || currentUser.role !== 'CLIENT') {
+        if (!currentUser || currentUser.role !== "CLIENT") {
             return false;
         }
 
@@ -793,8 +1197,8 @@ return [];
     }, [currentUser, favorites, id]);
 
     const toggleFavorite = async () => {
-        if (!currentUser || currentUser.role !== 'CLIENT') {
-            navigate({ name: 'login' });
+        if (!currentUser || currentUser.role !== "CLIENT") {
+            navigate({ name: "login" });
 
             return;
         }
@@ -806,27 +1210,46 @@ return [];
         }
 
         await queryClient.invalidateQueries({
-            queryKey: ['favorites', currentUser.id],
+            queryKey: ["favorites", currentUser.id],
         });
     };
 
-    // --- Service introuvable ---
-    if (!service) {
+    const shouldShowLoading =
+        Boolean(id) &&
+        (isLoading || (!service && !isFetched && serviceExists !== false));
+    const shouldShowNotFound =
+        !shouldShowLoading && !service && (serviceExists === false || isNotFound);
+
+    if (shouldShowLoading) {
         return (
-            <div className="wdr-detail__not-found">
-                <h1>{t('service.not_found_title')}</h1>
-                <p>{t('service.not_found_desc')}</p>
-                <Button
-                    variant="primary"
-                    onClick={() => navigate({ name: 'home' })}
-                >
-                    {t('common.back_home')}
-                </Button>
+            <div className="wdr-detail__loading" aria-busy="true">
+                <div className="wdr-detail__loading-shell">
+                    <div className="wdr-detail__loading-breadcrumb" />
+                    <div className="wdr-detail__loading-gallery" />
+                    <div className="wdr-detail__loading-layout">
+                        <div className="wdr-detail__loading-main">
+                            <div className="wdr-detail__loading-line wdr-detail__loading-line--title" />
+                            <div className="wdr-detail__loading-line wdr-detail__loading-line--meta" />
+                            <div className="wdr-detail__loading-line" />
+                            <div className="wdr-detail__loading-line" />
+                            <div className="wdr-detail__loading-line wdr-detail__loading-line--short" />
+                        </div>
+                        <div className="wdr-detail__loading-panel" />
+                    </div>
+                </div>
             </div>
         );
     }
 
-    const categoryLabel = ServiceCategoryLabels[service.category];
+    if (shouldShowNotFound) {
+        return <NotFoundPage />;
+    }
+
+    if (!service) {
+        return null;
+    }
+
+    const categoryLabel = getCategoryLabel(service.category, locale);
     const selectedStructureCategory =
         structureCategories.find(
             (entry) => entry.id === service.serviceCategoryId,
@@ -838,8 +1261,11 @@ return [];
         ]),
     );
     const dynamicAttributes = Object.entries(
-        (service.extraData?.attributes as Record<string, string | boolean>) ?? {},
-    ).filter(([, value]) => value !== '' && value !== false && value != null);
+        (service.extraData?.attributes as Record<string, string | boolean>) ??
+            {},
+    ).filter(([, value]) => value !== "" && value !== false && value != null);
+    const locationLabel = getLocationLabel(service);
+    const descriptionBlocks = renderDescriptionBlocks(service.description);
     const serviceExtras = (selectedStructureCategory?.extras ?? []).filter(
         (extra) => extra.isActive,
     );
@@ -852,11 +1278,11 @@ return [];
                           title: service.title,
                           latitude: service.location.coordinates.latitude,
                           longitude: service.location.coordinates.longitude,
-                          subtitle: `${service.location.city}, ${service.location.country}`,
+                          subtitle: locationLabel,
                       },
                   ]
                 : [],
-        [service],
+        [locationLabel, service],
     );
 
     return (
@@ -866,15 +1292,15 @@ return [];
           ============================================================ */}
             <nav
                 className="wdr-detail__breadcrumb"
-                aria-label={t('service.breadcrumb')}
+                aria-label={t("service.breadcrumb")}
             >
                 <div className="wdr-detail__breadcrumb-inner">
                     <button
                         type="button"
                         className="wdr-detail__breadcrumb-link"
-                        onClick={() => navigate({ name: 'home' })}
+                        onClick={() => navigate({ name: "home" })}
                     >
-                        {t('nav.home')}
+                        {t("nav.home")}
                     </button>
                     <span aria-hidden="true">/</span>
                     <button
@@ -882,11 +1308,11 @@ return [];
                         className="wdr-detail__breadcrumb-link"
                         onClick={() =>
                             navigate({
-                                name: 'search',
-                                query: '',
+                                name: "search",
+                                query: "",
                                 category: service.category,
-                                dateFrom: '',
-                                dateTo: '',
+                                dateFrom: "",
+                                dateTo: "",
                             })
                         }
                     >
@@ -918,29 +1344,31 @@ return [];
                     {/* En-tete du service */}
                     <header className="wdr-detail__service-header">
                         <div className="wdr-detail__service-header-top">
-                            <span className="wdr-detail__category-badge">
-                                {categoryLabel}
-                            </span>
+                            <div className="wdr-detail__service-badges">
+                                <span className="wdr-detail__category-badge">
+                                    {categoryLabel}
+                                </span>
+                            </div>
                             <button
                                 type="button"
-                                className={`wdr-detail__fav-btn ${isFavorite ? 'wdr-detail__fav-btn--active' : ''}`}
+                                className={`wdr-detail__fav-btn ${isFavorite ? "wdr-detail__fav-btn--active" : ""}`}
                                 onClick={toggleFavorite}
                                 aria-label={
                                     isFavorite
-                                        ? t('service.favorite_remove')
-                                        : t('service.favorite_add')
+                                        ? t("service.favorite_remove")
+                                        : t("service.favorite_add")
                                 }
                                 title={
                                     isFavorite
-                                        ? t('service.favorite_remove')
-                                        : t('service.favorite_add')
+                                        ? t("service.favorite_remove")
+                                        : t("service.favorite_add")
                                 }
                             >
                                 <svg
                                     width="20"
                                     height="20"
                                     viewBox="0 0 24 24"
-                                    fill={isFavorite ? 'currentColor' : 'none'}
+                                    fill={isFavorite ? "currentColor" : "none"}
                                     stroke="currentColor"
                                     strokeWidth="2"
                                     strokeLinecap="round"
@@ -960,27 +1388,28 @@ return [];
                                     count={service.reviewCount}
                                 />
                             )}
-                            <address
-                                className="wdr-detail__location"
-                                aria-label={t('service.location')}
-                            >
-                                <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
+                            {locationLabel && (
+                                <address
+                                    className="wdr-detail__location"
+                                    aria-label={t("service.location")}
                                 >
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                {service.location.city},{' '}
-                                {service.location.country}
-                            </address>
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    {locationLabel}
+                                </address>
+                            )}
                         </div>
                     </header>
 
@@ -993,11 +1422,15 @@ return [];
                             id="desc-heading"
                             className="wdr-detail__section-title"
                         >
-                            {t('service.description')}
+                            {t("service.description")}
                         </h2>
-                        <p className="wdr-detail__description">
-                            {service.description}
-                        </p>
+                        <div className="wdr-detail__description">
+                            {descriptionBlocks.map((block, index) => (
+                                <React.Fragment key={index}>
+                                    {block}
+                                </React.Fragment>
+                            ))}
+                        </div>
                     </section>
 
                     {mapMarkers.length > 0 && (
@@ -1010,7 +1443,7 @@ return [];
                                     id="map-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.location')}
+                                    {t("service.location")}
                                 </h2>
                                 <a
                                     className="wdr-detail__map-link"
@@ -1018,7 +1451,7 @@ return [];
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    OpenStreetMap
+                                    {t("service.map_open")}
                                 </a>
                             </div>
                             <GeoMap
@@ -1040,32 +1473,37 @@ return [];
                                 id="dynamic-heading"
                                 className="wdr-detail__section-title"
                             >
-                                {t('service.features')}
+                                {t("service.features")}
                             </h2>
                             <dl className="wdr-detail__info-grid">
                                 {service.serviceCategoryName && (
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.detail_category')}</dt>
+                                        <dt>{t("service.detail_category")}</dt>
                                         <dd>{service.serviceCategoryName}</dd>
                                     </div>
                                 )}
                                 {service.serviceSubcategoryName && (
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.subcategory')}</dt>
-                                        <dd>{service.serviceSubcategoryName}</dd>
+                                        <dt>{t("service.subcategory")}</dt>
+                                        <dd>
+                                            {service.serviceSubcategoryName}
+                                        </dd>
                                     </div>
                                 )}
                                 {dynamicAttributes.map(([key, value]) => (
-                                    <div key={key} className="wdr-detail__info-item">
+                                    <div
+                                        key={key}
+                                        className="wdr-detail__info-item"
+                                    >
                                         <dt>
                                             {dynamicAttributeLabels.get(key) ??
-                                                key.replaceAll('_', ' ')}
+                                                key.replaceAll("_", " ")}
                                         </dt>
                                         <dd>
-                                            {typeof value === 'boolean'
+                                            {typeof value === "boolean"
                                                 ? value
-                                                    ? t('service.yes')
-                                                    : t('service.no')
+                                                    ? t("service.yes")
+                                                    : t("service.no")
                                                 : String(value)}
                                         </dd>
                                     </div>
@@ -1083,7 +1521,7 @@ return [];
                                 id="extras-heading"
                                 className="wdr-detail__section-title"
                             >
-                                {t('service.extras_available')}
+                                {t("service.extras_available")}
                             </h2>
                             <dl className="wdr-detail__info-grid">
                                 {serviceExtras.map((extra) => (
@@ -1095,7 +1533,7 @@ return [];
                                         <dd>
                                             {extra.description
                                                 ? `${extra.description} - `
-                                                : ''}
+                                                : ""}
                                             {formatPrice(
                                                 extra.defaultPrice *
                                                     (1 +
@@ -1110,7 +1548,7 @@ return [];
                     )}
 
                     {/* Sections specifiques a la categorie */}
-                    {service.category === 'ACTIVITE' && (
+                    {service.category === "ACTIVITE" && (
                         <>
                             {/* Inclus */}
                             <section
@@ -1121,7 +1559,7 @@ return [];
                                     id="included-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.included')}
+                                    {t("service.included")}
                                 </h2>
                                 <CheckList
                                     items={service.included}
@@ -1138,7 +1576,7 @@ return [];
                                     id="excluded-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.excluded')}
+                                    {t("service.excluded")}
                                 </h2>
                                 <CheckList
                                     items={service.notIncluded}
@@ -1155,64 +1593,66 @@ return [];
                                     id="practical-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.practical_info')}
+                                    {t("service.practical_info")}
                                 </h2>
                                 <dl className="wdr-detail__info-grid">
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.meeting_point')}</dt>
+                                        <dt>{t("service.meeting_point")}</dt>
                                         <dd>{service.meetingPoint}</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.departure_times')}</dt>
+                                        <dt>{t("service.departure_times")}</dt>
                                         <dd>
                                             {service.schedule.startTimes.join(
-                                                ' - ',
+                                                " - ",
                                             )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.difficulty')}</dt>
+                                        <dt>{t("service.difficulty")}</dt>
                                         <dd>
                                             {service.difficulty.replace(
-                                                '_',
-                                                ' ',
+                                                "_",
+                                                " ",
                                             )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.participants')}</dt>
+                                        <dt>{t("service.participants")}</dt>
                                         <dd>
-                                            {service.minParticipants} -{' '}
+                                            {service.minParticipants} -{" "}
                                             {service.maxParticipants} personnes
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.minimum_age')}</dt>
+                                        <dt>{t("service.minimum_age")}</dt>
                                         <dd>{service.minAgeYears} ans</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.languages')}</dt>
+                                        <dt>{t("service.languages")}</dt>
                                         <dd>
                                             {service.languages
-                                                .join(', ')
+                                                .join(", ")
                                                 .toUpperCase()}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.group_type')}</dt>
+                                        <dt>{t("service.group_type")}</dt>
                                         <dd>
                                             {service.groupType.replace(
-                                                '_',
-                                                ' ',
+                                                "_",
+                                                " ",
                                             )}
                                         </dd>
                                     </div>
                                     {service.requiresMedicalClearance && (
                                         <div className="wdr-detail__info-item wdr-detail__info-item--alert">
-                                            <dt>{t('service.medical_clearance')}</dt>
+                                            <dt>
+                                                {t("service.medical_clearance")}
+                                            </dt>
                                             <dd>
                                                 {t(
-                                                    'service.medical_clearance_required',
+                                                    "service.medical_clearance_required",
                                                 )}
                                             </dd>
                                         </div>
@@ -1222,7 +1662,7 @@ return [];
                         </>
                     )}
 
-                    {service.category === 'BATEAU' && (
+                    {service.category === "BATEAU" && (
                         <>
                             {/* Amenagements */}
                             <section
@@ -1233,7 +1673,7 @@ return [];
                                     id="amenities-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.boats_amenities')}
+                                    {t("service.boats_amenities")}
                                 </h2>
                                 <CheckList
                                     items={service.amenities}
@@ -1250,49 +1690,55 @@ return [];
                                     id="specs-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.specifications')}
+                                    {t("service.specifications")}
                                 </h2>
                                 <dl className="wdr-detail__info-grid">
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.boat_type')}</dt>
+                                        <dt>{t("service.boat_type")}</dt>
                                         <dd>{service.boatType}</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.passengers')}</dt>
+                                        <dt>{t("service.passengers")}</dt>
                                         <dd>
-                                            {service.passengerCapacity}{' '}
-                                            personnes max.
-                                        </dd>
-                                    </div>
-                                    <div className="wdr-detail__info-item">
-                                        <dt>{t('service.berths')}</dt>
-                                        <dd>{service.sleepingBerths}</dd>
-                                    </div>
-                                    <div className="wdr-detail__info-item">
-                                        <dt>{t('service.length')}</dt>
-                                        <dd>{service.lengthMeters} m</dd>
-                                    </div>
-                                    <div className="wdr-detail__info-item">
-                                        <dt>{t('service.rental_mode')}</dt>
-                                        <dd>
-                                            {service.rentalMode.replace(
-                                                /_/g,
-                                                ' ',
+                                            {t("service.capacity_max").replace(
+                                                "{count}",
+                                                String(
+                                                    service.passengerCapacity,
+                                                ),
                                             )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.deposit')}</dt>
+                                        <dt>{t("service.berths")}</dt>
+                                        <dd>{service.sleepingBerths}</dd>
+                                    </div>
+                                    <div className="wdr-detail__info-item">
+                                        <dt>{t("service.length")}</dt>
+                                        <dd>{service.lengthMeters} m</dd>
+                                    </div>
+                                    <div className="wdr-detail__info-item">
+                                        <dt>{t("service.rental_mode")}</dt>
+                                        <dd>
+                                            {service.rentalMode.replace(
+                                                /_/g,
+                                                " ",
+                                            )}
+                                        </dd>
+                                    </div>
+                                    <div className="wdr-detail__info-item">
+                                        <dt>{t("service.deposit")}</dt>
                                         <dd>
                                             {formatPrice(
                                                 service.depositAmountEur,
-                                                'EUR',
+                                                "EUR",
                                             )}
                                         </dd>
                                     </div>
                                     {service.licenseRequired && (
                                         <div className="wdr-detail__info-item wdr-detail__info-item--alert">
-                                            <dt>{t('service.license_required')}</dt>
+                                            <dt>
+                                                {t("service.license_required")}
+                                            </dt>
                                             <dd>{service.licenseType}</dd>
                                         </div>
                                     )}
@@ -1301,7 +1747,7 @@ return [];
                         </>
                     )}
 
-                    {service.category === 'HEBERGEMENT' && (
+                    {service.category === "HEBERGEMENT" && (
                         <>
                             <section
                                 className="wdr-detail__section"
@@ -1311,7 +1757,7 @@ return [];
                                     id="amenities-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.equipment')}
+                                    {t("service.equipment")}
                                 </h2>
                                 <CheckList
                                     items={service.amenities}
@@ -1327,33 +1773,53 @@ return [];
                                     id="stay-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.stay_conditions')}
+                                    {t("service.stay_conditions")}
                                 </h2>
                                 <dl className="wdr-detail__info-grid">
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.check_in')}</dt>
+                                        <dt>{t("service.check_in")}</dt>
                                         <dd>
-                                            À partir de {service.checkInTime}
+                                            {t("service.check_in_from").replace(
+                                                "{time}",
+                                                service.checkInTime,
+                                            )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.check_out')}</dt>
-                                        <dd>Avant {service.checkOutTime}</dd>
-                                    </div>
-                                    <div className="wdr-detail__info-item">
-                                        <dt>{t('service.capacity')}</dt>
+                                        <dt>{t("service.check_out")}</dt>
                                         <dd>
-                                            {service.maxGuests} personnes max.
+                                            {t(
+                                                "service.check_out_before",
+                                            ).replace(
+                                                "{time}",
+                                                service.checkOutTime,
+                                            )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.minimum_stay')}</dt>
+                                        <dt>{t("service.capacity")}</dt>
                                         <dd>
-                                            {service.minimumStayNights} nuits
+                                            {t("service.capacity_max").replace(
+                                                "{count}",
+                                                String(service.maxGuests),
+                                            )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.cancellation')}</dt>
+                                        <dt>{t("service.minimum_stay")}</dt>
+                                        <dd>
+                                            {t(
+                                                "service.minimum_stay_nights",
+                                            ).replace(
+                                                "{count}",
+                                                String(
+                                                    service.minimumStayNights,
+                                                ),
+                                            )}
+                                        </dd>
+                                    </div>
+                                    <div className="wdr-detail__info-item">
+                                        <dt>{t("service.cancellation")}</dt>
                                         <dd>{service.cancellationPolicy}</dd>
                                     </div>
                                 </dl>
@@ -1368,7 +1834,7 @@ return [];
                                         id="rules-heading"
                                         className="wdr-detail__section-title"
                                     >
-                                        {t('service.house_rules')}
+                                        {t("service.house_rules")}
                                     </h2>
                                     <ul className="wdr-detail__rule-list">
                                         {service.houseRules.map((rule) => (
@@ -1380,7 +1846,7 @@ return [];
                         </>
                     )}
 
-                    {service.category === 'VOITURE' && (
+                    {service.category === "VOITURE" && (
                         <>
                             <section
                                 className="wdr-detail__section"
@@ -1390,68 +1856,91 @@ return [];
                                     id="car-specs-heading"
                                     className="wdr-detail__section-title"
                                 >
-                                    {t('service.car_features')}
+                                    {t("service.car_features")}
                                 </h2>
                                 <dl className="wdr-detail__info-grid">
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.vehicle')}</dt>
+                                        <dt>{t("service.vehicle")}</dt>
                                         <dd>
                                             {service.brand} {service.model} (
                                             {service.year})
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.transmission')}</dt>
+                                        <dt>{t("service.transmission")}</dt>
                                         <dd>{service.transmission}</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.fuel')}</dt>
+                                        <dt>{t("service.fuel")}</dt>
                                         <dd>{service.fuelType}</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.seats')}</dt>
+                                        <dt>{t("service.seats")}</dt>
                                         <dd>{service.seats}</dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.luggage')}</dt>
+                                        <dt>{t("service.luggage")}</dt>
                                         <dd>
-                                            {service.luggage.largeSuitcases}{' '}
-                                            grande(s) valise(s) &#43;{' '}
-                                            {service.luggage.smallBags} petit(s)
-                                            bagage(s)
+                                            {t("service.luggage_details")
+                                                .replace(
+                                                    "{large}",
+                                                    String(
+                                                        service.luggage
+                                                            .largeSuitcases,
+                                                    ),
+                                                )
+                                                .replace(
+                                                    "{small}",
+                                                    String(
+                                                        service.luggage
+                                                            .smallBags,
+                                                    ),
+                                                )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.mileage')}</dt>
+                                        <dt>{t("service.mileage")}</dt>
                                         <dd>
-                                            {service.mileageLimit === 'ILLIMITE'
-                                                ? t('service.unlimited')
-                                                : `${service.mileageLimit} km/jour`}
-                                        </dd>
-                                    </div>
-                                    <div className="wdr-detail__info-item">
-                                        <dt>{t('service.insurance')}</dt>
-                                        <dd>
-                                            {service.insuranceIncluded
-                                                ? t('service.included_feminine')
+                                            {service.mileageLimit === "ILLIMITE"
+                                                ? t("service.unlimited")
                                                 : t(
-                                                      'service.not_included_feminine',
+                                                      "service.mileage_per_day",
+                                                  ).replace(
+                                                      "{count}",
+                                                      String(
+                                                          service.mileageLimit,
+                                                      ),
                                                   )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.deposit')}</dt>
+                                        <dt>{t("service.insurance")}</dt>
+                                        <dd>
+                                            {service.insuranceIncluded
+                                                ? t("service.included_feminine")
+                                                : t(
+                                                      "service.not_included_feminine",
+                                                  )}
+                                        </dd>
+                                    </div>
+                                    <div className="wdr-detail__info-item">
+                                        <dt>{t("service.deposit")}</dt>
                                         <dd>
                                             {formatPrice(
                                                 service.depositAmountEur,
-                                                'EUR',
+                                                "EUR",
                                             )}
                                         </dd>
                                     </div>
                                     <div className="wdr-detail__info-item">
-                                        <dt>{t('service.driver_age')}</dt>
+                                        <dt>{t("service.driver_age")}</dt>
                                         <dd>
-                                            Minimum {service.driverMinAge} ans
+                                            {t(
+                                                "service.driver_age_min",
+                                            ).replace(
+                                                "{age}",
+                                                String(service.driverMinAge),
+                                            )}
                                         </dd>
                                     </div>
                                 </dl>
@@ -1467,7 +1956,7 @@ return [];
                                             id="pickup-heading"
                                             className="wdr-detail__section-title"
                                         >
-                                            {t('service.pickup_points')}
+                                            {t("service.pickup_points")}
                                         </h2>
                                         <ul className="wdr-detail__rule-list">
                                             {service.deliveryLocations.map(
@@ -1504,7 +1993,7 @@ return [];
                             id="avail-heading"
                             className="wdr-detail__similar-title"
                         >
-                            {t('service.availability')}
+                            {t("service.availability")}
                         </h2>
                         <div className="wdr-detail__avail-grid">
                             {availabilities.slice(0, 6).map((avail) => (
@@ -1523,8 +2012,8 @@ return [];
                                             >
                                                 {slot.startTime}
                                                 <small>
-                                                    ({slot.maxCapacity}{' '}
-                                                    {t('service.places')})
+                                                    ({slot.maxCapacity}{" "}
+                                                    {t("service.places")})
                                                 </small>
                                             </span>
                                         ))}
@@ -1548,15 +2037,15 @@ return [];
                         id="reviews-heading"
                         className="wdr-detail__similar-title"
                     >
-                        {t('service.customer_reviews').replace(
-                            '{count}',
+                        {t("service.customer_reviews").replace(
+                            "{count}",
                             String(reviews.length),
                         )}
                     </h2>
                     {reviews.length === 0 ? (
                         <EmptyState
-                            title={t('service.no_reviews_title')}
-                            description={t('service.no_reviews_desc')}
+                            title={t("service.no_reviews_title")}
+                            description={t("service.no_reviews_desc")}
                         />
                     ) : (
                         <div className="wdr-detail__reviews-grid">
@@ -1566,7 +2055,7 @@ return [];
                                         key={review.id}
                                         review={review}
                                         authorName={
-                                            review.authorName ?? 'Utilisateur'
+                                            review.authorName ?? "Utilisateur"
                                         }
                                     />
                                 );
@@ -1589,7 +2078,7 @@ return [];
                             id="similar-heading"
                             className="wdr-detail__similar-title"
                         >
-                            {t('service.similar')}
+                            {t("service.similar")}
                         </h2>
                         <div className="wdr-detail__similar-grid">
                             {similarServices.map((s) => (
@@ -1598,7 +2087,7 @@ return [];
                                     service={s}
                                     variant="compact"
                                     onBookClick={(sid) =>
-                                        navigate({ name: 'service', id: sid })
+                                        navigate({ name: "service", id: sid })
                                     }
                                 />
                             ))}

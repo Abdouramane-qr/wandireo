@@ -7,6 +7,8 @@
 
 import { Link as InertiaLink } from '@inertiajs/react';
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { localizePath } from '@/lib/locale';
 import './Link.css';
 
 export type LinkVariant = 'default' | 'muted' | 'nav' | 'underline';
@@ -32,12 +34,17 @@ return href;
 return href.slice(1);
 }
 
-    return href;
+    return localizePath(href);
 }
 
 function ExternalIcon() {
+    const { t } = useTranslation();
+
     return (
-        <span className="wdr-link__external-icon" aria-label="(lien externe)">
+        <span
+            className="wdr-link__external-icon"
+            aria-label={t('common.external_link')}
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

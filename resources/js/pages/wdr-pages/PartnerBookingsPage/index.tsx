@@ -1,16 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { bookingsApi } from '@/api/bookings';
-import { Button, useToast } from '@/components/wdr';
-import { useUser } from '@/context/UserContext';
-import { usePartnerBookingsData } from '@/hooks/useBookingsData';
-import { usePartnerApprovalGuard } from '@/hooks/usePartnerApprovalGuard';
-import { useServicesData } from '@/hooks/useServicesData';
-import { useRouter } from '@/hooks/useWdrRouter';
-import { formatPrice } from '@/lib/formatters';
-import { BookingStatusNames  } from '@/types/booking';
-import type {BookingStatus} from '@/types/booking';
-import './PartnerBookingsPage.css';
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { bookingsApi } from "@/api/bookings";
+import { Button, useToast } from "@/components/wdr";
+import { useUser } from "@/context/UserContext";
+import { usePartnerBookingsData } from "@/hooks/useBookingsData";
+import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
+import { useServicesData } from "@/hooks/useServicesData";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "@/hooks/useWdrRouter";
+import { formatPrice } from "@/lib/formatters";
+import { BookingStatusNames } from "@/types/booking";
+import type { BookingStatus } from "@/types/booking";
+import "./PartnerBookingsPage.css";
 
 const CheckIcon: React.FC = () => (
     <svg
@@ -100,42 +101,45 @@ const ArrowLeftIcon: React.FC = () => (
     </svg>
 );
 
-function formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
+function formatDate(date: Date, locale: string): string {
+    return new Intl.DateTimeFormat(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
     }).format(date);
 }
 
-function formatBookingExtrasSummary(
-    booking: {
-        selectedExtras?: Array<{ name: string; quantity: number }>;
-        extrasTotal?: number;
-        currency: string;
-    },
-): string | null {
+function formatBookingExtrasSummary(booking: {
+    selectedExtras?: Array<{ name: string; quantity: number }>;
+    extrasTotal?: number;
+    currency: string;
+}): string | null {
     if (!booking.selectedExtras || booking.selectedExtras.length === 0) {
         return null;
     }
 
     const extrasLabel = booking.selectedExtras
         .map((extra) =>
-            extra.quantity > 1 ? `${extra.name} x${extra.quantity}` : extra.name,
+            extra.quantity > 1
+                ? `${extra.name} x${extra.quantity}`
+                : extra.name,
         )
-        .join(', ');
+        .join(", ");
 
     return `${extrasLabel} · ${formatPrice(booking.extrasTotal ?? 0, booking.currency)}`;
 }
 
-function statusLabel(status: BookingStatus): string {
+function statusLabel(
+    status: BookingStatus,
+    t: (key: string) => string,
+): string {
     switch (status) {
         case BookingStatusNames.CONFIRMED:
-            return 'Confirmee';
+            return t("partner.bookings.status.confirmed");
         case BookingStatusNames.PENDING:
-            return 'En attente';
+            return t("partner.bookings.status.pending");
         case BookingStatusNames.CANCELLED:
-            return 'Annulee';
+            return t("partner.bookings.status.cancelled");
     }
 }
 
@@ -152,14 +156,15 @@ const ModalRefus: React.FC<ModalRefusProps> = ({
     onCancel,
     isSubmitting,
 }) => {
-    const [reason, setReason] = useState('');
-    const [error, setError] = useState('');
+    const { t } = useTranslation();
+    const [reason, setReason] = useState("");
+    const [error, setError] = useState("");
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
 
         if (!reason.trim()) {
-            setError('Veuillez indiquer un motif de refus.');
+            setError(t("partner.bookings.reject_modal.error"));
 
             return;
         }
@@ -175,8 +180,8 @@ const ModalRefus: React.FC<ModalRefusProps> = ({
             aria-labelledby="modal-refus-title"
             onClick={(event) => {
                 if (event.target === event.currentTarget && !isSubmitting) {
-onCancel();
-}
+                    onCancel();
+                }
             }}
         >
             <div className="wdr-partner-bk__modal">
@@ -184,21 +189,26 @@ onCancel();
                     id="modal-refus-title"
                     className="wdr-partner-bk__modal-title"
                 >
-                    Refuser la demande #{bookingId}
+                    {t("partner.bookings.reject_modal.title").replace(
+                        "{id}",
+                        bookingId,
+                    )}
                 </h2>
                 <p className="wdr-partner-bk__modal-desc">
-                    Indiquez un motif de refus. Il sera transmis au voyageur.
+                    {t("partner.bookings.reject_modal.description")}
                 </p>
 
                 <form onSubmit={handleSubmit}>
                     <textarea
-                        className={`wdr-partner-bk__modal-textarea${error ? 'wdr-partner-bk__modal-textarea--error' : ''}`}
+                        className={`wdr-partner-bk__modal-textarea${error ? "wdr-partner-bk__modal-textarea--error" : ""}`}
                         value={reason}
                         onChange={(event) => {
                             setReason(event.target.value);
-                            setError('');
+                            setError("");
                         }}
-                        placeholder="Ex. : Complet pour cette date, indisponibilite exceptionnelle..."
+                        placeholder={t(
+                            "partner.bookings.reject_modal.placeholder",
+                        )}
                         rows={4}
                         maxLength={500}
                         autoFocus
@@ -215,7 +225,7 @@ onCancel();
                             onClick={onCancel}
                             disabled={isSubmitting}
                         >
-                            Annuler
+                            {t("partner.bookings.reject_modal.cancel")}
                         </Button>
                         <Button
                             variant="danger"
@@ -223,7 +233,9 @@ onCancel();
                             leftIcon={<XIcon />}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Envoi...' : 'Confirmer le refus'}
+                            {isSubmitting
+                                ? t("partner.bookings.reject_modal.submitting")
+                                : t("partner.bookings.reject_modal.submit")}
                         </Button>
                     </div>
                 </form>
@@ -232,39 +244,33 @@ onCancel();
     );
 };
 
-type FilterTab = 'all' | BookingStatus;
-
-const FILTER_TABS: Array<{ key: FilterTab; label: string }> = [
-    { key: 'all', label: 'Toutes' },
-    { key: BookingStatusNames.PENDING, label: 'En attente' },
-    { key: BookingStatusNames.CONFIRMED, label: 'Confirmees' },
-    { key: BookingStatusNames.CANCELLED, label: 'Annulees' },
-];
+type FilterTab = "all" | BookingStatus;
 
 export const PartnerBookingsPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
     const { success, error } = useToast();
+    const { t, intlLocale } = useTranslation();
     const { isBlocked } = usePartnerApprovalGuard();
     const queryClient = useQueryClient();
     const { bookings: apiBookings } = usePartnerBookingsData(
-        currentUser?.id ?? '',
+        currentUser?.id ?? "",
     );
     const { services } = useServicesData();
 
-    const [activeTab, setActiveTab] = useState<FilterTab>('all');
+    const [activeTab, setActiveTab] = useState<FilterTab>("all");
     const [refusingId, setRefusingId] = useState<string | null>(null);
     const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!currentUser) {
-            navigate({ name: 'home' });
+            navigate({ name: "home" });
 
             return;
         }
 
-        if (currentUser.role !== 'PARTNER') {
-            navigate({ name: 'dashboard' });
+        if (currentUser.role !== "PARTNER") {
+            navigate({ name: "dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -294,15 +300,31 @@ export const PartnerBookingsPage: React.FC = () => {
 
     const filteredBookings = useMemo(
         () =>
-            activeTab === 'all'
+            activeTab === "all"
                 ? bookings
                 : bookings.filter((booking) => booking.status === activeTab),
         [activeTab, bookings],
     );
 
+    const filterTabs: Array<{ key: FilterTab; label: string }> = [
+        { key: "all", label: t("partner.bookings.tab.all") },
+        {
+            key: BookingStatusNames.PENDING,
+            label: t("partner.bookings.tab.pending"),
+        },
+        {
+            key: BookingStatusNames.CONFIRMED,
+            label: t("partner.bookings.tab.confirmed"),
+        },
+        {
+            key: BookingStatusNames.CANCELLED,
+            label: t("partner.bookings.tab.cancelled"),
+        },
+    ];
+
     const refreshBookings = useCallback(async () => {
         await queryClient.invalidateQueries({
-            queryKey: ['bookings', 'partner', currentUser?.id ?? ''],
+            queryKey: ["bookings", "partner", currentUser?.id ?? ""],
         });
     }, [currentUser?.id, queryClient]);
 
@@ -316,14 +338,14 @@ export const PartnerBookingsPage: React.FC = () => {
                     BookingStatusNames.CONFIRMED,
                 );
                 await refreshBookings();
-                success('Reservation confirmee.');
+                success(t("partner.bookings.toast.confirm_success"));
             } catch {
-                error('Impossible de confirmer cette reservation.');
+                error(t("partner.bookings.toast.confirm_error"));
             } finally {
                 setIsUpdatingId(null);
             }
         },
-        [error, refreshBookings, success],
+        [error, refreshBookings, success, t],
     );
 
     const handleRefuseConfirm = useCallback(
@@ -342,17 +364,17 @@ export const PartnerBookingsPage: React.FC = () => {
                 );
                 await refreshBookings();
                 setRefusingId(null);
-                success('Reservation refusee.');
+                success(t("partner.bookings.toast.reject_success"));
             } catch {
-                error('Impossible de refuser cette reservation.');
+                error(t("partner.bookings.toast.reject_error"));
             } finally {
                 setIsUpdatingId(null);
             }
         },
-        [error, refusingId, refreshBookings, success],
+        [error, refusingId, refreshBookings, success, t],
     );
 
-    if (isBlocked || !currentUser || currentUser.role !== 'PARTNER') {
+    if (isBlocked || !currentUser || currentUser.role !== "PARTNER") {
         return null;
     }
 
@@ -365,19 +387,21 @@ export const PartnerBookingsPage: React.FC = () => {
                             type="button"
                             className="wdr-partner-bk__back-btn"
                             onClick={() =>
-                                navigate({ name: 'partner-dashboard' })
+                                navigate({ name: "partner-dashboard" })
                             }
-                            aria-label="Retour au tableau de bord"
+                            aria-label={t("partner.bookings.back_dashboard")}
                         >
                             <ArrowLeftIcon />
                         </button>
                         <div>
                             <h1 className="wdr-partner-bk__title">
-                                Reservations
+                                {t("partner.bookings.title")}
                             </h1>
                             <p className="wdr-partner-bk__subtitle">
-                                {bookings.length} reservation
-                                {bookings.length !== 1 ? 's' : ''} au total
+                                {bookings.length}{" "}
+                                {bookings.length === 1
+                                    ? t("partner.bookings.count_one")
+                                    : t("partner.bookings.count_other")}
                             </p>
                         </div>
                     </div>
@@ -386,9 +410,9 @@ export const PartnerBookingsPage: React.FC = () => {
                 <div
                     className="wdr-partner-bk__tabs"
                     role="tablist"
-                    aria-label="Filtrer par statut"
+                    aria-label={t("partner.bookings.tabs_aria")}
                 >
-                    {FILTER_TABS.map(({ key, label }) => {
+                    {filterTabs.map(({ key, label }) => {
                         const isPendingTab = key === BookingStatusNames.PENDING;
 
                         return (
@@ -398,12 +422,12 @@ export const PartnerBookingsPage: React.FC = () => {
                                 role="tab"
                                 aria-selected={activeTab === key}
                                 className={[
-                                    'wdr-partner-bk__tab',
+                                    "wdr-partner-bk__tab",
                                     activeTab === key
-                                        ? 'wdr-partner-bk__tab--active'
-                                        : '',
+                                        ? "wdr-partner-bk__tab--active"
+                                        : "",
                                 ]
-                                    .join(' ')
+                                    .join(" ")
                                     .trim()}
                                 onClick={() => setActiveTab(key)}
                             >
@@ -411,7 +435,12 @@ export const PartnerBookingsPage: React.FC = () => {
                                 {isPendingTab && pendingCount > 0 && (
                                     <span
                                         className="wdr-partner-bk__tab-badge"
-                                        aria-label={`${pendingCount} en attente`}
+                                        aria-label={t(
+                                            "partner.bookings.pending_badge",
+                                        ).replace(
+                                            "{count}",
+                                            String(pendingCount),
+                                        )}
                                     >
                                         {pendingCount}
                                     </span>
@@ -426,11 +455,17 @@ export const PartnerBookingsPage: React.FC = () => {
                 {filteredBookings.length === 0 ? (
                     <div className="wdr-partner-bk__empty">
                         <p>
-                            Aucune reservation{' '}
-                            {activeTab !== 'all'
-                                ? `avec le statut "${statusLabel(activeTab as BookingStatus)}"`
-                                : ''}{' '}
-                            pour le moment.
+                            {t("partner.bookings.empty_prefix")}{" "}
+                            {activeTab !== "all"
+                                ? t("partner.bookings.empty_status").replace(
+                                      "{status}",
+                                      statusLabel(
+                                          activeTab as BookingStatus,
+                                          t,
+                                      ),
+                                  )
+                                : ""}{" "}
+                            {t("partner.bookings.empty_suffix")}
                         </p>
                     </div>
                 ) : (
@@ -449,38 +484,55 @@ export const PartnerBookingsPage: React.FC = () => {
                                 <li
                                     key={booking.id}
                                     className={[
-                                        'wdr-partner-bk__card',
+                                        "wdr-partner-bk__card",
                                         isPending
-                                            ? 'wdr-partner-bk__card--pending'
-                                            : '',
+                                            ? "wdr-partner-bk__card--pending"
+                                            : "",
                                         isConfirmed
-                                            ? 'wdr-partner-bk__card--confirmed'
-                                            : '',
+                                            ? "wdr-partner-bk__card--confirmed"
+                                            : "",
                                         isCancelled
-                                            ? 'wdr-partner-bk__card--cancelled'
-                                            : '',
+                                            ? "wdr-partner-bk__card--cancelled"
+                                            : "",
                                     ]
-                                        .join(' ')
+                                        .join(" ")
                                         .trim()}
                                 >
                                     <div className="wdr-partner-bk__card-header">
                                         <div className="wdr-partner-bk__card-id-block">
                                             <span className="wdr-partner-bk__card-id">
-                                                Reservation #{booking.id}
+                                                {t(
+                                                    "partner.bookings.booking_id",
+                                                ).replace("{id}", booking.id)}
                                             </span>
                                             <span
                                                 className={[
-                                                    'wdr-partner-bk__badge',
+                                                    "wdr-partner-bk__badge",
                                                     `wdr-partner-bk__badge--${booking.status.toLowerCase()}`,
-                                                ].join(' ')}
-                                                aria-label={`Statut : ${statusLabel(booking.status)}`}
+                                                ].join(" ")}
+                                                aria-label={t(
+                                                    "partner.bookings.status_aria",
+                                                ).replace(
+                                                    "{status}",
+                                                    statusLabel(
+                                                        booking.status,
+                                                        t,
+                                                    ),
+                                                )}
                                             >
-                                                {statusLabel(booking.status)}
+                                                {statusLabel(booking.status, t)}
                                             </span>
                                         </div>
                                         <span className="wdr-partner-bk__card-received">
-                                            Recue le{' '}
-                                            {formatDate(booking.createdAt)}
+                                            {t(
+                                                "partner.bookings.received_on",
+                                            ).replace(
+                                                "{date}",
+                                                formatDate(
+                                                    booking.createdAt,
+                                                    intlLocale,
+                                                ),
+                                            )}
                                         </span>
                                     </div>
 
@@ -492,14 +544,21 @@ export const PartnerBookingsPage: React.FC = () => {
                                     <div className="wdr-partner-bk__card-details">
                                         <span className="wdr-partner-bk__detail">
                                             <CalendarIcon />
-                                            {formatDate(booking.startDate)}
+                                            {formatDate(
+                                                booking.startDate,
+                                                intlLocale,
+                                            )}
                                         </span>
                                         <span className="wdr-partner-bk__detail">
                                             <UsersIcon />
-                                            {booking.participants} participant
-                                            {booking.participants !== 1
-                                                ? 's'
-                                                : ''}
+                                            {booking.participants}{" "}
+                                            {booking.participants === 1
+                                                ? t(
+                                                      "partner.bookings.participants_one",
+                                                  )
+                                                : t(
+                                                      "partner.bookings.participants_other",
+                                                  )}
                                         </span>
                                         <span className="wdr-partner-bk__detail wdr-partner-bk__detail--price">
                                             {formatPrice(
@@ -511,7 +570,12 @@ export const PartnerBookingsPage: React.FC = () => {
 
                                     {extrasSummary && (
                                         <p className="wdr-partner-bk__card-extras">
-                                            Extras: {extrasSummary}
+                                            {t(
+                                                "partner.bookings.extras",
+                                            ).replace(
+                                                "{summary}",
+                                                extrasSummary,
+                                            )}
                                         </p>
                                     )}
 
@@ -524,8 +588,12 @@ export const PartnerBookingsPage: React.FC = () => {
                                     {isCancelled &&
                                         booking.cancellationReason && (
                                             <p className="wdr-partner-bk__card-cancel-reason">
-                                                Motif :{' '}
-                                                {booking.cancellationReason}
+                                                {t(
+                                                    "partner.bookings.reason",
+                                                ).replace(
+                                                    "{reason}",
+                                                    booking.cancellationReason,
+                                                )}
                                             </p>
                                         )}
 
@@ -544,7 +612,7 @@ export const PartnerBookingsPage: React.FC = () => {
                                                     isUpdatingId === booking.id
                                                 }
                                             >
-                                                Accepter
+                                                {t("partner.bookings.accept")}
                                             </Button>
                                             <Button
                                                 variant="danger"
@@ -557,7 +625,7 @@ export const PartnerBookingsPage: React.FC = () => {
                                                     isUpdatingId === booking.id
                                                 }
                                             >
-                                                Refuser
+                                                {t("partner.bookings.reject")}
                                             </Button>
                                         </div>
                                     )}
