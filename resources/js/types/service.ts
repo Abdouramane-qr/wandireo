@@ -15,24 +15,24 @@
 // CONSTANTES ET TYPES COMMUNS
 // ============================================================
 
-import type { Locale } from '@/lib/locale';
+import type { Locale } from "@/lib/locale";
 
 export type LocalizedTextMap = Partial<Record<Locale, string>>;
 
 export const ServiceCategoryNames = {
-    ACTIVITE: 'ACTIVITE',
-    BATEAU: 'BATEAU',
-    HEBERGEMENT: 'HEBERGEMENT',
-    VOITURE: 'VOITURE',
+    ACTIVITE: "ACTIVITE",
+    BATEAU: "BATEAU",
+    HEBERGEMENT: "HEBERGEMENT",
+    VOITURE: "VOITURE",
 } as const;
 
 export type ServiceCategory =
     (typeof ServiceCategoryNames)[keyof typeof ServiceCategoryNames];
 
-export type BookingMode = 'INSTANT' | 'REQUEST' | 'EXTERNAL_REDIRECT';
-export type FareHarborPriceStatus = 'KNOWN' | 'DEPOSIT_ONLY' | 'UNKNOWN';
-export type ServiceAttributeType = 'text' | 'number' | 'boolean' | 'select';
-export type ServiceExtraInputType = 'CHECKBOX' | 'REQUIRED';
+export type BookingMode = "INSTANT" | "REQUEST" | "EXTERNAL_REDIRECT";
+export type FareHarborPriceStatus = "KNOWN" | "DEPOSIT_ONLY" | "UNKNOWN";
+export type ServiceAttributeType = "text" | "number" | "boolean" | "select";
+export type ServiceExtraInputType = "CHECKBOX" | "REQUIRED";
 
 export interface ServiceAttributeOptionDefinition {
     id: string;
@@ -90,12 +90,12 @@ export interface ServiceCategoryDefinition {
 
 /** Unité de facturation. Chaque catégorie restreint l'ensemble à ses valeurs pertinentes. */
 export type ServicePricingUnit =
-    | 'PAR_PERSONNE'
-    | 'PAR_GROUPE'
-    | 'PAR_JOUR'
-    | 'PAR_DEMI_JOURNEE'
-    | 'PAR_SEMAINE'
-    | 'PAR_NUIT';
+    | "PAR_PERSONNE"
+    | "PAR_GROUPE"
+    | "PAR_JOUR"
+    | "PAR_DEMI_JOURNEE"
+    | "PAR_SEMAINE"
+    | "PAR_NUIT";
 
 // ============================================================
 // MODE DE PAIEMENT (configure par le prestataire)
@@ -119,35 +119,35 @@ export type ServicePricingUnit =
  * Invariant : amountDueOnline + amountDueOnSite = clientTotal (pour tous les modes)
  */
 export const PaymentModeNames = {
-    FULL_CASH_ON_SITE: 'FULL_CASH_ON_SITE',
-    COMMISSION_ONLINE_REST_ON_SITE: 'COMMISSION_ONLINE_REST_ON_SITE',
-    FULL_ONLINE: 'FULL_ONLINE',
-    CONNECTED_ACCOUNT: 'CONNECTED_ACCOUNT',
-    EXTERNAL_REDIRECT: 'EXTERNAL_REDIRECT',
+    FULL_CASH_ON_SITE: "FULL_CASH_ON_SITE",
+    COMMISSION_ONLINE_REST_ON_SITE: "COMMISSION_ONLINE_REST_ON_SITE",
+    FULL_ONLINE: "FULL_ONLINE",
+    CONNECTED_ACCOUNT: "CONNECTED_ACCOUNT",
+    EXTERNAL_REDIRECT: "EXTERNAL_REDIRECT",
 } as const;
 
 export type PaymentMode =
     (typeof PaymentModeNames)[keyof typeof PaymentModeNames];
 
 export const PaymentModeLabels: Record<PaymentMode, string> = {
-    FULL_CASH_ON_SITE: 'Paiement sur place',
-    COMMISSION_ONLINE_REST_ON_SITE: 'Commission en ligne + reste sur place',
-    FULL_ONLINE: 'Paiement en ligne',
-    CONNECTED_ACCOUNT: 'Compte connecte Stripe',
-    EXTERNAL_REDIRECT: 'Reservation externe',
+    FULL_CASH_ON_SITE: "Paiement sur place",
+    COMMISSION_ONLINE_REST_ON_SITE: "Commission en ligne + reste sur place",
+    FULL_ONLINE: "Paiement en ligne",
+    CONNECTED_ACCOUNT: "Compte connecte Stripe",
+    EXTERNAL_REDIRECT: "Reservation externe",
 };
 
 export const PaymentModeDescriptions: Record<PaymentMode, string> = {
     FULL_CASH_ON_SITE:
-        'Aucun paiement en ligne. Vous reglez la totalite sur place en especes.',
+        "Aucun paiement en ligne. Vous reglez la totalite sur place en especes.",
     COMMISSION_ONLINE_REST_ON_SITE:
-        'Les frais de service Wandireo sont debites maintenant. Le solde est regle directement au prestataire.',
+        "Les frais de service Wandireo sont debites maintenant. Le solde est regle directement au prestataire.",
     FULL_ONLINE:
-        'Le montant total est preleve en ligne. Aucun paiement supplementaire sur place.',
+        "Le montant total est preleve en ligne. Aucun paiement supplementaire sur place.",
     CONNECTED_ACCOUNT:
-        'Le paiement est traite en ligne via un compte connecte du partenaire.',
+        "Le paiement est traite en ligne via un compte connecte du partenaire.",
     EXTERNAL_REDIRECT:
-        'La reservation et le paiement sont geres sur la plateforme du partenaire.',
+        "La reservation et le paiement sont geres sur la plateforme du partenaire.",
 };
 
 export interface ServiceLocation {
@@ -200,7 +200,7 @@ export interface BaseService {
     bookingMode?: BookingMode;
     featured?: boolean;
     videoUrl?: string;
-    sourceType?: 'LOCAL' | 'EXTERNAL';
+    sourceType?: "LOCAL" | "EXTERNAL";
     sourceProvider?: string;
     sourceExternalId?: string;
     isExternalRedirect?: boolean;
@@ -216,6 +216,9 @@ export interface BaseService {
             bookingUrl?: string;
             bookingFlow?: string;
             paymentCollection?: string;
+            lastSeenInLatestSync?: boolean;
+            lastSeenAt?: string;
+            lastMissingAt?: string;
             isDepositRequired?: boolean;
             depositAmount?: number;
             depositAmountEur?: number;
@@ -237,38 +240,38 @@ export interface BaseService {
 // ============================================================
 
 export type ActivityType =
-    | 'PLONGEE'
-    | 'RANDONNEE'
-    | 'KAYAK'
-    | 'SURF'
-    | 'SNORKELING'
-    | 'PARACHUTISME'
-    | 'ESCALADE'
-    | 'CROISIERE_CULTURELLE'
-    | 'VELO'
-    | 'YOGA_PLAGE'
-    | 'QUAD_BUGGY'
-    | 'OBSERVATION_CETACES';
+    | "PLONGEE"
+    | "RANDONNEE"
+    | "KAYAK"
+    | "SURF"
+    | "SNORKELING"
+    | "PARACHUTISME"
+    | "ESCALADE"
+    | "CROISIERE_CULTURELLE"
+    | "VELO"
+    | "YOGA_PLAGE"
+    | "QUAD_BUGGY"
+    | "OBSERVATION_CETACES";
 
 export type DifficultyLevel =
-    | 'TOUS_NIVEAUX'
-    | 'DEBUTANT'
-    | 'INTERMEDIAIRE'
-    | 'AVANCE'
-    | 'EXPERT';
+    | "TOUS_NIVEAUX"
+    | "DEBUTANT"
+    | "INTERMEDIAIRE"
+    | "AVANCE"
+    | "EXPERT";
 
-export type PhysicalIntensity = 'FAIBLE' | 'MODEREE' | 'ELEVEE';
+export type PhysicalIntensity = "FAIBLE" | "MODEREE" | "ELEVEE";
 
-export type GroupType = 'GROUPE_PRIVE' | 'GROUPE_PARTAGE' | 'AU_CHOIX';
+export type GroupType = "GROUPE_PRIVE" | "GROUPE_PARTAGE" | "AU_CHOIX";
 
 export type DayOfWeek =
-    | 'LUNDI'
-    | 'MARDI'
-    | 'MERCREDI'
-    | 'JEUDI'
-    | 'VENDREDI'
-    | 'SAMEDI'
-    | 'DIMANCHE';
+    | "LUNDI"
+    | "MARDI"
+    | "MERCREDI"
+    | "JEUDI"
+    | "VENDREDI"
+    | "SAMEDI"
+    | "DIMANCHE";
 
 export interface ActivitySchedule {
     /** Horaires de départ disponibles, format "HH:MM". */
@@ -282,12 +285,12 @@ export interface ActivitySchedule {
 }
 
 export interface ActivityService extends BaseService {
-    category: 'ACTIVITE';
-    pricingUnit: 'PAR_PERSONNE' | 'PAR_GROUPE';
+    category: "ACTIVITE";
+    pricingUnit: "PAR_PERSONNE" | "PAR_GROUPE";
     activityType: ActivityType;
     /** Valeur numérique de la durée, interprétée avec `durationUnit`. */
     duration: number;
-    durationUnit: 'MINUTES' | 'HEURES' | 'JOURS';
+    durationUnit: "MINUTES" | "HEURES" | "JOURS";
     difficulty: DifficultyLevel;
     physicalIntensity: PhysicalIntensity;
     minParticipants: number;
@@ -316,24 +319,24 @@ export interface ActivityService extends BaseService {
 // ============================================================
 
 export type BoatType =
-    | 'VOILIER'
-    | 'CATAMARAN'
-    | 'YACHT_MOTEUR'
-    | 'SEMI_RIGIDE'
-    | 'GOELETTE'
-    | 'PENICHE';
+    | "VOILIER"
+    | "CATAMARAN"
+    | "YACHT_MOTEUR"
+    | "SEMI_RIGIDE"
+    | "GOELETTE"
+    | "PENICHE";
 
-export type EngineType = 'VOILE' | 'MOTEUR' | 'VOILE_ET_MOTEUR';
+export type EngineType = "VOILE" | "MOTEUR" | "VOILE_ET_MOTEUR";
 
 export type RentalMode =
-    | 'AVEC_SKIPPER'
-    | 'SANS_SKIPPER'
-    | 'BARE_BOAT'
-    | 'AVEC_EQUIPAGE_COMPLET';
+    | "AVEC_SKIPPER"
+    | "SANS_SKIPPER"
+    | "BARE_BOAT"
+    | "AVEC_EQUIPAGE_COMPLET";
 
 export interface BoatService extends BaseService {
-    category: 'BATEAU';
-    pricingUnit: 'PAR_JOUR' | 'PAR_DEMI_JOURNEE' | 'PAR_SEMAINE';
+    category: "BATEAU";
+    pricingUnit: "PAR_JOUR" | "PAR_DEMI_JOURNEE" | "PAR_SEMAINE";
     boatType: BoatType;
     /** Nom propre du bateau (ex: "Cap Soleil"). */
     boatName: string;
@@ -371,24 +374,24 @@ export interface BoatService extends BaseService {
 // ============================================================
 
 export type AccommodationType =
-    | 'HOTEL'
-    | 'VILLA'
-    | 'APPARTEMENT'
-    | 'BUNGALOW'
-    | 'MAISON_HOTES'
-    | 'BASTIDE'
-    | 'RIAD'
-    | 'LODGE';
+    | "HOTEL"
+    | "VILLA"
+    | "APPARTEMENT"
+    | "BUNGALOW"
+    | "MAISON_HOTES"
+    | "BASTIDE"
+    | "RIAD"
+    | "LODGE";
 
 export type CancellationPolicy =
-    | 'FLEXIBLE'
-    | 'MODEREE'
-    | 'STRICTE'
-    | 'NON_REMBOURSABLE';
+    | "FLEXIBLE"
+    | "MODEREE"
+    | "STRICTE"
+    | "NON_REMBOURSABLE";
 
 export interface AccommodationService extends BaseService {
-    category: 'HEBERGEMENT';
-    pricingUnit: 'PAR_NUIT' | 'PAR_SEMAINE';
+    category: "HEBERGEMENT";
+    pricingUnit: "PAR_NUIT" | "PAR_SEMAINE";
     accommodationType: AccommodationType;
     /** Classification officielle en étoiles (hôtels uniquement). */
     starRating?: 1 | 2 | 3 | 4 | 5;
@@ -421,25 +424,25 @@ export interface AccommodationService extends BaseService {
 // ============================================================
 
 export type VehicleType =
-    | 'CITADINE'
-    | 'BERLINE'
-    | 'SUV'
-    | 'CABRIOLET'
-    | 'MONOSPACE'
-    | 'UTILITAIRE'
-    | 'QUAD'
-    | 'SCOOTER_125';
+    | "CITADINE"
+    | "BERLINE"
+    | "SUV"
+    | "CABRIOLET"
+    | "MONOSPACE"
+    | "UTILITAIRE"
+    | "QUAD"
+    | "SCOOTER_125";
 
-export type TransmissionType = 'MANUELLE' | 'AUTOMATIQUE';
+export type TransmissionType = "MANUELLE" | "AUTOMATIQUE";
 
-export type FuelType = 'ESSENCE' | 'DIESEL' | 'ELECTRIQUE' | 'HYBRIDE' | 'GPL';
+export type FuelType = "ESSENCE" | "DIESEL" | "ELECTRIQUE" | "HYBRIDE" | "GPL";
 
 /** Kilométrage journalier inclus, ou 'ILLIMITE'. */
-export type MileageLimit = number | 'ILLIMITE';
+export type MileageLimit = number | "ILLIMITE";
 
 export interface CarService extends BaseService {
-    category: 'VOITURE';
-    pricingUnit: 'PAR_JOUR' | 'PAR_SEMAINE';
+    category: "VOITURE";
+    pricingUnit: "PAR_JOUR" | "PAR_SEMAINE";
     vehicleType: VehicleType;
     brand: string;
     model: string;
@@ -495,10 +498,10 @@ export type Service =
 
 /** Labels lisibles en français pour chaque catégorie de service */
 export const ServiceCategoryLabels: Record<ServiceCategory, string> = {
-    ACTIVITE: 'Activité',
-    BATEAU: 'Bateau',
-    HEBERGEMENT: 'Hébergement',
-    VOITURE: 'Voiture',
+    ACTIVITE: "Activité",
+    BATEAU: "Bateau",
+    HEBERGEMENT: "Hébergement",
+    VOITURE: "Voiture",
 };
 
 /**

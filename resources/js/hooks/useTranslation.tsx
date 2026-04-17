@@ -156,6 +156,27 @@ function fareHarborTranslations(locale: Locale): Record<string, string> {
                 "admin.services.fareharbor.status.syncing": "Syncing",
                 "admin.services.fareharbor.status.success": "Success",
                 "admin.services.fareharbor.status.failed": "Failed",
+                "admin.services.fareharbor.catalog_summary":
+                    "{companies} tracked companie(s), {services} imported service(s), {listed} listed on the site.",
+                "admin.services.fareharbor.stats.companies":
+                    "Tracked companies",
+                "admin.services.fareharbor.stats.companies_note":
+                    "{count} enabled",
+                "admin.services.fareharbor.stats.imported": "Imported services",
+                "admin.services.fareharbor.stats.imported_note":
+                    "synced catalog",
+                "admin.services.fareharbor.stats.listed": "Listed services",
+                "admin.services.fareharbor.stats.listed_note":
+                    "visible on the site",
+                "admin.services.fareharbor.stats.health": "Sync health",
+                "admin.services.fareharbor.stats.health_note":
+                    "{count} with errors",
+                "admin.services.fareharbor.catalog_note":
+                    "Imported FareHarbor services stay listed on the site after sync. {count} service(s) were missing from the latest provider catalog snapshot.",
+                "admin.services.fareharbor.card.imported": "{count} imported",
+                "admin.services.fareharbor.card.listed": "{count} listed",
+                "admin.services.fareharbor.card.sync_enabled": "sync enabled",
+                "admin.services.fareharbor.card.sync_disabled": "sync disabled",
             };
         case "es":
             return {
@@ -1206,6 +1227,23 @@ const translations: Record<Locale, Record<string, string>> = {
         "admin.services.fareharbor.status.syncing": "Synchronisation en cours",
         "admin.services.fareharbor.status.success": "Succès",
         "admin.services.fareharbor.status.failed": "Échec",
+        "admin.services.fareharbor.catalog_summary":
+            "{companies} société(s) suivie(s), {services} service(s) importé(s), {listed} affiché(s) sur le site.",
+        "admin.services.fareharbor.stats.companies": "Sociétés suivies",
+        "admin.services.fareharbor.stats.companies_note": "{count} actives",
+        "admin.services.fareharbor.stats.imported": "Services importés",
+        "admin.services.fareharbor.stats.imported_note":
+            "catalogue synchronisé",
+        "admin.services.fareharbor.stats.listed": "Services affichés",
+        "admin.services.fareharbor.stats.listed_note": "visibles sur le site",
+        "admin.services.fareharbor.stats.health": "Santé de la sync",
+        "admin.services.fareharbor.stats.health_note": "{count} en erreur",
+        "admin.services.fareharbor.catalog_note":
+            "Les services importés FareHarbor restent affichés sur le site après chaque sync. {count} service(s) étaient absents du dernier instantané fournisseur.",
+        "admin.services.fareharbor.card.imported": "{count} importé(s)",
+        "admin.services.fareharbor.card.listed": "{count} affiché(s)",
+        "admin.services.fareharbor.card.sync_enabled": "sync active",
+        "admin.services.fareharbor.card.sync_disabled": "sync coupée",
 
         "admin.structure.toast.category_updated": "Catégorie mise à jour.",
         "admin.structure.toast.category_created": "Catégorie créée.",

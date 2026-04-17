@@ -178,8 +178,10 @@ export const AdminServicesPage: React.FC = () => {
         [allServices],
     );
     const externalServicesCount = externalServices.length;
-    const externalVisibleServicesCount = externalServices.filter(
-        (service) => service.isAvailable,
+    const externalVisibleServicesCount = externalServicesCount;
+    const externalMissingInLatestSyncCount = externalServices.filter(
+        (service) =>
+            service.extraData?.fareharbor?.lastSeenInLatestSync === false,
     ).length;
     const enabledCompaniesCount = fareHarborCompanies.filter(
         (company) => company.isEnabled,
@@ -210,10 +212,7 @@ export const AdminServicesPage: React.FC = () => {
 
             const current = counters.get(slug) ?? { total: 0, visible: 0 };
             current.total += 1;
-
-            if (service.isAvailable) {
-                current.visible += 1;
-            }
+            current.visible += 1;
 
             counters.set(slug, current);
         });
@@ -600,7 +599,19 @@ export const AdminServicesPage: React.FC = () => {
                                 FareHarbor
                             </h2>
                             <p className="wdr-admin-svc__fareharbor-subtitle">
-                                {`${fareHarborCompanies.length} société(s) suivie(s), ${externalServicesCount} service(s) importé(s), ${externalVisibleServicesCount} publié(s).`}
+                                {t("admin.services.fareharbor.catalog_summary")
+                                    .replace(
+                                        "{companies}",
+                                        String(fareHarborCompanies.length),
+                                    )
+                                    .replace(
+                                        "{services}",
+                                        String(externalServicesCount),
+                                    )
+                                    .replace(
+                                        "{listed}",
+                                        String(externalVisibleServicesCount),
+                                    )}
                             </p>
                         </div>
                         <Button
@@ -616,56 +627,71 @@ export const AdminServicesPage: React.FC = () => {
                     <div className="wdr-admin-svc__fareharbor-summary">
                         <article className="wdr-admin-svc__fareharbor-stat">
                             <span className="wdr-admin-svc__fareharbor-stat-label">
-                                Sociétés suivies
+                                {t("admin.services.fareharbor.stats.companies")}
                             </span>
                             <strong className="wdr-admin-svc__fareharbor-stat-value">
                                 {fareHarborCompanies.length}
                             </strong>
                             <span className="wdr-admin-svc__fareharbor-stat-note">
-                                {enabledCompaniesCount} actives
+                                {t(
+                                    "admin.services.fareharbor.stats.companies_note",
+                                ).replace(
+                                    "{count}",
+                                    String(enabledCompaniesCount),
+                                )}
                             </span>
                         </article>
                         <article className="wdr-admin-svc__fareharbor-stat">
                             <span className="wdr-admin-svc__fareharbor-stat-label">
-                                Services importés
+                                {t("admin.services.fareharbor.stats.imported")}
                             </span>
                             <strong className="wdr-admin-svc__fareharbor-stat-value">
                                 {externalServicesCount}
                             </strong>
                             <span className="wdr-admin-svc__fareharbor-stat-note">
-                                catalogue synchronisé
+                                {t(
+                                    "admin.services.fareharbor.stats.imported_note",
+                                )}
                             </span>
                         </article>
                         <article className="wdr-admin-svc__fareharbor-stat">
                             <span className="wdr-admin-svc__fareharbor-stat-label">
-                                Services publiés
+                                {t("admin.services.fareharbor.stats.listed")}
                             </span>
                             <strong className="wdr-admin-svc__fareharbor-stat-value">
                                 {externalVisibleServicesCount}
                             </strong>
                             <span className="wdr-admin-svc__fareharbor-stat-note">
-                                visibles sur le site
+                                {t(
+                                    "admin.services.fareharbor.stats.listed_note",
+                                )}
                             </span>
                         </article>
                         <article
                             className={`wdr-admin-svc__fareharbor-stat ${failingCompaniesCount > 0 ? "wdr-admin-svc__fareharbor-stat--danger" : healthyCompaniesCount > 0 ? "wdr-admin-svc__fareharbor-stat--success" : ""}`}
                         >
                             <span className="wdr-admin-svc__fareharbor-stat-label">
-                                Santé de la sync
+                                {t("admin.services.fareharbor.stats.health")}
                             </span>
                             <strong className="wdr-admin-svc__fareharbor-stat-value">
                                 {healthyCompaniesCount}
                             </strong>
                             <span className="wdr-admin-svc__fareharbor-stat-note">
-                                {failingCompaniesCount} en erreur
+                                {t(
+                                    "admin.services.fareharbor.stats.health_note",
+                                ).replace(
+                                    "{count}",
+                                    String(failingCompaniesCount),
+                                )}
                             </span>
                         </article>
                     </div>
 
                     <p className="wdr-admin-svc__fareharbor-note">
-                        Tous les services importés FareHarbor sont désormais
-                        publiés par défaut. Les exceptions restent possibles via
-                        les overrides service par service.
+                        {t("admin.services.fareharbor.catalog_note").replace(
+                            "{count}",
+                            String(externalMissingInLatestSyncCount),
+                        )}
                     </p>
 
                     <div className="wdr-admin-svc__fareharbor-create">
@@ -842,15 +868,33 @@ export const AdminServicesPage: React.FC = () => {
 
                                         <div className="wdr-admin-svc__fareharbor-meta">
                                             <span>
-                                                {`${companyServiceStats.total} importé(s)`}
+                                                {t(
+                                                    "admin.services.fareharbor.card.imported",
+                                                ).replace(
+                                                    "{count}",
+                                                    String(
+                                                        companyServiceStats.total,
+                                                    ),
+                                                )}
                                             </span>
                                             <span>
-                                                {`${companyServiceStats.visible} publié(s)`}
+                                                {t(
+                                                    "admin.services.fareharbor.card.listed",
+                                                ).replace(
+                                                    "{count}",
+                                                    String(
+                                                        companyServiceStats.visible,
+                                                    ),
+                                                )}
                                             </span>
                                             <span>
                                                 {company.isEnabled
-                                                    ? "sync active"
-                                                    : "sync coupée"}
+                                                    ? t(
+                                                          "admin.services.fareharbor.card.sync_enabled",
+                                                      )
+                                                    : t(
+                                                          "admin.services.fareharbor.card.sync_disabled",
+                                                      )}
                                             </span>
                                         </div>
 
@@ -1109,9 +1153,7 @@ export const AdminServicesPage: React.FC = () => {
                                         <tr
                                             key={service.id}
                                             className={
-                                                !service.isAvailable ||
-                                                service.sourceType ===
-                                                    "EXTERNAL"
+                                                !service.isAvailable
                                                     ? "wdr-admin-svc__table-row--inactive"
                                                     : ""
                                             }

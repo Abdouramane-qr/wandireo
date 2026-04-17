@@ -624,10 +624,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         const hasDetailedCategories = filters.detailedCategories.length > 0;
 
         let services = allServices.filter((service) => {
-            if (!service.isAvailable) {
-                return false;
-            }
-
             if (
                 activeVertical !== "ALL" &&
                 service.category !== activeVertical
