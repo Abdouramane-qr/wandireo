@@ -210,6 +210,10 @@ export interface BaseService {
     serviceCategoryName?: string;
     serviceSubcategoryName?: string;
     extraData?: Record<string, unknown> & {
+        wandireo?: {
+            attributes?: Record<string, unknown>;
+            manualPartnerPrice?: number;
+        };
         fareharbor?: {
             company?: string;
             itemId?: string;

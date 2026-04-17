@@ -123,12 +123,29 @@ function normalizeText(value: string): string {
 }
 
 function getServiceAttributes(service: Service): Record<string, unknown> {
-    return (service.extraData?.attributes as Record<string, unknown>) ?? {};
+    const attributes = service.extraData?.attributes;
+
+    return attributes &&
+        typeof attributes === "object" &&
+        !Array.isArray(attributes)
+        ? (attributes as Record<string, unknown>)
+        : {};
 }
 
 function formatFilterValue(value: unknown): string {
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => formatFilterValue(item))
+            .filter(Boolean)
+            .join(", ");
+    }
+
     if (typeof value === "boolean") {
         return value ? "Oui" : "Non";
+    }
+
+    if (value && typeof value === "object") {
+        return "";
     }
 
     return String(value).trim();
@@ -269,7 +286,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     dateFrom,
     dateTo,
 }) => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const queryClient = useQueryClient();
@@ -387,6 +404,33 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         ],
         [t],
     );
+
+    const activeVerticalMeta =
+        VERTICALS.find((vertical) => vertical.value === activeVertical) ??
+        VERTICALS[0];
+
+    const detailedCategoriesHeading = useMemo(() => {
+        if (activeVertical === "ALL") {
+            return locale === "fr"
+                ? "Sous-catégories"
+                : t("search.detailed_categories");
+        }
+
+        if (locale !== "fr") {
+            return `${t("search.types_prefix")} ${activeVerticalMeta.label.toLowerCase()}`;
+        }
+
+        switch (activeVertical) {
+            case "ACTIVITE":
+                return "Types d'activités";
+            case "HEBERGEMENT":
+                return "Types d'hébergements";
+            case "BATEAU":
+                return "Types de bateaux";
+            case "VOITURE":
+                return "Types de voitures";
+        }
+    }, [activeVertical, activeVerticalMeta.label, locale, t]);
 
     const destinationOptions = useMemo(() => {
         const algarveSet = new Set(ALGARVE_CITIES);
@@ -588,7 +632,13 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                         continue;
                     }
 
-                    values.add(formatFilterValue(rawValue));
+                    const normalizedValue = formatFilterValue(rawValue);
+
+                    if (!normalizedValue) {
+                        continue;
+                    }
+
+                    values.add(normalizedValue);
                 }
 
                 const sortedValues = Array.from(values).sort((a, b) =>
@@ -671,7 +721,13 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                     service.serviceSubcategoryName ?? "",
                     ...service.tags,
                     ...Object.entries(getServiceAttributes(service)).map(
-                        ([key, value]) => `${key} ${formatFilterValue(value)}`,
+                        ([key, value]) => {
+                            const normalizedValue = formatFilterValue(value);
+
+                            return normalizedValue
+                                ? `${key} ${normalizedValue}`
+                                : key;
+                        },
                     ),
                 ].join(" "),
             );
@@ -793,10 +849,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
         return parts.join(" ");
     }, [activeVertical, filters, t, CATEGORY_LABELS]);
-
-    const activeVerticalMeta =
-        VERTICALS.find((vertical) => vertical.value === activeVertical) ??
-        VERTICALS[0];
 
     const handleFavoriteToggle = async (serviceId: string) => {
         if (!currentUser || currentUser.role !== "CLIENT") {
@@ -1055,9 +1107,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                     {visibleDetailedCategories.length > 0 && (
                         <div className="wdr-search__filter-group">
                             <h3 className="wdr-search__filter-label">
-                                {activeVertical === "ALL"
-                                    ? t("search.detailed_categories")
-                                    : `${t("search.types_prefix")} ${activeVerticalMeta.label.toLowerCase()}`}
+                                {detailedCategoriesHeading}
                             </h3>
                             <ul
                                 className="wdr-search__checkbox-list"

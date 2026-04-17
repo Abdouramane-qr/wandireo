@@ -1,9 +1,9 @@
-import type { Availability } from '@/types/availability';
-import type { BlogPost, BlogStatus } from '@/types/blog';
-import type { Booking, BookingStatus, PaymentStatus } from '@/types/booking';
-import type { Favorite } from '@/types/favorite';
-import type { Review } from '@/types/review';
-import type { MandateContractStatus, PartnerStatus } from '@/types/wdr-user';
+import type { Availability } from "@/types/availability";
+import type { BlogPost, BlogStatus } from "@/types/blog";
+import type { Booking, BookingStatus, PaymentStatus } from "@/types/booking";
+import type { Favorite } from "@/types/favorite";
+import type { Review } from "@/types/review";
+import type { MandateContractStatus, PartnerStatus } from "@/types/wdr-user";
 import type {
     AccommodationService,
     ActivityService,
@@ -19,22 +19,22 @@ import type {
     ServiceExtraDefinition,
     ServicePricingUnit,
     ServiceSubcategoryDefinition,
-} from '@/types/service';
-import { PaymentModeNames } from '@/types/service';
-import type { User } from '@/types/wdr-user';
+} from "@/types/service";
+import { PaymentModeNames } from "@/types/service";
+import type { User } from "@/types/wdr-user";
 
 type UnknownRecord = Record<string, unknown>;
 
 function asRecord(value: unknown): UnknownRecord {
-    return value && typeof value === 'object' ? (value as UnknownRecord) : {};
+    return value && typeof value === "object" ? (value as UnknownRecord) : {};
 }
 
-function asString(value: unknown, fallback = ''): string {
-    if (typeof value === 'string') {
+function asString(value: unknown, fallback = ""): string {
+    if (typeof value === "string") {
         return value;
     }
 
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
         return String(value);
     }
 
@@ -42,11 +42,11 @@ function asString(value: unknown, fallback = ''): string {
 }
 
 function asNumber(value: unknown, fallback = 0): number {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
         return value;
     }
 
-    if (typeof value === 'string' && value.trim() !== '') {
+    if (typeof value === "string" && value.trim() !== "") {
         const parsed = Number(value);
 
         if (!Number.isNaN(parsed)) {
@@ -58,16 +58,16 @@ function asNumber(value: unknown, fallback = 0): number {
 }
 
 function asBoolean(value: unknown, fallback = false): boolean {
-    if (typeof value === 'boolean') {
+    if (typeof value === "boolean") {
         return value;
     }
 
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
         return value !== 0;
     }
 
-    if (typeof value === 'string') {
-        return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+    if (typeof value === "string") {
+        return ["1", "true", "yes", "on"].includes(value.toLowerCase());
     }
 
     return fallback;
@@ -79,11 +79,15 @@ function asStringArray(value: unknown): string[] {
         : [];
 }
 
-function asLocalizedTextMap(value: unknown): Record<string, string> | undefined {
+function asLocalizedTextMap(
+    value: unknown,
+): Record<string, string> | undefined {
     const record = asRecord(value);
     const entries = Object.entries(record)
-        .map(([locale, translation]) => [locale, asString(translation)] as const)
-        .filter(([, translation]) => translation.trim() !== '');
+        .map(
+            ([locale, translation]) => [locale, asString(translation)] as const,
+        )
+        .filter(([, translation]) => translation.trim() !== "");
 
     if (entries.length === 0) {
         return undefined;
@@ -103,7 +107,41 @@ function asDate(value: unknown): Date {
 }
 
 function serviceExtra(raw: UnknownRecord): UnknownRecord {
-    return asRecord(raw.extra_data);
+    const extra = asRecord(raw.extra_data);
+    const wandireo = asRecord(extra.wandireo);
+    const legacyFareHarborOverrides = asRecord(
+        asRecord(extra.fareharbor).overrides,
+    );
+    const legacyAttributes = asRecord(extra.attributes);
+    const effectiveAttributes =
+        Object.keys(asRecord(wandireo.attributes)).length > 0
+            ? asRecord(wandireo.attributes)
+            : Object.keys(asRecord(legacyFareHarborOverrides.attributes))
+                    .length > 0
+              ? asRecord(legacyFareHarborOverrides.attributes)
+              : legacyAttributes;
+
+    if (
+        Object.keys(wandireo).length === 0 &&
+        Object.keys(effectiveAttributes).length === 0
+    ) {
+        return extra;
+    }
+
+    return {
+        ...extra,
+        attributes: effectiveAttributes,
+        wandireo: {
+            ...wandireo,
+            attributes: effectiveAttributes,
+            manualPartnerPrice:
+                typeof wandireo.manual_partner_price === "number"
+                    ? wandireo.manual_partner_price
+                    : typeof wandireo.manualPartnerPrice === "number"
+                      ? wandireo.manualPartnerPrice
+                      : undefined,
+        },
+    };
 }
 
 function normalizePricingUnit(
@@ -112,12 +150,12 @@ function normalizePricingUnit(
 ): ServicePricingUnit {
     const candidate = asString(value, fallback);
     const allowed = [
-        'PAR_PERSONNE',
-        'PAR_GROUPE',
-        'PAR_JOUR',
-        'PAR_DEMI_JOURNEE',
-        'PAR_SEMAINE',
-        'PAR_NUIT',
+        "PAR_PERSONNE",
+        "PAR_GROUPE",
+        "PAR_JOUR",
+        "PAR_DEMI_JOURNEE",
+        "PAR_SEMAINE",
+        "PAR_NUIT",
     ];
 
     return allowed.includes(candidate)
@@ -138,17 +176,17 @@ function normalizePaymentMode(value: unknown): PaymentMode {
 }
 
 function normalizeBookingMode(value: unknown): BookingMode {
-    const candidate = asString(value, 'REQUEST');
+    const candidate = asString(value, "REQUEST");
 
-    if (candidate === 'INSTANT') {
-        return 'INSTANT';
+    if (candidate === "INSTANT") {
+        return "INSTANT";
     }
 
-    if (candidate === 'EXTERNAL_REDIRECT') {
-        return 'EXTERNAL_REDIRECT';
+    if (candidate === "EXTERNAL_REDIRECT") {
+        return "EXTERNAL_REDIRECT";
     }
 
-    return 'REQUEST';
+    return "REQUEST";
 }
 
 function baseService(rawInput: unknown): {
@@ -178,7 +216,7 @@ function baseService(rawInput: unknown): {
     bookingMode: BookingMode;
     featured: boolean;
     videoUrl?: string;
-    sourceType?: 'LOCAL' | 'EXTERNAL';
+    sourceType?: "LOCAL" | "EXTERNAL";
     sourceProvider?: string;
     sourceExternalId?: string;
     isExternalRedirect?: boolean;
@@ -188,15 +226,21 @@ function baseService(rawInput: unknown): {
     serviceCategoryName?: string;
     serviceSubcategoryName?: string;
     extraData: Record<string, unknown>;
-    location: Service['location'];
+    location: Service["location"];
 } {
     const raw = asRecord(rawInput);
     const extra = serviceExtra(raw);
-    const category = asString(raw.category, 'ACTIVITE') as ServiceCategory;
-    const partnerPrice = asNumber(raw.partner_price ?? raw.partnerPrice);
+    const category = asString(raw.category, "ACTIVITE") as ServiceCategory;
+    const wandireo = asRecord(extra.wandireo);
+    const partnerPrice = asNumber(
+        raw.partner_price ??
+            raw.partnerPrice ??
+            wandireo.manual_partner_price ??
+            wandireo.manualPartnerPrice,
+    );
     const commissionRate = asNumber(
         raw.commission_rate ?? raw.commissionRate,
-        0.20,
+        0.2,
     );
     const commissionAmount = asNumber(
         raw.commission_amount ?? raw.commissionAmount,
@@ -209,9 +253,9 @@ function baseService(rawInput: unknown): {
     const locationData = asRecord(raw.location);
     const coordinates = asRecord(locationData.coordinates);
     const sourceType =
-        asString(raw.source_type ?? raw.sourceType, 'LOCAL') === 'EXTERNAL'
-            ? 'EXTERNAL'
-            : 'LOCAL';
+        asString(raw.source_type ?? raw.sourceType, "LOCAL") === "EXTERNAL"
+            ? "EXTERNAL"
+            : "LOCAL";
     const sourceProvider =
         asString(raw.source_provider ?? raw.sourceProvider) || undefined;
     const fareHarbor = asRecord(extra.fareharbor);
@@ -221,10 +265,10 @@ function baseService(rawInput: unknown): {
     const isExternalRedirect =
         asBoolean(raw.is_external_redirect ?? raw.isExternalRedirect) ||
         normalizeBookingMode(raw.booking_mode ?? raw.bookingMode) ===
-            'EXTERNAL_REDIRECT' ||
+            "EXTERNAL_REDIRECT" ||
         normalizePaymentMode(raw.payment_mode ?? raw.paymentMode) ===
             PaymentModeNames.EXTERNAL_REDIRECT ||
-        bookingUrl === '__force_external_redirect__';
+        bookingUrl === "__force_external_redirect__";
 
     return {
         raw,
@@ -244,13 +288,13 @@ function baseService(rawInput: unknown): {
         category,
         pricingUnit: normalizePricingUnit(
             raw.pricing_unit ?? raw.pricingUnit,
-            category === 'ACTIVITE' ? 'PAR_PERSONNE' : 'PAR_JOUR',
+            category === "ACTIVITE" ? "PAR_PERSONNE" : "PAR_JOUR",
         ),
         partnerPrice,
         commissionRate,
         commissionAmount,
         clientPrice,
-        currency: asString(raw.currency, 'EUR'),
+        currency: asString(raw.currency, "EUR"),
         rating: raw.rating == null ? undefined : asNumber(raw.rating),
         reviewCount: asNumber(raw.review_count ?? raw.reviewCount),
         isAvailable: asBoolean(raw.is_available ?? raw.isAvailable, true),
@@ -335,7 +379,7 @@ export function normalizeServiceAttribute(
         ),
         label: asString(raw.label),
         key: asString(raw.key),
-        type: asString(raw.type, 'text') as ServiceAttributeDefinition['type'],
+        type: asString(raw.type, "text") as ServiceAttributeDefinition["type"],
         isRequired: asBoolean(raw.is_required ?? raw.isRequired),
         isFilterable: asBoolean(raw.is_filterable ?? raw.isFilterable, true),
         sortOrder: asNumber(raw.sort_order ?? raw.sortOrder),
@@ -360,8 +404,8 @@ export function normalizeServiceExtra(
         defaultPrice: asNumber(raw.default_price ?? raw.defaultPrice),
         inputType: asString(
             raw.input_type ?? raw.inputType,
-            'CHECKBOX',
-        ) as ServiceExtraDefinition['inputType'],
+            "CHECKBOX",
+        ) as ServiceExtraDefinition["inputType"],
         isRequired: asBoolean(raw.is_required ?? raw.isRequired),
         isActive: asBoolean(raw.is_active ?? raw.isActive, true),
         sortOrder: asNumber(raw.sort_order ?? raw.sortOrder),
@@ -395,7 +439,7 @@ export function normalizeServiceCategory(
         id: asString(raw.id),
         serviceType: asString(
             raw.service_type ?? raw.serviceType,
-            'ACTIVITE',
+            "ACTIVITE",
         ) as ServiceCategory,
         name: asString(raw.name),
         slug: asString(raw.slug),
@@ -416,14 +460,14 @@ export function normalizeServiceCategory(
 
 export function normalizeUser(rawInput: unknown): User {
     const raw = asRecord(rawInput);
-    const role = asString(raw.role, 'CLIENT') as User['role'];
+    const role = asString(raw.role, "CLIENT") as User["role"];
     const firstName = asString(
-        raw.first_name ?? raw.firstName ?? raw.name?.toString().split(' ')[0],
+        raw.first_name ?? raw.firstName ?? raw.name?.toString().split(" ")[0],
     );
     const lastName = asString(
         raw.last_name ??
             raw.lastName ??
-            raw.name?.toString().split(' ').slice(1).join(' '),
+            raw.name?.toString().split(" ").slice(1).join(" "),
     );
     const base = {
         id: asString(raw.id),
@@ -436,12 +480,12 @@ export function normalizeUser(rawInput: unknown): User {
         createdAt: asDate(raw.created_at ?? raw.createdAt),
         updatedAt: asDate(raw.updated_at ?? raw.updatedAt),
         phoneNumber: asString(raw.phone_number ?? raw.phoneNumber) || undefined,
-        language: asString(raw.language, 'fr') || undefined,
+        language: asString(raw.language, "fr") || undefined,
         bookingsCount: asNumber(raw.bookings_count ?? raw.bookingsCount),
         reviewsCount: asNumber(raw.reviews_count ?? raw.reviewsCount),
     };
 
-    if (role === 'PARTNER') {
+    if (role === "PARTNER") {
         return {
             ...base,
             role,
@@ -456,7 +500,7 @@ export function normalizeUser(rawInput: unknown): User {
                 undefined,
             partnerStatus: asString(
                 raw.partner_status ?? raw.partnerStatus,
-                'PENDING',
+                "PENDING",
             ) as PartnerStatus,
             partnerValidatedAt:
                 raw.partner_validated_at || raw.partnerValidatedAt
@@ -468,7 +512,7 @@ export function normalizeUser(rawInput: unknown): User {
                 ) || undefined,
             mandateContractStatus: asString(
                 raw.mandate_contract_status ?? raw.mandateContractStatus,
-                'NOT_SENT',
+                "NOT_SENT",
             ) as MandateContractStatus,
             mandateContractFilePath:
                 asString(
@@ -489,13 +533,13 @@ export function normalizeUser(rawInput: unknown): User {
             activities: asStringArray(raw.activities),
             commissionRate: asNumber(
                 raw.commission_rate ?? raw.commissionRate,
-                0.20,
+                0.2,
             ),
             totalSales: asNumber(raw.total_sales ?? raw.totalSales),
         };
     }
 
-    if (role === 'ADMIN') {
+    if (role === "ADMIN") {
         return {
             ...base,
             role,
@@ -511,7 +555,7 @@ export function normalizeUser(rawInput: unknown): User {
 
     return {
         ...base,
-        role: 'CLIENT',
+        role: "CLIENT",
         bookings: asStringArray(raw.bookings),
         reviews: asStringArray(raw.reviews),
         preferredCurrency:
@@ -524,18 +568,18 @@ export function normalizeService(rawInput: unknown): Service {
     const base = baseService(rawInput);
     const { extra, category, pricingUnit, ...shared } = base;
 
-    if (category === 'BATEAU') {
+    if (category === "BATEAU") {
         const service: BoatService = {
             ...shared,
             category,
             pricingUnit: normalizePricingUnit(
                 pricingUnit,
-                'PAR_JOUR',
-            ) as BoatService['pricingUnit'],
+                "PAR_JOUR",
+            ) as BoatService["pricingUnit"],
             boatType: asString(
                 extra.boatType,
-                'VOILIER',
-            ) as BoatService['boatType'],
+                "VOILIER",
+            ) as BoatService["boatType"],
             boatName: asString(extra.boatName, shared.title),
             passengerCapacity: asNumber(extra.passengerCapacity, 6),
             sleepingBerths: asNumber(extra.sleepingBerths, 0),
@@ -546,16 +590,16 @@ export function normalizeService(rawInput: unknown): Service {
             ),
             engineType: asString(
                 extra.engineType,
-                'VOILE_ET_MOTEUR',
-            ) as BoatService['engineType'],
+                "VOILE_ET_MOTEUR",
+            ) as BoatService["engineType"],
             enginePowerKw:
                 extra.enginePowerKw == null
                     ? undefined
                     : asNumber(extra.enginePowerKw),
             rentalMode: asString(
                 extra.rentalMode,
-                'AVEC_SKIPPER',
-            ) as BoatService['rentalMode'],
+                "AVEC_SKIPPER",
+            ) as BoatService["rentalMode"],
             cabins: asNumber(extra.cabins, 1),
             bathrooms: asNumber(extra.bathrooms, 1),
             amenities: asStringArray(extra.amenities),
@@ -579,24 +623,24 @@ export function normalizeService(rawInput: unknown): Service {
         return service;
     }
 
-    if (category === 'HEBERGEMENT') {
+    if (category === "HEBERGEMENT") {
         const service: AccommodationService = {
             ...shared,
             category,
             pricingUnit: normalizePricingUnit(
                 pricingUnit,
-                'PAR_NUIT',
-            ) as AccommodationService['pricingUnit'],
+                "PAR_NUIT",
+            ) as AccommodationService["pricingUnit"],
             accommodationType: asString(
                 extra.accommodationType,
-                'APPARTEMENT',
-            ) as AccommodationService['accommodationType'],
+                "APPARTEMENT",
+            ) as AccommodationService["accommodationType"],
             starRating:
                 extra.starRating == null
                     ? undefined
                     : (asNumber(
                           extra.starRating,
-                      ) as AccommodationService['starRating']),
+                      ) as AccommodationService["starRating"]),
             maxGuests: asNumber(extra.maxGuests, 2),
             bedrooms: asNumber(extra.bedrooms, 1),
             bathrooms: asNumber(extra.bathrooms, 1),
@@ -605,8 +649,8 @@ export function normalizeService(rawInput: unknown): Service {
                     ? undefined
                     : asNumber(extra.totalSurfaceM2),
             amenities: asStringArray(extra.amenities),
-            checkInTime: asString(extra.checkInTime, '14:00'),
-            checkOutTime: asString(extra.checkOutTime, '11:00'),
+            checkInTime: asString(extra.checkInTime, "14:00"),
+            checkOutTime: asString(extra.checkOutTime, "11:00"),
             breakfastIncluded: asBoolean(extra.breakfastIncluded),
             minimumStayNights: asNumber(extra.minimumStayNights, 1),
             petsAllowed: asBoolean(extra.petsAllowed),
@@ -615,8 +659,8 @@ export function normalizeService(rawInput: unknown): Service {
             houseRules: asStringArray(extra.houseRules),
             cancellationPolicy: asString(
                 extra.cancellationPolicy,
-                'MODEREE',
-            ) as AccommodationService['cancellationPolicy'],
+                "MODEREE",
+            ) as AccommodationService["cancellationPolicy"],
             nearbyAttractions: asStringArray(extra.nearbyAttractions),
             distanceToBeachMeters:
                 extra.distanceToBeachMeters == null
@@ -631,30 +675,30 @@ export function normalizeService(rawInput: unknown): Service {
         return service;
     }
 
-    if (category === 'VOITURE') {
+    if (category === "VOITURE") {
         const luggage = asRecord(extra.luggage);
         const service: CarService = {
             ...shared,
             category,
             pricingUnit: normalizePricingUnit(
                 pricingUnit,
-                'PAR_JOUR',
-            ) as CarService['pricingUnit'],
+                "PAR_JOUR",
+            ) as CarService["pricingUnit"],
             vehicleType: asString(
                 extra.vehicleType,
-                'SUV',
-            ) as CarService['vehicleType'],
-            brand: asString(extra.brand, 'Vehicule'),
+                "SUV",
+            ) as CarService["vehicleType"],
+            brand: asString(extra.brand, "Vehicule"),
             model: asString(extra.model, shared.title),
             year: asNumber(extra.year, new Date().getFullYear()),
             transmission: asString(
                 extra.transmission,
-                'AUTOMATIQUE',
-            ) as CarService['transmission'],
+                "AUTOMATIQUE",
+            ) as CarService["transmission"],
             fuelType: asString(
                 extra.fuelType,
-                'ESSENCE',
-            ) as CarService['fuelType'],
+                "ESSENCE",
+            ) as CarService["fuelType"],
             seats: asNumber(extra.seats, 4),
             doors: asNumber(extra.doors, 4),
             luggage: {
@@ -669,8 +713,8 @@ export function normalizeService(rawInput: unknown): Service {
             ),
             fuelIncluded: asBoolean(extra.fuelIncluded),
             mileageLimit:
-                extra.mileageLimit === 'ILLIMITE'
-                    ? 'ILLIMITE'
+                extra.mileageLimit === "ILLIMITE"
+                    ? "ILLIMITE"
                     : asNumber(extra.mileageLimit, 0),
             mileageExtraChargePerKm:
                 extra.mileageExtraChargePerKm == null
@@ -694,28 +738,28 @@ export function normalizeService(rawInput: unknown): Service {
     const schedule = asRecord(extra.schedule);
     const service: ActivityService = {
         ...shared,
-        category: 'ACTIVITE',
+        category: "ACTIVITE",
         pricingUnit: normalizePricingUnit(
             pricingUnit,
-            'PAR_PERSONNE',
-        ) as ActivityService['pricingUnit'],
+            "PAR_PERSONNE",
+        ) as ActivityService["pricingUnit"],
         activityType: asString(
             extra.activityType,
-            'RANDONNEE',
-        ) as ActivityService['activityType'],
+            "RANDONNEE",
+        ) as ActivityService["activityType"],
         duration: asNumber(extra.duration, 60),
         durationUnit: asString(
             extra.durationUnit,
-            'MINUTES',
-        ) as ActivityService['durationUnit'],
+            "MINUTES",
+        ) as ActivityService["durationUnit"],
         difficulty: asString(
             extra.difficulty,
-            'TOUS_NIVEAUX',
-        ) as ActivityService['difficulty'],
+            "TOUS_NIVEAUX",
+        ) as ActivityService["difficulty"],
         physicalIntensity: asString(
             extra.physicalIntensity,
-            'MODEREE',
-        ) as ActivityService['physicalIntensity'],
+            "MODEREE",
+        ) as ActivityService["physicalIntensity"],
         minParticipants: asNumber(extra.minParticipants, 1),
         maxParticipants: asNumber(extra.maxParticipants, 10),
         minAgeYears: asNumber(extra.minAgeYears, 0),
@@ -730,7 +774,7 @@ export function normalizeService(rawInput: unknown): Service {
             startTimes: asStringArray(schedule.startTimes),
             daysAvailable: asStringArray(
                 schedule.daysAvailable,
-            ) as ActivityService['schedule']['daysAvailable'],
+            ) as ActivityService["schedule"]["daysAvailable"],
             seasonAvailability: schedule.seasonAvailability
                 ? {
                       from: asString(
@@ -743,8 +787,8 @@ export function normalizeService(rawInput: unknown): Service {
         languages: asStringArray(extra.languages),
         groupType: asString(
             extra.groupType,
-            'GROUPE_PARTAGE',
-        ) as ActivityService['groupType'],
+            "GROUPE_PARTAGE",
+        ) as ActivityService["groupType"],
     };
 
     return service;
@@ -753,7 +797,8 @@ export function normalizeService(rawInput: unknown): Service {
 export function normalizeBooking(rawInput: unknown): Booking {
     const raw = asRecord(rawInput);
     const extraData = asRecord(raw.extra_data ?? raw.extraData);
-    const rawSelectedExtras = extraData.selected_extras ?? extraData.selectedExtras;
+    const rawSelectedExtras =
+        extraData.selected_extras ?? extraData.selectedExtras;
     const bookingExtras = Array.isArray(rawSelectedExtras)
         ? rawSelectedExtras.map((extra) => {
               const extraRecord = asRecord(extra);
@@ -770,8 +815,8 @@ export function normalizeBooking(rawInput: unknown): Booking {
                   ),
                   inputType: asString(
                       extraRecord.input_type ?? extraRecord.inputType,
-                      'CHECKBOX',
-                  ) as 'CHECKBOX' | 'REQUIRED',
+                      "CHECKBOX",
+                  ) as "CHECKBOX" | "REQUIRED",
               };
           })
         : [];
@@ -781,10 +826,10 @@ export function normalizeBooking(rawInput: unknown): Booking {
         clientId: asString(raw.client_id ?? raw.clientId),
         partnerId: asString(raw.partner_id ?? raw.partnerId),
         serviceId: asString(raw.service_id ?? raw.serviceId),
-        status: asString(raw.status, 'PENDING') as BookingStatus,
+        status: asString(raw.status, "PENDING") as BookingStatus,
         paymentStatus: asString(
             raw.payment_status ?? raw.paymentStatus,
-            'PENDING',
+            "PENDING",
         ) as PaymentStatus,
         startDate: asDate(raw.start_date ?? raw.startDate),
         endDate:
@@ -794,7 +839,7 @@ export function normalizeBooking(rawInput: unknown): Booking {
         participants: asNumber(raw.participants, 1),
         unitPrice: asNumber(raw.unit_price ?? raw.unitPrice),
         totalPrice: asNumber(raw.total_price ?? raw.totalPrice),
-        currency: asString(raw.currency, 'EUR'),
+        currency: asString(raw.currency, "EUR"),
         stripePaymentIntentId:
             asString(
                 raw.stripe_payment_intent_id ?? raw.stripePaymentIntentId,
@@ -839,10 +884,9 @@ export function normalizeReview(rawInput: unknown): Review {
         id: asString(raw.id),
         clientId: asString(raw.client_id ?? raw.clientId),
         serviceId: asString(raw.service_id ?? raw.serviceId),
-        rating: asNumber(raw.rating, 5) as Review['rating'],
+        rating: asNumber(raw.rating, 5) as Review["rating"],
         comment: asString(raw.comment),
-        status:
-            asString(raw.status, 'APPROVED') as Review['status'],
+        status: asString(raw.status, "APPROVED") as Review["status"],
         moderatedAt:
             raw.moderated_at || raw.moderatedAt
                 ? asDate(raw.moderated_at ?? raw.moderatedAt)
@@ -903,7 +947,7 @@ export function normalizeBlogPost(rawInput: unknown): BlogPost {
             ) || undefined,
         coverImage: asString(raw.cover_image ?? raw.coverImage),
         authorId: asString(raw.author_id ?? raw.authorId),
-        status: asString(raw.status, 'DRAFT') as BlogStatus,
+        status: asString(raw.status, "DRAFT") as BlogStatus,
         tags: asStringArray(raw.tags),
         publishedAt:
             raw.published_at || raw.publishedAt

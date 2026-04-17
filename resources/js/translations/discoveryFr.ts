@@ -25,7 +25,7 @@ export function buildDiscoveryFrTranslations(): Record<string, string> {
         "search.date_note":
             "Vos dates sont reprises automatiquement dans la réservation quand le service le permet.",
         "search.main_categories": "Catégories principales",
-        "search.detailed_categories": "Affiner par type",
+        "search.detailed_categories": "Sous-catégories",
         "search.types_prefix": "Types de",
         "search.budget": "Budget",
         "search.min_rating": "Note minimale",
@@ -135,8 +135,7 @@ export function buildDiscoveryFrTranslations(): Record<string, string> {
         "home.faq.3.a":
             "Cela dépend du service réservé. Les conditions d’annulation sont précisées sur chaque fiche avant la réservation.",
         "home.faq.4.q": "Le paiement est-il sécurisé ?",
-        "home.faq.4.a":
-            "Oui, tous les paiements sont sécurisés et chiffrés.",
+        "home.faq.4.a": "Oui, tous les paiements sont sécurisés et chiffrés.",
         "home.faq.5.q": "Quels moyens de paiement sont acceptés ?",
         "home.faq.5.a":
             "Selon le service, le paiement peut se faire en ligne, en acompte ou sur place. Les modalités exactes sont affichées avant validation.",
