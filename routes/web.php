@@ -89,7 +89,11 @@ Route::prefix('{locale?}')->group(function () {
         Route::get('/services/creation/{serviceId}', [PageController::class, 'adminServiceForm'])->name('admin.services.edit');
         Route::get('/avis', [PageController::class, 'adminReviews'])->name('admin.reviews');
         Route::get('/transactions', [PageController::class, 'adminTransactions'])->name('admin.transactions');
-        Route::get('/support', [PageController::class, 'adminSupport'])->name('admin.support');
+        
+        Route::get('/support', [\App\Http\Controllers\Admin\SupportTicketController::class, 'index'])->name('admin.support');
+        Route::post('/support/tickets', [\App\Http\Controllers\Admin\SupportTicketController::class, 'store'])->name('admin.support.store');
+        Route::patch('/support/tickets/{id}', [\App\Http\Controllers\Admin\SupportTicketController::class, 'update'])->name('admin.support.update');
+
         Route::get('/blog', [PageController::class, 'adminBlogIndex'])->name('admin.blog');
         Route::get('/blog/editeur', [PageController::class, 'adminBlogEditor'])->name('admin.blog.editor');
         Route::get('/blog/editeur/{postId}', [PageController::class, 'adminBlogEditor'])->name('admin.blog.editor.edit');

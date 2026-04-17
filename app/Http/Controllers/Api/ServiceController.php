@@ -151,17 +151,14 @@ class ServiceController extends Controller
     /** GET /api/services/{id} */
     public function show(string $id): JsonResponse
     {
-        $cacheKey = "services:show:" . app()->getLocale() . ":{$id}";
-        $resolver = fn () => Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])->findOrFail($id);
-
-        $service = $this->supportsTaggedCache()
-            ? Cache::tags(['services'])->remember($cacheKey, self::CACHE_TTL_SECONDS, $resolver)
-            : Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, $resolver);
+        $service = Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])
+            ->findOrFail($id)
+            ->toArray();
 
         if (! in_array(request()->user()?->role, ['ADMIN', 'PARTNER'], true)) {
             $this->analyticsTracker->track(request(), 'service_viewed', [
-                'service_id' => $service->id,
-                'category' => $service->category,
+                'service_id' => data_get($service, 'id'),
+                'category' => data_get($service, 'category'),
             ]);
         }
 
@@ -225,6 +222,7 @@ class ServiceController extends Controller
         $data['source_type'] = 'LOCAL';
 
         $service = Service::create($data);
+        $service->refresh();
         $this->flushServicesCache();
 
         return response()->json($service->load(['partner', 'serviceCategory', 'serviceSubcategory']), 201);
@@ -271,6 +269,7 @@ class ServiceController extends Controller
         $this->prepareServiceUpdatePayload($request, $service, $payload);
 
         $service->update($payload);
+        $service->refresh();
 
         $this->flushServicesCache();
 

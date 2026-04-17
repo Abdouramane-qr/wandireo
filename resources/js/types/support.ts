@@ -11,6 +11,7 @@ export interface SupportTicket {
     partner?: BaseUser;
     subject: string;
     message: string;
+    media?: string;
     status: SupportStatus;
     priority: SupportPriority;
     createdAt: string;
