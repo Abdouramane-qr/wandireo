@@ -1,18 +1,12 @@
 /**
  * @file pages/AdminTransactionsPage/AdminTransactionsPage.css
  * @description Styles de la page Transactions — Administration Wandireo.
- *
- * Nomenclature BEM : .wdr-admin-tx__[element]--[modifier]
- * Variables CSS héritées de src/index.css
  */
 
-/* ============================================================
-   Racine
-   ============================================================ */
-
 .wdr-admin-tx {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 4.75rem);
     background-color: var(--bg-subtle);
+    padding-bottom: 4rem;
 }
 
 @media (min-width: 1180px) {
@@ -42,446 +36,128 @@
     }
 }
 
-/* ============================================================
-   Hero
-   ============================================================ */
-
 .wdr-admin-tx__hero {
     background: linear-gradient(135deg, #1a1a2e 0%, var(--brand-purple) 100%);
-    color: var(--text-light);
+    color: #ffffff;
     padding: 2.5rem 1.5rem;
-}
-
-.wdr-admin-tx__hero-content {
-    max-width: 1440px;
-    margin: 0 auto;
 }
 
 .wdr-admin-tx__hero-badge {
     display: inline-block;
     font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-sm);
     padding: 0.2rem 0.6rem;
-    margin: 0 0 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .wdr-admin-tx__hero-title {
     font-family: var(--font-heading);
     font-size: clamp(1.4rem, 3.5vw, 2rem);
-    font-weight: 700;
-    margin: 0 0 0.4rem;
-}
-
-.wdr-admin-tx__hero-subtitle {
-    font-size: 0.875rem;
-    opacity: 0.75;
+    font-weight: 800;
     margin: 0;
 }
 
-/* ============================================================
-   Corps
-   ============================================================ */
+.wdr-admin-tx__hero-subtitle {
+    font-size: 0.9375rem;
+    opacity: 0.85;
+    margin-top: 0.5rem;
+}
 
 .wdr-admin-tx__body {
     padding: 2rem 0;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    min-width: 0;
 }
 
-
-/* ============================================================
-   Bannière formule
-   ============================================================ */
-
-.wdr-admin-tx__formula-banner {
-    background: #eef3ff;
-    border: 1px solid #c3d5ff;
-    border-radius: var(--radius-md);
-    padding: 0.75rem 1.25rem;
-    font-size: 0.8rem;
-    color: #2c4a9e;
-    line-height: 1.6;
-}
-
-/* ============================================================
-   Totaux globaux
-   ============================================================ */
-
+/* TOTALS CARDS */
 .wdr-admin-tx__totals {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
 }
 
 .wdr-admin-tx__total-card {
     background: var(--bg-elevated);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.5rem;
-    box-shadow: var(--card-shadow);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    border: var(--card-border);
-    transition:
-        box-shadow var(--transition-base),
-        border-color var(--transition-base),
-        transform var(--transition-base);
-}
-
-.wdr-admin-tx__total-card:hover {
-    box-shadow: var(--card-shadow-hover);
-    border-color: var(--border-strong);
-    transform: translateY(-2px);
+    gap: 0.5rem;
+    transition: all 200ms;
 }
 
 .wdr-admin-tx__total-label {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .wdr-admin-tx__total-value {
     font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 800;
     color: var(--text-main);
-    line-height: 1.1;
 }
 
-.wdr-admin-tx__total-card--commission .wdr-admin-tx__total-value {
-    color: var(--success-dark);
-}
-
-/* ============================================================
-   En-tête de section
-   ============================================================ */
-
-.wdr-admin-tx__section-title {
-    font-family: var(--font-heading);
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0 0 0.875rem;
-}
-
-/* ============================================================
-   Filtres
-   ============================================================ */
-
-.wdr-admin-tx__filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.wdr-admin-tx__filter-select {
-    height: 38px;
-    padding: 0 0.875rem;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    background: #ffffff;
-    font-size: 0.875rem;
-    color: var(--text-main);
-    cursor: pointer;
-    transition: border-color var(--transition-base);
-}
-
-.wdr-admin-tx__filter-select:focus {
-    outline: none;
-    border-color: var(--brand-purple);
-    box-shadow: 0 0 0 3px rgba(134, 59, 255, 0.12);
-}
-
-.wdr-admin-tx__filter-count {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-left: auto;
-}
-
-/* ============================================================
-   Tableaux
-   ============================================================ */
-
+/* TABLE */
 .wdr-admin-tx__table-wrapper {
     background: var(--bg-elevated);
     border-radius: var(--radius-lg);
-    box-shadow: var(--card-shadow);
-    border: var(--card-border);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .wdr-admin-tx__table {
     width: 100%;
-    min-width: 1180px;
+    min-width: 1100px;
     border-collapse: collapse;
-    font-size: 0.82rem;
 }
 
 .wdr-admin-tx__table th {
     text-align: left;
-    padding: 0.65rem 0.875rem;
-    font-size: 0.68rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--text-muted);
+    text-transform: uppercase;
     border-bottom: 1px solid var(--border-light);
-    white-space: nowrap;
 }
 
 .wdr-admin-tx__table td {
-    padding: 0.8rem 0.875rem;
-    color: var(--text-main);
+    padding: 1rem;
     border-bottom: 1px solid var(--border-light);
-    vertical-align: middle;
+    font-size: 0.875rem;
 }
 
-.wdr-admin-tx__table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.wdr-admin-tx__table tbody tr:hover td {
-    background-color: var(--bg-subtle);
-}
-
-.wdr-admin-tx__table-empty {
-    text-align: center;
-    color: var(--text-muted);
-    font-style: italic;
-    padding: 2.5rem !important;
-}
-
-/* Colonnes */
-.wdr-admin-tx__table-id {
-    font-family: monospace;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__table-date {
-    white-space: nowrap;
-    color: var(--text-muted);
-}
-
-.wdr-admin-tx__table-service {
-    min-width: 220px;
-    max-width: 260px;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-}
-
-.wdr-admin-tx__table-extras {
-    margin-top: 0.25rem;
-    font-size: 0.74rem;
-    color: var(--text-muted);
-    line-height: 1.4;
-}
-
-.wdr-admin-tx__table-mode {
-    white-space: nowrap;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-.wdr-admin-tx__amount {
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__commission {
-    color: var(--success-dark);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__net {
-    white-space: nowrap;
-    color: var(--text-muted);
-}
-
-.wdr-admin-tx__partner-name {
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__rate-badge {
-    display: inline-block;
-    background: #f3eeff;
-    color: var(--brand-purple);
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
-}
-
-.wdr-admin-tx__stripe-id {
-    font-family: monospace;
-    font-size: 0.73rem;
-    color: var(--primary);
-    background: #eef6ff;
-    border: 1px solid #cce3ff;
-    border-radius: var(--radius-sm);
-    padding: 0.1rem 0.4rem;
-    word-break: break-all;
-}
-
-.wdr-admin-tx__stripe-intent {
-    font-family: monospace;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    background: var(--bg-subtle);
-    border-radius: var(--radius-sm);
-    padding: 0.1rem 0.35rem;
-}
-
-/* ============================================================
-   Badges statut
-   ============================================================ */
-
-.wdr-admin-tx__status {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.18rem 0.55rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.wdr-admin-tx__status--confirmed {
-    background: #e8f8ef;
-    color: var(--success-dark);
-}
-
-.wdr-admin-tx__status--pending {
-    background: #fef9e7;
-    color: var(--warning-dark);
-}
-
-.wdr-admin-tx__status--cancelled {
-    background: #fde8e8;
-    color: var(--danger-dark);
-}
-
-.wdr-admin-tx__status--payment-paid {
-    background: #e8f8ef;
-    color: var(--success-dark);
-}
-
-.wdr-admin-tx__status--payment-pending {
-    background: #fef9e7;
-    color: var(--warning-dark);
-}
-
-.wdr-admin-tx__status--payment-refunded {
-    background: #f0f0ff;
-    color: #4a3fa0;
-}
-
-/* ============================================================
-   Responsive
-   ============================================================ */
-
-@media (max-width: 768px) {
-    .wdr-admin-tx {
-        min-height: calc(100svh - 4.25rem);
-    }
-
-    .wdr-admin-tx__body {
-        padding: 1.5rem 1rem;
-    }
-
-    .wdr-admin-tx__nav-item {
-        padding: 0.75rem 0.6rem;
-        font-size: 0.78rem;
-    }
-
-    .wdr-admin-tx__totals {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .wdr-admin-tx__filters {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .wdr-admin-tx__filters > * {
-        width: 100%;
-    }
-
-    .wdr-admin-tx__filter-count {
-        margin-left: 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .wdr-admin-tx__totals {
-        grid-template-columns: 1fr;
-    }
-}
-
+/* DARK MODE */
 :is(.dark) .wdr-admin-tx {
     background-color: var(--bg-main);
 }
 
-:is(.dark) .wdr-admin-tx__formula-banner {
-    background: rgba(76, 159, 255, 0.12);
-    border-color: rgba(76, 159, 255, 0.24);
-    color: #a9cfff;
+:is(.dark) .wdr-admin-tx__hero {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
 }
 
-:is(.dark) .wdr-admin-tx__filter-select {
-    background:
-        linear-gradient(180deg, rgba(21, 50, 67, 0.98) 0%, rgba(16, 42, 56, 0.98) 100%);
-    color: var(--text-main);
-    border-color: rgba(117, 217, 226, 0.18);
+:is(.dark) .wdr-admin-tx__total-card,
+:is(.dark) .wdr-admin-tx__table-wrapper {
+    background-color: var(--bg-elevated);
+    border-color: var(--border-light);
 }
 
-:is(.dark) .wdr-admin-tx__table th {
-    color: var(--text-soft);
-}
-
-:is(.dark) .wdr-admin-tx__table tbody tr:hover td {
-    background-color: var(--bg-soft);
-}
-
-:is(.dark) .wdr-admin-tx__rate-badge {
-    background: rgba(140, 116, 255, 0.16);
-    color: #dacdff;
-}
-
-:is(.dark) .wdr-admin-tx__stripe-id {
-    background: rgba(51, 184, 213, 0.14);
-    border-color: rgba(51, 184, 213, 0.24);
-    color: var(--primary);
-}
-
-:is(.dark) .wdr-admin-tx__status--confirmed,
-:is(.dark) .wdr-admin-tx__status--payment-paid {
-    background: rgba(73, 192, 129, 0.16);
-    color: #9de5bc;
-}
-
-:is(.dark) .wdr-admin-tx__status--pending,
-:is(.dark) .wdr-admin-tx__status--payment-pending {
-    background: rgba(245, 191, 66, 0.16);
-    color: #ffd77a;
-}
-
-:is(.dark) .wdr-admin-tx__status--cancelled,
-:is(.dark) .wdr-admin-tx__status--payment-refunded {
-    background: rgba(221, 92, 75, 0.16);
-    color: #ffb2a8;
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .wdr-admin-tx__totals {
+        grid-template-columns: 1fr;
+    }
 }
