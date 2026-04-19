@@ -74,3 +74,42 @@ Artisan::command('fareharbor:bootstrap-companies {--sync} {--create-partners}', 
 
     return self::SUCCESS;
 })->purpose('Bootstrap the default FareHarbor V1 company list, optionally creating partner accounts and syncing it.');
+
+Artisan::command('fareharbor:translate-missing', function (
+    \App\Services\TranslationService $translator
+) {
+    $this->info('Scanning for services missing French translations...');
+
+    $services = \App\Models\Service::where('source_provider', 'FAREHARBOR')->get();
+    $count = 0;
+
+    foreach ($services as $service) {
+        $hasTitleFr = !empty($service->getTranslation('title', 'fr', false));
+        $hasDescFr = !empty($service->getTranslation('description', 'fr', false));
+
+        if (!$hasTitleFr || !$hasDescFr) {
+            $this->comment("Translating: " . $service->getTranslation('title', 'en'));
+
+            if (!$hasTitleFr) {
+                $enTitle = $service->getTranslation('title', 'en');
+                $frTitle = $translator->translateToFrench($enTitle);
+                if ($frTitle) {
+                    $service->setTranslation('title', 'fr', $frTitle);
+                }
+            }
+
+            if (!$hasDescFr) {
+                $enDesc = $service->getTranslation('description', 'en');
+                $frDesc = $translator->translateToFrench($enDesc);
+                if ($frDesc) {
+                    $service->setTranslation('description', 'fr', $frDesc);
+                }
+            }
+
+            $service->save();
+            $count++;
+        }
+    }
+
+    $this->info("Done! {$count} services updated.");
+})->purpose('Automatically translate missing French content for FareHarbor services.');

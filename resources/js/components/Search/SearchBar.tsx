@@ -167,15 +167,14 @@ export function SearchBar({
                                 onDateFromChange(event.target.value)
                             }
                             aria-label={t("search.date_from")}
+                            data-has-value={!!dateFrom}
                         />
-                        {!dateFrom && (
-                            <span
-                                className="wdr-home__date-placeholder"
-                                aria-hidden="true"
-                            >
-                                {datePlaceholder}
-                            </span>
-                        )}
+                        <span
+                            className="wdr-home__date-placeholder"
+                            aria-hidden="true"
+                        >
+                            {datePlaceholder}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -200,15 +199,14 @@ export function SearchBar({
                                 onDateToChange(event.target.value)
                             }
                             aria-label={t("search.date_to")}
+                            data-has-value={!!dateTo}
                         />
-                        {!dateTo && (
-                            <span
-                                className="wdr-home__date-placeholder"
-                                aria-hidden="true"
-                            >
-                                {datePlaceholder}
-                            </span>
-                        )}
+                        <span
+                            className="wdr-home__date-placeholder"
+                            aria-hidden="true"
+                        >
+                            {datePlaceholder}
+                        </span>
                     </div>
                 </div>
             </div>

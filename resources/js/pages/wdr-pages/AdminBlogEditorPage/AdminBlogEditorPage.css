@@ -237,6 +237,49 @@
     line-height: 1.6;
 }
 
+/* ---- Toolbar Editeur ---- */
+.wdr-editor__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border: 1.5px solid var(--border-light);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fdfd 100%);
+    margin-bottom: 0;
+}
+
+.wdr-editor__toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.wdr-editor__toolbar-btn:hover {
+    background: rgba(0, 132, 255, 0.08);
+    border-color: rgba(0, 132, 255, 0.2);
+    color: var(--primary);
+}
+
+.wdr-editor__toolbar-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.wdr-editor__textarea--with-toolbar {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+
 /* ---- Tabs Editeur / Apercu ---- */
 .wdr-editor__content-header {
     display: flex;
@@ -283,6 +326,33 @@
     min-height: 480px;
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, #f7fbfd 100%);
+    overflow-y: auto;
+}
+
+.wdr-markdown-content h1,
+.wdr-markdown-content h2,
+.wdr-markdown-content h3 {
+    margin: 1.5rem 0 1rem;
+    color: var(--text-main);
+}
+
+.wdr-markdown-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.wdr-markdown-content ul,
+.wdr-markdown-content ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+.wdr-markdown-content blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: var(--text-muted);
 }
 
 /* ---- Sidebar panels ---- */

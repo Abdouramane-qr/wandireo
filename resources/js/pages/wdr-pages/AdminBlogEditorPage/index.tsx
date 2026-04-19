@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { blogApi } from "@/api/blog";
 import { uploadsApi } from "@/api/uploads";
 import { Breadcrumb, Button, Input, useToast } from "@/components/wdr";
@@ -14,6 +14,19 @@ import {
     type Locale,
 } from "@/lib/locale";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
+import { renderMarkdownBlocks } from "@/lib/markdownRenderer";
+import {
+    Bold,
+    Heading1,
+    Heading2,
+    Image as ImageIcon,
+    Italic,
+    Link as LinkIcon,
+    List,
+    ListOrdered,
+    Quote,
+    Type,
+} from "lucide-react";
 import { BlogStatusNames } from "@/types/blog";
 import type { BlogStatus } from "@/types/blog";
 import type { LocalizedTextMap } from "@/types/service";
@@ -102,6 +115,24 @@ interface AdminBlogEditorPageProps {
     postId?: string;
 }
 
+interface ToolbarButtonProps {
+    onClick: () => void;
+    icon: React.ReactNode;
+    label: string;
+}
+
+const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, icon, label }) => (
+    <button
+        type="button"
+        className="wdr-editor__toolbar-btn"
+        onClick={onClick}
+        title={label}
+        aria-label={label}
+    >
+        {icon}
+    </button>
+);
+
 export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
     postId,
 }) => {
@@ -112,6 +143,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
     const queryClient = useQueryClient();
     const isEditing = !!postId;
     const { post: existingPost } = useAdminBlogPostData(postId ?? "");
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const [form, setForm] = useState<BlogFormState>({
         titleTranslations: {},
@@ -154,13 +186,17 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         });
     }, [existingPost, isEditing]);
 
-    const safePreview = useMemo(
-        () =>
-            sanitizeHtml(
-                readLocalizedValue(form.contentTranslations, activeLocale),
-            ),
-        [activeLocale, form.contentTranslations],
-    );
+    const safePreview = useMemo(() => {
+        const content = readLocalizedValue(form.contentTranslations, activeLocale);
+        if (!content) return null;
+
+        // If it looks like HTML, sanitize it, otherwise render as Markdown
+        if (content.trim().startsWith("<") && content.includes(">")) {
+            return <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} />;
+        }
+
+        return <div className="wdr-markdown-content">{renderMarkdownBlocks(content)}</div>;
+    }, [activeLocale, form.contentTranslations]);
 
     const setField = <K extends keyof BlogFormState>(
         key: K,
@@ -192,6 +228,32 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
         if (!slugManuallyEdited && activeLocale === "fr") {
             setField("slug", slugify(value));
         }
+    };
+
+    const insertMarkdown = (before: string, after: string = "") => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const currentText = readLocalizedValue(form.contentTranslations, activeLocale);
+        const selectedText = currentText.substring(start, end);
+        
+        const newText = 
+            currentText.substring(0, start) + 
+            before + selectedText + after + 
+            currentText.substring(end);
+
+        handleLocalizedFieldChange("contentTranslations", newText);
+
+        // Restore focus and selection
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(
+                start + before.length,
+                end + before.length
+            );
+        }, 0);
     };
 
     const handleCoverUpload = async (
@@ -563,10 +625,58 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                             </div>
 
                             {activeTab === "edit" ? (
-                                <>
+                                <div className="wdr-editor__content-edit-wrapper">
+                                    <div className="wdr-editor__toolbar">
+                                        <ToolbarButton 
+                                            icon={<Bold />} 
+                                            label="Gras" 
+                                            onClick={() => insertMarkdown("**", "**")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<Italic />} 
+                                            label="Italique" 
+                                            onClick={() => insertMarkdown("*", "*")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<Heading1 />} 
+                                            label="Titre 1" 
+                                            onClick={() => insertMarkdown("# ", "")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<Heading2 />} 
+                                            label="Titre 2" 
+                                            onClick={() => insertMarkdown("## ", "")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<List />} 
+                                            label="Liste" 
+                                            onClick={() => insertMarkdown("- ", "")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<ListOrdered />} 
+                                            label="Liste ordonnée" 
+                                            onClick={() => insertMarkdown("1. ", "")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<Quote />} 
+                                            label="Citation" 
+                                            onClick={() => insertMarkdown("> ", "")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<LinkIcon />} 
+                                            label="Lien" 
+                                            onClick={() => insertMarkdown("[", "](url)")} 
+                                        />
+                                        <ToolbarButton 
+                                            icon={<ImageIcon />} 
+                                            label="Image" 
+                                            onClick={() => insertMarkdown("![alt](", ")")} 
+                                        />
+                                    </div>
                                     <textarea
                                         id="ed-content"
-                                        className="wdr-editor__textarea wdr-editor__textarea--lg"
+                                        ref={textareaRef}
+                                        className="wdr-editor__textarea wdr-editor__textarea--lg wdr-editor__textarea--with-toolbar"
                                         rows={20}
                                         value={readLocalizedValue(
                                             form.contentTranslations,
@@ -596,16 +706,13 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                             {errors.content}
                                         </p>
                                     )}
-                                </>
+                                </div>
                             ) : (
-                                <div
-                                    className="wdr-editor__preview wdr-post__body"
-                                    dangerouslySetInnerHTML={{
-                                        __html:
-                                            safePreview ||
-                                            `<p><em>${t("admin.blog.editor.placeholder.preview")}</em></p>`,
-                                    }}
-                                />
+                                <div className="wdr-editor__preview wdr-post__body">
+                                    {safePreview || (
+                                        <p><em>{t("admin.blog.editor.placeholder.preview")}</em></p>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>

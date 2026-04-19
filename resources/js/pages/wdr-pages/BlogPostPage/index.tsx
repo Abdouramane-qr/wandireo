@@ -10,6 +10,7 @@ import { useBlogPostData, useBlogPostsData } from "@/hooks/useBlogData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
+import { renderMarkdownBlocks } from "@/lib/markdownRenderer";
 import { BlogStatusNames } from "@/types/blog";
 import { NotFoundPage } from "../NotFoundPage";
 import "./BlogPostPage.css";
@@ -49,11 +50,31 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug }) => {
             .slice(0, 3);
     }, [post, allPublished]);
 
+    const renderedContent = useMemo(() => {
+        if (!post?.content) return null;
+        
+        const content = post.content.trim();
+        // Simple detection: if it looks like HTML, sanitize and render
+        if (content.startsWith("<") && content.includes(">")) {
+            return (
+                <div 
+                    className="wdr-post__body" 
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} 
+                />
+            );
+        }
+
+        // Otherwise render as Markdown
+        return (
+            <div className="wdr-post__body wdr-markdown-content">
+                {renderMarkdownBlocks(post.content)}
+            </div>
+        );
+    }, [post?.content]);
+
     if (!post) {
         return <NotFoundPage />;
     }
-
-    const safeContent = sanitizeHtml(post.content);
 
     return (
         <article className="wdr-post">
@@ -124,11 +145,8 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug }) => {
                 )}
             </header>
 
-            {/* Contenu assaini */}
-            <div
-                className="wdr-post__body"
-                dangerouslySetInnerHTML={{ __html: safeContent }}
-            />
+            {/* Contenu */}
+            {renderedContent}
 
             {/* Articles suggérés */}
             {relatedPosts.length > 0 && (

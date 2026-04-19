@@ -1,22 +1,25 @@
 import React from 'react';
-import { Calendar, User, ChevronRight } from 'lucide-react';
+import { Calendar, User, ChevronRight, MessageSquare, ExternalLink } from 'lucide-react';
 import { SupportTicket } from '@/types/support';
 import { StatusBadge, PriorityBadge } from './SupportBadges';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
     tickets: SupportTicket[];
     onViewDetail: (ticket: SupportTicket) => void;
 }
 
-const supportDateFormatter = new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-});
-
 export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
+    const { t, intlLocale } = useTranslation();
+    
+    const dateFormatter = new Intl.DateTimeFormat(intlLocale, {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-md">
             <div className="overflow-x-auto">
@@ -24,22 +27,22 @@ export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
                     <thead>
                         <tr className="bg-slate-50/50">
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                                Date
+                                {t('support.ticket_date')}
                             </th>
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                                Sujet
+                                {t('support.ticket_subject')}
                             </th>
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                                Utilisateur
+                                {t('support.ticket_user')}
                             </th>
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">
-                                Statut
+                                {t('support.status.all')}
                             </th>
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">
-                                Priorité
+                                {t('support.ticket_priority')}
                             </th>
                             <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">
-                                Actions
+                                {t('support.ticket_actions')}
                             </th>
                         </tr>
                     </thead>
@@ -52,17 +55,22 @@ export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
                             >
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2 text-slate-500">
-                                        <Calendar className="w-4 h-4 opacity-50" />
+                                        <Calendar className="w-3.5 h-3.5 opacity-50" />
                                         <span className="text-xs font-medium">
-                                            {supportDateFormatter.format(new Date(ticket.createdAt || (ticket as any).created_at))}
+                                            {dateFormatter.format(new Date(ticket.createdAt))}
                                         </span>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex flex-col max-w-xs md:max-w-md">
-                                        <span className="text-sm font-bold text-slate-800 group-hover:text-sky-600 transition-colors truncate">
-                                            {ticket.subject}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-bold text-slate-800 group-hover:text-sky-600 transition-colors truncate">
+                                                {ticket.subject}
+                                            </span>
+                                            {ticket.media && (
+                                                <ExternalLink className="w-3 h-3 text-sky-400 flex-shrink-0" title="Contient un média" />
+                                            )}
+                                        </div>
                                         <span className="text-xs text-slate-400 truncate opacity-0 group-hover:opacity-100 transition-opacity">
                                             {ticket.message}
                                         </span>
@@ -78,7 +86,7 @@ export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
                                                 {ticket.user ? `${ticket.user.firstName} ${ticket.user.lastName}` : (ticket.partner ? `${ticket.partner.firstName} ${ticket.partner.lastName}` : 'Anonyme')}
                                             </span>
                                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                {ticket.user ? 'Client' : 'Partenaire'}
+                                                {ticket.user ? t('support.author.client') : (ticket.partner ? t('support.author.partner') : '-')}
                                             </span>
                                         </div>
                                     </div>
@@ -91,7 +99,7 @@ export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <button className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 group-hover:text-sky-600 transition-colors">
-                                        <span>Détails</span>
+                                        <span>{t('common.view')}</span>
                                         <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                                     </button>
                                 </td>
@@ -99,9 +107,12 @@ export const SupportTicketTable = ({ tickets, onViewDetail }: Props) => {
                         ))}
                         {tickets.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-6 py-16 text-center">
-                                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                                        <span className="text-sm italic">Aucun ticket trouvé.</span>
+                                <td colSpan={6} className="px-6 py-20 text-center">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+                                            <MessageSquare className="w-6 h-6 text-slate-200" />
+                                        </div>
+                                        <span className="text-sm font-medium text-slate-400">{t('support.empty')}</span>
                                     </div>
                                 </td>
                             </tr>

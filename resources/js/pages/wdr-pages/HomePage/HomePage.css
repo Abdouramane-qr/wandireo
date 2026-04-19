@@ -254,7 +254,7 @@
     letter-spacing: 0.07em;
     color: var(--text-main);
     line-height: 1;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.35rem;
 }
 
 .wdr-home__sfield-input {
@@ -262,7 +262,7 @@
     outline: none;
     background: transparent;
     font-size: 0.875rem;
-    color: var(--text-muted);
+    color: var(--text-main);
     font-family: var(--font-family);
     width: 100%;
     padding: 0;
@@ -280,7 +280,30 @@
     color-scheme: light;
     cursor: pointer;
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    appearance: none;
+    -webkit-appearance: none;
+    min-height: 1.5rem;
+    color: transparent;
+    width: 100%;
+}
+
+/* Masquer le texte par défaut du navigateur quand vide pour laisser place au placeholder personnalisé */
+.wdr-home__sfield-input--date::-webkit-datetime-edit {
+    color: transparent !important;
+    display: none;
+}
+
+.wdr-home__sfield-input--date::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    color: transparent;
 }
 
 .wdr-home__date-placeholder {
@@ -293,10 +316,26 @@
     line-height: 1.3;
     pointer-events: none;
     white-space: nowrap;
+    z-index: 1;
+    opacity: 1;
+    transition: opacity var(--transition-base);
 }
 
-.wdr-home__sfield-input--date:not([value=""]) {
+.wdr-home__sfield-input--date:focus + .wdr-home__date-placeholder,
+.wdr-home__sfield-input--date[data-has-value="true"] + .wdr-home__date-placeholder {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.wdr-home__sfield-input--date:focus,
+.wdr-home__sfield-input--date[data-has-value="true"] {
     color: var(--text-main);
+}
+
+.wdr-home__sfield-input--date:focus::-webkit-datetime-edit,
+.wdr-home__sfield-input--date[data-has-value="true"]::-webkit-datetime-edit {
+    color: var(--text-main) !important;
+    display: inline-block;
 }
 
 .wdr-home__sfield-select {
