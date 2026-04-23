@@ -54,15 +54,17 @@ export function renderMarkdownBlocks(value: string): React.ReactNode[] {
         const headingMatch = currentLine.match(/^(#{1,6})\s*(.+)$/);
         if (headingMatch) {
             const level = headingMatch[1].length;
-            const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+            const tagName = `h${level}` as keyof HTMLElementTagNameMap;
 
             blocks.push(
-                <Tag
-                    key={`heading-${index}`}
-                    className={`wdr-markdown-heading wdr-markdown-heading--h${level}`}
-                >
-                    {renderInlineMarkdown(headingMatch[2].trim())}
-                </Tag>,
+                React.createElement(
+                    tagName,
+                    {
+                        key: `heading-${index}`,
+                        className: `wdr-markdown-heading wdr-markdown-heading--h${level}`,
+                    },
+                    renderInlineMarkdown(headingMatch[2].trim()),
+                ),
             );
             index += 1;
             continue;

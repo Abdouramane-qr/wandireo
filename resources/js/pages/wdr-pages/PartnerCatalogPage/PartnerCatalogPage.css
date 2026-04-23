@@ -566,9 +566,42 @@
         gap: 0.75rem;
     }
 
+    .wdr-catalog__header-left {
+        width: 100%;
+    }
+
+    .wdr-catalog__header-inner > * {
+        width: 100%;
+    }
+
     .wdr-catalog__price-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.2rem;
+    }
+
+    .wdr-catalog-modal__overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .wdr-catalog-modal__panel {
+        max-width: none;
+        max-height: min(92svh, 92vh);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .wdr-catalog-modal__header,
+    .wdr-catalog-modal__footer {
+        padding-inline: 1rem;
+    }
+
+    .wdr-catalog-modal__footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .wdr-catalog-modal__price-preview {
+        grid-template-columns: 1fr;
     }
 }

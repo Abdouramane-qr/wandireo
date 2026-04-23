@@ -1,5 +1,6 @@
 import { Form } from "@inertiajs/react";
 import { useRef } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import ProfileController from "@/actions/App/Http/Controllers/Settings/ProfileController";
 import Heading from "@/components/heading";
 import InputError from "@/components/input-error";
@@ -18,20 +19,22 @@ import { Label } from "@/components/ui/label";
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
+    const { t } = useTranslation();
 
     return (
         <div className="space-y-6">
             <Heading
                 variant="small"
-                title="Supprimer le compte"
-                description="Supprimez votre compte et toutes ses données"
+                title={t("settings.delete_user.title")}
+                description={t("settings.delete_user.description")}
             />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                    <p className="font-medium">Attention</p>
+                    <p className="font-medium">
+                        {t("settings.delete_user.warning_title")}
+                    </p>
                     <p className="text-sm">
-                        Cette action est définitive et ne pourra pas être
-                        annulée.
+                        {t("settings.delete_user.warning_body")}
                     </p>
                 </div>
 
@@ -41,18 +44,15 @@ export default function DeleteUser() {
                             variant="destructive"
                             data-test="delete-user-button"
                         >
-                            Supprimer le compte
+                            {t("settings.delete_user.button")}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogTitle>
-                            Voulez-vous vraiment supprimer votre compte ?
+                            {t("settings.delete_user.confirm_title")}
                         </DialogTitle>
                         <DialogDescription>
-                            Une fois votre compte supprimé, toutes ses données
-                            seront également supprimées définitivement.
-                            Saisissez votre mot de passe pour confirmer cette
-                            suppression.
+                            {t("settings.delete_user.confirm_description")}
                         </DialogDescription>
 
                         <Form
@@ -71,14 +71,18 @@ export default function DeleteUser() {
                                             htmlFor="password"
                                             className="sr-only"
                                         >
-                                            Mot de passe
+                                            {t(
+                                                "settings.delete_user.password_label",
+                                            )}
                                         </Label>
 
                                         <PasswordInput
                                             id="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder="Mot de passe"
+                                            placeholder={t(
+                                                "settings.delete_user.password_placeholder",
+                                            )}
                                             autoComplete="current-password"
                                         />
 
@@ -93,7 +97,7 @@ export default function DeleteUser() {
                                                     resetAndClearErrors()
                                                 }
                                             >
-                                                Annuler
+                                                {t("common.cancel")}
                                             </Button>
                                         </DialogClose>
 
@@ -106,7 +110,9 @@ export default function DeleteUser() {
                                                 type="submit"
                                                 data-test="confirm-delete-user-button"
                                             >
-                                                Supprimer le compte
+                                                {t(
+                                                    "settings.delete_user.confirm_button",
+                                                )}
                                             </button>
                                         </Button>
                                     </DialogFooter>

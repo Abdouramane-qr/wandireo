@@ -110,7 +110,7 @@ export function SearchBar({
     onSubmit,
 }: SearchBarProps) {
     const { t } = useTranslation();
-    const datePlaceholder = "jj/mm/aaaa";
+    const datePlaceholder = t("search.date_placeholder");
 
     return (
         <form

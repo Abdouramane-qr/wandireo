@@ -613,7 +613,9 @@ export const AdminDashboardPage: React.FC = () => {
                         >
                             <thead>
                                 <tr>
-                                    <th scope="col">ID</th>
+                                    <th scope="col">
+                                        {t("admin.dashboard.table.id")}
+                                    </th>
                                     <th scope="col">
                                         {t("admin.dashboard.table.client")}
                                     </th>
@@ -652,26 +654,29 @@ export const AdminDashboardPage: React.FC = () => {
 
                                     return (
                                         <tr key={booking.id}>
-                                            <td className="wdr-admin-dash__table-id">
+                                            <td
+                                                className="wdr-admin-dash__table-id"
+                                                data-label={t("admin.dashboard.table.id")}
+                                            >
                                                 {booking.id}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.dashboard.table.client")}>
                                                 {client
                                                     ? `${client.firstName} ${client.lastName}`
                                                     : booking.clientId}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.dashboard.table.partner")}>
                                                 {partner
                                                     ? partner.companyName
                                                     : booking.partnerId}
                                             </td>
-                                            <td className="wdr-admin-dash__table-amount">
+                                            <td className="wdr-admin-dash__table-amount" data-label={t("admin.dashboard.table.amount")}>
                                                 {formatPrice(
                                                     booking.totalPrice,
                                                     booking.currency,
                                                 )}
                                             </td>
-                                            <td className="wdr-admin-dash__table-commission">
+                                            <td className="wdr-admin-dash__table-commission" data-label={t("admin.dashboard.table.commission")}>
                                                 {booking.status ===
                                                 BookingStatusNames.CONFIRMED
                                                     ? formatPrice(
@@ -680,7 +685,7 @@ export const AdminDashboardPage: React.FC = () => {
                                                       )
                                                     : "—"}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.dashboard.table.status")}>
                                                 <span
                                                     className={`wdr-admin-dash__status wdr-admin-dash__status--${getStatusClass(booking.status)}`}
                                                 >

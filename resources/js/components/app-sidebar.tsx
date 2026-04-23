@@ -13,36 +13,37 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { NavItem } from '@/types';
 
 const dashboardHref = '/mon-espace';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboardHref,
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { t } = useTranslation();
+    const mainNavItems: NavItem[] = [
+        {
+            title: t('nav.dashboard'),
+            href: dashboardHref,
+            icon: LayoutGrid,
+        },
+    ];
+    const footerNavItems: NavItem[] = [
+        {
+            title: t('nav.repository'),
+            href: 'https://github.com/laravel/react-starter-kit',
+            icon: FolderGit2,
+        },
+        {
+            title: t('nav.documentation'),
+            href: 'https://laravel.com/docs/starter-kits#react',
+            icon: BookOpen,
+        },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
-                        <SidebarMenu>
+                <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href={dashboardHref} prefetch>

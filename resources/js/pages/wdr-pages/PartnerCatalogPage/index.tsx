@@ -1270,11 +1270,17 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                                     {t("partner.catalog.field.currency")}
                                 </label>
                                 {sel("currency", [
-                                    { value: "EUR", label: "EUR — Euro" },
-                                    { value: "USD", label: "USD — Dollar US" },
+                                    {
+                                        value: "EUR",
+                                        label: t("partner.catalog.currency.eur"),
+                                    },
+                                    {
+                                        value: "USD",
+                                        label: t("partner.catalog.currency.usd"),
+                                    },
                                     {
                                         value: "GBP",
-                                        label: "GBP — Livre sterling",
+                                        label: t("partner.catalog.currency.gbp"),
                                     },
                                 ])}
                             </div>

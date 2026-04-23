@@ -29,10 +29,10 @@ export const SupportTicketForm = ({ onClose }: Props) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-slate-900/60 p-3 backdrop-blur-md animate-in fade-in duration-300 md:items-center md:p-4">
+            <div className="flex max-h-[calc(100vh-1.5rem)] w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-white/20 bg-white shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 md:max-h-[90vh] md:rounded-[2.5rem]">
                 {/* Header */}
-                <div className="relative px-8 pt-10 pb-4">
+                <div className="relative shrink-0 px-5 pt-6 pb-4 md:px-8 md:pt-10">
                     <div className="flex items-center justify-between mb-4">
                         <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-sky-50 text-sky-600 text-[10px] font-black tracking-widest uppercase border border-sky-100">
                             {t('support.new_ticket')}
@@ -40,6 +40,7 @@ export const SupportTicketForm = ({ onClose }: Props) => {
                         <button
                             onClick={onClose}
                             className="p-2 hover:bg-slate-100 rounded-full transition-all group"
+                            aria-label={t('common.close')}
                         >
                             <X className="w-5 h-5 text-slate-400 group-hover:text-slate-600 group-hover:rotate-90 transition-transform duration-300" />
                         </button>
@@ -52,7 +53,8 @@ export const SupportTicketForm = ({ onClose }: Props) => {
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="px-8 pb-10 space-y-6">
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 pb-5 md:px-8 md:pb-10">
+                    <div className="space-y-6">
                     {/* Subject */}
                     <div className="space-y-2">
                         <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -142,22 +144,23 @@ export const SupportTicketForm = ({ onClose }: Props) => {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex items-center justify-end pt-4 gap-4">
+                    <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-slate-100 bg-white/95 pt-4 backdrop-blur sm:flex-row sm:items-center sm:justify-end">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-8 py-4 rounded-2xl text-sm font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all"
+                            className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-600 sm:w-auto"
                         >
                             {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="flex items-center gap-2 px-10 py-4 rounded-2xl bg-slate-900 text-white text-sm font-black shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-10 py-4 text-sm font-black text-white shadow-xl shadow-slate-900/10 transition-all hover:scale-[1.02] hover:shadow-slate-900/20 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
                         >
                             {t('support.form.submit')}
                             <Send className="w-4 h-4" />
                         </button>
+                    </div>
                     </div>
                 </form>
             </div>

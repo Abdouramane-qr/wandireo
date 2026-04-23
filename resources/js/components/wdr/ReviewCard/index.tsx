@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Review } from '../../../types/review';
 import { RatingStars } from '../RatingStars';
 import './ReviewCard.css';
@@ -17,8 +18,8 @@ export interface ReviewCardProps {
     className?: string;
 }
 
-function formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('fr-FR', {
+function formatDate(date: Date, locale: string): string {
+    return new Intl.DateTimeFormat(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -31,12 +32,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     authorAvatar,
     className = '',
 }) => {
+    const { intlLocale, t } = useTranslation();
     const initial = authorName.charAt(0).toUpperCase();
 
     return (
         <article
             className={`wdr-review ${className}`.trim()}
-            aria-label={`Avis de ${authorName}`}
+            aria-label={t('review.card_aria').replace('{author}', authorName)}
         >
             <header className="wdr-review__header">
                 <div className="wdr-review__author">
@@ -64,7 +66,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
                             className="wdr-review__date"
                             dateTime={review.createdAt.toISOString()}
                         >
-                            {formatDate(review.createdAt)}
+                            {formatDate(review.createdAt, intlLocale)}
                         </time>
                     </div>
                 </div>

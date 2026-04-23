@@ -364,10 +364,10 @@ export const AdminTransactionsPage: React.FC = () => {
                                 ) : (
                                     partnerSummaries.map((summary) => (
                                         <tr key={summary.partnerId}>
-                                            <td className="wdr-admin-tx__partner-name">
+                                            <td className="wdr-admin-tx__partner-name" data-label={t("admin.transactions.col.provider")}>
                                                 {summary.companyName}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.transactions.col.rate")}>
                                                 <span className="wdr-admin-tx__rate-badge">
                                                     {Math.round(
                                                         summary.rate * 100,
@@ -375,30 +375,30 @@ export const AdminTransactionsPage: React.FC = () => {
                                                     %
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.transactions.col.stripe_id")}>
                                                 <code className="wdr-admin-tx__stripe-id">
                                                     {summary.stripeId || "—"}
                                                 </code>
                                             </td>
-                                            <td className="wdr-admin-tx__amount">
+                                            <td className="wdr-admin-tx__amount" data-label={t("admin.transactions.col.volume")}>
                                                 {formatPrice(
                                                     summary.volume,
                                                     "EUR",
                                                 )}
                                             </td>
-                                            <td className="wdr-admin-tx__commission">
+                                            <td className="wdr-admin-tx__commission" data-label={t("admin.transactions.col.commission")}>
                                                 {formatPrice(
                                                     summary.commission,
                                                     "EUR",
                                                 )}
                                             </td>
-                                            <td className="wdr-admin-tx__net">
+                                            <td className="wdr-admin-tx__net" data-label={t("admin.transactions.col.partner_net")}>
                                                 {formatPrice(
                                                     summary.partnerNet,
                                                     "EUR",
                                                 )}
                                             </td>
-                                            <td>{summary.bookingsCount}</td>
+                                            <td data-label={t("admin.transactions.col.bookings")}>{summary.bookingsCount}</td>
                                         </tr>
                                     ))
                                 )}
@@ -546,10 +546,10 @@ export const AdminTransactionsPage: React.FC = () => {
                                             partnerNet,
                                         }) => (
                                             <tr key={booking.id}>
-                                                <td className="wdr-admin-tx__table-id">
+                                                <td className="wdr-admin-tx__table-id" data-label={t("admin.transactions.col.id")}>
                                                     {booking.id}
                                                 </td>
-                                                <td className="wdr-admin-tx__table-date">
+                                                <td className="wdr-admin-tx__table-date" data-label={t("admin.transactions.col.date")}>
                                                     {booking.createdAt.toLocaleDateString(
                                                         intlLocale,
                                                         {
@@ -559,12 +559,12 @@ export const AdminTransactionsPage: React.FC = () => {
                                                         },
                                                     )}
                                                 </td>
-                                                <td>
+                                                <td data-label={t("admin.transactions.col.client")}>
                                                     {client
                                                         ? `${client.firstName} ${client.lastName}`
                                                         : booking.clientId}
                                                 </td>
-                                                <td className="wdr-admin-tx__table-service">
+                                                <td className="wdr-admin-tx__table-service" data-label={t("admin.transactions.col.service")}>
                                                     <div>
                                                         {service?.title ??
                                                             booking.serviceId}
@@ -584,25 +584,25 @@ export const AdminTransactionsPage: React.FC = () => {
                                                         </div>
                                                     )}
                                                 </td>
-                                                <td>
+                                                <td data-label={t("admin.transactions.col.partner")}>
                                                     {partner?.role === "PARTNER"
                                                         ? partner.companyName
                                                         : booking.partnerId}
                                                 </td>
-                                                <td className="wdr-admin-tx__table-mode">
+                                                <td className="wdr-admin-tx__table-mode" data-label={t("admin.transactions.col.payment_mode")}>
                                                     {
                                                         PaymentModeLabels[
                                                             booking.paymentMode
                                                         ]
                                                     }
                                                 </td>
-                                                <td className="wdr-admin-tx__amount">
+                                                <td className="wdr-admin-tx__amount" data-label={t("admin.transactions.col.client_total")}>
                                                     {formatPrice(
                                                         booking.totalPrice,
                                                         booking.currency,
                                                     )}
                                                 </td>
-                                                <td className="wdr-admin-tx__commission">
+                                                <td className="wdr-admin-tx__commission" data-label={t("admin.transactions.col.commission")}>
                                                     {booking.status ===
                                                     BookingStatusNames.CONFIRMED
                                                         ? formatPrice(
@@ -611,7 +611,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                                           )
                                                         : "—"}
                                                 </td>
-                                                <td className="wdr-admin-tx__net">
+                                                <td className="wdr-admin-tx__net" data-label={t("admin.transactions.col.partner_net")}>
                                                     {booking.status ===
                                                     BookingStatusNames.CONFIRMED
                                                         ? formatPrice(
@@ -620,13 +620,13 @@ export const AdminTransactionsPage: React.FC = () => {
                                                           )
                                                         : "—"}
                                                 </td>
-                                                <td>
+                                                <td data-label={t("admin.transactions.col.stripe_line")}>
                                                     <code className="wdr-admin-tx__stripe-intent">
                                                         {booking.stripePaymentIntentId ??
                                                             "—"}
                                                     </code>
                                                 </td>
-                                                <td>
+                                                <td data-label={t("admin.transactions.col.booking_status")}>
                                                     <span
                                                         className={`wdr-admin-tx__status wdr-admin-tx__status--${getBookingStatusClass(booking.status)}`}
                                                     >
@@ -636,7 +636,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                                         )}
                                                     </span>
                                                 </td>
-                                                <td>
+                                                <td data-label={t("admin.transactions.col.payment_status")}>
                                                     <span
                                                         className={`wdr-admin-tx__status wdr-admin-tx__status--payment-${getPaymentStatusClass(booking.paymentStatus)}`}
                                                     >

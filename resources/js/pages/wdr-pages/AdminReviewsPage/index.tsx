@@ -12,6 +12,20 @@ import "./AdminReviewsPage.css";
 
 type StatusFilter = "all" | "PENDING" | "APPROVED" | "REJECTED";
 
+function getReviewStatusLabel(
+    status: "PENDING" | "APPROVED" | "REJECTED",
+    t: (key: string) => string,
+): string {
+    switch (status) {
+        case "PENDING":
+            return t("admin.reviews.status.pending");
+        case "APPROVED":
+            return t("admin.reviews.status.approved");
+        case "REJECTED":
+            return t("admin.reviews.status.rejected");
+    }
+}
+
 export const AdminReviewsPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
@@ -159,7 +173,8 @@ export const AdminReviewsPage: React.FC = () => {
                             <div className="wdr-admin-reviews__card-head">
                                 <div>
                                     <strong>
-                                        {review.authorName ?? "Utilisateur"}
+                                        {review.authorName ??
+                                            t("admin.reviews.unknown_user")}
                                     </strong>
                                     <span>
                                         {review.serviceTitle ??
@@ -173,7 +188,10 @@ export const AdminReviewsPage: React.FC = () => {
                                 <span
                                     className={`wdr-admin-reviews__status wdr-admin-reviews__status--${String(review.status ?? "APPROVED").toLowerCase()}`}
                                 >
-                                    {review.status ?? "APPROVED"}
+                                    {getReviewStatusLabel(
+                                        review.status ?? "APPROVED",
+                                        t,
+                                    )}
                                 </span>
                             </div>
                             <p className="wdr-admin-reviews__comment">

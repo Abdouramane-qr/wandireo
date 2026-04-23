@@ -9,6 +9,7 @@
  */
 
 import React, { useId } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import '../Form.css';
 
 /** Mode de selection */
@@ -105,7 +106,7 @@ const ErrorIcon: React.FC = () => (
 export const DatePicker: React.FC<DatePickerProps> = ({
     mode = 'single',
     label,
-    endLabel = 'Retour',
+    endLabel,
     startDate = '',
     endDate = '',
     minDate,
@@ -119,6 +120,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     className = '',
     id: externalId,
 }) => {
+    const { t } = useTranslation();
     const generatedId = useId();
     const baseId = externalId || generatedId;
     const startId = `${baseId}-start`;
@@ -138,6 +140,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     const describedBy = [error ? errorId : '', hint && !error ? hintId : '']
         .filter(Boolean)
         .join(' ');
+    const resolvedEndLabel = endLabel || t('service.booking.return');
 
     return (
         <div className={fieldClassNames}>
@@ -233,7 +236,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                     {/* Date de fin */}
                     <div className="wdr-field">
                         <label htmlFor={endId} className="wdr-field__label">
-                            {endLabel}
+                            {resolvedEndLabel}
                             {required && (
                                 <span
                                     className="wdr-field__required"

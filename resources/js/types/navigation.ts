@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 
 export type BreadcrumbItem = {
     title: string;
+    translationKey?: string;
     href: NonNullable<InertiaLinkProps['href']>;
 };
 

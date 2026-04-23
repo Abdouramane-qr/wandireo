@@ -57,7 +57,7 @@ export const AdminServicesPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
     const { success, error } = useToast();
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const queryClient = useQueryClient();
     const { services: allServices } = useServicesDataWithOptions(
         {
@@ -901,7 +901,7 @@ export const AdminServicesPage: React.FC = () => {
                                         <div className="wdr-admin-svc__fareharbor-meta">
                                             <span>
                                                 {company.lastSyncedAt
-                                                    ? `${t("admin.services.fareharbor.last_sync")} ${company.lastSyncedAt.toLocaleString()}`
+                                                    ? `${t("admin.services.fareharbor.last_sync")} ${company.lastSyncedAt.toLocaleString(intlLocale)}`
                                                     : t(
                                                           "admin.services.fareharbor.never_synced",
                                                       )}
@@ -1158,7 +1158,7 @@ export const AdminServicesPage: React.FC = () => {
                                                     : ""
                                             }
                                         >
-                                            <td className="wdr-admin-svc__table-title">
+                                            <td className="wdr-admin-svc__table-title" data-label={t("admin.services.col.service")}>
                                                 <span className="wdr-admin-svc__service-title">
                                                     {service.title}
                                                 </span>
@@ -1167,7 +1167,7 @@ export const AdminServicesPage: React.FC = () => {
                                                     {service.location.country}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.services.col.category")}>
                                                 <span
                                                     className={`wdr-admin-svc__category-badge wdr-admin-svc__category-badge--${service.category.toLowerCase()}`}
                                                 >
@@ -1184,7 +1184,7 @@ export const AdminServicesPage: React.FC = () => {
                                                         "LOCAL"}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-partner">
+                                            <td className="wdr-admin-svc__table-partner" data-label={t("admin.services.col.partner")}>
                                                 {partner?.role === "PARTNER"
                                                     ? partner.companyName
                                                     : service.partnerId ||
@@ -1192,7 +1192,7 @@ export const AdminServicesPage: React.FC = () => {
                                                           "admin.services.unassigned",
                                                       )}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.services.col.source")}>
                                                 <span
                                                     className={`wdr-admin-svc__availability${service.sourceType === "EXTERNAL" ? " wdr-admin-svc__availability--inactive" : " wdr-admin-svc__availability--active"}`}
                                                 >
@@ -1200,7 +1200,7 @@ export const AdminServicesPage: React.FC = () => {
                                                         "LOCAL"}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-price">
+                                            <td className="wdr-admin-svc__table-price" data-label={t("admin.services.col.client_price")}>
                                                 {formatPrice(
                                                     service.clientPrice,
                                                     service.currency,
@@ -1212,7 +1212,7 @@ export const AdminServicesPage: React.FC = () => {
                                                         .toLowerCase()}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-commission">
+                                            <td className="wdr-admin-svc__table-commission" data-label={t("admin.services.col.commission")}>
                                                 {formatPrice(
                                                     service.commissionAmount,
                                                     service.currency,
@@ -1226,13 +1226,13 @@ export const AdminServicesPage: React.FC = () => {
                                                     %)
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-net">
+                                            <td className="wdr-admin-svc__table-net" data-label={t("admin.services.col.partner_net")}>
                                                 {formatPrice(
                                                     service.partnerPrice,
                                                     service.currency,
                                                 )}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.services.col.rating")}>
                                                 {service.rating != null ? (
                                                     <span className="wdr-admin-svc__rating">
                                                         {service.rating.toFixed(
@@ -1252,7 +1252,7 @@ export const AdminServicesPage: React.FC = () => {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.services.col.availability")}>
                                                 <span
                                                     className={`wdr-admin-svc__availability${service.isAvailable ? "wdr-admin-svc__availability--active" : "wdr-admin-svc__availability--inactive"}`}
                                                 >
@@ -1265,7 +1265,7 @@ export const AdminServicesPage: React.FC = () => {
                                                           )}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.services.col.action")}>
                                                 <div className="wdr-admin-svc__table-actions">
                                                     <Button
                                                         variant="ghost"

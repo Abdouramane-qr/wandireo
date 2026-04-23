@@ -97,6 +97,23 @@ interface PricingRuleFormState {
     priority: string;
 }
 
+function getCalendarSyncStatusLabel(
+    status: string | null | undefined,
+    t: (key: string) => string,
+): string {
+    switch (status) {
+        case "SUCCESS":
+            return t("service.form.ical.status.success");
+        case "FAILED":
+            return t("service.form.ical.status.failed");
+        case "RUNNING":
+            return t("service.form.ical.status.running");
+        case "IDLE":
+        default:
+            return t("service.form.ical.status.idle");
+    }
+}
+
 const CATEGORY_OPTIONS = [
     {
         value: ServiceCategoryNames.ACTIVITE,
@@ -258,7 +275,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
     const { navigate } = useRouter();
     const { currentUser } = useUser();
     const { success, error } = useToast();
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const { isBlocked } = usePartnerApprovalGuard(!adminMode);
     const { categories: serviceCategories } = useServiceStructureData();
     const { users } = useAdminUsersData({ role: "PARTNER" }, adminMode);
@@ -670,7 +687,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
         if (!hasAnyTranslation(form.titleTranslations)) {
             nextErrors.title = t("service.form.error.title_required");
         } else if (!hasLocaleTranslation(form.titleTranslations, "fr")) {
-            nextErrors.title = "Le titre FR est obligatoire.";
+            nextErrors.title = t("service.form.error.fr_title_required");
         }
 
         if (!hasAnyTranslation(form.descriptionTranslations)) {
@@ -678,7 +695,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                 "service.form.error.description_required",
             );
         } else if (!hasLocaleTranslation(form.descriptionTranslations, "fr")) {
-            nextErrors.description = "La description FR est obligatoire.";
+            nextErrors.description = t(
+                "service.form.error.fr_description_required",
+            );
         }
 
         if (
@@ -1569,8 +1588,12 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                         />
                                                         <span className="wdr-sform__hint">
                                                             {attribute.isRequired
-                                                                ? "Obligatoire"
-                                                                : "Optionnel"}
+                                                                ? t(
+                                                                      "service.form.field.required",
+                                                                  )
+                                                                : t(
+                                                                      "service.form.field.optional",
+                                                                  )}
                                                         </span>
                                                     </div>
                                                 ) : attribute.type ===
@@ -2077,9 +2100,13 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                                 {rule.startDate &&
                                                                     rule.endDate && (
                                                                         <span>
-                                                                            {rule.startDate.toLocaleDateString()}{" "}
+                                                                            {rule.startDate.toLocaleDateString(
+                                                                                intlLocale,
+                                                                            )}{" "}
                                                                             →{" "}
-                                                                            {rule.endDate.toLocaleDateString()}
+                                                                            {rule.endDate.toLocaleDateString(
+                                                                                intlLocale,
+                                                                            )}
                                                                         </span>
                                                                     )}
                                                                 {rule.minUnits && (
@@ -2350,7 +2377,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 onChange={(e) =>
                                     setField("videoUrl", e.target.value)
                                 }
-                                placeholder="https://..."
+                                placeholder={t("service.form.url_placeholder")}
                             />
                         </div>
 
@@ -2434,7 +2461,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         onChange={(e) =>
                                             setCalendarImportUrl(e.target.value)
                                         }
-                                        placeholder="https://..."
+                                        placeholder={t(
+                                            "service.form.url_placeholder",
+                                        )}
                                     />
                                     <p className="wdr-sform__hint">
                                         {t("service.form.ical.import_hint")}
@@ -2468,8 +2497,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                     <span>
                                         {t("service.form.ical.status")}{" "}
                                         <strong>
-                                            {calendarSyncQuery.data
-                                                ?.lastStatus ?? "IDLE"}
+                                            {getCalendarSyncStatusLabel(
+                                                calendarSyncQuery.data
+                                                    ?.lastStatus,
+                                                t,
+                                            )}
                                         </strong>
                                     </span>
                                     <span>
@@ -2477,7 +2509,9 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         <strong>
                                             {calendarSyncQuery.data
                                                 ?.lastSyncedAt
-                                                ? calendarSyncQuery.data.lastSyncedAt.toLocaleString()
+                                                ? calendarSyncQuery.data.lastSyncedAt.toLocaleString(
+                                                      intlLocale,
+                                                  )
                                                 : t("service.form.ical.never")}
                                         </strong>
                                     </span>

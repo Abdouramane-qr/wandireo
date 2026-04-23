@@ -552,4 +552,55 @@
     .wdr-admin-dash__recent {
         padding: 1rem;
     }
+
+    .wdr-admin-dash__table {
+        min-width: 0;
+    }
+
+    .wdr-admin-dash__table thead {
+        display: none;
+    }
+
+    .wdr-admin-dash__table,
+    .wdr-admin-dash__table tbody,
+    .wdr-admin-dash__table tr,
+    .wdr-admin-dash__table td {
+        display: block;
+        width: 100%;
+    }
+
+    .wdr-admin-dash__table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.75rem 0;
+    }
+
+    .wdr-admin-dash__table tr {
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+        border-radius: 18px;
+        background: var(--bg-elevated);
+    }
+
+    .wdr-admin-dash__table td {
+        padding: 0.85rem 1rem;
+        white-space: normal;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .wdr-admin-dash__table td:last-child {
+        border-bottom: none;
+    }
+
+    .wdr-admin-dash__table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
 }

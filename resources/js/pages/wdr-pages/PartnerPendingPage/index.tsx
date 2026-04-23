@@ -3,6 +3,7 @@ import { Button } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
+import type { MandateContractStatus, PartnerStatus } from "@/types/wdr-user";
 import type { PartnerUser } from "@/types/wdr-user";
 import "./PartnerPendingPage.css";
 
@@ -59,6 +60,40 @@ function statusMessage(
     }
 }
 
+function accountStatusLabel(
+    status: PartnerStatus,
+    t: (key: string) => string,
+): string {
+    switch (status) {
+        case "APPROVED":
+            return t("partner.pending.status.account.approved");
+        case "REJECTED":
+            return t("partner.pending.status.account.rejected");
+        case "SUSPENDED":
+            return t("partner.pending.status.account.suspended");
+        case "PENDING":
+        default:
+            return t("partner.pending.status.account.pending");
+    }
+}
+
+function contractStatusLabel(
+    status: MandateContractStatus,
+    t: (key: string) => string,
+): string {
+    switch (status) {
+        case "SIGNED":
+            return t("partner.pending.status.contract.signed");
+        case "REJECTED":
+            return t("partner.pending.status.contract.rejected");
+        case "PENDING_SIGNATURE":
+            return t("partner.pending.status.contract.pending_signature");
+        case "NOT_SENT":
+        default:
+            return t("partner.pending.status.contract.not_sent");
+    }
+}
+
 export const PartnerPendingPage: React.FC = () => {
     const { currentUser, logout } = useUser();
     const { navigate } = useRouter();
@@ -92,13 +127,20 @@ export const PartnerPendingPage: React.FC = () => {
                         <span className="wdr-partner-pending__label">
                             {t("partner.pending.account_status")}
                         </span>
-                        <strong>{currentUser.partnerStatus}</strong>
+                        <strong>
+                            {accountStatusLabel(currentUser.partnerStatus, t)}
+                        </strong>
                     </div>
                     <div className="wdr-partner-pending__item">
                         <span className="wdr-partner-pending__label">
                             {t("partner.pending.contract_status")}
                         </span>
-                        <strong>{currentUser.mandateContractStatus}</strong>
+                        <strong>
+                            {contractStatusLabel(
+                                currentUser.mandateContractStatus,
+                                t,
+                            )}
+                        </strong>
                     </div>
                     <div className="wdr-partner-pending__item">
                         <span className="wdr-partner-pending__label">

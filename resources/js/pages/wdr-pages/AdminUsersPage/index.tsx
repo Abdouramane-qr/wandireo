@@ -191,6 +191,53 @@ export const AdminUsersPage: React.FC = () => {
     });
     const [createForm, setCreateForm] =
         useState<PartnerCreateForm>(DEFAULT_CREATE_FORM);
+    const partnerStatusOptions: Array<{
+        value: PartnerStatus;
+        label: string;
+    }> = [
+        {
+            value: "PENDING",
+            label: t("admin.users.partner_status.pending"),
+        },
+        {
+            value: "APPROVED",
+            label: t("admin.users.partner_status.approved"),
+        },
+        {
+            value: "REJECTED",
+            label: t("admin.users.partner_status.rejected"),
+        },
+        {
+            value: "SUSPENDED",
+            label: t("admin.users.partner_status.suspended"),
+        },
+    ];
+    const contractStatusOptions: Array<{
+        value: MandateContractStatus;
+        label: string;
+    }> = [
+        {
+            value: "NOT_SENT",
+            label: t("admin.users.contract_status.not_sent"),
+        },
+        {
+            value: "PENDING_SIGNATURE",
+            label: t("admin.users.contract_status.pending_signature"),
+        },
+        {
+            value: "SIGNED",
+            label: t("admin.users.contract_status.signed"),
+        },
+        {
+            value: "REJECTED",
+            label: t("admin.users.contract_status.rejected"),
+        },
+    ];
+    const roleOptions: Array<{ value: UserRole; label: string }> = [
+        { value: "PARTNER", label: t("admin.users.role.partner") },
+        { value: "CLIENT", label: t("admin.users.role.client") },
+        { value: "ADMIN", label: t("admin.users.role.admin") },
+    ];
 
     useEffect(() => {
         if (!currentUser) {
@@ -568,18 +615,11 @@ export const AdminUsersPage: React.FC = () => {
                                 <option value="all">
                                     {t("admin.users.filter.all_statuses")}
                                 </option>
-                                <option value="PENDING">
-                                    {t("admin.users.filter.pending")}
-                                </option>
-                                <option value="APPROVED">
-                                    {t("admin.users.filter.approved")}
-                                </option>
-                                <option value="REJECTED">
-                                    {t("admin.users.filter.rejected")}
-                                </option>
-                                <option value="SUSPENDED">
-                                    {t("admin.users.filter.suspended")}
-                                </option>
+                                {partnerStatusOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </select>
                             <Button
                                 variant="primary"
@@ -893,22 +933,22 @@ export const AdminUsersPage: React.FC = () => {
                                 <tbody>
                                     {clients.map((client) => (
                                         <tr key={client.id}>
-                                            <td>
+                                            <td data-label={t("admin.users.table.name")}>
                                                 {client.firstName}{" "}
                                                 {client.lastName}
                                             </td>
-                                            <td>{client.email}</td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.email")}>{client.email}</td>
+                                            <td data-label={t("admin.users.table.language")}>
                                                 {client.language?.toUpperCase() ??
                                                     "—"}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.currency")}>
                                                 {client.preferredCurrency ??
                                                     "—"}
                                             </td>
-                                            <td>{client.bookingsCount ?? 0}</td>
-                                            <td>{client.reviewsCount ?? 0}</td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.bookings")}>{client.bookingsCount ?? 0}</td>
+                                            <td data-label={t("admin.users.table.reviews")}>{client.reviewsCount ?? 0}</td>
+                                            <td data-label={t("admin.users.table.action")}>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -955,23 +995,23 @@ export const AdminUsersPage: React.FC = () => {
                                 <tbody>
                                     {admins.map((admin) => (
                                         <tr key={admin.id}>
-                                            <td>
+                                            <td data-label={t("admin.users.table.name")}>
                                                 {admin.firstName}{" "}
                                                 {admin.lastName}
                                             </td>
-                                            <td>{admin.email}</td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.email")}>{admin.email}</td>
+                                            <td data-label={t("admin.users.table.language")}>
                                                 {admin.language?.toUpperCase() ??
                                                     "—"}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.permissions")}>
                                                 {admin.permissions.length > 0
                                                     ? admin.permissions.join(
                                                           ", ",
                                                       )
                                                     : "—"}
                                             </td>
-                                            <td>
+                                            <td data-label={t("admin.users.table.action")}>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -1037,18 +1077,11 @@ export const AdminUsersPage: React.FC = () => {
                                     }))
                                 }
                             >
-                                <option value="PENDING">
-                                    {t("admin.users.partner_status.pending")}
-                                </option>
-                                <option value="APPROVED">
-                                    {t("admin.users.partner_status.approved")}
-                                </option>
-                                <option value="REJECTED">
-                                    {t("admin.users.partner_status.rejected")}
-                                </option>
-                                <option value="SUSPENDED">
-                                    {t("admin.users.partner_status.suspended")}
-                                </option>
+                                {partnerStatusOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="wdr-admin-users__edit-field">
@@ -1066,20 +1099,11 @@ export const AdminUsersPage: React.FC = () => {
                                     }))
                                 }
                             >
-                                <option value="NOT_SENT">
-                                    {t("admin.users.contract_status.not_sent")}
-                                </option>
-                                <option value="PENDING_SIGNATURE">
-                                    {t(
-                                        "admin.users.contract_status.pending_signature",
-                                    )}
-                                </option>
-                                <option value="SIGNED">
-                                    {t("admin.users.contract_status.signed")}
-                                </option>
-                                <option value="REJECTED">
-                                    {t("admin.users.contract_status.rejected")}
-                                </option>
+                                {contractStatusOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="wdr-admin-users__edit-field">
@@ -1095,7 +1119,9 @@ export const AdminUsersPage: React.FC = () => {
                                             e.target.value,
                                     }))
                                 }
-                                placeholder="acct_..."
+                                placeholder={t(
+                                    "admin.users.field.stripe_placeholder",
+                                )}
                             />
                         </div>
                         <div className="wdr-admin-users__edit-field">
@@ -1124,7 +1150,9 @@ export const AdminUsersPage: React.FC = () => {
                                         mandateContractFilePath: e.target.value,
                                     }))
                                 }
-                                placeholder="storage/contracts/mandat.pdf"
+                                placeholder={t(
+                                    "admin.users.field.contract_placeholder",
+                                )}
                             />
                             {editForm.mandateContractFilePath && (
                                 <a
@@ -1345,7 +1373,9 @@ export const AdminUsersPage: React.FC = () => {
                                 {t("admin.users.section.account_type")}
                             </h3>
                             <span className="wdr-admin-users__role-pill">
-                                {createForm.role}
+                                {roleOptions.find(
+                                    (option) => option.value === createForm.role,
+                                )?.label ?? createForm.role}
                             </span>
                         </div>
                         <select
@@ -1358,15 +1388,11 @@ export const AdminUsersPage: React.FC = () => {
                                 }))
                             }
                         >
-                            <option value="PARTNER">
-                                {t("admin.users.role.partner")}
-                            </option>
-                            <option value="CLIENT">
-                                {t("admin.users.role.client")}
-                            </option>
-                            <option value="ADMIN">
-                                {t("admin.users.role.admin")}
-                            </option>
+                            {roleOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -1542,26 +1568,11 @@ export const AdminUsersPage: React.FC = () => {
                                         }))
                                     }
                                 >
-                                    <option value="PENDING">
-                                        {t(
-                                            "admin.users.partner_status.pending",
-                                        )}
-                                    </option>
-                                    <option value="APPROVED">
-                                        {t(
-                                            "admin.users.partner_status.approved",
-                                        )}
-                                    </option>
-                                    <option value="REJECTED">
-                                        {t(
-                                            "admin.users.partner_status.rejected",
-                                        )}
-                                    </option>
-                                    <option value="SUSPENDED">
-                                        {t(
-                                            "admin.users.partner_status.suspended",
-                                        )}
-                                    </option>
+                                    {partnerStatusOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
                                 </select>
                                 <select
                                     className="wdr-admin-users__input"
@@ -1574,20 +1585,11 @@ export const AdminUsersPage: React.FC = () => {
                                         }))
                                     }
                                 >
-                                    <option value="NOT_SENT">
-                                        {t("admin.users.contract.not_sent")}
-                                    </option>
-                                    <option value="PENDING_SIGNATURE">
-                                        {t(
-                                            "admin.users.contract.pending_signature",
-                                        )}
-                                    </option>
-                                    <option value="SIGNED">
-                                        {t("admin.users.contract.signed")}
-                                    </option>
-                                    <option value="REJECTED">
-                                        {t("admin.users.contract.rejected")}
-                                    </option>
+                                    {contractStatusOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

@@ -9,6 +9,10 @@ export function buildMainFrTranslations(): Record<string, string> {
         "nav.admin": "Administration",
         "nav.logout": "Déconnexion",
         "nav.become_partner": "Devenir partenaire",
+        "nav.dashboard": "Tableau de bord",
+        "nav.repository": "Dépôt",
+        "nav.documentation": "Documentation",
+        "nav.settings": "Paramètres",
 
         "common.loading": "Chargement...",
         "common.close": "Fermer",
@@ -19,10 +23,17 @@ export function buildMainFrTranslations(): Record<string, string> {
         "common.system": "Système",
         "common.light": "Clair",
         "common.dark": "Sombre",
+        "common.more": "Plus",
+        "common.anonymous": "Utilisateur",
         "common.back_home": "Retour à l'accueil",
+        "common.platform": "Plateforme",
+        "common.sidebar": "Barre latérale",
+        "common.sidebar_mobile_description": "Affiche la barre latérale mobile.",
+        "common.toggle_sidebar": "Basculer la barre latérale",
         "common.previous_page": "Page précédente",
         "common.next_page": "Page suivante",
         "common.page_number": "Page {page}",
+        "common.saved": "Enregistré",
 
         "theme.label": "Thème",
         "theme.change": "Changer de thème",
@@ -80,5 +91,104 @@ export function buildMainFrTranslations(): Record<string, string> {
         "support.title": "Support",
         "support.contact_us": "Nous contacter",
         "support.whatsapp": "Contact via WhatsApp",
+        "welcome.page_title": "Bienvenue",
+        "welcome.heading": "Pour bien démarrer",
+        "welcome.description":
+            "Laravel dispose d'un écosystème extrêmement riche. Nous vous suggérons de commencer par les ressources suivantes.",
+        "welcome.read_docs_prefix": "Lire la",
+        "welcome.watch_tutorials_prefix": "Voir les tutoriels vidéo sur",
+        "welcome.deploy_now": "Déployer maintenant",
+        "password.show": "Afficher le mot de passe",
+        "password.hide": "Masquer le mot de passe",
+        "settings.delete_user.title": "Supprimer le compte",
+        "settings.delete_user.description":
+            "Supprimez votre compte et toutes ses données",
+        "settings.delete_user.warning_title": "Attention",
+        "settings.delete_user.warning_body":
+            "Cette action est définitive et ne pourra pas être annulée.",
+        "settings.delete_user.button": "Supprimer le compte",
+        "settings.delete_user.confirm_title":
+            "Voulez-vous vraiment supprimer votre compte ?",
+        "settings.delete_user.confirm_description":
+            "Une fois votre compte supprimé, toutes ses données seront également supprimées définitivement. Saisissez votre mot de passe pour confirmer cette suppression.",
+        "settings.delete_user.password_label": "Mot de passe",
+        "settings.delete_user.password_placeholder": "Mot de passe",
+        "settings.delete_user.confirm_button": "Supprimer le compte",
+        "settings.profile.page_title": "Paramètres du profil",
+        "settings.profile.heading_title": "Informations du profil",
+        "settings.profile.heading_description":
+            "Mettez à jour votre nom et votre adresse e-mail",
+        "settings.profile.name_label": "Nom",
+        "settings.profile.name_placeholder": "Nom complet",
+        "settings.profile.email_label": "Adresse e-mail",
+        "settings.profile.email_placeholder": "Adresse e-mail",
+        "settings.profile.unverified_message":
+            "Votre adresse e-mail n'est pas vérifiée.",
+        "settings.profile.resend_verification":
+            "Cliquez ici pour renvoyer l'e-mail de vérification.",
+        "settings.profile.verification_sent":
+            "Un nouveau lien de vérification a été envoyé à votre adresse e-mail.",
+        "settings.profile.save_button": "Enregistrer",
+        "settings.security.page_title": "Paramètres de sécurité",
+        "settings.security.password_title": "Mettre à jour le mot de passe",
+        "settings.security.password_description":
+            "Utilisez un mot de passe long et difficile à deviner pour sécuriser votre compte",
+        "settings.security.current_password_label": "Mot de passe actuel",
+        "settings.security.current_password_placeholder":
+            "Mot de passe actuel",
+        "settings.security.new_password_label": "Nouveau mot de passe",
+        "settings.security.new_password_placeholder":
+            "Nouveau mot de passe",
+        "settings.security.confirm_password_label":
+            "Confirmer le mot de passe",
+        "settings.security.confirm_password_placeholder":
+            "Confirmer le mot de passe",
+        "settings.security.save_password_button":
+            "Enregistrer le mot de passe",
+        "settings.security.two_factor_title": "Double authentification",
+        "settings.security.two_factor_description":
+            "Gérez les réglages de votre double authentification",
+        "settings.security.two_factor_enabled_message":
+            "Lors de la connexion, un code temporaire vous sera demandé. Vous pourrez le récupérer depuis une application TOTP sur votre téléphone.",
+        "settings.security.two_factor_disabled_message":
+            "Lorsque vous activez la double authentification, un code temporaire vous sera demandé à la connexion. Ce code peut être récupéré depuis une application TOTP sur votre téléphone.",
+        "settings.security.disable_two_factor": "Désactiver la 2FA",
+        "settings.security.continue_setup": "Continuer la configuration",
+        "settings.security.enable_two_factor": "Activer la 2FA",
+        "settings.appearance.page_title": "Paramètres d’apparence",
+        "settings.appearance.heading_title": "Paramètres d’apparence",
+        "settings.appearance.heading_description":
+            "Mettez à jour les réglages visuels de votre compte",
+        "auth.two_factor.setup.enabled_title":
+            "Double authentification activée",
+        "auth.two_factor.setup.enabled_description":
+            "La double authentification est désormais activée. Scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification.",
+        "auth.two_factor.setup.verify_title":
+            "Vérifier le code d'authentification",
+        "auth.two_factor.setup.verify_description":
+            "Saisissez le code à 6 chiffres affiché dans votre application d'authentification",
+        "auth.two_factor.setup.enable_title":
+            "Activer la double authentification",
+        "auth.two_factor.setup.enable_description":
+            "Pour finaliser l'activation de la double authentification, scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification",
+        "auth.two_factor.setup.manual_or":
+            "ou saisissez le code manuellement",
+        "auth.two_factor.setup.close_button": "Fermer",
+        "auth.two_factor.setup.continue_button": "Continuer",
+        "auth.two_factor.recovery_codes.title": "Codes de récupération 2FA",
+        "auth.two_factor.recovery_codes.description":
+            "Les codes de récupération vous permettent de retrouver l'accès à votre compte si vous perdez votre appareil 2FA. Stockez-les dans un gestionnaire de mots de passe sécurisé.",
+        "auth.two_factor.recovery_codes.view":
+            "Afficher les codes de récupération",
+        "auth.two_factor.recovery_codes.hide":
+            "Masquer les codes de récupération",
+        "auth.two_factor.recovery_codes.regenerate":
+            "Régénérer les codes",
+        "auth.two_factor.recovery_codes.regenerate_help":
+            "Chaque code de récupération peut être utilisé une seule fois pour accéder à votre compte puis est supprimé. Si vous en avez besoin de nouveaux, cliquez sur Régénérer les codes ci-dessus.",
+        "auth.two_factor.recovery_codes.list_aria":
+            "Codes de récupération",
+        "auth.two_factor.recovery_codes.loading_aria":
+            "Chargement des codes de récupération",
     };
 }

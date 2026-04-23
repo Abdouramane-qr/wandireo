@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
+import clsx from 'clsx';
 import { Plus, Search, HelpCircle, Filter, X, MessageSquare, User, Calendar, ExternalLink } from 'lucide-react';
 import { AdminSectionNav, Button, Modal } from '@/components/wdr';
 import { SupportTicket, SupportStatus, SupportPriority } from '@/types/support';
@@ -101,7 +102,7 @@ export default function SupportIndex({ tickets }: Props) {
                         </div>
                         <input
                             type="text"
-                            placeholder="Rechercher un incident, un sujet..."
+                            placeholder={t('support.search_placeholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full pl-12 pr-12 py-4 rounded-2xl bg-slate-50 border-none focus:bg-white focus:ring-4 focus:ring-sky-500/5 transition-all outline-none text-sm font-medium"
@@ -158,7 +159,10 @@ export default function SupportIndex({ tickets }: Props) {
                 {/* Result count */}
                 <div className="mt-6 flex items-center justify-between px-2">
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                        {filteredTickets.length} {filteredTickets.length > 1 ? 'tickets trouvés' : 'ticket trouvé'}
+                        {(filteredTickets.length > 1
+                            ? t('support.results_other')
+                            : t('support.results_one')
+                        ).replace('{count}', String(filteredTickets.length))}
                     </p>
                 </div>
             </div>
@@ -189,7 +193,11 @@ export default function SupportIndex({ tickets }: Props) {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-slate-900">
-                                            {selectedTicket.user ? `${selectedTicket.user.firstName} ${selectedTicket.user.lastName}` : (selectedTicket.partner ? `${selectedTicket.partner.firstName} ${selectedTicket.partner.lastName}` : 'Anonyme')}
+                                            {selectedTicket.user
+                                                ? `${selectedTicket.user.firstName} ${selectedTicket.user.lastName}`
+                                                : selectedTicket.partner
+                                                  ? `${selectedTicket.partner.firstName} ${selectedTicket.partner.lastName}`
+                                                  : t('support.anonymous')}
                                         </span>
                                         <span className="text-[10px] font-bold text-sky-500 uppercase">
                                             {selectedTicket.user ? t('support.author.client') : t('support.author.partner')}
@@ -226,10 +234,14 @@ export default function SupportIndex({ tickets }: Props) {
                                         <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-slate-100 group-hover:border-sky-200 transition-colors">
                                             <ExternalLink className="w-5 h-5" />
                                         </div>
-                                        <span className="text-sm font-bold underline underline-offset-4">Voir le média</span>
+                                        <span className="text-sm font-bold underline underline-offset-4">
+                                            {t('support.view_media')}
+                                        </span>
                                     </a>
                                 ) : (
-                                    <span className="text-sm font-bold text-slate-300 italic">Aucun média</span>
+                                    <span className="text-sm font-bold text-slate-300 italic">
+                                        {t('support.no_media')}
+                                    </span>
                                 )}
                             </div>
                         </div>

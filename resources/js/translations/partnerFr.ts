@@ -50,6 +50,15 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.pending.company": "Entreprise",
         "partner.pending.contact": "Contact principal",
         "partner.pending.date_missing": "Non renseigné",
+        "partner.pending.status.account.pending": "En attente",
+        "partner.pending.status.account.approved": "Approuvé",
+        "partner.pending.status.account.rejected": "Refusé",
+        "partner.pending.status.account.suspended": "Suspendu",
+        "partner.pending.status.contract.not_sent": "Non envoyé",
+        "partner.pending.status.contract.pending_signature":
+            "Signature en attente",
+        "partner.pending.status.contract.signed": "Signé",
+        "partner.pending.status.contract.rejected": "Refusé",
 
         // Bookings Management
         "partner.bookings.title": "Gestion des réservations",
@@ -124,6 +133,9 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.catalog.field.pricing_unit": "Unité de prix",
         "partner.catalog.field.payment_mode": "Mode de paiement",
         "partner.catalog.field.currency": "Devise",
+        "partner.catalog.currency.eur": "EUR — Euro",
+        "partner.catalog.currency.usd": "USD — Dollar US",
+        "partner.catalog.currency.gbp": "GBP — Livre sterling",
         "partner.catalog.field.available": "Disponible",
         "partner.catalog.field.min_age": "Âge minimum",
         "partner.catalog.field.max_guests": "Capacité maximum",
@@ -258,6 +270,12 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.catalog.toast.toggle_error": "Erreur lors du changement de statut.",
 
         "partner.catalog.error.title_required": "Le titre est obligatoire.",
+        "service.form.error.fr_title_required": "Le titre FR est obligatoire.",
+        "service.form.error.fr_description_required":
+            "La description FR est obligatoire.",
+        "service.form.field.required": "Obligatoire",
+        "service.form.field.optional": "Optionnel",
+        "service.form.url_placeholder": "https://...",
         "partner.catalog.error.description_required": "La description est obligatoire.",
         "partner.catalog.error.price_positive": "Le prix doit être positif.",
         "partner.catalog.error.city_required": "La ville est obligatoire.",

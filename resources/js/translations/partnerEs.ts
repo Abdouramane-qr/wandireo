@@ -50,6 +50,15 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.pending.company": "Empresa",
         "partner.pending.contact": "Contacto principal",
         "partner.pending.date_missing": "No proporcionado",
+        "partner.pending.status.account.pending": "Pendiente",
+        "partner.pending.status.account.approved": "Aprobado",
+        "partner.pending.status.account.rejected": "Rechazado",
+        "partner.pending.status.account.suspended": "Suspendido",
+        "partner.pending.status.contract.not_sent": "No enviado",
+        "partner.pending.status.contract.pending_signature":
+            "Firma pendiente",
+        "partner.pending.status.contract.signed": "Firmado",
+        "partner.pending.status.contract.rejected": "Rechazado",
 
         // Bookings Management
         "partner.bookings.title": "Gestión de Reservas",
@@ -124,6 +133,9 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.catalog.field.pricing_unit": "Unidad de precio",
         "partner.catalog.field.payment_mode": "Modo de pago",
         "partner.catalog.field.currency": "Moneda",
+        "partner.catalog.currency.eur": "EUR — Euro",
+        "partner.catalog.currency.usd": "USD — Dólar estadounidense",
+        "partner.catalog.currency.gbp": "GBP — Libra esterlina",
         "partner.catalog.field.available": "Disponible",
         "partner.catalog.field.min_age": "Edad mínima",
         "partner.catalog.field.max_guests": "Capacidad máxima",
@@ -258,6 +270,7 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.catalog.toast.toggle_error": "Error al cambiar el estado.",
 
         "partner.catalog.error.title_required": "El título es obligatorio.",
+        "service.form.url_placeholder": "https://...",
         "partner.catalog.error.description_required": "La descripción es obligatoria.",
         "partner.catalog.error.price_positive": "El precio debe ser positivo.",
         "partner.catalog.error.city_required": "La ciudad es obligatoria.",

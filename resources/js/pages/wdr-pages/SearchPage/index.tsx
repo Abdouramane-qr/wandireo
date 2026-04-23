@@ -411,26 +411,20 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
     const detailedCategoriesHeading = useMemo(() => {
         if (activeVertical === "ALL") {
-            return locale === "fr"
-                ? "Sous-catégories"
-                : t("search.detailed_categories");
-        }
-
-        if (locale !== "fr") {
-            return `${t("search.types_prefix")} ${activeVerticalMeta.label.toLowerCase()}`;
+            return t("search.detailed_categories");
         }
 
         switch (activeVertical) {
             case "ACTIVITE":
-                return "Types d'activités";
+                return t("search.types.activities");
             case "HEBERGEMENT":
-                return "Types d'hébergements";
+                return t("search.types.accommodations");
             case "BATEAU":
-                return "Types de bateaux";
+                return t("search.types.boats");
             case "VOITURE":
-                return "Types de voitures";
+                return t("search.types.cars");
         }
-    }, [activeVertical, activeVerticalMeta.label, locale, t]);
+    }, [activeVertical, t]);
 
     const destinationOptions = useMemo(() => {
         const algarveSet = new Set(ALGARVE_CITIES);

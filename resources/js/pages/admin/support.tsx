@@ -358,10 +358,10 @@ export default function AdminSupportPage() {
                                 <tr>
                                     <th>{t("support.ticket_date")}</th>
                                     <th>{t("support.ticket_subject")}</th>
-                                    <th>{t("support.ticket_user")}</th>
-                                    <th>{t("support.status.all")}</th>
-                                    <th>{t("support.priority.medium")}</th>
-                                    <th>{t("support.ticket_actions")}</th>
+                                <th>{t("support.ticket_user")}</th>
+                                <th>{t("support.status.all")}</th>
+                                <th>{t("support.ticket_priority")}</th>
+                                <th>{t("support.ticket_actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -483,7 +483,7 @@ export default function AdminSupportPage() {
 
                     <div className="wdr-admin-support__meta-item">
                         <span className="label">
-                            {t("support.priority.medium")}
+                            {t("support.ticket_priority")}
                         </span>
                         <select
                             className="wdr-admin-support__select"
@@ -551,7 +551,10 @@ export default function AdminSupportPage() {
                 <Modal
                     isOpen={!!selectedTicket}
                     onClose={() => setSelectedTicket(null)}
-                    title={`Ticket : ${selectedTicket.subject}`}
+                    title={t("support.ticket_detail_title").replace(
+                        "{subject}",
+                        selectedTicket.subject,
+                    )}
                     size="lg"
                 >
                     <div className="wdr-admin-support__ticket-detail">
@@ -587,7 +590,7 @@ export default function AdminSupportPage() {
 
                             <div className="wdr-admin-support__meta-item">
                                 <span className="label">
-                                    {t("support.priority.medium")}
+                                    {t("support.ticket_priority")}
                                 </span>
                                 <select
                                     className="wdr-admin-support__select"

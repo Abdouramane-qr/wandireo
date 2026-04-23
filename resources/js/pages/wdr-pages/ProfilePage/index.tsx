@@ -11,23 +11,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import "./ProfilePage.css";
 
-const LANGUAGE_OPTIONS: { value: string; label: string }[] = [
-    { value: "fr", label: "Français" },
-    { value: "en", label: "English" },
-    { value: "es", label: "Espagnol" },
-    { value: "de", label: "Deutsch" },
-    { value: "it", label: "Italiano" },
-    { value: "pt", label: "Portugais" },
-];
-
-const CURRENCY_OPTIONS: { value: string; label: string }[] = [
-    { value: "EUR", label: "Euro (EUR)" },
-    { value: "USD", label: "Dollar US (USD)" },
-    { value: "GBP", label: "Livre sterling (GBP)" },
-    { value: "CHF", label: "Franc suisse (CHF)" },
-    { value: "CAD", label: "Dollar canadien (CAD)" },
-];
-
 const UserIcon: React.FC = () => (
     <svg
         width="22"
@@ -167,6 +150,21 @@ export const ProfilePage: React.FC = () => {
     const { navigate } = useRouter();
     const toast = useToast();
     const { t, intlLocale } = useTranslation();
+    const languageOptions = [
+        { value: "fr", label: t("profile.language.fr") },
+        { value: "en", label: t("profile.language.en") },
+        { value: "es", label: t("profile.language.es") },
+        { value: "de", label: t("profile.language.de") },
+        { value: "it", label: t("profile.language.it") },
+        { value: "pt", label: t("profile.language.pt") },
+    ];
+    const currencyOptions = [
+        { value: "EUR", label: t("profile.currency.eur") },
+        { value: "USD", label: t("profile.currency.usd") },
+        { value: "GBP", label: t("profile.currency.gbp") },
+        { value: "CHF", label: t("profile.currency.chf") },
+        { value: "CAD", label: t("profile.currency.cad") },
+    ];
     const preferredCurrency =
         currentUser?.role === "CLIENT" ? currentUser.preferredCurrency : "EUR";
 
@@ -328,14 +326,14 @@ export const ProfilePage: React.FC = () => {
                             id="profile-language"
                             label={t("profile.language")}
                             value={form.language}
-                            options={LANGUAGE_OPTIONS}
+                            options={languageOptions}
                             onChange={handleChange("language")}
                         />
                         <ProfileSelect
                             id="profile-currency"
                             label={t("profile.currency")}
                             value={form.preferredCurrency}
-                            options={CURRENCY_OPTIONS}
+                            options={currencyOptions}
                             onChange={handleChange("preferredCurrency")}
                         />
                     </div>

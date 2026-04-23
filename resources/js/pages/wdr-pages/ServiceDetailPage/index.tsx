@@ -2055,7 +2055,8 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
                                         key={review.id}
                                         review={review}
                                         authorName={
-                                            review.authorName ?? "Utilisateur"
+                                            review.authorName ??
+                                            t("common.anonymous")
                                         }
                                     />
                                 );

@@ -302,7 +302,9 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
             form.status === BlogStatusNames.PUBLISHED &&
             !hasLocaleTranslation(form.titleTranslations, "fr")
         ) {
-            nextErrors.title = "Le titre FR est obligatoire avant publication.";
+            nextErrors.title = t(
+                "admin.blog.editor.error.fr_title_required_publish",
+            );
         }
 
         if (!form.slug.trim()) {
@@ -315,8 +317,9 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
             form.status === BlogStatusNames.PUBLISHED &&
             !hasLocaleTranslation(form.excerptTranslations, "fr")
         ) {
-            nextErrors.excerpt =
-                "Le resume FR est obligatoire avant publication.";
+            nextErrors.excerpt = t(
+                "admin.blog.editor.error.fr_excerpt_required_publish",
+            );
         }
 
         if (!hasAnyTranslation(form.contentTranslations)) {
@@ -325,8 +328,9 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
             form.status === BlogStatusNames.PUBLISHED &&
             !hasLocaleTranslation(form.contentTranslations, "fr")
         ) {
-            nextErrors.content =
-                "Le contenu FR est obligatoire avant publication.";
+            nextErrors.content = t(
+                "admin.blog.editor.error.fr_content_required_publish",
+            );
         }
 
         setErrors(nextErrors);
@@ -629,47 +633,47 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({
                                     <div className="wdr-editor__toolbar">
                                         <ToolbarButton 
                                             icon={<Bold />} 
-                                            label="Gras" 
+                                            label={t("admin.blog.editor.toolbar.bold")} 
                                             onClick={() => insertMarkdown("**", "**")} 
                                         />
                                         <ToolbarButton 
                                             icon={<Italic />} 
-                                            label="Italique" 
+                                            label={t("admin.blog.editor.toolbar.italic")} 
                                             onClick={() => insertMarkdown("*", "*")} 
                                         />
                                         <ToolbarButton 
                                             icon={<Heading1 />} 
-                                            label="Titre 1" 
+                                            label={t("admin.blog.editor.toolbar.heading1")} 
                                             onClick={() => insertMarkdown("# ", "")} 
                                         />
                                         <ToolbarButton 
                                             icon={<Heading2 />} 
-                                            label="Titre 2" 
+                                            label={t("admin.blog.editor.toolbar.heading2")} 
                                             onClick={() => insertMarkdown("## ", "")} 
                                         />
                                         <ToolbarButton 
                                             icon={<List />} 
-                                            label="Liste" 
+                                            label={t("admin.blog.editor.toolbar.list")} 
                                             onClick={() => insertMarkdown("- ", "")} 
                                         />
                                         <ToolbarButton 
                                             icon={<ListOrdered />} 
-                                            label="Liste ordonnée" 
+                                            label={t("admin.blog.editor.toolbar.ordered_list")} 
                                             onClick={() => insertMarkdown("1. ", "")} 
                                         />
                                         <ToolbarButton 
                                             icon={<Quote />} 
-                                            label="Citation" 
+                                            label={t("admin.blog.editor.toolbar.quote")} 
                                             onClick={() => insertMarkdown("> ", "")} 
                                         />
                                         <ToolbarButton 
                                             icon={<LinkIcon />} 
-                                            label="Lien" 
+                                            label={t("admin.blog.editor.toolbar.link")} 
                                             onClick={() => insertMarkdown("[", "](url)")} 
                                         />
                                         <ToolbarButton 
                                             icon={<ImageIcon />} 
-                                            label="Image" 
+                                            label={t("admin.blog.editor.toolbar.image")} 
                                             onClick={() => insertMarkdown("![alt](", ")")} 
                                         />
                                     </div>

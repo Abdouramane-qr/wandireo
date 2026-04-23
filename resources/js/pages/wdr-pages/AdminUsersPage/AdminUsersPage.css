@@ -664,3 +664,57 @@
 :is(.dark) .wdr-admin-users__table tbody tr:hover td {
     background-color: var(--bg-soft);
 }
+
+@media (max-width: 768px) {
+    .wdr-admin-users__table {
+        min-width: 0;
+    }
+
+    .wdr-admin-users__table thead {
+        display: none;
+    }
+
+    .wdr-admin-users__table,
+    .wdr-admin-users__table tbody,
+    .wdr-admin-users__table tr,
+    .wdr-admin-users__table td {
+        display: block;
+        width: 100%;
+    }
+
+    .wdr-admin-users__table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .wdr-admin-users__table tr {
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .wdr-admin-users__table td {
+        padding: 0.85rem 1rem;
+        white-space: normal;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .wdr-admin-users__table td:last-child {
+        border-bottom: none;
+    }
+
+    .wdr-admin-users__table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+}

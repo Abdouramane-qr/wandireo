@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import './RatingStars.css';
 
 export type RatingStarsMode = 'display' | 'input';
@@ -90,16 +91,17 @@ export const RatingStars: React.FC<RatingStarsProps> = ({
     onChange,
     className = '',
 }) => {
+    const { t } = useTranslation();
     const [hoverIndex, setHoverIndex] = useState<number>(-1);
 
     const activeValue = hoverIndex >= 0 ? hoverIndex + 1 : value;
 
     const label =
         value > 0
-            ? `Note : ${value} sur 5`
+            ? t('service.card.rating_aria').replace('{rating}', String(value))
             : mode === 'input'
-              ? 'Sélectionner une note'
-              : 'Aucune note';
+              ? t('common.select_rating')
+              : t('common.no_rating');
 
     return (
         <span

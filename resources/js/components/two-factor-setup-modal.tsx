@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAppearance } from "@/hooks/use-appearance";
 import { useClipboard } from "@/hooks/use-clipboard";
 import { OTP_MAX_LENGTH } from "@/hooks/use-two-factor-auth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { confirm } from "@/routes/two-factor";
 
 function GridScanIcon() {
@@ -64,6 +65,7 @@ function TwoFactorSetupStep({
 }) {
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
+    const { t } = useTranslation();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
     return (
@@ -98,7 +100,7 @@ function TwoFactorSetupStep({
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
                         <span className="relative bg-card px-2 py-1">
-                            ou saisissez le code manuellement
+                            {t("auth.two_factor.setup.manual_or")}
                         </span>
                     </div>
 
@@ -139,6 +141,7 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
+    const { t } = useTranslation();
     const [code, setCode] = useState<string>("");
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -203,7 +206,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Retour
+                                {t("common.back")}
                             </Button>
                             <Button
                                 type="submit"
@@ -212,7 +215,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirmer
+                                {t("auth.confirm_password.submit")}
                             </Button>
                         </div>
                     </div>
@@ -245,6 +248,7 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
     errors,
 }: Props) {
+    const { t } = useTranslation();
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
@@ -255,29 +259,26 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: "Double authentification activée",
-                description:
-                    "La double authentification est désormais activée. Scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification.",
-                buttonText: "Fermer",
+                title: t("auth.two_factor.setup.enabled_title"),
+                description: t("auth.two_factor.setup.enabled_description"),
+                buttonText: t("auth.two_factor.setup.close_button"),
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: "Vérifier le code d'authentification",
-                description:
-                    "Saisissez le code à 6 chiffres affiché dans votre application d'authentification",
-                buttonText: "Continuer",
+                title: t("auth.two_factor.setup.verify_title"),
+                description: t("auth.two_factor.setup.verify_description"),
+                buttonText: t("auth.two_factor.setup.continue_button"),
             };
         }
 
         return {
-            title: "Activer la double authentification",
-            description:
-                "Pour finaliser l'activation de la double authentification, scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification",
-            buttonText: "Continuer",
+            title: t("auth.two_factor.setup.enable_title"),
+            description: t("auth.two_factor.setup.enable_description"),
+            buttonText: t("auth.two_factor.setup.continue_button"),
         };
-    }, [twoFactorEnabled, showVerificationStep]);
+    }, [showVerificationStep, t, twoFactorEnabled]);
 
     const resetModalState = useCallback(() => {
         setShowVerificationStep(false);

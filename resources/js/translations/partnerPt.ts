@@ -50,6 +50,15 @@ export function buildPartnerPtTranslations(): Record<string, string> {
         "partner.pending.company": "Empresa",
         "partner.pending.contact": "Contacto principal",
         "partner.pending.date_missing": "Não fornecido",
+        "partner.pending.status.account.pending": "Pendente",
+        "partner.pending.status.account.approved": "Aprovado",
+        "partner.pending.status.account.rejected": "Recusado",
+        "partner.pending.status.account.suspended": "Suspenso",
+        "partner.pending.status.contract.not_sent": "Não enviado",
+        "partner.pending.status.contract.pending_signature":
+            "Assinatura pendente",
+        "partner.pending.status.contract.signed": "Assinado",
+        "partner.pending.status.contract.rejected": "Recusado",
 
         // Bookings Management
         "partner.bookings.title": "Gestão de Reservas",
@@ -124,6 +133,9 @@ export function buildPartnerPtTranslations(): Record<string, string> {
         "partner.catalog.field.pricing_unit": "Unidade de preço",
         "partner.catalog.field.payment_mode": "Modo de pagamento",
         "partner.catalog.field.currency": "Moeda",
+        "partner.catalog.currency.eur": "EUR — Euro",
+        "partner.catalog.currency.usd": "USD — Dólar americano",
+        "partner.catalog.currency.gbp": "GBP — Libra esterlina",
         "partner.catalog.field.available": "Disponível",
         "partner.catalog.field.min_age": "Idade mínima",
         "partner.catalog.field.max_guests": "Capacidade máxima",
@@ -258,6 +270,7 @@ export function buildPartnerPtTranslations(): Record<string, string> {
         "partner.catalog.toast.toggle_error": "Erro ao alterar estado.",
 
         "partner.catalog.error.title_required": "O título é obrigatório.",
+        "service.form.url_placeholder": "https://...",
         "partner.catalog.error.description_required": "A descrição é obrigatória.",
         "partner.catalog.error.price_positive": "O preço deve ser positivo.",
         "partner.catalog.error.city_required": "A cidade é obrigatória.",

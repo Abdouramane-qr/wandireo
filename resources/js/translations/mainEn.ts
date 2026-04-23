@@ -9,6 +9,10 @@ export function buildMainEnTranslations(): Record<string, string> {
         "nav.admin": "Administration",
         "nav.logout": "Logout",
         "nav.become_partner": "Become a partner",
+        "nav.dashboard": "Dashboard",
+        "nav.repository": "Repository",
+        "nav.documentation": "Documentation",
+        "nav.settings": "Settings",
 
         "common.loading": "Loading...",
         "common.close": "Close",
@@ -19,10 +23,17 @@ export function buildMainEnTranslations(): Record<string, string> {
         "common.system": "System",
         "common.light": "Light",
         "common.dark": "Dark",
+        "common.more": "More",
+        "common.anonymous": "Anonymous",
         "common.back_home": "Back to home",
+        "common.platform": "Platform",
+        "common.sidebar": "Sidebar",
+        "common.sidebar_mobile_description": "Displays the mobile sidebar.",
+        "common.toggle_sidebar": "Toggle sidebar",
         "common.previous_page": "Previous page",
         "common.next_page": "Next page",
         "common.page_number": "Page {page}",
+        "common.saved": "Saved",
 
         "theme.label": "Theme",
         "theme.change": "Change theme",
@@ -80,5 +91,95 @@ export function buildMainEnTranslations(): Record<string, string> {
         "support.title": "Support",
         "support.contact_us": "Contact us",
         "support.whatsapp": "Contact via WhatsApp",
+        "welcome.page_title": "Welcome",
+        "welcome.heading": "Let's get started",
+        "welcome.description":
+            "Laravel has an incredibly rich ecosystem. We suggest starting with the following resources.",
+        "welcome.read_docs_prefix": "Read the",
+        "welcome.watch_tutorials_prefix": "Watch video tutorials at",
+        "welcome.deploy_now": "Deploy now",
+        "password.show": "Show password",
+        "password.hide": "Hide password",
+        "settings.delete_user.title": "Delete account",
+        "settings.delete_user.description":
+            "Delete your account and all associated data",
+        "settings.delete_user.warning_title": "Warning",
+        "settings.delete_user.warning_body":
+            "This action is permanent and cannot be undone.",
+        "settings.delete_user.button": "Delete account",
+        "settings.delete_user.confirm_title":
+            "Do you really want to delete your account?",
+        "settings.delete_user.confirm_description":
+            "Once your account is deleted, all of its data will be permanently removed as well. Enter your password to confirm deletion.",
+        "settings.delete_user.password_label": "Password",
+        "settings.delete_user.password_placeholder": "Password",
+        "settings.delete_user.confirm_button": "Delete account",
+        "settings.profile.page_title": "Profile settings",
+        "settings.profile.heading_title": "Profile information",
+        "settings.profile.heading_description":
+            "Update your name and email address",
+        "settings.profile.name_label": "Name",
+        "settings.profile.name_placeholder": "Full name",
+        "settings.profile.email_label": "Email address",
+        "settings.profile.email_placeholder": "Email address",
+        "settings.profile.unverified_message":
+            "Your email address is not verified.",
+        "settings.profile.resend_verification":
+            "Click here to resend the verification email.",
+        "settings.profile.verification_sent":
+            "A new verification link has been sent to your email address.",
+        "settings.profile.save_button": "Save",
+        "settings.security.page_title": "Security settings",
+        "settings.security.password_title": "Update password",
+        "settings.security.password_description":
+            "Use a long, hard-to-guess password to secure your account",
+        "settings.security.current_password_label": "Current password",
+        "settings.security.current_password_placeholder": "Current password",
+        "settings.security.new_password_label": "New password",
+        "settings.security.new_password_placeholder": "New password",
+        "settings.security.confirm_password_label": "Confirm password",
+        "settings.security.confirm_password_placeholder": "Confirm password",
+        "settings.security.save_password_button": "Save password",
+        "settings.security.two_factor_title": "Two-factor authentication",
+        "settings.security.two_factor_description":
+            "Manage your two-factor authentication settings",
+        "settings.security.two_factor_enabled_message":
+            "When you sign in, you will be asked for a temporary code. You can retrieve it from a TOTP app on your phone.",
+        "settings.security.two_factor_disabled_message":
+            "When you enable two-factor authentication, you will be asked for a temporary code at sign-in. This code can be retrieved from a TOTP app on your phone.",
+        "settings.security.disable_two_factor":
+            "Disable 2FA",
+        "settings.security.continue_setup": "Continue setup",
+        "settings.security.enable_two_factor": "Enable 2FA",
+        "settings.appearance.page_title": "Appearance settings",
+        "settings.appearance.heading_title": "Appearance settings",
+        "settings.appearance.heading_description":
+            "Update your account visual settings",
+        "auth.two_factor.setup.enabled_title":
+            "Two-factor authentication enabled",
+        "auth.two_factor.setup.enabled_description":
+            "Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.",
+        "auth.two_factor.setup.verify_title":
+            "Verify the authentication code",
+        "auth.two_factor.setup.verify_description":
+            "Enter the 6-digit code shown in your authenticator app",
+        "auth.two_factor.setup.enable_title":
+            "Enable two-factor authentication",
+        "auth.two_factor.setup.enable_description":
+            "To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app",
+        "auth.two_factor.setup.manual_or": "or enter the code manually",
+        "auth.two_factor.setup.close_button": "Close",
+        "auth.two_factor.setup.continue_button": "Continue",
+        "auth.two_factor.recovery_codes.title": "2FA recovery codes",
+        "auth.two_factor.recovery_codes.description":
+            "Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.",
+        "auth.two_factor.recovery_codes.view": "View recovery codes",
+        "auth.two_factor.recovery_codes.hide": "Hide recovery codes",
+        "auth.two_factor.recovery_codes.regenerate": "Regenerate codes",
+        "auth.two_factor.recovery_codes.regenerate_help":
+            "Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate codes above.",
+        "auth.two_factor.recovery_codes.list_aria": "Recovery codes",
+        "auth.two_factor.recovery_codes.loading_aria":
+            "Loading recovery codes",
     };
 }

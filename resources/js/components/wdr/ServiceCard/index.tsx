@@ -69,8 +69,8 @@ function formatDuration(minutes: number): string {
  *   (1250, "EUR") -> "1 250 €"
  *   (85, "EUR")   -> "85 €"
  */
-function formatPrice(amount: number, currency: string): string {
-    return new Intl.NumberFormat("fr-FR", {
+function formatPrice(amount: number, currency: string, locale: string): string {
+    return new Intl.NumberFormat(locale, {
         style: "currency",
         currency,
         maximumFractionDigits: 0,
@@ -83,57 +83,17 @@ function isDepositOnlyStatus(value: unknown): value is "DEPOSIT_ONLY" {
 
 function getCategoryLabel(
     category: ServiceCardData["category"],
-    locale: string,
+    t: (key: string) => string,
 ): string {
     switch (category) {
         case "ACTIVITE":
-            return locale === "en"
-                ? "Activity"
-                : locale === "pt"
-                  ? "Atividade"
-                  : locale === "es"
-                    ? "Actividad"
-                    : locale === "it"
-                      ? "Attivita"
-                      : locale === "de"
-                        ? "Aktivitat"
-                        : "Activité";
+            return t("service.category.activity");
         case "BATEAU":
-            return locale === "en"
-                ? "Boat"
-                : locale === "pt"
-                  ? "Barco"
-                  : locale === "es"
-                    ? "Barco"
-                    : locale === "it"
-                      ? "Barca"
-                      : locale === "de"
-                        ? "Boot"
-                        : "Bateau";
+            return t("service.category.boat");
         case "HEBERGEMENT":
-            return locale === "en"
-                ? "Stay"
-                : locale === "pt"
-                  ? "Alojamento"
-                  : locale === "es"
-                    ? "Alojamiento"
-                    : locale === "it"
-                      ? "Alloggio"
-                      : locale === "de"
-                        ? "Unterkunft"
-                        : "Hébergement";
+            return t("service.category.stay");
         case "VOITURE":
-            return locale === "en"
-                ? "Car"
-                : locale === "pt"
-                  ? "Carro"
-                  : locale === "es"
-                    ? "Coche"
-                    : locale === "it"
-                      ? "Auto"
-                      : locale === "de"
-                        ? "Auto"
-                        : "Voiture";
+            return t("service.category.car");
     }
 }
 
@@ -157,7 +117,7 @@ const Star: React.FC<{ filled: boolean }> = ({ filled }) => (
 
 /** Rangee de 5 etoiles representant la note globale */
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const filledCount = Math.round(rating);
 
     return (
@@ -190,7 +150,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
     onBookClick,
     className = "",
 }) => {
-    const { t, locale } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const {
         id,
         title,
@@ -238,6 +198,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         ? formatPrice(
               externalDepositAmount,
               externalDepositCurrency || currency,
+              intlLocale,
           )
         : "";
     const depositOnlySummary = showDepositOnlyPrice
@@ -299,7 +260,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                 {/* Badges superposes */}
                 <div className="wdr-card__badges" aria-hidden="true">
                     <span className="wdr-card__badge wdr-card__badge--category">
-                        {getCategoryLabel(category, locale)}
+                        {getCategoryLabel(category, t)}
                     </span>
                     {isFeatured && (
                         <span className="wdr-card__badge wdr-card__badge--featured">
@@ -473,7 +434,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                             ? t("service.external_price_total_unknown")
                             : showExternalPriceFallback
                               ? t("service.external_price_unavailable")
-                              : formatPrice(price, currency)}
+                              : formatPrice(price, currency, intlLocale)}
                         {!showExternalPriceFallback &&
                             !showDepositOnlyPrice && (
                                 <span className="wdr-card__price-unit">

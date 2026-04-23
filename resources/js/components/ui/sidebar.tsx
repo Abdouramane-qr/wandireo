@@ -21,6 +21,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -159,6 +160,7 @@ function Sidebar({
     collapsible?: "offcanvas" | "icon" | "none";
 }) {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+    const { t } = useTranslation();
 
     if (collapsible === "none") {
         return (
@@ -179,9 +181,9 @@ function Sidebar({
         return (
             <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
                 <SheetHeader className="sr-only">
-                    <SheetTitle>Barre latérale</SheetTitle>
+                    <SheetTitle>{t("common.sidebar")}</SheetTitle>
                     <SheetDescription>
-                        Affiche la barre latérale mobile.
+                        {t("common.sidebar_mobile_description")}
                     </SheetDescription>
                 </SheetHeader>
                 <SheetContent
@@ -250,6 +252,7 @@ function SidebarTrigger({
     ...props
 }: React.ComponentProps<typeof Button>) {
     const { toggleSidebar, isMobile, state } = useSidebar();
+    const { t } = useTranslation();
 
     return (
         <Button
@@ -269,22 +272,23 @@ function SidebarTrigger({
             ) : (
                 <PanelLeftCloseIcon />
             )}
-            <span className="sr-only">Basculer la barre latérale</span>
+            <span className="sr-only">{t("common.toggle_sidebar")}</span>
         </Button>
     );
 }
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
     const { toggleSidebar } = useSidebar();
+    const { t } = useTranslation();
 
     return (
         <button
             data-sidebar="rail"
             data-slot="sidebar-rail"
-            aria-label="Basculer la barre latérale"
+            aria-label={t("common.toggle_sidebar")}
             tabIndex={-1}
             onClick={toggleSidebar}
-            title="Basculer la barre latérale"
+            title={t("common.toggle_sidebar")}
             className={cn(
                 "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
                 "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

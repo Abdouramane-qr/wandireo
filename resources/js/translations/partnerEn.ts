@@ -50,6 +50,15 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.pending.company": "Company",
         "partner.pending.contact": "Primary contact",
         "partner.pending.date_missing": "Not provided",
+        "partner.pending.status.account.pending": "Pending",
+        "partner.pending.status.account.approved": "Approved",
+        "partner.pending.status.account.rejected": "Rejected",
+        "partner.pending.status.account.suspended": "Suspended",
+        "partner.pending.status.contract.not_sent": "Not sent",
+        "partner.pending.status.contract.pending_signature":
+            "Pending signature",
+        "partner.pending.status.contract.signed": "Signed",
+        "partner.pending.status.contract.rejected": "Rejected",
 
         // Bookings Management
         "partner.bookings.title": "Booking Management",
@@ -124,6 +133,9 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.catalog.field.pricing_unit": "Pricing unit",
         "partner.catalog.field.payment_mode": "Payment mode",
         "partner.catalog.field.currency": "Currency",
+        "partner.catalog.currency.eur": "EUR — Euro",
+        "partner.catalog.currency.usd": "USD — US Dollar",
+        "partner.catalog.currency.gbp": "GBP — British Pound",
         "partner.catalog.field.available": "Available",
         "partner.catalog.field.min_age": "Minimum age",
         "partner.catalog.field.max_guests": "Maximum capacity",
@@ -258,6 +270,7 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.catalog.toast.toggle_error": "Error during status change.",
 
         "partner.catalog.error.title_required": "Title is required.",
+        "service.form.url_placeholder": "https://...",
         "partner.catalog.error.description_required": "Description is required.",
         "partner.catalog.error.price_positive": "Price must be positive.",
         "partner.catalog.error.city_required": "City is required.",

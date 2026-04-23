@@ -7,6 +7,7 @@ import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/useTranslation";
 import { edit } from "@/routes/profile";
 import { send } from "@/routes/verification";
 
@@ -18,18 +19,19 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage().props;
+    const { t } = useTranslation();
 
     return (
         <>
-            <Head title="Paramètres du profil" />
+            <Head title={t("settings.profile.page_title")} />
 
-            <h1 className="sr-only">Paramètres du profil</h1>
+            <h1 className="sr-only">{t("settings.profile.page_title")}</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Informations du profil"
-                    description="Mettez à jour votre nom et votre adresse e-mail"
+                    title={t("settings.profile.heading_title")}
+                    description={t("settings.profile.heading_description")}
                 />
 
                 <Form
@@ -42,7 +44,9 @@ export default function Profile({
                     {({ processing, recentlySuccessful, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Nom</Label>
+                                <Label htmlFor="name">
+                                    {t("settings.profile.name_label")}
+                                </Label>
 
                                 <Input
                                     id="name"
@@ -51,7 +55,9 @@ export default function Profile({
                                     name="name"
                                     required
                                     autoComplete="name"
-                                    placeholder="Nom complet"
+                                    placeholder={t(
+                                        "settings.profile.name_placeholder",
+                                    )}
                                 />
 
                                 <InputError
@@ -61,7 +67,9 @@ export default function Profile({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Adresse e-mail</Label>
+                                <Label htmlFor="email">
+                                    {t("settings.profile.email_label")}
+                                </Label>
 
                                 <Input
                                     id="email"
@@ -71,7 +79,9 @@ export default function Profile({
                                     name="email"
                                     required
                                     autoComplete="username"
-                                    placeholder="Adresse e-mail"
+                                    placeholder={t(
+                                        "settings.profile.email_placeholder",
+                                    )}
                                 />
 
                                 <InputError
@@ -84,24 +94,26 @@ export default function Profile({
                                 auth.user.email_verified_at === null && (
                                     <div>
                                         <p className="-mt-4 text-sm text-muted-foreground">
-                                            Votre adresse e-mail n'est pas
-                                            vérifiée.{" "}
+                                            {t(
+                                                "settings.profile.unverified_message",
+                                            )}{" "}
                                             <Link
                                                 href={send()}
                                                 as="button"
                                                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                             >
-                                                Cliquez ici pour renvoyer
-                                                l'e-mail de vérification.
+                                                {t(
+                                                    "settings.profile.resend_verification",
+                                                )}
                                             </Link>
                                         </p>
 
                                         {status ===
                                             "verification-link-sent" && (
                                             <div className="mt-2 text-sm font-medium text-green-600">
-                                                Un nouveau lien de vérification
-                                                a été envoyé à votre adresse
-                                                e-mail.
+                                                {t(
+                                                    "settings.profile.verification_sent",
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -112,7 +124,7 @@ export default function Profile({
                                     disabled={processing}
                                     data-test="update-profile-button"
                                 >
-                                    Enregistrer
+                                    {t("settings.profile.save_button")}
                                 </Button>
 
                                 <Transition
@@ -123,7 +135,7 @@ export default function Profile({
                                     leaveTo="opacity-0"
                                 >
                                     <p className="text-sm text-neutral-600">
-                                        Enregistré
+                                        {t("common.saved")}
                                     </p>
                                 </Transition>
                             </div>
@@ -141,6 +153,7 @@ Profile.layout = {
     breadcrumbs: [
         {
             title: "Paramètres du profil",
+            translationKey: "settings.profile.page_title",
             href: edit(),
         },
     ],

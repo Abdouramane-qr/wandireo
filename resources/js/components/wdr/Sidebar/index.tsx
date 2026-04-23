@@ -83,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="wdr-sidebar__logo-text">
                         Wandi<span>reo</span>
                     </span>
-                    <button className="wdr-sidebar__close-btn" onClick={onClose} aria-label="Close">
+                    <button className="wdr-sidebar__close-btn" onClick={onClose} aria-label={t('common.close')}>
                         <X size={20} />
                     </button>
                 </div>

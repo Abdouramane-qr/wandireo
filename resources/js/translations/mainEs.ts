@@ -9,6 +9,10 @@ export function buildMainEsTranslations(): Record<string, string> {
         "nav.admin": "Administración",
         "nav.logout": "Cerrar sesión",
         "nav.become_partner": "Hazte socio",
+        "nav.dashboard": "Panel",
+        "nav.repository": "Repositorio",
+        "nav.documentation": "Documentación",
+        "nav.settings": "Ajustes",
 
         "common.loading": "Cargando...",
         "common.close": "Cerrar",
@@ -19,10 +23,17 @@ export function buildMainEsTranslations(): Record<string, string> {
         "common.system": "Sistema",
         "common.light": "Claro",
         "common.dark": "Oscuro",
+        "common.more": "Más",
+        "common.anonymous": "Anónimo",
         "common.back_home": "Volver al inicio",
+        "common.platform": "Plataforma",
+        "common.sidebar": "Barra lateral",
+        "common.sidebar_mobile_description": "Muestra la barra lateral móvil.",
+        "common.toggle_sidebar": "Alternar barra lateral",
         "common.previous_page": "Página anterior",
         "common.next_page": "Página siguiente",
         "common.page_number": "Página {page}",
+        "common.saved": "Guardado",
 
         "theme.label": "Tema",
         "theme.change": "Cambiar tema",
@@ -80,6 +91,110 @@ export function buildMainEsTranslations(): Record<string, string> {
         "support.title": "Soporte",
         "support.contact_us": "Contáctanos",
         "support.whatsapp": "Contacto vía WhatsApp",
+        "welcome.page_title": "Bienvenido",
+        "welcome.heading": "Empecemos",
+        "welcome.description":
+            "Laravel cuenta con un ecosistema increíblemente rico. Le sugerimos comenzar con los siguientes recursos.",
+        "welcome.read_docs_prefix": "Leer la",
+        "welcome.watch_tutorials_prefix":
+            "Ver tutoriales en vídeo en",
+        "welcome.deploy_now": "Desplegar ahora",
+        "password.show": "Mostrar contraseña",
+        "password.hide": "Ocultar contraseña",
+        "settings.delete_user.title": "Eliminar cuenta",
+        "settings.delete_user.description":
+            "Elimine su cuenta y todos sus datos",
+        "settings.delete_user.warning_title": "Atención",
+        "settings.delete_user.warning_body":
+            "Esta acción es definitiva y no se puede deshacer.",
+        "settings.delete_user.button": "Eliminar cuenta",
+        "settings.delete_user.confirm_title":
+            "¿Realmente desea eliminar su cuenta?",
+        "settings.delete_user.confirm_description":
+            "Una vez eliminada su cuenta, todos sus datos se eliminarán definitivamente. Introduzca su contraseña para confirmar la eliminación.",
+        "settings.delete_user.password_label": "Contraseña",
+        "settings.delete_user.password_placeholder": "Contraseña",
+        "settings.delete_user.confirm_button": "Eliminar cuenta",
+        "settings.profile.page_title": "Ajustes del perfil",
+        "settings.profile.heading_title": "Información del perfil",
+        "settings.profile.heading_description":
+            "Actualice su nombre y dirección de correo electrónico",
+        "settings.profile.name_label": "Nombre",
+        "settings.profile.name_placeholder": "Nombre completo",
+        "settings.profile.email_label": "Correo electrónico",
+        "settings.profile.email_placeholder": "Correo electrónico",
+        "settings.profile.unverified_message":
+            "Su dirección de correo electrónico no está verificada.",
+        "settings.profile.resend_verification":
+            "Haga clic aquí para reenviar el correo de verificación.",
+        "settings.profile.verification_sent":
+            "Se ha enviado un nuevo enlace de verificación a su dirección de correo electrónico.",
+        "settings.profile.save_button": "Guardar",
+        "settings.security.page_title": "Ajustes de seguridad",
+        "settings.security.password_title":
+            "Actualizar la contraseña",
+        "settings.security.password_description":
+            "Utilice una contraseña larga y difícil de adivinar para proteger su cuenta",
+        "settings.security.current_password_label":
+            "Contraseña actual",
+        "settings.security.current_password_placeholder":
+            "Contraseña actual",
+        "settings.security.new_password_label": "Nueva contraseña",
+        "settings.security.new_password_placeholder":
+            "Nueva contraseña",
+        "settings.security.confirm_password_label":
+            "Confirmar la contraseña",
+        "settings.security.confirm_password_placeholder":
+            "Confirmar la contraseña",
+        "settings.security.save_password_button":
+            "Guardar la contraseña",
+        "settings.security.two_factor_title":
+            "Autenticación de dos factores",
+        "settings.security.two_factor_description":
+            "Gestione la configuración de su autenticación de dos factores",
+        "settings.security.two_factor_enabled_message":
+            "Al iniciar sesión, se le solicitará un código temporal. Puede obtenerlo desde una aplicación TOTP en su teléfono.",
+        "settings.security.two_factor_disabled_message":
+            "Cuando active la autenticación de dos factores, se le solicitará un código temporal al iniciar sesión. Este código puede obtenerse desde una aplicación TOTP en su teléfono.",
+        "settings.security.disable_two_factor": "Desactivar 2FA",
+        "settings.security.continue_setup": "Continuar configuración",
+        "settings.security.enable_two_factor": "Activar 2FA",
+        "settings.appearance.page_title": "Ajustes de apariencia",
+        "settings.appearance.heading_title": "Ajustes de apariencia",
+        "settings.appearance.heading_description":
+            "Actualice los ajustes visuales de su cuenta",
+        "auth.two_factor.setup.enabled_title":
+            "Autenticación de dos factores activada",
+        "auth.two_factor.setup.enabled_description":
+            "La autenticación de dos factores ya está activada. Escanee el código QR o introduzca la clave de configuración en su aplicación de autenticación.",
+        "auth.two_factor.setup.verify_title":
+            "Verificar el código de autenticación",
+        "auth.two_factor.setup.verify_description":
+            "Introduzca el código de 6 dígitos que aparece en su aplicación de autenticación",
+        "auth.two_factor.setup.enable_title":
+            "Activar la autenticación de dos factores",
+        "auth.two_factor.setup.enable_description":
+            "Para finalizar la activación de la autenticación de dos factores, escanee el código QR o introduzca la clave de configuración en su aplicación de autenticación",
+        "auth.two_factor.setup.manual_or":
+            "o introduzca el código manualmente",
+        "auth.two_factor.setup.close_button": "Cerrar",
+        "auth.two_factor.setup.continue_button": "Continuar",
+        "auth.two_factor.recovery_codes.title":
+            "Códigos de recuperación 2FA",
+        "auth.two_factor.recovery_codes.description":
+            "Los códigos de recuperación le permiten recuperar el acceso si pierde su dispositivo 2FA. Guárdelos en un gestor de contraseñas seguro.",
+        "auth.two_factor.recovery_codes.view":
+            "Ver códigos de recuperación",
+        "auth.two_factor.recovery_codes.hide":
+            "Ocultar códigos de recuperación",
+        "auth.two_factor.recovery_codes.regenerate":
+            "Regenerar códigos",
+        "auth.two_factor.recovery_codes.regenerate_help":
+            "Cada código de recuperación puede utilizarse una vez para acceder a su cuenta y se eliminará después de su uso. Si necesita más, haga clic en Regenerar códigos arriba.",
+        "auth.two_factor.recovery_codes.list_aria":
+            "Códigos de recuperación",
+        "auth.two_factor.recovery_codes.loading_aria":
+            "Cargando códigos de recuperación",
         "support.new_ticket": "Nuevo ticket",
         "support.ticket_subject": "Asunto",
         "support.ticket_message": "Mensaje",
