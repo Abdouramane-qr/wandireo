@@ -18,26 +18,38 @@ import { buildAuthBookingFrTranslations } from "@/translations/authBookingFr";
 import { buildAuthBookingEnTranslations } from "@/translations/authBookingEn";
 import { buildAuthBookingPtTranslations } from "@/translations/authBookingPt";
 import { buildAuthBookingEsTranslations } from "@/translations/authBookingEs";
+import { buildAuthBookingDeTranslations } from "@/translations/authBookingDe";
 import { buildDiscoveryFrTranslations } from "@/translations/discoveryFr";
 import { buildDiscoveryEnTranslations } from "@/translations/discoveryEn";
 import { buildDiscoveryPtTranslations } from "@/translations/discoveryPt";
 import { buildDiscoveryEsTranslations } from "@/translations/discoveryEs";
+import { buildDiscoveryItTranslations } from "@/translations/discoveryIt";
+import { buildDiscoveryDeTranslations } from "@/translations/discoveryDe";
 import { buildServiceFrTranslations } from "@/translations/serviceFr";
 import { buildServiceEnTranslations } from "@/translations/serviceEn";
 import { buildServicePtTranslations } from "@/translations/servicePt";
 import { buildServiceEsTranslations } from "@/translations/serviceEs";
+import { buildServiceItTranslations } from "@/translations/serviceIt";
+import { buildServiceDeTranslations } from "@/translations/serviceDe";
 import { buildPublicPagesFrTranslations } from "@/translations/publicPagesFr";
 import { buildPublicPagesEnTranslations } from "@/translations/publicPagesEn";
 import { buildPublicPagesPtTranslations } from "@/translations/publicPagesPt";
 import { buildPublicPagesEsTranslations } from "@/translations/publicPagesEs";
+import { buildPublicPagesItTranslations } from "@/translations/publicPagesIt";
+import { buildPublicPagesDeTranslations } from "@/translations/publicPagesDe";
 import { buildPartnerFrTranslations } from "@/translations/partnerFr";
 import { buildPartnerEnTranslations } from "@/translations/partnerEn";
 import { buildPartnerPtTranslations } from "@/translations/partnerPt";
 import { buildPartnerEsTranslations } from "@/translations/partnerEs";
+import { buildPartnerItTranslations } from "@/translations/partnerIt";
+import { buildPartnerDeTranslations } from "@/translations/partnerDe";
 import { buildAdminFrTranslations } from "@/translations/adminFr";
 import { buildAdminEnTranslations } from "@/translations/adminEn";
 import { buildAdminPtTranslations } from "@/translations/adminPt";
 import { buildAdminEsTranslations } from "@/translations/adminEs";
+import { buildAdminItTranslations } from "@/translations/adminIt";
+import { buildAdminDeTranslations } from "@/translations/adminDe";
+import { buildAuthBookingItTranslations } from "@/translations/authBookingIt";
 import { buildSharedUiTranslations } from "@/translations/sharedUi";
 import { buildFareHarborTranslations } from "@/translations/fareHarbor";
 import { buildMainTranslations } from "@/translations/mainTranslations";
@@ -91,11 +103,23 @@ const translations: Record<Locale, Record<string, string>> = {
     },
     it: {
         ...buildMainTranslations("it"),
+        ...buildAuthBookingItTranslations(),
+        ...buildDiscoveryItTranslations(),
+        ...buildServiceItTranslations(),
+        ...buildPublicPagesItTranslations(),
+        ...buildPartnerItTranslations(),
+        ...buildAdminItTranslations(),
         ...buildSharedUiTranslations("it"),
         ...buildFareHarborTranslations("it"),
     },
     de: {
         ...buildMainTranslations("de"),
+        ...buildAuthBookingDeTranslations(),
+        ...buildDiscoveryDeTranslations(),
+        ...buildServiceDeTranslations(),
+        ...buildPublicPagesDeTranslations(),
+        ...buildPartnerDeTranslations(),
+        ...buildAdminDeTranslations(),
         ...buildSharedUiTranslations("de"),
         ...buildFareHarborTranslations("de"),
     },

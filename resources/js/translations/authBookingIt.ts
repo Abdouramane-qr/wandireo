@@ -1,0 +1,233 @@
+export function buildAuthBookingItTranslations(): Record<string, string> {
+    return {
+        "auth.login.title": "Accesso",
+        "auth.login.subtitle":
+            "Ritrova le tue prenotazioni e continua il tuo viaggio su Wandireo.",
+        "auth.login.email": "Indirizzo e-mail",
+        "auth.login.email_placeholder": "tu@esempio.com",
+        "auth.login.password": "Password",
+        "auth.login.password_placeholder": "La tua password",
+        "auth.login.submit": "Continua",
+        "auth.login.forgot": "Password dimenticata?",
+        "auth.login.no_account": "Non hai ancora un account?",
+        "auth.login.create_account": "Crea un account",
+        "auth.login.partner_prompt": "Offri dei servizi?",
+        "auth.login.partner_cta": "Diventa partner",
+        "auth.login.error.required":
+            "Inserisci la tua e-mail e la tua password.",
+        "auth.login.error.invalid":
+            "Indirizzo e-mail o password non corretti.",
+        "auth.password.show": "Mostra password",
+        "auth.password.hide": "Nascondi password",
+
+        "auth.register.title": "Crea un account",
+        "auth.register.subtitle":
+            "Crea il tuo account per prenotare piu facilmente e ritrovare le tue selezioni.",
+        "auth.register.first_name": "Nome",
+        "auth.register.last_name": "Cognome",
+        "auth.register.password": "Password",
+        "auth.register.confirm_password": "Conferma password",
+        "auth.register.password_hint": "Almeno 6 caratteri",
+        "auth.register.confirm_placeholder": "Ripeti la tua password",
+        "auth.register.accept_terms_prefix": "Accetto i",
+        "auth.register.accept_terms_join": "e la",
+        "auth.register.terms": "termini e condizioni",
+        "auth.register.privacy": "informativa sulla privacy",
+        "auth.register.submit": "Crea il mio account gratuito",
+        "auth.register.have_account": "Hai gia un account?",
+        "auth.register.login": "Accedi",
+        "auth.register.error.first_name": "Il nome e obbligatorio.",
+        "auth.register.error.last_name": "Il cognome e obbligatorio.",
+        "auth.register.error.email_required":
+            "L'indirizzo e-mail e obbligatorio.",
+        "auth.register.error.email_invalid":
+            "L'indirizzo e-mail non e valido.",
+        "auth.register.error.password_required": "La password e obbligatoria.",
+        "auth.register.error.password_length":
+            "La password deve contenere almeno 6 caratteri.",
+        "auth.register.error.password_match":
+            "Le password non corrispondono.",
+        "auth.register.error.accept_terms":
+            "Devi accettare i termini e le condizioni.",
+
+        "cart.empty_message":
+            "Il tuo carrello e attualmente vuoto. Scegli un'offerta per iniziare la prenotazione.",
+        "cart.back_catalog": "Scopri le offerte",
+        "cart.steps_aria": "Fasi della prenotazione",
+        "cart.step.cart": "Carrello",
+        "cart.step.info": "Informazioni",
+        "cart.step.payment": "Pagamento",
+        "cart.step.confirmation": "Conferma",
+        "cart.title": "La tua prenotazione",
+        "cart.subtitle":
+            "Verifica la tua selezione prima di inserire le informazioni del viaggiatore.",
+        "cart.service_aria": "Servizio selezionato",
+        "cart.reviews": "recensioni",
+        "cart.selection_title": "Riepilogo",
+        "cart.selection.dates": "Data",
+        "cart.selection.dates_plural": "Date",
+        "cart.selection.time_slot": "Fascia oraria",
+        "cart.selection.quantity": "Quantita",
+        "cart.selection.destination": "Destinazione",
+        "cart.selection.extras": "Extra",
+        "cart.summary_aria": "Riepilogo e prezzo",
+        "cart.summary_title": "Riepilogo del prezzo",
+        "cart.payment_mode.full_cash_on_site.label": "Pagamento in loco",
+        "cart.payment_mode.full_cash_on_site.description":
+            "Nessun pagamento online. Il pagamento avviene in loco secondo le condizioni dell'offerta.",
+        "cart.payment_mode.commission_online_rest_on_site.label":
+            "Acconto online, saldo in loco",
+        "cart.payment_mode.commission_online_rest_on_site.description":
+            "La parte dovuta online viene pagata ora. Il saldo si paga in loco.",
+        "cart.payment_mode.full_online.label": "Pagamento online",
+        "cart.payment_mode.full_online.description":
+            "L'importo dovuto online viene pagato ora su Wandireo.",
+        "cart.payment_mode.connected_account.label": "Pagamento online",
+        "cart.payment_mode.connected_account.description":
+            "Il pagamento online viene elaborato al momento della prenotazione.",
+        "cart.payment_mode.external_redirect.label": "Prenotazione esterna",
+        "cart.payment_mode.external_redirect.description":
+            "La prenotazione viene finalizzata al di fuori del percorso Wandireo.",
+        "cart.price.partner": "Prezzo del fornitore",
+        "cart.price.extras": "Extra",
+        "cart.price.fees": "Costi di servizio",
+        "cart.price.onsite": "Da pagare in loco",
+        "cart.price.now": "Importo da pagare ora",
+        "cart.price.free": "0 EUR (gratuito)",
+        "cart.price.total": "Totale IVA inclusa",
+        "cart.price.pay_online": "Da pagare ora",
+        "cart.secure.cash":
+            "Prenotazione garantita. Il pagamento avverra in loco secondo le condizioni del servizio.",
+        "cart.secure.online":
+            "Pagamento sicuro su Wandireo. L'importo visualizzato e quello convalidato per la tua prenotazione.",
+        "cart.cta.continue": "Continua",
+        "cart.cta.edit": "Modifica selezione",
+        "cart.quantity.participant_one": "1 partecipante",
+        "cart.quantity.participant_other": "{count} partecipanti",
+        "cart.quantity.night_one": "1 notte",
+        "cart.quantity.night_other": "{count} notti",
+        "cart.quantity.day_one": "1 giorno",
+        "cart.quantity.day_other": "{count} giorni",
+
+        "checkout.steps.cart": "Carrello",
+        "checkout.steps.information": "Informazioni",
+        "checkout.steps.payment": "Pagamento",
+        "checkout.steps.confirmation": "Conferma",
+        "checkout.title": "Informazioni del viaggiatore",
+        "checkout.subtitle":
+            "Queste informazioni servono a preparare la tua prenotazione e a garantire il corretto svolgimento del servizio.",
+        "checkout.identity": "Identita",
+        "checkout.contact": "Contatti",
+        "checkout.special_requests": "Informazioni utili",
+        "checkout.optional": "facoltativo",
+        "checkout.first_name": "Nome",
+        "checkout.last_name": "Cognome",
+        "checkout.nationality": "Nazionalita",
+        "checkout.nationality_placeholder":
+            "Es.: Italiana, Francese, Belga...",
+        "checkout.email": "Indirizzo e-mail",
+        "checkout.email_placeholder": "tu@email.com",
+        "checkout.email_hint":
+            "Il riepilogo e gli aggiornamenti della prenotazione saranno inviati a questo indirizzo.",
+        "checkout.phone": "Telefono",
+        "checkout.phone_placeholder": "+39 333 123 45 67",
+        "checkout.phone_hint":
+            "Utile se il partner deve contattarti rapidamente il giorno del servizio.",
+        "checkout.message_label": "Messaggio aggiuntivo",
+        "checkout.message_placeholder":
+            "Vincoli, allergie, richieste particolari o dettagli utili...",
+        "checkout.back": "Torna al carrello",
+        "checkout.continue": "Continua al pagamento",
+        "checkout.order": "La tua prenotazione",
+        "checkout.partner_price": "Prezzo del fornitore",
+        "checkout.extras": "Extra",
+        "checkout.service_fee": "Costi di servizio",
+        "checkout.total_vat": "Totale IVA inclusa",
+        "checkout.errors.first_name": "Il nome e obbligatorio.",
+        "checkout.errors.last_name": "Il cognome e obbligatorio.",
+        "checkout.errors.email_required":
+            "L'indirizzo e-mail e obbligatorio.",
+        "checkout.errors.email_invalid":
+            "Inserisci un indirizzo e-mail valido.",
+        "checkout.errors.phone": "Il numero di telefono e obbligatorio.",
+        "checkout.errors.nationality": "La nazionalita e obbligatoria.",
+
+        "payment.steps.cart": "Carrello",
+        "payment.steps.information": "Informazioni",
+        "payment.steps.payment": "Pagamento",
+        "payment.steps.confirmation": "Conferma",
+        "payment.title": "Conferma la prenotazione",
+        "payment.subtitle":
+            "Controlla un'ultima volta le informazioni prima della conferma finale.",
+        "payment.summary_title": "Riepilogo prima della conferma",
+        "payment.traveler": "Viaggiatore",
+        "payment.email": "E-mail",
+        "payment.service": "Servizio",
+        "payment.extras": "Extra",
+        "payment.total": "Totale",
+        "payment.pay_later": "Da pagare in loco",
+        "payment.pay_now": "Da pagare ora",
+        "payment.syncing": "Verifica dell'importo in corso...",
+        "payment.sync_error":
+            "Non e stato possibile verificare nuovamente l'importo.",
+        "payment.submit_error":
+            "Impossibile confermare la prenotazione in questo momento. Riprova.",
+        "payment.back": "Indietro",
+        "payment.confirming": "Salvataggio...",
+        "payment.verifying": "Verifica...",
+        "payment.confirm": "Conferma e prenota",
+        "payment.order": "La tua prenotazione",
+        "payment.customer": "Viaggiatore principale",
+        "payment.partner_price": "Prezzo del fornitore",
+        "payment.service_fee": "Costi di servizio",
+        "payment.total_vat": "Totale IVA inclusa",
+
+        "confirmation.steps_aria": "Fasi della prenotazione",
+        "confirmation.empty_title": "Conferma non trovata",
+        "confirmation.empty":
+            "Nessuna conferma e stata trovata per questo riferimento.",
+        "confirmation.empty_desc":
+            "Questo riferimento non corrisponde ad alcuna prenotazione disponibile.",
+        "confirmation.back_home": "Torna alla home",
+        "confirmation.title": "Prenotazione confermata!",
+        "confirmation.subtitle":
+            "La tua prenotazione e stata registrata correttamente. Un riepilogo verra inviato a",
+        "confirmation.reference": "Riferimento",
+        "confirmation.stay": "La tua prenotazione",
+        "confirmation.start_date": "Data di inizio",
+        "confirmation.end_date": "Data di fine",
+        "confirmation.slot": "Fascia oraria",
+        "confirmation.participants": "Partecipanti",
+        "confirmation.participant": "partecipante",
+        "confirmation.participants_plural": "partecipanti",
+        "confirmation.nights": "Notti",
+        "confirmation.days": "Giorni",
+        "confirmation.traveler": "Viaggiatore principale",
+        "confirmation.full_name": "Nome completo",
+        "confirmation.email": "E-mail",
+        "confirmation.phone": "Telefono",
+        "confirmation.nationality": "Nazionalita",
+        "confirmation.requests": "Informazioni aggiuntive",
+        "confirmation.payment_summary": "Riepilogo del pagamento",
+        "confirmation.partner_price": "Prezzo del fornitore",
+        "confirmation.service_fee": "Costi di servizio",
+        "confirmation.total": "Totale IVA inclusa",
+        "confirmation.paid_online": "Pagato online",
+        "confirmation.pay_onsite": "Da pagare in loco",
+        "confirmation.cash_guaranteed":
+            "Prenotazione garantita, pagamento in loco",
+        "confirmation.commission_paid": "Commissione pagata online",
+        "confirmation.payment_received": "Pagamento ricevuto",
+        "confirmation.next_steps": "E adesso?",
+        "confirmation.next1_title": "Conferma via e-mail",
+        "confirmation.next1_desc":
+            "Riceverai un riepilogo completo via e-mail nei prossimi minuti.",
+        "confirmation.next2_title": "Contatto del fornitore",
+        "confirmation.next2_desc":
+            "Il partner potrebbe ricontattarti se un dettaglio pratico deve essere chiarito.",
+        "confirmation.next3_title": "Goditi la tua esperienza",
+        "confirmation.next3_desc":
+            "Non ti resta che goderti l'esperienza.",
+        "confirmation.discover_more": "Scopri altre attivita",
+    };
+}
