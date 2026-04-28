@@ -6,6 +6,7 @@ use App\Models\FareHarborCompany;
 use App\Models\Service;
 use App\Models\ServiceCalendarSync;
 use App\Models\ServiceCategory;
+use App\Services\PartnerContentTranslationService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -14,6 +15,7 @@ class FareHarborSyncService
 {
     public function __construct(
         private readonly FareHarborClient $client,
+        private readonly PartnerContentTranslationService $partnerContentTranslator,
     ) {
     }
 
@@ -242,17 +244,72 @@ class FareHarborSyncService
 
         $categoryType = 'ACTIVITE';
         $category = ServiceCategory::where('service_type', $categoryType)->first();
+        $sourceFields = $this->partnerContentTranslator->normalizeSourceFields([
+            'title' => $title,
+            'description' => $description,
+            'meetingPoint' => $meetingPoint,
+            'included' => $this->stringList($detailItem, ['included', 'includes']),
+            'notIncluded' => $this->stringList($detailItem, ['not_included', 'excludes']),
+            'fareharbor.headline' => $this->stringValue($detailItem, ['headline'], $title),
+            'fareharbor.shortDescription' => $this->stringValue(
+                $detailItem,
+                ['short_description', 'summary'],
+                $description,
+            ),
+        ]);
+        $translationState = $this->partnerContentTranslator->buildTranslationState(
+            $sourceFields,
+            is_array(data_get($existingExtraData, 'translations'))
+                ? data_get($existingExtraData, 'translations')
+                : [],
+        );
+        $titleTranslations = $this->partnerContentTranslator->applyStringOverrides(
+            is_array(data_get($translationState, 'fields.title'))
+                ? data_get($translationState, 'fields.title')
+                : $this->localizedImportedText($title, [], 'en'),
+            data_get($overrides, 'title'),
+        );
+        $descriptionTranslations = $this->partnerContentTranslator->applyStringOverrides(
+            is_array(data_get($translationState, 'fields.description'))
+                ? data_get($translationState, 'fields.description')
+                : $this->localizedImportedText($description, [], 'en'),
+            data_get($overrides, 'description'),
+        );
+        $included = $this->partnerContentTranslator->applyListOverrides(
+            is_array(data_get($translationState, 'fields.included'))
+                ? data_get($translationState, 'fields.included')
+                : [],
+            data_get($overrides, 'included'),
+        );
+        $notIncluded = $this->partnerContentTranslator->applyListOverrides(
+            is_array(data_get($translationState, 'fields.notIncluded'))
+                ? data_get($translationState, 'fields.notIncluded')
+                : [],
+            data_get($overrides, 'notIncluded'),
+        );
+        $meetingPointTranslations = $this->partnerContentTranslator->applyStringOverrides(
+            is_array(data_get($translationState, 'fields.meetingPoint'))
+                ? data_get($translationState, 'fields.meetingPoint')
+                : [],
+            data_get($overrides, 'meetingPoint'),
+        );
+        $headlineTranslations = $this->partnerContentTranslator->applyStringOverrides(
+            is_array(($translationState['fields']['fareharbor.headline'] ?? null))
+                ? $translationState['fields']['fareharbor.headline']
+                : [],
+            data_get($overrides, 'fareharbor.headline'),
+        );
+        $shortDescriptionTranslations = $this->partnerContentTranslator->applyStringOverrides(
+            is_array(($translationState['fields']['fareharbor.shortDescription'] ?? null))
+                ? $translationState['fields']['fareharbor.shortDescription']
+                : [],
+            data_get($overrides, 'fareharbor.shortDescription'),
+        );
 
         return [
             'partner_id' => $company->partner_id,
-            'title' => $this->localizedImportedText(
-                $this->overrideValue($overrides, 'title', $title),
-                $existingService?->getTranslations('title') ?? [],
-            ),
-            'description' => $this->localizedImportedText(
-                $this->overrideValue($overrides, 'description', $description),
-                $existingService?->getTranslations('description') ?? [],
-            ),
+            'title' => $titleTranslations,
+            'description' => $descriptionTranslations,
             'category' => $categoryType,
             'service_category_id' => $this->overrideValue(
                 $overrides,
@@ -333,9 +390,9 @@ class FareHarborSyncService
                 ),
                 'requiresMedicalClearance' => false,
                 'equipmentProvided' => false,
-                'included' => $this->stringList($detailItem, ['included', 'includes']),
-                'notIncluded' => $this->stringList($detailItem, ['not_included', 'excludes']),
-                'meetingPoint' => $meetingPoint,
+                'included' => data_get($sourceFields, 'included', []),
+                'notIncluded' => data_get($sourceFields, 'notIncluded', []),
+                'meetingPoint' => data_get($sourceFields, 'meetingPoint'),
                 'schedule' => [
                     'startTimes' => [],
                     'daysAvailable' => [],
@@ -360,13 +417,9 @@ class FareHarborSyncService
                     'depositAmountEur' => $priceContext['depositAmountEur'],
                     'processorCurrency' => $priceContext['processorCurrency'],
                     'priceStatus' => $priceContext['priceStatus'],
-                    'headline' => $this->stringValue($detailItem, ['headline'], $title),
-                    'shortDescription' => $this->stringValue(
-                        $detailItem,
-                        ['short_description', 'summary'],
-                        $description,
-                    ),
-                    'meetingPoint' => $meetingPoint,
+                    'headline' => $sourceFields['fareharbor.headline'] ?? null,
+                    'shortDescription' => $sourceFields['fareharbor.shortDescription'] ?? null,
+                    'meetingPoint' => data_get($sourceFields, 'meetingPoint'),
                     'duration' => sprintf('%d %s', $duration, strtolower($durationUnit)),
                     'images' => $images,
                     'calendarTimezone' => $this->stringValue(
@@ -376,6 +429,19 @@ class FareHarborSyncService
                     ),
                     'overrides' => $overrides,
                     'raw' => $detailItem,
+                ],
+                'translations' => [
+                    ...$translationState,
+                    'fields' => [
+                        ...data_get($translationState, 'fields', []),
+                        'title' => $titleTranslations,
+                        'description' => $descriptionTranslations,
+                        'meetingPoint' => $meetingPointTranslations,
+                        'included' => $included,
+                        'notIncluded' => $notIncluded,
+                        'fareharbor.headline' => $headlineTranslations,
+                        'fareharbor.shortDescription' => $shortDescriptionTranslations,
+                    ],
                 ],
             ],
         ];

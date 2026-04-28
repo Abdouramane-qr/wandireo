@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\FareHarborCompany;
+use App\Models\Service;
 use App\Services\FareHarbor\FareHarborPartnerProvisioner;
 use App\Services\FareHarbor\FareHarborSyncService;
+use App\Services\PartnerContentTranslationService;
 use App\Support\FareHarborDefaultCompanies;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -75,41 +77,98 @@ Artisan::command('fareharbor:bootstrap-companies {--sync} {--create-partners}', 
     return self::SUCCESS;
 })->purpose('Bootstrap the default FareHarbor V1 company list, optionally creating partner accounts and syncing it.');
 
-Artisan::command('fareharbor:translate-missing', function (
-    \App\Services\TranslationService $translator
+Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--force}', function (
+    PartnerContentTranslationService $translator,
 ) {
-    $this->info('Scanning for services missing French translations...');
+    $provider = strtoupper((string) $this->option('provider'));
+    $force = (bool) $this->option('force');
+    $this->info(sprintf('Scanning %s services for translation backfill...', $provider));
 
-    $services = \App\Models\Service::where('source_provider', 'FAREHARBOR')->get();
-    $count = 0;
+    $services = Service::query()
+        ->where('source_provider', $provider)
+        ->orderBy('id')
+        ->get();
+    $translated = 0;
+    $unchanged = 0;
+    $failed = 0;
 
     foreach ($services as $service) {
-        $hasTitleFr = !empty($service->getTranslation('title', 'fr', false));
-        $hasDescFr = !empty($service->getTranslation('description', 'fr', false));
+        $sourceFields = $translator->extractServiceSourceFields($service);
+        $extraData = is_array($service->extra_data) ? $service->extra_data : [];
+        $existingState = is_array(data_get($extraData, 'translations'))
+            ? data_get($extraData, 'translations')
+            : [];
+        $translationState = $translator->buildTranslationState($sourceFields, $existingState, $force);
 
-        if (!$hasTitleFr || !$hasDescFr) {
-            $this->comment("Translating: " . $service->getTranslation('title', 'en'));
+        if (! $force && data_get($existingState, 'source_hash') === data_get($translationState, 'source_hash')) {
+            $unchanged++;
 
-            if (!$hasTitleFr) {
-                $enTitle = $service->getTranslation('title', 'en');
-                $frTitle = $translator->translateToFrench($enTitle);
-                if ($frTitle) {
-                    $service->setTranslation('title', 'fr', $frTitle);
-                }
-            }
-
-            if (!$hasDescFr) {
-                $enDesc = $service->getTranslation('description', 'en');
-                $frDesc = $translator->translateToFrench($enDesc);
-                if ($frDesc) {
-                    $service->setTranslation('description', 'fr', $frDesc);
-                }
-            }
-
-            $service->save();
-            $count++;
+            continue;
         }
+
+        $overrides = is_array(data_get($extraData, 'fareharbor.overrides'))
+            ? data_get($extraData, 'fareharbor.overrides')
+            : [];
+        $titleTranslations = $translator->applyStringOverrides(
+            is_array(data_get($translationState, 'fields.title'))
+                ? data_get($translationState, 'fields.title')
+                : $service->getTranslations('title'),
+            data_get($overrides, 'title'),
+        );
+        $descriptionTranslations = $translator->applyStringOverrides(
+            is_array(data_get($translationState, 'fields.description'))
+                ? data_get($translationState, 'fields.description')
+                : $service->getTranslations('description'),
+            data_get($overrides, 'description'),
+        );
+        $fields = is_array(data_get($translationState, 'fields'))
+            ? data_get($translationState, 'fields')
+            : [];
+        $fields['title'] = $titleTranslations;
+        $fields['description'] = $descriptionTranslations;
+        $fields['meetingPoint'] = $translator->applyStringOverrides(
+            is_array($fields['meetingPoint'] ?? null) ? $fields['meetingPoint'] : [],
+            data_get($overrides, 'meetingPoint'),
+        );
+        $fields['included'] = $translator->applyListOverrides(
+            is_array($fields['included'] ?? null) ? $fields['included'] : [],
+            data_get($overrides, 'included'),
+        );
+        $fields['notIncluded'] = $translator->applyListOverrides(
+            is_array($fields['notIncluded'] ?? null) ? $fields['notIncluded'] : [],
+            data_get($overrides, 'notIncluded'),
+        );
+        $fields['fareharbor.headline'] = $translator->applyStringOverrides(
+            is_array(($fields['fareharbor.headline'] ?? null)) ? $fields['fareharbor.headline'] : [],
+            data_get($overrides, 'fareharbor.headline'),
+        );
+        $fields['fareharbor.shortDescription'] = $translator->applyStringOverrides(
+            is_array(($fields['fareharbor.shortDescription'] ?? null)) ? $fields['fareharbor.shortDescription'] : [],
+            data_get($overrides, 'fareharbor.shortDescription'),
+        );
+
+        data_set($extraData, 'translations', [
+            ...$translationState,
+            'fields' => $fields,
+        ]);
+
+        if ((string) data_get($translationState, 'status') === 'PARTIAL') {
+            $failed++;
+        }
+
+        $service->forceFill([
+            'title' => $titleTranslations,
+            'description' => $descriptionTranslations,
+            'extra_data' => $extraData,
+        ])->save();
+
+        $translated++;
     }
 
-    $this->info("Done! {$count} services updated.");
-})->purpose('Automatically translate missing French content for FareHarbor services.');
+    $this->info(sprintf(
+        'Backfill complete. translated=%d unchanged=%d partial=%d',
+        $translated,
+        $unchanged,
+        $failed,
+    ));
+})->purpose('Backfill stored translations for imported partner services.');

@@ -673,6 +673,50 @@ class ServiceController extends Controller
                 }
             }
 
+            if (is_array($payload['extra_data'] ?? null)) {
+                $localizedStringOverrideKeys = [
+                    'meetingPoint',
+                    'fareharbor.headline',
+                    'fareharbor.shortDescription',
+                ];
+                $localizedListOverrideKeys = [
+                    'included',
+                    'notIncluded',
+                ];
+
+                foreach ($localizedStringOverrideKeys as $key) {
+                    if (! data_get($payload['extra_data'], $key)) {
+                        continue;
+                    }
+
+                    data_set(
+                        $newOverrides,
+                        $key,
+                        $this->normalizeLocalizedExtraDataStringOverride(
+                            data_get($payload['extra_data'], $key),
+                            data_get($existingOverrides, $key),
+                        ),
+                    );
+                    Arr::forget($payload['extra_data'], $key);
+                }
+
+                foreach ($localizedListOverrideKeys as $key) {
+                    if (! is_array(data_get($payload['extra_data'], $key))) {
+                        continue;
+                    }
+
+                    data_set(
+                        $newOverrides,
+                        $key,
+                        $this->normalizeLocalizedExtraDataListOverride(
+                            data_get($payload['extra_data'], $key),
+                            data_get($existingOverrides, $key),
+                        ),
+                    );
+                    Arr::forget($payload['extra_data'], $key);
+                }
+            }
+
             if ($newOverrides !== []) {
                 data_set(
                     $payload,
@@ -742,5 +786,49 @@ class ServiceController extends Controller
 
         Arr::forget($incomingExtraData, 'attributes');
         $payload['extra_data'] = $incomingExtraData;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function normalizeLocalizedExtraDataStringOverride(
+        mixed $value,
+        mixed $existingOverride = null,
+    ): array {
+        $normalized = trim((string) $value);
+
+        if ($normalized === '') {
+            return is_array($existingOverride) ? $existingOverride : [];
+        }
+
+        $locale = app()->getLocale();
+        $existing = is_array($existingOverride) ? $existingOverride : [];
+        $existing[$locale] = $normalized;
+
+        return $existing;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function normalizeLocalizedExtraDataListOverride(
+        mixed $value,
+        mixed $existingOverride = null,
+    ): array {
+        $normalized = collect(is_array($value) ? $value : [])
+            ->map(fn (mixed $entry): string => is_scalar($entry) ? trim((string) $entry) : '')
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($normalized === []) {
+            return is_array($existingOverride) ? $existingOverride : [];
+        }
+
+        $locale = app()->getLocale();
+        $existing = is_array($existingOverride) ? $existingOverride : [];
+        $existing[$locale] = $normalized;
+
+        return $existing;
     }
 }

@@ -10,6 +10,8 @@ use App\Services\FareHarbor\FareHarborClient;
 use App\Services\FareHarbor\FareHarborSyncService;
 use App\Support\FareHarborDefaultCompanies;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Mockery;
 use Tests\TestCase;
@@ -437,6 +439,185 @@ class FareHarborIntegrationTest extends TestCase
         );
     }
 
+    public function test_sync_translates_visible_partner_content_and_serves_the_requested_locale(): void
+    {
+        $counts = $this->fakeFastTranslateApi('pt');
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Seafaris',
+            'company_slug' => 'seafaris',
+            'is_enabled' => true,
+            'sync_items_enabled' => true,
+            'sync_details_enabled' => true,
+        ]);
+
+        $client = Mockery::mock(FareHarborClient::class);
+        $client->shouldReceive('listItems')
+            ->once()
+            ->with('seafaris')
+            ->andReturn([
+                ['pk' => 'fh-pt', 'title' => 'Passeio de Barco'],
+            ]);
+        $client->shouldReceive('getItem')
+            ->once()
+            ->with('seafaris', 'fh-pt')
+            ->andReturn([
+                'item' => [
+                    'pk' => 'fh-pt',
+                    'name' => 'Passeio de Barco',
+                    'description' => 'Explore as grutas.',
+                    'meeting_point' => 'Marina de Lagos',
+                    'included' => ['Colete salva-vidas'],
+                    'not_included' => ['Transfer'],
+                    'headline' => 'Passeio dourado',
+                    'short_description' => 'Uma tarde no mar.',
+                ],
+            ]);
+
+        $this->app->instance(FareHarborClient::class, $client);
+
+        $this->app->make(FareHarborSyncService::class)->syncCompany($company);
+
+        $service = Service::query()
+            ->where('source_provider', 'FAREHARBOR')
+            ->where('source_external_id', 'seafaris:fh-pt')
+            ->firstOrFail();
+
+        $this->assertSame('pt', data_get($service->extra_data, 'translations.source_locale'));
+        $this->assertSame('[de] Marina de Lagos', data_get($service->extra_data, 'translations.fields.meetingPoint.de'));
+        $this->assertSame('[es] Colete salva-vidas', data_get($service->extra_data, 'translations.fields.included.es.0'));
+        $this->assertGreaterThan(0, $counts['translate']);
+        $this->assertSame(1, $counts['detect']);
+
+        $this->getJson("/api/services/{$service->id}", [
+            'Accept-Language' => 'de',
+        ])
+            ->assertOk()
+            ->assertJsonPath('title', '[de] Passeio de Barco')
+            ->assertJsonPath('description', '[de] Explore as grutas.')
+            ->assertJsonPath('extra_data.meetingPoint', '[de] Marina de Lagos')
+            ->assertJsonPath('extra_data.included.0', '[de] Colete salva-vidas')
+            ->assertJsonPath('extra_data.notIncluded.0', '[de] Transfer')
+            ->assertJsonPath('extra_data.fareharbor.headline', '[de] Passeio dourado')
+            ->assertJsonPath('extra_data.fareharbor.shortDescription', '[de] Uma tarde no mar.');
+    }
+
+    public function test_sync_skips_detection_and_translation_when_imported_source_has_not_changed(): void
+    {
+        $counts = $this->fakeFastTranslateApi('en');
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Seafaris',
+            'company_slug' => 'seafaris',
+            'is_enabled' => true,
+            'sync_items_enabled' => true,
+            'sync_details_enabled' => true,
+        ]);
+
+        $client = Mockery::mock(FareHarborClient::class);
+        $client->shouldReceive('listItems')
+            ->twice()
+            ->with('seafaris')
+            ->andReturn([
+                ['pk' => 'fh-stable', 'title' => 'Sea Safari'],
+            ]);
+        $client->shouldReceive('getItem')
+            ->twice()
+            ->with('seafaris', 'fh-stable')
+            ->andReturn([
+                'item' => [
+                    'pk' => 'fh-stable',
+                    'name' => 'Sea Safari',
+                    'description' => 'Explore the coast.',
+                    'meeting_point' => 'Lagos Marina',
+                    'included' => ['Life jacket'],
+                    'not_included' => ['Hotel pickup'],
+                    'headline' => 'Golden cruise',
+                    'short_description' => 'Afternoon at sea.',
+                ],
+            ]);
+
+        $this->app->instance(FareHarborClient::class, $client);
+
+        $syncService = $this->app->make(FareHarborSyncService::class);
+        $syncService->syncCompany($company);
+
+        $afterFirstSync = [
+            'detect' => $counts['detect'],
+            'translate' => $counts['translate'],
+        ];
+
+        $syncService->syncCompany($company);
+
+        $this->assertSame($afterFirstSync['detect'], $counts['detect']);
+        $this->assertSame($afterFirstSync['translate'], $counts['translate']);
+    }
+
+    public function test_sync_retranslates_when_the_partner_source_content_changes(): void
+    {
+        $counts = $this->fakeFastTranslateApi('en');
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Seafaris',
+            'company_slug' => 'seafaris',
+            'is_enabled' => true,
+            'sync_items_enabled' => true,
+            'sync_details_enabled' => true,
+        ]);
+
+        $client = Mockery::mock(FareHarborClient::class);
+        $client->shouldReceive('listItems')
+            ->twice()
+            ->with('seafaris')
+            ->andReturn(
+                [['pk' => 'fh-delta', 'title' => 'Sea Safari']],
+                [['pk' => 'fh-delta', 'title' => 'Sunset Safari']],
+            );
+        $client->shouldReceive('getItem')
+            ->twice()
+            ->with('seafaris', 'fh-delta')
+            ->andReturn(
+                [
+                    'item' => [
+                        'pk' => 'fh-delta',
+                        'name' => 'Sea Safari',
+                        'description' => 'Explore the coast.',
+                        'meeting_point' => 'Lagos Marina',
+                        'included' => ['Life jacket'],
+                        'not_included' => ['Hotel pickup'],
+                        'headline' => 'Golden cruise',
+                        'short_description' => 'Afternoon at sea.',
+                    ],
+                ],
+                [
+                    'item' => [
+                        'pk' => 'fh-delta',
+                        'name' => 'Sunset Safari',
+                        'description' => 'Watch the cliffs at sunset.',
+                        'meeting_point' => 'Lagos Marina',
+                        'included' => ['Life jacket'],
+                        'not_included' => ['Hotel pickup'],
+                        'headline' => 'Sunset escape',
+                        'short_description' => 'Golden hour cruise.',
+                    ],
+                ],
+            );
+
+        $this->app->instance(FareHarborClient::class, $client);
+
+        $syncService = $this->app->make(FareHarborSyncService::class);
+        $syncService->syncCompany($company);
+        $afterFirstSync = $counts['translate'];
+
+        $syncService->syncCompany($company);
+
+        $service = Service::query()
+            ->where('source_provider', 'FAREHARBOR')
+            ->where('source_external_id', 'seafaris:fh-delta')
+            ->firstOrFail();
+
+        $this->assertGreaterThan($afterFirstSync, $counts['translate']);
+        $this->assertSame('[de] Sunset Safari', $service->getTranslations('title')['de']);
+        $this->assertSame('[it] Watch the cliffs at sunset.', $service->getTranslations('description')['it']);
+    }
+
     public function test_sync_assigns_imported_services_to_the_company_partner(): void
     {
         $partner = User::factory()->create([
@@ -510,6 +691,9 @@ class FareHarborIntegrationTest extends TestCase
             'partner_price' => 88.50,
             'images' => ['https://cdn.example.com/cover.jpg'],
             'extra_data' => [
+                'meetingPoint' => 'Port de Lagos',
+                'included' => ['Guide francophone'],
+                'notIncluded' => ['Transfert hotel'],
                 'attributes' => [
                     'family_friendly' => true,
                 ],
@@ -520,8 +704,6 @@ class FareHarborIntegrationTest extends TestCase
 
         $service->refresh();
 
-        $this->assertSame('Titre Wandireo', $service->title);
-        $this->assertSame('Description locale', $service->description);
         $this->assertSame(88.5, (float) $service->partner_price);
         $this->assertSame(
             ['https://cdn.example.com/cover.jpg'],
@@ -529,12 +711,68 @@ class FareHarborIntegrationTest extends TestCase
         );
         $this->assertSame(
             true,
-            data_get($service->extra_data, 'attributes.family_friendly'),
+            data_get($service->extra_data, 'wandireo.attributes.family_friendly'),
         );
         $this->assertSame(
             'Titre Wandireo',
-            data_get($service->extra_data, 'fareharbor.overrides.title'),
+            data_get($service->extra_data, 'fareharbor.overrides.title.fr'),
         );
+        $this->assertContains(
+            'Port de Lagos',
+            data_get($service->extra_data, 'fareharbor.overrides.meetingPoint', []),
+        );
+        $this->assertContains(
+            ['Guide francophone'],
+            data_get($service->extra_data, 'fareharbor.overrides.included', []),
+        );
+        $this->assertContains(
+            ['Transfert hotel'],
+            data_get($service->extra_data, 'fareharbor.overrides.notIncluded', []),
+        );
+
+        $this->getJson("/api/services/{$service->id}", [
+            'Accept-Language' => 'fr',
+        ])
+            ->assertOk()
+            ->assertJsonPath('title', 'Titre Wandireo')
+            ->assertJsonPath('description', 'Description locale')
+            ->assertJsonPath('extra_data.meetingPoint', 'Port de Lagos')
+            ->assertJsonPath('extra_data.included.0', 'Guide francophone')
+            ->assertJsonPath('extra_data.notIncluded.0', 'Transfert hotel');
+    }
+
+    public function test_backfill_command_translates_existing_imported_partner_services(): void
+    {
+        $this->fakeFastTranslateApi('en');
+
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'source_external_id' => 'seafaris:fh-backfill',
+                'title' => ['en' => 'Sea Safari'],
+                'description' => ['en' => 'Explore the coast.'],
+                'extra_data' => [
+                    'meetingPoint' => 'Lagos Marina',
+                    'included' => ['Life jacket'],
+                    'notIncluded' => ['Hotel pickup'],
+                    'fareharbor' => [
+                        'headline' => 'Golden cruise',
+                        'shortDescription' => 'Afternoon at sea.',
+                    ],
+                ],
+            ]);
+
+        $this->artisan('partner-content:translate-backfill', [
+            '--provider' => 'FAREHARBOR',
+        ])->assertSuccessful();
+
+        $service->refresh();
+
+        $this->assertSame('[fr] Sea Safari', $service->getTranslations('title')['fr']);
+        $this->assertSame('[de] Explore the coast.', $service->getTranslations('description')['de']);
+        $this->assertSame('[it] Lagos Marina', data_get($service->extra_data, 'translations.fields.meetingPoint.it'));
     }
 
     public function test_admin_can_create_and_link_a_partner_account_for_a_fareharbor_company(): void
@@ -584,5 +822,51 @@ class FareHarborIntegrationTest extends TestCase
         $this->artisan('fareharbor:bootstrap-companies')->assertSuccessful();
 
         $this->assertSame(10, FareHarborCompany::query()->count());
+    }
+
+    /**
+     * @return \ArrayObject<string, int>
+     */
+    private function fakeFastTranslateApi(string $detectedLanguage): \ArrayObject
+    {
+        config()->set('services.fast_translate.enabled', true);
+        config()->set('services.fast_translate.base_url', 'https://translate.test/api/v1');
+        config()->set('services.fast_translate.api_key', 'test-key');
+        config()->set('services.fast_translate.timeout', 5);
+
+        $counts = new \ArrayObject([
+            'detect' => 0,
+            'translate' => 0,
+        ]);
+
+        Http::fake(function (Request $request) use ($counts, $detectedLanguage) {
+            if (str_ends_with($request->url(), '/detect/')) {
+                $counts['detect']++;
+
+                return Http::response([
+                    'language' => $detectedLanguage,
+                    'confidence' => 0.99,
+                ]);
+            }
+
+            if (str_ends_with($request->url(), '/translate/')) {
+                $counts['translate']++;
+                $payload = $request->data();
+
+                return Http::response([
+                    'translated_text' => sprintf(
+                        '[%s] %s',
+                        $payload['target_language'],
+                        $payload['text'],
+                    ),
+                    'source_language' => $payload['source_language'],
+                    'target_language' => $payload['target_language'],
+                ]);
+            }
+
+            return Http::response([], 404);
+        });
+
+        return $counts;
     }
 }

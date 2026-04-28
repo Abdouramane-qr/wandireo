@@ -57,4 +57,11 @@ return [
         'autosync_timezone' => env('FAREHARBOR_AUTOSYNC_TIMEZONE', 'UTC'),
     ],
 
+    'fast_translate' => [
+        'enabled' => env('FAST_TRANSLATE_ENABLED', false),
+        'base_url' => env('FAST_TRANSLATE_BASE_URL'),
+        'api_key' => env('FAST_TRANSLATE_API_KEY'),
+        'timeout' => env('FAST_TRANSLATE_TIMEOUT', 15),
+    ],
+
 ];

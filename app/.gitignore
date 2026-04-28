@@ -2,3 +2,11 @@
 !private/
 !public/
 !.gitignore
+!Services/
+!Services/FastTranslate/
+!Services/FastTranslate/FastTranslateClient.php
+!Services/PartnerContentTranslationService.php
+!Models/
+!Models/Service.php
+!Support/
+!Support/ServiceExtraDataLocalizer.php
