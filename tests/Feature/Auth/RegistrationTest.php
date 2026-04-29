@@ -31,9 +31,9 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-        ]);
+        ], ['Cookie' => 'locale=fr']);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('home', absolute: false));
+        $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
 }

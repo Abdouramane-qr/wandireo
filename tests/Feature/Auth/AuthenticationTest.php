@@ -26,10 +26,10 @@ class AuthenticationTest extends TestCase
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
-        ]);
+        ], ['Cookie' => 'locale=fr']);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
 
     public function test_clients_are_redirected_to_the_client_dashboard_after_login()
@@ -41,10 +41,10 @@ class AuthenticationTest extends TestCase
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
-        ]);
+        ], ['Cookie' => 'locale=fr']);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
 
     public function test_approved_partners_are_redirected_to_the_partner_dashboard_after_login()
@@ -57,10 +57,10 @@ class AuthenticationTest extends TestCase
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
-        ]);
+        ], ['Cookie' => 'locale=fr']);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect(route('partner.dashboard', absolute: false));
+        $response->assertRedirect(route('partner.dashboard', ['locale' => 'fr'], false));
     }
 
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
@@ -106,10 +106,26 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('logout'));
+        $response = $this->actingAs($user)->post(route('logout'), [], ['Cookie' => 'locale=fr']);
 
         $this->assertGuest();
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('home', ['locale' => 'fr'], false));
+    }
+
+    public function test_manual_locale_cookie_wins_over_user_language_after_login()
+    {
+        $user = User::factory()->create([
+            'language' => 'en',
+            'role' => 'CLIENT',
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ], ['Cookie' => 'locale=fr']);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
 
     public function test_users_are_rate_limited()

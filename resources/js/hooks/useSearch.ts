@@ -5,6 +5,7 @@ import {
     searchApi,
     type SearchResponse,
 } from "@/api/search";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -14,6 +15,7 @@ export function useSearch(query: string): {
     isLoading: boolean;
     hasResults: boolean;
 } {
+    const { locale } = useTranslation();
     const [debouncedQuery, setDebouncedQuery] = useState(query.trim());
 
     useEffect(() => {
@@ -25,7 +27,7 @@ export function useSearch(query: string): {
     }, [query]);
 
     const searchQuery = useQuery({
-        queryKey: ["search", "global", debouncedQuery],
+        queryKey: ["search", "global", locale, debouncedQuery],
         queryFn: async () => searchApi.search(debouncedQuery),
         enabled: debouncedQuery.length > 0,
         staleTime: 30_000,

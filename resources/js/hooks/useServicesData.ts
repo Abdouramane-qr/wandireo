@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useMemo } from "react";
 import { servicesApi } from "@/api/services";
+import { useTranslation } from "@/hooks/useTranslation";
 import type { ServicesParams } from "@/api/services";
 import type { Service } from "@/types/service";
 
@@ -30,10 +31,12 @@ export function useServicesDataWithOptions(
     isLoading: boolean;
     isApiActive: boolean;
 } {
+    const { locale } = useTranslation();
     const query = useQuery({
         queryKey: [
             "services",
             "list",
+            locale,
             params ?? {},
             options?.fetchAll ?? false,
         ],
@@ -65,8 +68,9 @@ export function useServiceData(id: string): {
     isFetched: boolean;
     isNotFound: boolean;
 } {
+    const { locale } = useTranslation();
     const query = useQuery({
-        queryKey: ["services", "detail", id],
+        queryKey: ["services", "detail", locale, id],
         queryFn: async () => servicesApi.get(id),
         staleTime: 60_000,
         enabled: Boolean(id),

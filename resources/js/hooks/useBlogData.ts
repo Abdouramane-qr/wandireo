@@ -4,16 +4,18 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { blogApi  } from '@/api/blog';
-import type {BlogPostsParams} from '@/api/blog';
+import { blogApi } from '@/api/blog';
+import type { BlogPostsParams } from '@/api/blog';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { BlogPost } from '@/types/blog';
 
 export function useBlogPostsData(params?: BlogPostsParams): {
     posts: BlogPost[];
     isLoading: boolean;
 } {
+    const { locale } = useTranslation();
     const query = useQuery({
-        queryKey: ['blog', 'list', params ?? {}],
+        queryKey: ['blog', 'list', locale, params ?? {}],
         queryFn: async () => {
             const response = await blogApi.list(params);
 
@@ -30,8 +32,9 @@ export function useBlogPostData(slug: string): {
     post: BlogPost | undefined;
     isLoading: boolean;
 } {
+    const { locale } = useTranslation();
     const query = useQuery({
-        queryKey: ['blog', 'post', slug],
+        queryKey: ['blog', 'post', locale, slug],
         queryFn: async () => blogApi.getBySlug(slug),
         staleTime: 120_000,
         enabled: Boolean(slug),
@@ -45,8 +48,9 @@ export function useAdminBlogPostData(id: string): {
     post: BlogPost | undefined;
     isLoading: boolean;
 } {
+    const { locale } = useTranslation();
     const query = useQuery({
-        queryKey: ['blog', 'admin-post', id],
+        queryKey: ['blog', 'admin-post', locale, id],
         queryFn: async () => blogApi.getById(id),
         staleTime: 120_000,
         enabled: Boolean(id),

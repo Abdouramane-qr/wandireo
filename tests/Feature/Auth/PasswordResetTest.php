@@ -69,11 +69,11 @@ class PasswordResetTest extends TestCase
                 'email' => $user->email,
                 'password' => 'password',
                 'password_confirmation' => 'password',
-            ]);
+            ], ['Cookie' => 'locale=fr']);
 
             $response
                 ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
+                ->assertRedirect(route('login', ['locale' => 'fr'], false));
 
             return true;
         });
