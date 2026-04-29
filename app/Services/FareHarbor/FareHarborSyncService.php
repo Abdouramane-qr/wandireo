@@ -250,14 +250,15 @@ class FareHarborSyncService
             'meetingPoint' => $meetingPoint,
             'included' => $this->stringList($detailItem, ['included', 'includes']),
             'notIncluded' => $this->stringList($detailItem, ['not_included', 'excludes']),
-            'fareharbor.headline' => $this->stringValue($detailItem, ['headline'], $title),
-            'fareharbor.shortDescription' => $this->stringValue(
+            'provider.headline' => $this->stringValue($detailItem, ['headline'], $title),
+            'provider.shortDescription' => $this->stringValue(
                 $detailItem,
                 ['short_description', 'summary'],
                 $description,
             ),
         ]);
         $translationState = $this->partnerContentTranslator->buildTranslationState(
+            'FAREHARBOR',
             $sourceFields,
             is_array(data_get($existingExtraData, 'translations'))
                 ? data_get($existingExtraData, 'translations')
@@ -294,14 +295,14 @@ class FareHarborSyncService
             data_get($overrides, 'meetingPoint'),
         );
         $headlineTranslations = $this->partnerContentTranslator->applyStringOverrides(
-            is_array(($translationState['fields']['fareharbor.headline'] ?? null))
-                ? $translationState['fields']['fareharbor.headline']
+            is_array(($translationState['fields']['provider.headline'] ?? null))
+                ? $translationState['fields']['provider.headline']
                 : [],
             data_get($overrides, 'fareharbor.headline'),
         );
         $shortDescriptionTranslations = $this->partnerContentTranslator->applyStringOverrides(
-            is_array(($translationState['fields']['fareharbor.shortDescription'] ?? null))
-                ? $translationState['fields']['fareharbor.shortDescription']
+            is_array(($translationState['fields']['provider.shortDescription'] ?? null))
+                ? $translationState['fields']['provider.shortDescription']
                 : [],
             data_get($overrides, 'fareharbor.shortDescription'),
         );
@@ -398,6 +399,13 @@ class FareHarborSyncService
                     'daysAvailable' => [],
                 ],
                 'languages' => $this->stringList($detailItem, ['languages']),
+                'provider_content' => [
+                    'provider' => 'FAREHARBOR',
+                    'fields' => [
+                        'headline' => $sourceFields['provider.headline'] ?? null,
+                        'shortDescription' => $sourceFields['provider.shortDescription'] ?? null,
+                    ],
+                ],
                 'groupType' => 'GROUPE_PARTAGE',
                 'wandireo' => [
                     ...$wandireoData,
@@ -417,8 +425,8 @@ class FareHarborSyncService
                     'depositAmountEur' => $priceContext['depositAmountEur'],
                     'processorCurrency' => $priceContext['processorCurrency'],
                     'priceStatus' => $priceContext['priceStatus'],
-                    'headline' => $sourceFields['fareharbor.headline'] ?? null,
-                    'shortDescription' => $sourceFields['fareharbor.shortDescription'] ?? null,
+                    'headline' => $sourceFields['provider.headline'] ?? null,
+                    'shortDescription' => $sourceFields['provider.shortDescription'] ?? null,
                     'meetingPoint' => data_get($sourceFields, 'meetingPoint'),
                     'duration' => sprintf('%d %s', $duration, strtolower($durationUnit)),
                     'images' => $images,
@@ -439,8 +447,8 @@ class FareHarborSyncService
                         'meetingPoint' => $meetingPointTranslations,
                         'included' => $included,
                         'notIncluded' => $notIncluded,
-                        'fareharbor.headline' => $headlineTranslations,
-                        'fareharbor.shortDescription' => $shortDescriptionTranslations,
+                        'provider.headline' => $headlineTranslations,
+                        'provider.shortDescription' => $shortDescriptionTranslations,
                     ],
                 ],
             ],

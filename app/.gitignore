@@ -5,7 +5,14 @@
 !Services/
 !Services/FastTranslate/
 !Services/FastTranslate/FastTranslateClient.php
+!Services/PartnerContent/
+!Services/PartnerContent/Provider/
+!Services/PartnerContent/PartnerContentProviderRegistry.php
+!Services/PartnerContent/Provider/PartnerContentProvider.php
+!Services/PartnerContent/Provider/FareHarborPartnerContentProvider.php
 !Services/PartnerContentTranslationService.php
+!Providers/
+!Providers/AppServiceProvider.php
 !Models/
 !Models/Service.php
 !Support/

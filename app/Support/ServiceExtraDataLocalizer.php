@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use Illuminate\Support\Arr;
 
 class ServiceExtraDataLocalizer
@@ -12,56 +13,49 @@ class ServiceExtraDataLocalizer
      */
     public static function localize(array $extraData): array
     {
+        /** @var PartnerContentProviderRegistry $providers */
+        $providers = app(PartnerContentProviderRegistry::class);
         $translations = is_array(data_get($extraData, 'translations.fields'))
             ? data_get($extraData, 'translations.fields')
             : [];
-        $overrides = is_array(data_get($extraData, 'fareharbor.overrides'))
-            ? data_get($extraData, 'fareharbor.overrides')
-            : [];
+        $provider = data_get($extraData, 'translations.provider')
+            ?? data_get($extraData, 'provider_content.provider');
+        $overrides = $providers->overrides($extraData, is_string($provider) ? $provider : null);
+        $resolvedFields = [];
 
-        $meetingPoint = self::resolveLocalizedString(
-            $overrides['meetingPoint'] ?? null,
-            $translations['meetingPoint'] ?? null,
-            data_get($extraData, 'meetingPoint'),
-        );
-        $included = self::resolveLocalizedList(
-            $overrides['included'] ?? null,
-            $translations['included'] ?? null,
-            data_get($extraData, 'included', []),
-        );
-        $notIncluded = self::resolveLocalizedList(
-            $overrides['notIncluded'] ?? null,
-            $translations['notIncluded'] ?? null,
-            data_get($extraData, 'notIncluded', []),
-        );
-        $headline = self::resolveLocalizedString(
-            data_get($overrides, 'fareharbor.headline'),
-            $translations['fareharbor.headline'] ?? null,
-            data_get($extraData, 'fareharbor.headline'),
-        );
-        $shortDescription = self::resolveLocalizedString(
-            data_get($overrides, 'fareharbor.shortDescription'),
-            $translations['fareharbor.shortDescription'] ?? null,
-            data_get($extraData, 'fareharbor.shortDescription'),
-        );
+        foreach ($providers->stringFields(is_string($provider) ? $provider : null) as $field => $config) {
+            $resolvedFields[$field] = self::resolveLocalizedString(
+                data_get($overrides, $config['override_path']),
+                $translations[$field] ?? null,
+                data_get($extraData, $config['target_path']),
+            );
 
-        $extraData['meetingPoint'] = $meetingPoint ?? '';
-        $extraData['included'] = $included;
-        $extraData['notIncluded'] = $notIncluded;
-
-        if ($meetingPoint !== null) {
-            data_set($extraData, 'fareharbor.meetingPoint', $meetingPoint);
+            if ($resolvedFields[$field] !== null) {
+                data_set($extraData, $config['target_path'], $resolvedFields[$field]);
+            }
         }
 
-        if ($headline !== null) {
-            data_set($extraData, 'fareharbor.headline', $headline);
+        foreach ($providers->listFields(is_string($provider) ? $provider : null) as $field => $config) {
+            $resolvedFields[$field] = self::resolveLocalizedList(
+                data_get($overrides, $config['override_path']),
+                $translations[$field] ?? null,
+                data_get($extraData, $config['target_path'], []),
+            );
+
+            data_set($extraData, $config['target_path'], $resolvedFields[$field]);
         }
 
-        if ($shortDescription !== null) {
-            data_set($extraData, 'fareharbor.shortDescription', $shortDescription);
-        }
+        $extraData['meetingPoint'] = is_string($resolvedFields['meetingPoint'] ?? null)
+            ? $resolvedFields['meetingPoint']
+            : '';
+        $extraData['included'] = is_array($resolvedFields['included'] ?? null) ? $resolvedFields['included'] : [];
+        $extraData['notIncluded'] = is_array($resolvedFields['notIncluded'] ?? null) ? $resolvedFields['notIncluded'] : [];
 
-        return $extraData;
+        return $providers->hydrateExtraData(
+            $extraData,
+            is_string($provider) ? $provider : null,
+            $resolvedFields,
+        );
     }
 
     /**

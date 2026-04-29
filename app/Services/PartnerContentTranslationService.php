@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Models\Service;
 use App\Services\FastTranslate\FastTranslateClient;
+use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Support\Locale;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class PartnerContentTranslationService
 {
@@ -15,6 +15,7 @@ class PartnerContentTranslationService
 
     public function __construct(
         private readonly FastTranslateClient $client,
+        private readonly PartnerContentProviderRegistry $providers,
     ) {
     }
 
@@ -24,6 +25,7 @@ class PartnerContentTranslationService
      * @return array<string, mixed>
      */
     public function buildTranslationState(
+        string $provider,
         array $sourceFields,
         array $existingState = [],
         bool $force = false,
@@ -74,7 +76,7 @@ class PartnerContentTranslationService
         }
 
         return [
-            'provider' => 'FAREHARBOR',
+            'provider' => strtoupper($provider),
             'version' => self::VERSION,
             'status' => $errors === [] ? 'READY' : 'PARTIAL',
             'source_locale' => $sourceLocale,
@@ -94,9 +96,22 @@ class PartnerContentTranslationService
         $translationState = is_array(data_get($extraData, 'translations'))
             ? data_get($extraData, 'translations')
             : [];
+        $provider = (string) data_get($translationState, 'provider', $service->source_provider);
         $sourceLocale = (string) data_get($translationState, 'source_locale', '');
         $titleTranslations = $service->getTranslations('title');
         $descriptionTranslations = $service->getTranslations('description');
+        $providerFields = is_array(data_get($extraData, 'provider_content.fields'))
+            ? data_get($extraData, 'provider_content.fields')
+            : [];
+        $normalizedProviderFields = [];
+
+        foreach ($providerFields as $key => $value) {
+            if (! is_string($key) || trim($key) === '') {
+                continue;
+            }
+
+            $normalizedProviderFields['provider.' . trim($key)] = $value;
+        }
 
         return $this->normalizeSourceFields([
             'title' => $this->resolveLocalizedValue($titleTranslations, $sourceLocale),
@@ -105,8 +120,8 @@ class PartnerContentTranslationService
                 ?? data_get($extraData, 'meetingPoint'),
             'included' => data_get($extraData, 'included', []),
             'notIncluded' => data_get($extraData, 'notIncluded', []),
-            'fareharbor.headline' => data_get($extraData, 'fareharbor.headline'),
-            'fareharbor.shortDescription' => data_get($extraData, 'fareharbor.shortDescription'),
+            ...$this->providers->legacySourceFields($extraData, $provider),
+            ...$normalizedProviderFields,
         ]);
     }
 
@@ -116,15 +131,29 @@ class PartnerContentTranslationService
      */
     public function normalizeSourceFields(array $fields): array
     {
-        return [
-            'title' => $this->normalizeString(data_get($fields, 'title')),
-            'description' => $this->normalizeString(data_get($fields, 'description')),
-            'meetingPoint' => $this->normalizeString(data_get($fields, 'meetingPoint')),
-            'included' => $this->normalizeStringList(data_get($fields, 'included', [])),
-            'notIncluded' => $this->normalizeStringList(data_get($fields, 'notIncluded', [])),
-            'fareharbor.headline' => $this->normalizeString($fields['fareharbor.headline'] ?? null),
-            'fareharbor.shortDescription' => $this->normalizeString($fields['fareharbor.shortDescription'] ?? null),
-        ];
+        $normalized = [];
+
+        foreach ($fields as $field => $value) {
+            if (! is_string($field) || trim($field) === '') {
+                continue;
+            }
+
+            $normalizedValue = is_array($value)
+                ? $this->normalizeStringList($value)
+                : $this->normalizeString($value);
+
+            if ($normalizedValue === null) {
+                continue;
+            }
+
+            if (is_array($normalizedValue) && $normalizedValue === []) {
+                continue;
+            }
+
+            $normalized[$field] = $normalizedValue;
+        }
+
+        return $normalized;
     }
 
     /**
@@ -224,15 +253,18 @@ class PartnerContentTranslationService
      */
     private function detectSourceLocale(array $fields, array $existingState): string
     {
-        $seedText = collect([
-            data_get($fields, 'title'),
-            data_get($fields, 'description'),
-            $fields['fareharbor.headline'] ?? null,
-            $fields['fareharbor.shortDescription'] ?? null,
-            data_get($fields, 'meetingPoint'),
-            ...data_get($fields, 'included', []),
-            ...data_get($fields, 'notIncluded', []),
-        ])
+        $seedText = collect($fields)
+            ->flatMap(function (mixed $value): array {
+                if (is_string($value)) {
+                    return [$value];
+                }
+
+                if (is_array($value)) {
+                    return $value;
+                }
+
+                return [];
+            })
             ->filter(fn (mixed $value): bool => is_string($value) && trim($value) !== '')
             ->implode("\n");
 
@@ -375,7 +407,7 @@ class PartnerContentTranslationService
             $errors[] = [
                 'field' => $field,
                 'locale' => $targetLocale,
-                'message' => Str::limit($exception->getMessage(), 250),
+                'message' => mb_strimwidth($exception->getMessage(), 0, 250, '...'),
             ];
 
             return is_string($existingFallback) && trim($existingFallback) !== ''

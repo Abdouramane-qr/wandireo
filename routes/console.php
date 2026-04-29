@@ -4,6 +4,7 @@ use App\Models\FareHarborCompany;
 use App\Models\Service;
 use App\Services\FareHarbor\FareHarborPartnerProvisioner;
 use App\Services\FareHarbor\FareHarborSyncService;
+use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Services\PartnerContentTranslationService;
 use App\Support\FareHarborDefaultCompanies;
 use Illuminate\Foundation\Inspiring;
@@ -79,6 +80,7 @@ Artisan::command('fareharbor:bootstrap-companies {--sync} {--create-partners}', 
 
 Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--force}', function (
     PartnerContentTranslationService $translator,
+    PartnerContentProviderRegistry $providers,
 ) {
     $provider = strtoupper((string) $this->option('provider'));
     $force = (bool) $this->option('force');
@@ -98,7 +100,7 @@ Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--
         $existingState = is_array(data_get($extraData, 'translations'))
             ? data_get($extraData, 'translations')
             : [];
-        $translationState = $translator->buildTranslationState($sourceFields, $existingState, $force);
+        $translationState = $translator->buildTranslationState($provider, $sourceFields, $existingState, $force);
 
         if (! $force && data_get($existingState, 'source_hash') === data_get($translationState, 'source_hash')) {
             $unchanged++;
@@ -106,9 +108,7 @@ Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--
             continue;
         }
 
-        $overrides = is_array(data_get($extraData, 'fareharbor.overrides'))
-            ? data_get($extraData, 'fareharbor.overrides')
-            : [];
+        $overrides = $providers->overrides($extraData, $provider);
         $titleTranslations = $translator->applyStringOverrides(
             is_array(data_get($translationState, 'fields.title'))
                 ? data_get($translationState, 'fields.title')
@@ -126,26 +126,20 @@ Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--
             : [];
         $fields['title'] = $titleTranslations;
         $fields['description'] = $descriptionTranslations;
-        $fields['meetingPoint'] = $translator->applyStringOverrides(
-            is_array($fields['meetingPoint'] ?? null) ? $fields['meetingPoint'] : [],
-            data_get($overrides, 'meetingPoint'),
-        );
-        $fields['included'] = $translator->applyListOverrides(
-            is_array($fields['included'] ?? null) ? $fields['included'] : [],
-            data_get($overrides, 'included'),
-        );
-        $fields['notIncluded'] = $translator->applyListOverrides(
-            is_array($fields['notIncluded'] ?? null) ? $fields['notIncluded'] : [],
-            data_get($overrides, 'notIncluded'),
-        );
-        $fields['fareharbor.headline'] = $translator->applyStringOverrides(
-            is_array(($fields['fareharbor.headline'] ?? null)) ? $fields['fareharbor.headline'] : [],
-            data_get($overrides, 'fareharbor.headline'),
-        );
-        $fields['fareharbor.shortDescription'] = $translator->applyStringOverrides(
-            is_array(($fields['fareharbor.shortDescription'] ?? null)) ? $fields['fareharbor.shortDescription'] : [],
-            data_get($overrides, 'fareharbor.shortDescription'),
-        );
+
+        foreach ($providers->stringFields($provider) as $field => $config) {
+            $fields[$field] = $translator->applyStringOverrides(
+                is_array($fields[$field] ?? null) ? $fields[$field] : [],
+                data_get($overrides, $config['override_path']),
+            );
+        }
+
+        foreach ($providers->listFields($provider) as $field => $config) {
+            $fields[$field] = $translator->applyListOverrides(
+                is_array($fields[$field] ?? null) ? $fields[$field] : [],
+                data_get($overrides, $config['override_path']),
+            );
+        }
 
         data_set($extraData, 'translations', [
             ...$translationState,

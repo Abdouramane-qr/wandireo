@@ -7,6 +7,7 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
 use App\Models\ServiceAttribute;
 use App\Models\Service;
+use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Support\Locale;
 use App\Services\Analytics\ProductAnalyticsTracker;
 use Illuminate\Cache\TaggableStore;
@@ -25,6 +26,7 @@ class ServiceController extends Controller
 
     public function __construct(
         private readonly ProductAnalyticsTracker $analyticsTracker,
+        private readonly PartnerContentProviderRegistry $partnerContentProviders,
     ) {
     }
 
@@ -644,6 +646,7 @@ class ServiceController extends Controller
         $this->promoteWandireoPayload($payload, $existingExtraData, $service);
 
         if ($service->source_type === 'EXTERNAL') {
+            $provider = $service->source_provider;
             $overrideKeys = [
                 'title',
                 'description',
@@ -662,8 +665,9 @@ class ServiceController extends Controller
                 'tags',
                 'is_available',
             ];
-            $existingOverrides = is_array(data_get($existingExtraData, 'fareharbor.overrides'))
-                ? data_get($existingExtraData, 'fareharbor.overrides')
+            $overrideRootPath = $this->partnerContentProviders->resolve($provider)?->overrideRootPath();
+            $existingOverrides = is_string($overrideRootPath) && is_array(data_get($existingExtraData, $overrideRootPath))
+                ? data_get($existingExtraData, $overrideRootPath)
                 : [];
             $newOverrides = [];
 
@@ -674,53 +678,43 @@ class ServiceController extends Controller
             }
 
             if (is_array($payload['extra_data'] ?? null)) {
-                $localizedStringOverrideKeys = [
-                    'meetingPoint',
-                    'fareharbor.headline',
-                    'fareharbor.shortDescription',
-                ];
-                $localizedListOverrideKeys = [
-                    'included',
-                    'notIncluded',
-                ];
-
-                foreach ($localizedStringOverrideKeys as $key) {
+                foreach ($this->partnerContentProviders->inputStringFields($provider) as $key => $config) {
                     if (! data_get($payload['extra_data'], $key)) {
                         continue;
                     }
 
                     data_set(
                         $newOverrides,
-                        $key,
+                        $config['override_path'],
                         $this->normalizeLocalizedExtraDataStringOverride(
                             data_get($payload['extra_data'], $key),
-                            data_get($existingOverrides, $key),
+                            data_get($existingOverrides, $config['override_path']),
                         ),
                     );
                     Arr::forget($payload['extra_data'], $key);
                 }
 
-                foreach ($localizedListOverrideKeys as $key) {
+                foreach ($this->partnerContentProviders->inputListFields($provider) as $key => $config) {
                     if (! is_array(data_get($payload['extra_data'], $key))) {
                         continue;
                     }
 
                     data_set(
                         $newOverrides,
-                        $key,
+                        $config['override_path'],
                         $this->normalizeLocalizedExtraDataListOverride(
                             data_get($payload['extra_data'], $key),
-                            data_get($existingOverrides, $key),
+                            data_get($existingOverrides, $config['override_path']),
                         ),
                     );
                     Arr::forget($payload['extra_data'], $key);
                 }
             }
 
-            if ($newOverrides !== []) {
+            if ($newOverrides !== [] && is_string($overrideRootPath)) {
                 data_set(
                     $payload,
-                    'extra_data.fareharbor.overrides',
+                    'extra_data.' . $overrideRootPath,
                     array_replace($existingOverrides, $newOverrides),
                 );
             }
