@@ -1,5 +1,18 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { bookingsApi } from '@/api/bookings';
+import {
+    clearStoredBookingIntent,
+    defaultCartResumePath,
+    getStoredBookingIntent,
+    saveStoredBookingIntent,
+} from '@/lib/bookingIntent';
 import type { Booking } from '@/types/booking';
 import { PaymentModeNames } from '@/types/service';
 import type { PaymentMode, Service } from '@/types/service';
@@ -44,8 +57,12 @@ interface BookingContextValue {
     draft: BookingDraft | null;
     travelerInfo: TravelerInfo | null;
     confirmedBooking: Booking | null;
+    hasPendingAuthResume: boolean;
     initDraft: (draft: BookingDraft) => void;
     saveTravelerInfo: (info: TravelerInfo) => void;
+    markAuthResume: (path?: string) => void;
+    completeAuthResume: () => void;
+    setResumePath: (path: string) => void;
     syncDraftPricing: () => Promise<void>;
     confirmPayment: (stripePaymentIntentId?: string) => Promise<string>;
     clearBooking: () => void;
@@ -56,20 +73,60 @@ const BookingContext = createContext<BookingContextValue | null>(null);
 export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const [draft, setDraft] = useState<BookingDraft | null>(null);
-    const [travelerInfo, setTravelerInfo] = useState<TravelerInfo | null>(null);
-    const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(
-        null,
+    const initialState = useMemo(() => getStoredBookingIntent(), []);
+    const [draft, setDraft] = useState<BookingDraft | null>(initialState.draft);
+    const [travelerInfo, setTravelerInfo] = useState<TravelerInfo | null>(
+        initialState.travelerInfo,
     );
+    const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(
+        initialState.confirmedBooking,
+    );
+    const [resumePath, setResumePathState] = useState<string | null>(
+        initialState.resumePath,
+    );
+    const [hasPendingAuthResume, setHasPendingAuthResume] = useState(
+        initialState.resumeAfterAuth,
+    );
+
+    useEffect(() => {
+        saveStoredBookingIntent({
+            draft,
+            travelerInfo,
+            confirmedBooking,
+            resumePath,
+            resumeAfterAuth: hasPendingAuthResume,
+        });
+    }, [
+        confirmedBooking,
+        draft,
+        hasPendingAuthResume,
+        resumePath,
+        travelerInfo,
+    ]);
 
     const initDraft = useCallback((newDraft: BookingDraft) => {
         setDraft(newDraft);
         setTravelerInfo(null);
         setConfirmedBooking(null);
+        setResumePathState(defaultCartResumePath());
+        setHasPendingAuthResume(false);
     }, []);
 
     const saveTravelerInfo = useCallback((info: TravelerInfo) => {
         setTravelerInfo(info);
+    }, []);
+
+    const markAuthResume = useCallback((path?: string) => {
+        setResumePathState(path ?? defaultCartResumePath());
+        setHasPendingAuthResume(true);
+    }, []);
+
+    const completeAuthResume = useCallback(() => {
+        setHasPendingAuthResume(false);
+    }, []);
+
+    const setResumePath = useCallback((path: string) => {
+        setResumePathState(path);
     }, []);
 
     const syncDraftPricing = useCallback(async (): Promise<void> => {
@@ -88,6 +145,16 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
             selectedExtras: draft.selectedExtras,
             extrasTotal: draft.extrasTotal,
         });
+
+        const serverPartnerTotal =
+            response.pricing?.partner_total ??
+            response.pricing?.partnerSubtotal ??
+            response.pricing?.partner_subtotal;
+        const serverCommissionTotal =
+            response.pricing?.commission_total ??
+            response.pricing?.commissionTotal;
+        const serverClientTotal =
+            response.pricing?.client_total ?? response.pricing?.clientTotal;
 
         const normalizedExtras = (response.selectedExtras ?? []).map((extra) => {
             const unitPrice = extra.unit_price ?? extra.unitPrice ?? 0;
@@ -108,11 +175,18 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
         const extrasTotal =
             response.extrasTotal ??
             normalizedExtras.reduce((sum, extra) => sum + extra.totalPrice, 0);
-        const basePartnerTotal = draft.service.partnerPrice * units;
-        const baseCommissionTotal = draft.service.commissionAmount * units;
-        const partnerTotal = +(basePartnerTotal + extrasTotal).toFixed(2);
-        const commissionTotal = +baseCommissionTotal.toFixed(2);
-        const clientTotal = +(partnerTotal + commissionTotal).toFixed(2);
+        const partnerTotal =
+            typeof serverPartnerTotal === 'number'
+                ? +(serverPartnerTotal + extrasTotal).toFixed(2)
+                : +((draft.service.partnerPrice * units) + extrasTotal).toFixed(2);
+        const commissionTotal =
+            typeof serverCommissionTotal === 'number'
+                ? +serverCommissionTotal.toFixed(2)
+                : +(draft.service.commissionAmount * units).toFixed(2);
+        const clientTotal =
+            typeof serverClientTotal === 'number'
+                ? +(serverClientTotal + extrasTotal).toFixed(2)
+                : +(partnerTotal + commissionTotal).toFixed(2);
         const amountDueOnline = +response.amountOnline.toFixed(2);
         const amountDueOnSite =
             draft.paymentMode === PaymentModeNames.FULL_CASH_ON_SITE
@@ -165,6 +239,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
             });
 
             setConfirmedBooking(confirmed);
+            setHasPendingAuthResume(false);
 
             return confirmed.id;
         },
@@ -175,6 +250,9 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
         setDraft(null);
         setTravelerInfo(null);
         setConfirmedBooking(null);
+        setResumePathState(null);
+        setHasPendingAuthResume(false);
+        clearStoredBookingIntent();
     }, []);
 
     return (
@@ -183,8 +261,12 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
                 draft,
                 travelerInfo,
                 confirmedBooking,
+                hasPendingAuthResume,
                 initDraft,
                 saveTravelerInfo,
+                markAuthResume,
+                completeAuthResume,
+                setResumePath,
                 syncDraftPricing,
                 confirmPayment,
                 clearBooking,

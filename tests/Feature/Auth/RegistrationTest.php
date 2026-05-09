@@ -36,4 +36,18 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
+
+    public function test_new_users_can_resume_booking_after_registration(): void
+    {
+        $response = $this->post(route('register.store'), [
+            'name' => 'Test User',
+            'email' => 'resume@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'booking_resume_redirect' => '/fr/panier',
+        ], ['Cookie' => 'locale=fr']);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect('/fr/panier');
+    }
 }

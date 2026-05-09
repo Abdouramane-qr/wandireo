@@ -6,7 +6,7 @@ import { favoritesApi } from "@/api/favorites";
 import { useFavoritesData } from "@/hooks/useFavoritesData";
 import { useBlogPostsData } from "@/hooks/useBlogData";
 import { useGeoContext } from "@/hooks/useGeoContext";
-import { useServicesData } from "@/hooks/useServicesData";
+import { useServicesDataWithOptions } from "@/hooks/useServicesData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { useUser } from "@/context/UserContext";
@@ -62,7 +62,10 @@ export const HomePage: React.FC = () => {
     const [category, setCategory] = useState("");
 
     const today = todayISO();
-    const { services } = useServicesData();
+    const { services } = useServicesDataWithOptions(
+        { limit: 100 },
+        { fetchAll: true },
+    );
     const { favorites } = useFavoritesData(currentUser?.id ?? "");
     const { posts: allPosts } = useBlogPostsData({
         status: BlogStatusNames.PUBLISHED,
@@ -171,10 +174,7 @@ export const HomePage: React.FC = () => {
                 .filter((service) => service.isAvailable)
                 .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
                 .slice(0, 4)
-                .map((service) => ({
-                    ...toServiceCardData(service),
-                    isFeatured: true,
-                })),
+                .map((service) => toServiceCardData(service)),
         [services],
     );
 
@@ -208,7 +208,9 @@ export const HomePage: React.FC = () => {
             ].map((tile) => ({
                 ...tile,
                 count: services.filter(
-                    (service) => service.category === tile.value,
+                    (service) =>
+                        service.isAvailable &&
+                        service.category === tile.value,
                 ).length,
             })),
         [services, t],

@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import BookingIntentSync from '@/components/BookingIntentSync';
 import { LocalizedQuerySync } from '@/components/LocalizedQuerySync';
 import { ToastProvider } from '@/components/wdr';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -111,6 +112,7 @@ return [AppLayout, SettingsLayout];
                                     <ToastProvider>
                                         <TooltipProvider delayDuration={0}>
                                             <LocalizedQuerySync />
+                                            <BookingIntentSync />
                                             <Component key={key} {...pageProps} />
                                         </TooltipProvider>
                                     </ToastProvider>

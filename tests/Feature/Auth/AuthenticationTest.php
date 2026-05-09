@@ -128,6 +128,39 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', ['locale' => 'fr'], false));
     }
 
+    public function test_client_booking_resume_redirect_wins_after_login(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'CLIENT',
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'booking_resume_redirect' => '/fr/panier',
+        ], ['Cookie' => 'locale=fr']);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect('/fr/panier');
+    }
+
+    public function test_partner_ignores_booking_resume_redirect_after_login(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'booking_resume_redirect' => '/fr/panier',
+        ], ['Cookie' => 'locale=fr']);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('partner.dashboard', ['locale' => 'fr'], false));
+    }
+
     public function test_users_are_rate_limited()
     {
         $user = User::factory()->create();

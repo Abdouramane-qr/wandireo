@@ -95,6 +95,12 @@ class ServiceController extends Controller
     {
         $query = Service::with(['partner', 'serviceCategory', 'serviceSubcategory']);
         $operator = $this->likeOperator();
+        $shouldRestrictToPublicCatalog = ! $request->boolean('adminAll')
+            && ! $request->filled('partnerId');
+
+        if ($shouldRestrictToPublicCatalog) {
+            $query->where('is_available', true);
+        }
 
         if ($request->category) {
             $query->where('category', $request->category);

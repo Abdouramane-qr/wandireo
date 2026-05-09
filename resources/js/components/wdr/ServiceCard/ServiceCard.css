@@ -288,6 +288,8 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 /* ---- Notation etoiles ---- */
@@ -403,6 +405,7 @@
     line-height: 1.4;
     color: var(--text-muted);
     max-width: none;
+    overflow-wrap: anywhere;
 }
 
 .wdr-card__price-note--subtle {

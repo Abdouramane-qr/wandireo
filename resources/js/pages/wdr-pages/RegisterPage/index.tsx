@@ -4,6 +4,7 @@ import { Button, Input } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getBookingAuthResumePath } from "@/lib/bookingIntent";
 import "./RegisterPage.css";
 
 interface FormState {
@@ -129,6 +130,7 @@ export const RegisterPage: React.FC = () => {
                 email: form.email.trim().toLowerCase(),
                 password: form.password,
                 password_confirmation: form.confirmPassword,
+                booking_resume_redirect: getBookingAuthResumePath(),
             },
             {
                 preserveScroll: true,

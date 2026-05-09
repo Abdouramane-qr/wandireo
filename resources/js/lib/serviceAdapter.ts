@@ -53,29 +53,6 @@ function toPositiveNumber(value: unknown): number | undefined {
     return undefined;
 }
 
-function formatAttributeValue(value: unknown): string {
-    if (Array.isArray(value)) {
-        return value
-            .map((item) => formatAttributeValue(item))
-            .filter(Boolean)
-            .join(", ");
-    }
-
-    if (typeof value === "boolean") {
-        return value ? "Oui" : "";
-    }
-
-    if (value == null) {
-        return "";
-    }
-
-    if (typeof value === "object") {
-        return "";
-    }
-
-    return String(value).trim();
-}
-
 function getExternalDepositAmount(service: Service): number | undefined {
     const fareHarbor = service.extraData?.fareharbor;
     const directAmount = toPositiveNumber(fareHarbor?.depositAmount);
@@ -192,23 +169,6 @@ export function toServiceCardData(service: Service): ServiceCardData {
         typeof service.extraData?.fareharbor?.processorCurrency === "string"
             ? service.extraData.fareharbor.processorCurrency
             : service.currency;
-    const rawAttributes = service.extraData?.attributes;
-    const structuredAttributesSource =
-        rawAttributes &&
-        typeof rawAttributes === "object" &&
-        !Array.isArray(rawAttributes)
-            ? (rawAttributes as Record<string, unknown>)
-            : {};
-    const structuredAttributes = Object.entries(structuredAttributesSource)
-        .filter(([, value]) => value !== "" && value !== false && value != null)
-        .map(([key, value]) => {
-            const label = key.replaceAll("_", " ");
-            const normalizedValue = formatAttributeValue(value);
-
-            return normalizedValue ? `${label}: ${normalizedValue}` : label;
-        })
-        .filter(Boolean);
-
     const durationMinutes =
         service.category === "ACTIVITE"
             ? toDurationMinutes(service.duration, service.durationUnit)
@@ -244,10 +204,9 @@ export function toServiceCardData(service: Service): ServiceCardData {
         highlights: [
             headlineHighlight,
             service.serviceSubcategoryName ?? service.serviceCategoryName ?? "",
-            ...structuredAttributes,
         ]
             .filter(Boolean)
-            .slice(0, 3),
+            .slice(0, 2),
         externalPriceStatus,
         externalDepositAmount,
         externalDepositCurrency,

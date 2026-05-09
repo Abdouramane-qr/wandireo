@@ -571,7 +571,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
     const { error } = useToast();
     const { navigate } = useRouter();
     const { currentUser } = useUser();
-    const { initDraft } = useBooking();
+    const { initDraft, markAuthResume } = useBooking();
     const { t } = useTranslation();
     const today = todayISO();
     const priceStatus = getFareHarborPriceStatus(service);
@@ -695,12 +695,6 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
 
     /** Validation simple avant soumission */
     const handleReserve = () => {
-        if (!currentUser || currentUser.role !== "CLIENT") {
-            navigate({ name: "login" });
-
-            return;
-        }
-
         if (!canReserve) {
             error(t("service.external_price_unavailable"));
 
@@ -789,6 +783,13 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
             selectedExtras,
             extrasTotal,
         });
+
+        if (!currentUser || currentUser.role !== "CLIENT") {
+            markAuthResume();
+            navigate({ name: "login" });
+
+            return;
+        }
 
         navigate({ name: "cart" });
     };
