@@ -115,6 +115,28 @@ function buildCategoriesForVertical(
     return buildInitialCategories(vertical);
 }
 
+function dedupeNormalizedValues(values: string[]): string[] {
+    return Array.from(
+        new Set(
+            values
+                .map((value) => normalizeText(value.trim()))
+                .filter(Boolean),
+        ),
+    );
+}
+
+function singularizeCategoryLabel(value: string): string {
+    if (value.endsWith("ies")) {
+        return `${value.slice(0, -3)}y`;
+    }
+
+    if (value.endsWith("s")) {
+        return value.slice(0, -1);
+    }
+
+    return value;
+}
+
 function normalizeText(value: string): string {
     return value
         .toLowerCase()
@@ -298,18 +320,88 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         dateFrom,
         dateTo,
     };
+    const CATEGORY_LABELS: Record<ServiceCategory, string> = useMemo(
+        () => ({
+            ACTIVITE: t("search.activities"),
+            BATEAU: t("search.boats"),
+            HEBERGEMENT: t("search.accommodations"),
+            VOITURE: t("search.cars"),
+        }),
+        [t],
+    );
+    const categoryQueryAliases = useMemo(
+        () =>
+            ({
+                ACTIVITE: dedupeNormalizedValues([
+                    CATEGORY_LABELS.ACTIVITE,
+                    singularizeCategoryLabel(CATEGORY_LABELS.ACTIVITE),
+                    "activite",
+                    "activites",
+                    "activity",
+                    "activities",
+                ]),
+                BATEAU: dedupeNormalizedValues([
+                    CATEGORY_LABELS.BATEAU,
+                    singularizeCategoryLabel(CATEGORY_LABELS.BATEAU),
+                    "bateau",
+                    "bateaux",
+                    "boat",
+                    "boats",
+                ]),
+                HEBERGEMENT: dedupeNormalizedValues([
+                    CATEGORY_LABELS.HEBERGEMENT,
+                    singularizeCategoryLabel(CATEGORY_LABELS.HEBERGEMENT),
+                    "hebergement",
+                    "hebergements",
+                    "accommodation",
+                    "accommodations",
+                    "stay",
+                    "stays",
+                ]),
+                VOITURE: dedupeNormalizedValues([
+                    CATEGORY_LABELS.VOITURE,
+                    singularizeCategoryLabel(CATEGORY_LABELS.VOITURE),
+                    "voiture",
+                    "voitures",
+                    "car",
+                    "cars",
+                ]),
+            }) satisfies Record<ServiceCategory, string[]>,
+        [CATEGORY_LABELS],
+    );
+    const inferredCategoryFromQuery = useMemo(() => {
+        const normalizedQuery = normalizeText(effectiveRoute.query ?? "");
+
+        if (!normalizedQuery) {
+            return "";
+        }
+
+        for (const categoryKey of ALL_CATEGORIES) {
+            if (categoryQueryAliases[categoryKey].includes(normalizedQuery)) {
+                return categoryKey;
+            }
+        }
+
+        return "";
+    }, [categoryQueryAliases, effectiveRoute.query]);
+    const effectiveCategory =
+        effectiveRoute.category || inferredCategoryFromQuery || "";
+    const effectiveQuery =
+        !effectiveRoute.category && inferredCategoryFromQuery
+            ? ""
+            : (effectiveRoute.query ?? "");
     const [viewMode, setViewMode] = useState<ViewMode>("grid");
     const [sortBy, setSortBy] = useState<SortOption>("pertinence");
     const [activeVertical, setActiveVertical] = useState<SearchVertical>(() =>
-        buildInitialVertical(effectiveRoute.category ?? ""),
+        buildInitialVertical(effectiveCategory),
     );
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState<FilterState>(() => ({
-        query: effectiveRoute.query ?? "",
+        query: effectiveQuery,
         dateFrom: effectiveRoute.dateFrom ?? "",
         dateTo: effectiveRoute.dateTo ?? "",
-        categories: buildInitialCategories(effectiveRoute.category ?? ""),
+        categories: buildInitialCategories(effectiveCategory),
         detailedCategories: [],
         priceMin: "",
         priceMax: "",
@@ -318,14 +410,14 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     }));
 
     useEffect(() => {
-        setActiveVertical(buildInitialVertical(effectiveRoute.category ?? ""));
+        setActiveVertical(buildInitialVertical(effectiveCategory));
         setCurrentPage(1);
         setMobileFiltersOpen(false);
         setFilters({
-            query: effectiveRoute.query ?? "",
+            query: effectiveQuery,
             dateFrom: effectiveRoute.dateFrom ?? "",
             dateTo: effectiveRoute.dateTo ?? "",
-            categories: buildInitialCategories(effectiveRoute.category ?? ""),
+            categories: buildInitialCategories(effectiveCategory),
             detailedCategories: [],
             priceMin: "",
             priceMax: "",
@@ -333,10 +425,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
             dynamicFilters: {},
         });
     }, [
-        effectiveRoute.category,
         effectiveRoute.dateFrom,
         effectiveRoute.dateTo,
         effectiveRoute.query,
+        effectiveCategory,
+        effectiveQuery,
     ]);
     const { services: allServices } = useServicesDataWithOptions(
         { limit: 100 },
@@ -348,16 +441,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     const favoriteServiceIds = useMemo(
         () => new Set(favorites.map((favorite) => favorite.serviceId)),
         [favorites],
-    );
-
-    const CATEGORY_LABELS: Record<ServiceCategory, string> = useMemo(
-        () => ({
-            ACTIVITE: t("search.activities"),
-            BATEAU: t("search.boats"),
-            HEBERGEMENT: t("search.accommodations"),
-            VOITURE: t("search.cars"),
-        }),
-        [t],
     );
 
     const VERTICALS: Array<{
