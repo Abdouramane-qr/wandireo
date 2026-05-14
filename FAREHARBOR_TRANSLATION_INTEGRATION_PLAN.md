@@ -11,7 +11,11 @@ Le besoin metier a garder comme reference est le suivant :
 
 - telecharger les items FareHarbor de chaque partenaire et les stocker dans notre base
 - disposer d'une fonction de resynchronisation par partenaire et globale
-- verifier la disponibilite en appelant le calendrier FareHarbor a chaque tentative de booking
+- verifier la disponibilite en appelant le calen
+
+
+
+drier FareHarbor a chaque tentative de booking
 - rediriger ensuite l'utilisateur vers la reservation externe du partenaire
 
 Comparaison avec les messages du `09/04/2026` et du `11/04/2026` :

@@ -859,6 +859,19 @@ export function normalizeBooking(rawInput: unknown): Booking {
             undefined,
         createdAt: asDate(raw.created_at ?? raw.createdAt),
         updatedAt: asDate(raw.updated_at ?? raw.updatedAt),
+        externalBookingReference:
+            asString(
+                raw.external_booking_reference ??
+                    raw.externalBookingReference,
+            ) || undefined,
+        externalBookingStatus:
+            asString(
+                raw.external_booking_status ?? raw.externalBookingStatus,
+            ) || undefined,
+        externalErrorMessage:
+            asString(
+                raw.external_error_message ?? raw.externalErrorMessage,
+            ) || undefined,
     };
 }
 

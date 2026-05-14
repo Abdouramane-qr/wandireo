@@ -176,6 +176,18 @@
     margin: 0;
 }
 
+.wdr-history__card-source {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.3rem 0 0;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
 /* Badges de statut */
 
 .wdr-history__card-badges {

@@ -5,6 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { bookingsApi } from '@/api/bookings';
+import type { BookingsParams } from '@/api/bookings';
 import type { Booking } from '@/types/booking';
 
 export function useMyBookingsData(clientId: string): {
@@ -37,14 +38,14 @@ export function usePartnerBookingsData(partnerId: string): {
     return { bookings: query.data ?? [], isLoading: query.isLoading };
 }
 
-export function useAdminBookingsData(): {
+export function useAdminBookingsData(params?: BookingsParams): {
     bookings: Booking[];
     isLoading: boolean;
 } {
     const query = useQuery({
-        queryKey: ['bookings', 'admin'],
+        queryKey: ['bookings', 'admin', params ?? {}],
         queryFn: async () => {
-            const response = await bookingsApi.adminList();
+            const response = await bookingsApi.adminList(params);
 
             return response.data;
         },

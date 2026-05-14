@@ -1,6 +1,7 @@
 import React from "react";
 import { SearchResults } from "@/components/Navbar/SearchResults";
 import { useSearch } from "@/hooks/useSearch";
+import { resolveSearchRouteParams } from "@/lib/searchCategory";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 
@@ -23,7 +24,7 @@ const SearchIcon: React.FC = () => (
 
 export function SearchBar() {
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const { navigate } = useRouter();
     const [query, setQuery] = React.useState("");
     const [isOpen, setIsOpen] = React.useState(false);
@@ -70,9 +71,11 @@ export function SearchBar() {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         setIsOpen(false);
+        const params = resolveSearchRouteParams(query, locale);
         navigate({
             name: "search",
-            query: query.trim(),
+            query: params.query,
+            category: params.category,
         });
     };
 

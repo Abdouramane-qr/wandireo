@@ -71,6 +71,8 @@ export function buildPublicPagesFrTranslations(): Record<string, string> {
         "profile.save_success_title": "Profil mis à jour",
         "profile.save_success_desc":
             "Vos préférences ont bien été enregistrées.",
+        "profile.save_validation_error":
+            "Certaines informations doivent être corrigées avant l'enregistrement.",
         "profile.password_desc":
             "Vous pouvez modifier votre mot de passe depuis le lien de réinitialisation envoyé par e-mail.",
         "profile.two_factor_desc":
@@ -82,8 +84,29 @@ export function buildPublicPagesFrTranslations(): Record<string, string> {
             "Retrouvez vos réservations passées et à venir, avec leur statut et les montants réglés.",
         "history.dashboard": "Retour à l’espace voyageur",
         "history.filters": "Filtrer les réservations",
+        "history.tab.all": "Toutes les réservations",
+        "history.tab.upcoming": "À venir",
+        "history.tab.past": "Réservations passées",
+        "history.tab.cancelled": "Réservations annulées",
+        "history.status.awaiting_payment": "En attente de paiement",
+        "history.status.pending": "En attente",
+        "history.status.confirmed": "Confirmée",
+        "history.status.completed": "Terminée",
+        "history.status.cancelled": "Annulée",
+        "history.payment.paid": "Réglé",
+        "history.payment.refunded": "Remboursé",
         "history.reference": "Réf.",
         "history.payment.pending": "En attente de règlement",
+        "history.participants_one": "voyageur",
+        "history.participants_other": "voyageurs",
+        "history.online": "en ligne",
+        "history.onsite": "sur place",
+        "history.total": "Total",
+        "history.extras": "Extras",
+        "history.cancellation_reason": "Motif d’annulation :",
+        "history.source.external": "Offre partenaire, réservée et payée ici via Stripe",
+        "history.source.local": "Offre Wandireo",
+        "history.rating.aria": "Évaluer la réservation {id}",
         "history.review_done": "Avis déjà envoyé",
         "history.review_title": "Partager votre avis",
         "history.review_placeholder":

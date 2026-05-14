@@ -8,13 +8,13 @@
  *   - shortDescription : 160 premiers caracteres + ellipse si necessaire.
  *   - thumbnailUrl     : premiere entree du tableau images[].
  *   - durationMinutes  : normalise uniquement pour les activites.
- *   - partnerName      : resolu via un mapping statique partnerId -> label.
+ *   - partnerName      : conserve pour compatibilite de type, non expose publiquement.
  */
 
 import type { Service, ServiceCardData } from "@/types/service";
 import { markdownToSingleLineText } from "@/lib/textSanitizers";
 
-// ---- Mapping statique partnerId -> nom affiche ----
+// ---- Mapping statique partnerId -> libelle interne de compatibilite ----
 
 const PARTNER_NAMES: Record<string, string> = {
     partner_001: "Exp-Travel Ltd",
@@ -178,10 +178,6 @@ export function toServiceCardData(service: Service): ServiceCardData {
     const descriptionSource =
         cleanedDescription || externalShortDescription || externalHeadline;
     const shortDescription = truncateText(descriptionSource, 190);
-    const headlineHighlight =
-        externalHeadline && externalHeadline !== shortDescription
-            ? truncateText(externalHeadline, 60)
-            : "";
 
     return {
         id: service.id,
@@ -201,12 +197,9 @@ export function toServiceCardData(service: Service): ServiceCardData {
         isFeatured: service.featured,
         isExternalRedirect: service.isExternalRedirect,
         sourceProvider: service.sourceProvider,
-        highlights: [
-            headlineHighlight,
-            service.serviceSubcategoryName ?? service.serviceCategoryName ?? "",
-        ]
+        highlights: [service.serviceSubcategoryName ?? service.serviceCategoryName ?? ""]
             .filter(Boolean)
-            .slice(0, 2),
+            .slice(0, 1),
         externalPriceStatus,
         externalDepositAmount,
         externalDepositCurrency,

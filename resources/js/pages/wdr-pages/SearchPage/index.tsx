@@ -18,6 +18,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import type { Route } from "@/hooks/useWdrRouter";
 import { formatPrice } from "@/lib/formatters";
+import { inferCategoryFromSearchTerm } from "@/lib/searchCategory";
 import { toServiceCardData } from "@/lib/serviceAdapter";
 import type {
     Service,
@@ -113,28 +114,6 @@ function buildCategoriesForVertical(
     }
 
     return buildInitialCategories(vertical);
-}
-
-function dedupeNormalizedValues(values: string[]): string[] {
-    return Array.from(
-        new Set(
-            values
-                .map((value) => normalizeText(value.trim()))
-                .filter(Boolean),
-        ),
-    );
-}
-
-function singularizeCategoryLabel(value: string): string {
-    if (value.endsWith("ies")) {
-        return `${value.slice(0, -3)}y`;
-    }
-
-    if (value.endsWith("s")) {
-        return value.slice(0, -1);
-    }
-
-    return value;
 }
 
 function normalizeText(value: string): string {
@@ -329,61 +308,9 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         }),
         [t],
     );
-    const categoryQueryAliases = useMemo(
-        () =>
-            ({
-                ACTIVITE: dedupeNormalizedValues([
-                    CATEGORY_LABELS.ACTIVITE,
-                    singularizeCategoryLabel(CATEGORY_LABELS.ACTIVITE),
-                    "activite",
-                    "activites",
-                    "activity",
-                    "activities",
-                ]),
-                BATEAU: dedupeNormalizedValues([
-                    CATEGORY_LABELS.BATEAU,
-                    singularizeCategoryLabel(CATEGORY_LABELS.BATEAU),
-                    "bateau",
-                    "bateaux",
-                    "boat",
-                    "boats",
-                ]),
-                HEBERGEMENT: dedupeNormalizedValues([
-                    CATEGORY_LABELS.HEBERGEMENT,
-                    singularizeCategoryLabel(CATEGORY_LABELS.HEBERGEMENT),
-                    "hebergement",
-                    "hebergements",
-                    "accommodation",
-                    "accommodations",
-                    "stay",
-                    "stays",
-                ]),
-                VOITURE: dedupeNormalizedValues([
-                    CATEGORY_LABELS.VOITURE,
-                    singularizeCategoryLabel(CATEGORY_LABELS.VOITURE),
-                    "voiture",
-                    "voitures",
-                    "car",
-                    "cars",
-                ]),
-            }) satisfies Record<ServiceCategory, string[]>,
-        [CATEGORY_LABELS],
-    );
     const inferredCategoryFromQuery = useMemo(() => {
-        const normalizedQuery = normalizeText(effectiveRoute.query ?? "");
-
-        if (!normalizedQuery) {
-            return "";
-        }
-
-        for (const categoryKey of ALL_CATEGORIES) {
-            if (categoryQueryAliases[categoryKey].includes(normalizedQuery)) {
-                return categoryKey;
-            }
-        }
-
-        return "";
-    }, [categoryQueryAliases, effectiveRoute.query]);
+        return inferCategoryFromSearchTerm(effectiveRoute.query ?? "", locale);
+    }, [effectiveRoute.query, locale]);
     const effectiveCategory =
         effectiveRoute.category || inferredCategoryFromQuery || "";
     const effectiveQuery =

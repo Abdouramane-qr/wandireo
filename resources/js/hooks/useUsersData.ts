@@ -26,7 +26,7 @@ export function useAdminUsersData(
 } {
     const query = useQuery({
         queryKey: ['users', 'admin', params ?? {}],
-        queryFn: async () => (await usersApi.adminList(params)).data,
+        queryFn: async () => (await usersApi.adminListAll(params)).data,
         staleTime: 60_000,
         retry: 1,
         enabled,

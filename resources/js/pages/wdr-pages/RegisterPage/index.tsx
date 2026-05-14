@@ -74,6 +74,8 @@ export const RegisterPage: React.FC = () => {
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         if (!currentUser) {
@@ -96,6 +98,30 @@ export const RegisterPage: React.FC = () => {
     if (currentUser) {
         return null;
     }
+
+    const passwordEye = (
+        <button
+            type="button"
+            className="wdr-login__eye-btn"
+            onClick={() => setShowPassword((value) => !value)}
+            aria-label={
+                showPassword ? t("auth.password.hide") : t("auth.password.show")
+            }
+        >{showPassword ? "HIDE" : "SHOW"}</button>
+    );
+
+    const confirmPasswordEye = (
+        <button
+            type="button"
+            className="wdr-login__eye-btn"
+            onClick={() => setShowConfirmPassword((value) => !value)}
+            aria-label={
+                showConfirmPassword
+                    ? t("auth.password.hide")
+                    : t("auth.password.show")
+            }
+        >{showConfirmPassword ? "HIDE" : "SHOW"}</button>
+    );
 
     const setField =
         (field: keyof FormState) =>
@@ -221,24 +247,26 @@ export const RegisterPage: React.FC = () => {
 
                     <Input
                         label={t("auth.register.password")}
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder={t("auth.register.password_hint")}
                         value={form.password}
                         onChange={setField("password")}
                         error={errors.password}
                         required
                         autoComplete="new-password"
+                        rightIcon={passwordEye}
                     />
 
                     <Input
                         label={t("auth.register.confirm_password")}
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder={t("auth.register.confirm_placeholder")}
                         value={form.confirmPassword}
                         onChange={setField("confirmPassword")}
                         error={errors.confirmPassword}
                         required
                         autoComplete="new-password"
+                        rightIcon={confirmPasswordEye}
                     />
 
                     <label className="wdr-register__checkbox">

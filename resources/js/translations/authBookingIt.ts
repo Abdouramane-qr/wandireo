@@ -88,7 +88,7 @@ export function buildAuthBookingItTranslations(): Record<string, string> {
         "cart.payment_mode.external_redirect.label": "Prenotazione esterna",
         "cart.payment_mode.external_redirect.description":
             "La prenotazione viene finalizzata al di fuori del percorso Wandireo.",
-        "cart.price.partner": "Prezzo del fornitore",
+        "cart.price.partner": "Prezzo base",
         "cart.price.extras": "Extra",
         "cart.price.fees": "Costi di servizio",
         "cart.price.onsite": "Da pagare in loco",

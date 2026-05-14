@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PaymentButton from "@/components/PaymentButton";
 import { Button } from "@/components/wdr";
 import { useBooking } from "@/context/BookingContext";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -81,6 +82,31 @@ export const PaymentPage: React.FC = () => {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const checkoutPayload = {
+        serviceId: draft.service.id,
+        startDate: draft.dateFrom,
+        endDate: draft.dateTo,
+        participants: draft.participants,
+        paymentMode: draft.paymentMode,
+        selectedExtras: draft.selectedExtras.map((extra) => ({
+            id: extra.id,
+            quantity: extra.quantity,
+        })),
+        extrasTotal: draft.extrasTotal,
+        traveler: travelerInfo,
+        notes:
+            [
+                travelerInfo.specialRequests?.trim(),
+                draft.selectedExtras.length > 0
+                    ? `Extras: ${draft.selectedExtras
+                          .map((extra) => extra.name)
+                          .join(", ")}`
+                    : "",
+            ]
+                .filter(Boolean)
+                .join(" | ") || undefined,
     };
 
     return (
@@ -233,20 +259,31 @@ export const PaymentPage: React.FC = () => {
                                 >
                                     {t("payment.back")}
                                 </Button>
-                                <Button
-                                    type="button"
-                                    variant="primary"
-                                    size="lg"
-                                    loading={isSubmitting || isSyncing}
-                                    onClick={handleConfirm}
-                                    disabled={isSyncing}
-                                >
-                                    {isSubmitting
-                                        ? t("payment.confirming")
-                                        : isSyncing
-                                          ? t("payment.verifying")
-                                          : t("payment.confirm")}
-                                </Button>
+                                {draft.amountDueOnline > 0 &&
+                                draft.requiresStripeCheckout !== false ? (
+                                    <PaymentButton
+                                        payload={checkoutPayload}
+                                        disabled={isSyncing}
+                                        idleLabel={t("payment.confirm")}
+                                        loadingLabel={t("payment.confirming")}
+                                        onError={setSubmitError}
+                                    />
+                                ) : (
+                                    <Button
+                                        type="button"
+                                        variant="primary"
+                                        size="lg"
+                                        loading={isSubmitting || isSyncing}
+                                        onClick={handleConfirm}
+                                        disabled={isSyncing}
+                                    >
+                                        {isSubmitting
+                                            ? t("payment.confirming")
+                                            : isSyncing
+                                              ? t("payment.verifying")
+                                              : t("payment.confirm")}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </section>

@@ -89,7 +89,7 @@ export function buildAuthBookingDeTranslations(): Record<string, string> {
         "cart.payment_mode.external_redirect.label": "Externe Buchung",
         "cart.payment_mode.external_redirect.description":
             "Die Buchung wird ausserhalb des Wandireo-Buchungsprozesses abgeschlossen.",
-        "cart.price.partner": "Anbieterpreis",
+        "cart.price.partner": "Grundpreis",
         "cart.price.extras": "Extras",
         "cart.price.fees": "Servicegebuehren",
         "cart.price.onsite": "Vor Ort zu zahlen",

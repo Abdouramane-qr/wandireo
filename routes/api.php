@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AdminServiceStructureController;
-use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SupportController;
@@ -22,7 +23,9 @@ use Illuminate\Support\Facades\Route;
 // Webhooks (public — verified by signature, excluded from CSRF)
 // ============================================================
 
-Route::post('/webhooks/stripe', [WebhookController::class, 'stripe'])
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])
+    ->middleware('throttle:webhooks');
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])
     ->middleware('throttle:webhooks');
 
 // ============================================================
@@ -80,6 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/init',                 [BookingController::class, 'init']);
     Route::post('/bookings/confirm',              [BookingController::class, 'confirm']);
     Route::get('/bookings/mine',                  [BookingController::class, 'mine']);
+    Route::post('/checkout',                      [PaymentController::class, 'checkout']);
+    Route::get('/payments/session/{sessionId}',   [PaymentController::class, 'showBySession']);
 
     // ── Avis ──────────────────────────────────────────────────────────────
     Route::post('/reviews',                       [ReviewController::class, 'store']);

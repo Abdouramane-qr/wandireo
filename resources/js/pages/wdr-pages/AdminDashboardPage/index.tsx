@@ -164,6 +164,10 @@ function getStatusLabel(status: string, t: (key: string) => string): string {
         return t("admin.dashboard.status.confirmed");
     }
 
+    if (status === BookingStatusNames.AWAITING_PAYMENT) {
+        return t("history.status.awaiting_payment");
+    }
+
     if (status === BookingStatusNames.PENDING) {
         return t("admin.dashboard.status.pending");
     }
@@ -174,6 +178,10 @@ function getStatusLabel(status: string, t: (key: string) => string): string {
 function getStatusClass(status: string): string {
     if (status === BookingStatusNames.CONFIRMED) {
         return "confirmed";
+    }
+
+    if (status === BookingStatusNames.AWAITING_PAYMENT) {
+        return "pending";
     }
 
     if (status === BookingStatusNames.PENDING) {

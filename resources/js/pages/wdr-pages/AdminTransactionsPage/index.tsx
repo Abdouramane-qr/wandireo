@@ -8,7 +8,7 @@ import { useAdminUsersData } from "@/hooks/useUsersData";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { formatPrice } from "@/lib/formatters";
 import { BookingStatusNames, PaymentStatusNames } from "@/types/booking";
-import type { PaymentStatus } from "@/types/booking";
+import type { BookingStatus, PaymentStatus } from "@/types/booking";
 import { PaymentModeLabels } from "@/types/service";
 import "./AdminTransactionsPage.css";
 
@@ -51,6 +51,10 @@ function getBookingStatusLabel(
         return t("admin.transactions.booking.confirmed");
     }
 
+    if (status === BookingStatusNames.AWAITING_PAYMENT) {
+        return t("history.status.awaiting_payment");
+    }
+
     if (status === BookingStatusNames.PENDING) {
         return t("admin.transactions.booking.pending");
     }
@@ -61,6 +65,10 @@ function getBookingStatusLabel(
 function getBookingStatusClass(status: string): string {
     if (status === BookingStatusNames.CONFIRMED) {
         return "confirmed";
+    }
+
+    if (status === BookingStatusNames.AWAITING_PAYMENT) {
+        return "pending";
     }
 
     if (status === BookingStatusNames.PENDING) {
@@ -93,18 +101,35 @@ function formatExtrasSummary(entry: {
 export const AdminTransactionsPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
-    const { t, intlLocale } = useTranslation();
-    const { bookings } = useAdminBookingsData();
+    const { t, intlLocale, locale } = useTranslation();
     const { services } = useServicesData({ adminAll: true, limit: 200 });
     const { users } = useAdminUsersData();
 
     const allPartners = users.filter((user) => user.role === "PARTNER");
     const allClients = users.filter((user) => user.role === "CLIENT");
 
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [filterPartner, setFilterPartner] = useState<string>("all");
+    const [filterBookingStatus, setFilterBookingStatus] = useState<
+        BookingStatus | "all"
+    >("all");
     const [filterPaymentStatus, setFilterPaymentStatus] = useState<
         PaymentStatus | "all"
     >("all");
+    const [filterExternalStatus, setFilterExternalStatus] = useState<
+        "all" | "CONFIRMED" | "FAILED" | "NONE"
+    >("all");
+
+    const { bookings } = useAdminBookingsData({
+        q: searchTerm.trim() || undefined,
+        partnerId: filterPartner !== "all" ? filterPartner : undefined,
+        status:
+            filterBookingStatus !== "all" ? filterBookingStatus : undefined,
+        paymentStatus:
+            filterPaymentStatus !== "all" ? filterPaymentStatus : undefined,
+        externalBookingStatus:
+            filterExternalStatus !== "all" ? filterExternalStatus : undefined,
+    });
 
     useEffect(() => {
         if (!currentUser) {
@@ -147,27 +172,7 @@ export const AdminTransactionsPage: React.FC = () => {
         [allClients, allPartners, bookings, services],
     );
 
-    const filteredBookings = useMemo(
-        () =>
-            enrichedBookings.filter((entry) => {
-                if (
-                    filterPartner !== "all" &&
-                    entry.booking.partnerId !== filterPartner
-                ) {
-                    return false;
-                }
-
-                if (
-                    filterPaymentStatus !== "all" &&
-                    entry.booking.paymentStatus !== filterPaymentStatus
-                ) {
-                    return false;
-                }
-
-                return true;
-            }),
-        [enrichedBookings, filterPartner, filterPaymentStatus],
-    );
+    const filteredBookings = enrichedBookings;
 
     const globalTotals = useMemo(() => {
         const confirmed = filteredBookings.filter(
@@ -432,6 +437,33 @@ export const AdminTransactionsPage: React.FC = () => {
 
                     <select
                         className="wdr-admin-tx__filter-select"
+                        value={filterBookingStatus}
+                        onChange={(e) =>
+                            setFilterBookingStatus(
+                                e.target.value as BookingStatus | "all",
+                            )
+                        }
+                        aria-label={t("admin.transactions.filter.booking_status")}
+                    >
+                        <option value="all">
+                            {t("admin.transactions.filter.status_all")}
+                        </option>
+                        <option value={BookingStatusNames.AWAITING_PAYMENT}>
+                            {t("history.status.awaiting_payment")}
+                        </option>
+                        <option value={BookingStatusNames.PENDING}>
+                            {t("admin.transactions.booking.pending")}
+                        </option>
+                        <option value={BookingStatusNames.CONFIRMED}>
+                            {t("admin.transactions.booking.confirmed")}
+                        </option>
+                        <option value={BookingStatusNames.CANCELLED}>
+                            {t("admin.transactions.booking.cancelled")}
+                        </option>
+                    </select>
+
+                    <select
+                        className="wdr-admin-tx__filter-select"
                         value={filterPaymentStatus}
                         onChange={(e) =>
                             setFilterPaymentStatus(
@@ -455,6 +487,45 @@ export const AdminTransactionsPage: React.FC = () => {
                             {t("admin.transactions.payment.refunded")}
                         </option>
                     </select>
+
+                    <select
+                        className="wdr-admin-tx__filter-select"
+                        value={filterExternalStatus}
+                        onChange={(e) =>
+                            setFilterExternalStatus(
+                                e.target.value as
+                                    | "all"
+                                    | "CONFIRMED"
+                                    | "FAILED"
+                                    | "NONE",
+                            )
+                        }
+                        aria-label={t("admin.transactions.filter.provider_status")}
+                    >
+                        <option value="all">
+                            {t("admin.transactions.filter.provider_all")}
+                        </option>
+                        <option value="CONFIRMED">
+                            {t("admin.transactions.external.confirmed")}
+                        </option>
+                        <option value="FAILED">
+                            {t("admin.transactions.external.failed")}
+                        </option>
+                        <option value="NONE">
+                            {t("admin.transactions.external.none")}
+                        </option>
+                    </select>
+
+                    <input
+                        type="search"
+                        className="wdr-admin-tx__filter-select"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        aria-label={t("admin.transactions.filter.search")}
+                        placeholder={t("admin.transactions.filter.search_placeholder")}
+                        inputMode="search"
+                        lang={locale}
+                    />
 
                     <span className="wdr-admin-tx__filter-count">
                         {t("admin.transactions.count").replace(
@@ -627,14 +698,30 @@ export const AdminTransactionsPage: React.FC = () => {
                                                     </code>
                                                 </td>
                                                 <td data-label={t("admin.transactions.col.booking_status")}>
-                                                    <span
-                                                        className={`wdr-admin-tx__status wdr-admin-tx__status--${getBookingStatusClass(booking.status)}`}
-                                                    >
-                                                        {getBookingStatusLabel(
-                                                            booking.status,
-                                                            t,
-                                                        )}
-                                                    </span>
+                                                    <div>
+                                                        <span
+                                                            className={`wdr-admin-tx__status wdr-admin-tx__status--${getBookingStatusClass(booking.status)}`}
+                                                        >
+                                                            {getBookingStatusLabel(
+                                                                booking.status,
+                                                                t,
+                                                            )}
+                                                        </span>
+                                                        {booking.externalBookingStatus ? (
+                                                            <div className="wdr-admin-tx__table-extras">
+                                                                External:{" "}
+                                                                {booking.externalBookingStatus}
+                                                                {booking.externalBookingReference
+                                                                    ? ` · ${booking.externalBookingReference}`
+                                                                    : ""}
+                                                            </div>
+                                                        ) : null}
+                                                        {booking.externalErrorMessage ? (
+                                                            <div className="wdr-admin-tx__table-extras">
+                                                                {booking.externalErrorMessage}
+                                                            </div>
+                                                        ) : null}
+                                                    </div>
                                                 </td>
                                                 <td data-label={t("admin.transactions.col.payment_status")}>
                                                     <span

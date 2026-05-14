@@ -12,6 +12,8 @@
  *   cart                    → /panier
  *   checkout                → /commande
  *   payment                 → /paiement
+ *   payment-success         → /paiement/succes
+ *   payment-cancel          → /paiement/annulation
  *   confirmation (id)       → /confirmation/{id}
  *   dashboard               → /mon-espace
  *   bookings-history        → /mes-reservations
@@ -62,6 +64,8 @@ export type WdrRoute =
     | { name: 'cart' }
     | { name: 'checkout' }
     | { name: 'payment' }
+    | { name: 'payment-success' }
+    | { name: 'payment-cancel' }
     | { name: 'confirmation'; bookingId: string }
     | { name: 'dashboard' }
     | { name: 'bookings-history' }
@@ -132,6 +136,10 @@ p.set('dateTo', wdrRoute.dateTo);
             return '/commande';
         case 'payment':
             return '/paiement';
+        case 'payment-success':
+            return '/paiement/succes';
+        case 'payment-cancel':
+            return '/paiement/annulation';
         case 'confirmation':
             return `/confirmation/${wdrRoute.bookingId}`;
         case 'dashboard':

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\FareHarbor\FareHarborAvailabilityService;
 use App\Services\FareHarbor\FareHarborClient;
 use App\Services\FareHarbor\FareHarborSyncService;
+use App\Services\PartnerContentTranslationService;
 use App\Support\FareHarborDefaultCompanies;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
@@ -616,6 +617,194 @@ class FareHarborIntegrationTest extends TestCase
         $this->assertGreaterThan($afterFirstSync, $counts['translate']);
         $this->assertSame('[de] Sunset Safari', $service->getTranslations('title')['de']);
         $this->assertSame('[it] Watch the cliffs at sunset.', $service->getTranslations('description')['it']);
+    }
+
+    public function test_sync_reuses_existing_non_french_translations_when_a_resync_call_fails(): void
+    {
+        config()->set('services.fast_translate.enabled', true);
+        config()->set('services.fast_translate.base_url', 'https://translate.test/api/v1');
+        config()->set('services.fast_translate.api_key', 'test-key');
+        config()->set('services.fast_translate.timeout', 5);
+
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Seafaris',
+            'company_slug' => 'seafaris',
+            'is_enabled' => true,
+            'sync_items_enabled' => true,
+            'sync_details_enabled' => true,
+        ]);
+
+        $translateAttempts = new \ArrayObject([
+            'sea_safari_es' => 0,
+        ]);
+
+        Http::fake(function (Request $request) use ($translateAttempts) {
+            if (str_ends_with($request->url(), '/detect/')) {
+                return Http::response([
+                    'language' => 'en',
+                    'confidence' => 0.99,
+                ]);
+            }
+
+            if (str_ends_with($request->url(), '/translate/')) {
+                $payload = $request->data();
+
+                if ($payload['text'] === 'Sea Safari' && $payload['target_language'] === 'es') {
+                    $translateAttempts['sea_safari_es']++;
+
+                    if ($translateAttempts['sea_safari_es'] > 1) {
+                        return Http::response([
+                            'detail' => 'Translation not found.',
+                        ], 422);
+                    }
+                }
+
+                return Http::response([
+                    'translated_text' => sprintf(
+                        '[%s] %s',
+                        $payload['target_language'],
+                        $payload['text'],
+                    ),
+                    'source_language' => $payload['source_language'],
+                    'target_language' => $payload['target_language'],
+                ]);
+            }
+
+            return Http::response([], 404);
+        });
+
+        $client = Mockery::mock(FareHarborClient::class);
+        $client->shouldReceive('listItems')
+            ->twice()
+            ->with('seafaris')
+            ->andReturn(
+                [['pk' => 'fh-resilient', 'title' => 'Sea Safari']],
+                [['pk' => 'fh-resilient', 'title' => 'Sea Safari']],
+            );
+        $client->shouldReceive('getItem')
+            ->twice()
+            ->with('seafaris', 'fh-resilient')
+            ->andReturn(
+                [
+                    'item' => [
+                        'pk' => 'fh-resilient',
+                        'name' => 'Sea Safari',
+                        'description' => 'Explore the coast.',
+                        'meeting_point' => 'Lagos Marina',
+                        'included' => ['Life jacket'],
+                        'not_included' => ['Hotel pickup'],
+                        'headline' => 'Golden cruise',
+                        'short_description' => 'Afternoon at sea.',
+                    ],
+                ],
+                [
+                    'item' => [
+                        'pk' => 'fh-resilient',
+                        'name' => 'Sea Safari',
+                        'description' => 'Watch the cliffs at sunset.',
+                        'meeting_point' => 'Lagos Marina',
+                        'included' => ['Life jacket'],
+                        'not_included' => ['Hotel pickup'],
+                        'headline' => 'Sunset escape',
+                        'short_description' => 'Golden hour cruise.',
+                    ],
+                ],
+            );
+
+        $this->app->instance(FareHarborClient::class, $client);
+
+        $syncService = $this->app->make(FareHarborSyncService::class);
+        $syncService->syncCompany($company);
+        $syncService->syncCompany($company);
+
+        $service = Service::query()
+            ->where('source_provider', 'FAREHARBOR')
+            ->where('source_external_id', 'seafaris:fh-resilient')
+            ->firstOrFail();
+
+        $audit = $this->app->make(PartnerContentTranslationService::class)
+            ->auditServiceTranslations($service);
+
+        $this->assertSame('[es] Sea Safari', $service->getTranslations('title')['es']);
+        $this->assertSame('[de] Watch the cliffs at sunset.', $service->getTranslations('description')['de']);
+        $this->assertSame('READY', data_get($service->extra_data, 'translations.status'));
+        $this->assertSame([], $audit['blocking_issues']);
+    }
+
+    public function test_translation_audit_treats_source_match_as_warning_and_allows_benign_titles(): void
+    {
+        $translator = $this->app->make(PartnerContentTranslationService::class);
+
+        $allowed = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'source_external_id' => 'fh-kayak',
+                'title' => [
+                    'fr' => 'Kayak',
+                    'en' => 'Kayak',
+                ],
+                'description' => [
+                    'fr' => 'Description francaise',
+                    'en' => 'English description',
+                ],
+                'extra_data' => [
+                    'translations' => [
+                        'provider' => 'FAREHARBOR',
+                        'status' => 'READY',
+                        'source_locale' => 'en',
+                        'source_hash' => 'kayak-hash',
+                        'fields' => [
+                            'title' => ['fr' => 'Kayak', 'en' => 'Kayak'],
+                            'description' => ['fr' => 'Description francaise', 'en' => 'English description'],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $warning = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'source_external_id' => 'fh-gift-card',
+                'title' => [
+                    'fr' => 'Gift Card',
+                    'en' => 'Gift Card',
+                ],
+                'description' => [
+                    'fr' => 'Treat your loved ones to unforgettable experiences!',
+                    'en' => 'Treat your loved ones to unforgettable experiences!',
+                ],
+                'extra_data' => [
+                    'translations' => [
+                        'provider' => 'FAREHARBOR',
+                        'status' => 'READY',
+                        'source_locale' => 'en',
+                        'source_hash' => 'gift-card-hash',
+                        'fields' => [
+                            'title' => ['fr' => 'Gift Card', 'en' => 'Gift Card'],
+                            'description' => [
+                                'fr' => 'Treat your loved ones to unforgettable experiences!',
+                                'en' => 'Treat your loved ones to unforgettable experiences!',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $allowedAudit = $translator->auditServiceTranslations($allowed);
+        $warningAudit = $translator->auditServiceTranslations($warning);
+
+        $this->assertSame([], $allowedAudit['blocking_issues']);
+        $this->assertSame([], $allowedAudit['warning_issues']);
+        $this->assertSame([], $warningAudit['blocking_issues']);
+        $this->assertSame(
+            ['fr_matches_source_title', 'fr_matches_source_description'],
+            $warningAudit['warning_issues'],
+        );
+        $this->assertFalse($translator->serviceHasIncompleteTranslations($warning));
     }
 
     public function test_sync_assigns_imported_services_to_the_company_partner(): void

@@ -128,6 +128,24 @@ class Service extends Model
             || $this->payment_mode === 'EXTERNAL_REDIRECT';
     }
 
+    public function getCommissionAmountAttribute($value): float
+    {
+        if ($value !== null) {
+            return round((float) $value, 2);
+        }
+
+        return round((float) $this->partner_price * (float) $this->commission_rate, 2);
+    }
+
+    public function getClientPriceAttribute($value): float
+    {
+        if ($value !== null) {
+            return round((float) $value, 2);
+        }
+
+        return round((float) $this->partner_price + $this->commission_amount, 2);
+    }
+
     // ── Méthodes ──────────────────────────────────────────────────────────────
 
     /**

@@ -9,6 +9,7 @@ use App\Models\ServiceCategory;
 use App\Services\PartnerContentTranslationService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class FareHarborSyncService
@@ -52,6 +53,25 @@ class FareHarborSyncService
                 $this->upsertService($company, $item, $detail, $externalId);
                 $seenExternalIds[] = $providerExternalId;
                 $importedCount++;
+            }
+
+            if (! $company->sync_items_enabled) {
+                Service::query()
+                    ->where('source_provider', 'FAREHARBOR')
+                    ->where(function ($query) use ($company) {
+                        foreach ($this->companySlugAliases($company->company_slug) as $slug) {
+                            $query->orWhereJsonContains(
+                                'extra_data->fareharbor->company',
+                                $slug,
+                            );
+                        }
+                    })
+                    ->get()
+                    ->each(fn (Service $service) => $this->touchCalendarSync(
+                        $service,
+                        'SUCCESS',
+                        null,
+                    ));
             }
 
             if ($company->sync_items_enabled) {
@@ -181,6 +201,30 @@ class FareHarborSyncService
             $payload,
         );
 
+        if (
+            ! $company->sync_details_enabled
+            && is_string($payload['title'] ?? null)
+            && is_string($payload['description'] ?? null)
+        ) {
+            Service::query()
+                ->whereKey($service->id)
+                ->update([
+                    'title' => $payload['title'],
+                    'description' => $payload['description'],
+                ]);
+
+            $service->refresh();
+        }
+
+        if ($this->partnerContentTranslator->serviceHasIncompleteTranslations($service)) {
+            Log::warning('Imported partner service remains translation-incomplete after sync.', [
+                'service_id' => $service->id,
+                'provider' => 'FAREHARBOR',
+                'source_external_id' => $service->source_external_id,
+                'issues' => $this->partnerContentTranslator->auditServiceTranslations($service)['issues'],
+            ]);
+        }
+
         $this->touchCalendarSync($service, 'SUCCESS', null);
     }
 
@@ -307,10 +351,18 @@ class FareHarborSyncService
             data_get($overrides, 'fareharbor.shortDescription'),
         );
 
+        $storeRawImportedText = ! $company->sync_details_enabled;
+        $storedTitle = $storeRawImportedText
+            ? (string) data_get($overrides, 'title.fr', $title)
+            : $titleTranslations;
+        $storedDescription = $storeRawImportedText
+            ? (string) data_get($overrides, 'description.fr', $description)
+            : $descriptionTranslations;
+
         return [
             'partner_id' => $company->partner_id,
-            'title' => $titleTranslations,
-            'description' => $descriptionTranslations,
+            'title' => $storedTitle,
+            'description' => $storedDescription,
             'category' => $categoryType,
             'service_category_id' => $this->overrideValue(
                 $overrides,

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Support\Locale;
+use App\Services\ExternalBookings\ExternalBookingGatewayRegistry;
+use App\Services\ExternalBookings\Gateways\FareHarborExternalBookingGateway;
 use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Services\PartnerContent\Provider\FareHarborPartnerContentProvider;
 use Carbon\CarbonImmutable;
@@ -22,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(ExternalBookingGatewayRegistry::class, function ($app) {
+            return new ExternalBookingGatewayRegistry([
+                $app->make(FareHarborExternalBookingGateway::class),
+            ]);
+        });
+
         $this->app->singleton(PartnerContentProviderRegistry::class, function () {
             return new PartnerContentProviderRegistry([
                 new FareHarborPartnerContentProvider(),
@@ -79,6 +88,10 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureUrlGeneration(): void
     {
+        URL::defaults([
+            'locale' => Locale::default(),
+        ]);
+
         if (app()->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

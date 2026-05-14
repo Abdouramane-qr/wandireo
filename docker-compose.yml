@@ -26,6 +26,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      fast-translate:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "SCRIPT_NAME=/up SCRIPT_FILENAME=/var/www/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 >/dev/null 2>&1 || exit 1"]
       interval: 30s
@@ -87,6 +89,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  fast-translate:
+    build:
+      context: ./fast-translate-api-main
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./fast-translate-api-main/.env
+    environment:
+      PYTHONUNBUFFERED: "1"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8900/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   postgres_data:

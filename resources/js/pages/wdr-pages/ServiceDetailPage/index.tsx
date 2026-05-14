@@ -778,6 +778,7 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
             clientTotal,
             currency: service.currency,
             paymentMode: service.paymentMode,
+            requiresStripeCheckout: amountDueOnline > 0,
             amountDueOnline,
             amountDueOnSite,
             selectedExtras,

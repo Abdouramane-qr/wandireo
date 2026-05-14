@@ -8,10 +8,17 @@ use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Support\Locale;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PartnerContentTranslationService
 {
     private const VERSION = 1;
+    private const REQUIRED_TRANS_FIELDS = ['title', 'description'];
+    private const TITLE_SOURCE_MATCH_ALLOWLIST = [
+        'banana',
+        'jet ski',
+        'kayak',
+    ];
 
     public function __construct(
         private readonly FastTranslateClient $client,
@@ -38,8 +45,7 @@ class PartnerContentTranslationService
 
         if (
             ! $force
-            && $sourceHash === (string) data_get($existingState, 'source_hash')
-            && is_array(data_get($existingState, 'fields'))
+            && $this->shouldReuseExistingState($normalizedFields, $existingState, $sourceHash)
         ) {
             return $existingState;
         }
@@ -123,6 +129,113 @@ class PartnerContentTranslationService
             ...$this->providers->legacySourceFields($extraData, $provider),
             ...$normalizedProviderFields,
         ]);
+    }
+
+    /**
+     * @return array{
+     *   provider: string,
+     *   issues: array<int, string>,
+     *   blocking_issues: array<int, string>,
+     *   warning_issues: array<int, string>,
+     *   source_locale: string|null,
+     *   status: string|null
+     * }
+     */
+    public function auditServiceTranslations(Service $service): array
+    {
+        $extraData = is_array($service->extra_data) ? $service->extra_data : [];
+        $translationState = is_array(data_get($extraData, 'translations'))
+            ? data_get($extraData, 'translations')
+            : [];
+        $provider = strtoupper((string) ($service->source_provider ?: data_get($translationState, 'provider', '')));
+        $sourceLocale = Locale::normalize((string) data_get($translationState, 'source_locale', ''));
+        $status = is_string(data_get($translationState, 'status')) ? (string) data_get($translationState, 'status') : null;
+        $sourceFields = $this->extractServiceSourceFields($service);
+        $blockingIssues = [];
+        $warningIssues = [];
+
+        if ($translationState === []) {
+            $blockingIssues[] = 'missing_translation_state';
+        }
+
+        if ($sourceLocale === null) {
+            $blockingIssues[] = 'missing_source_locale';
+        }
+
+        if (! is_string(data_get($translationState, 'source_hash')) || trim((string) data_get($translationState, 'source_hash')) === '') {
+            $blockingIssues[] = 'missing_source_hash';
+        }
+
+        if ($status !== null && $status !== 'READY') {
+            $blockingIssues[] = 'translation_status_' . strtolower($status);
+        }
+
+        foreach (self::REQUIRED_TRANS_FIELDS as $field) {
+            $translations = $field === 'title'
+                ? $service->getTranslations('title')
+                : $service->getTranslations('description');
+
+            if (! isset($translations['fr']) || ! is_string($translations['fr']) || trim($translations['fr']) === '') {
+                $blockingIssues[] = "missing_fr_{$field}";
+            }
+
+            if ($sourceLocale !== null && $sourceLocale !== 'fr') {
+                $sourceValue = $translations[$sourceLocale] ?? null;
+                $frenchValue = $translations['fr'] ?? null;
+
+                if (
+                    is_string($sourceValue)
+                    && is_string($frenchValue)
+                    && trim($sourceValue) !== ''
+                    && trim($frenchValue) !== ''
+                    && trim($sourceValue) === trim($frenchValue)
+                    && ! $this->isAllowedFrenchSourceMatch($field, $sourceValue)
+                ) {
+                    $warningIssues[] = "fr_matches_source_{$field}";
+                }
+            }
+        }
+
+        foreach ($this->providers->stringFields($provider) as $field => $config) {
+            if (! array_key_exists($field, $sourceFields)) {
+                continue;
+            }
+
+            $fieldTranslations = $this->translationField($translationState, $field);
+
+            if (! is_array($fieldTranslations)) {
+                $blockingIssues[] = "missing_field_{$field}";
+            }
+        }
+
+        foreach ($this->providers->listFields($provider) as $field => $config) {
+            if (! array_key_exists($field, $sourceFields)) {
+                continue;
+            }
+
+            $fieldTranslations = $this->translationField($translationState, $field);
+
+            if (! is_array($fieldTranslations)) {
+                $blockingIssues[] = "missing_field_{$field}";
+            }
+        }
+
+        $blockingIssues = array_values(array_unique($blockingIssues));
+        $warningIssues = array_values(array_unique($warningIssues));
+
+        return [
+            'provider' => $provider,
+            'issues' => [...$blockingIssues, ...$warningIssues],
+            'blocking_issues' => $blockingIssues,
+            'warning_issues' => $warningIssues,
+            'source_locale' => $sourceLocale,
+            'status' => $status,
+        ];
+    }
+
+    public function serviceHasIncompleteTranslations(Service $service): bool
+    {
+        return $this->auditServiceTranslations($service)['blocking_issues'] !== [];
     }
 
     /**
@@ -315,7 +428,7 @@ class PartnerContentTranslationService
                 $value,
                 $sourceLocale,
                 $targetLocale,
-                data_get($existingFields, "{$field}.{$targetLocale}"),
+                $this->existingStringFieldTranslation($existingFields, $field, $targetLocale),
                 $errors,
             );
         }
@@ -357,7 +470,7 @@ class PartnerContentTranslationService
                     $value,
                     $sourceLocale,
                     $targetLocale,
-                    data_get($existingFields, "{$field}.{$targetLocale}.{$index}"),
+                    $this->existingListFieldTranslation($existingFields, $field, $targetLocale, $index),
                     $errors,
                 );
             }
@@ -383,21 +496,35 @@ class PartnerContentTranslationService
         mixed $existingFallback,
         array &$errors,
     ): string {
+        $existingTranslation = $this->normalizeString($existingFallback);
+
         if (! $this->client->isEnabled()) {
+            if ($this->canReuseExistingTranslation($targetLocale, $existingTranslation)) {
+                return $existingTranslation;
+            }
+
             $errors[] = [
                 'field' => $field,
                 'locale' => $targetLocale,
                 'message' => 'Translation client disabled.',
             ];
 
-            return is_string($existingFallback) && trim($existingFallback) !== ''
-                ? trim($existingFallback)
-                : $value;
+            return $existingTranslation ?? $value;
         }
 
         try {
             return $this->client->translate($value, $sourceLocale, $targetLocale);
         } catch (\Throwable $exception) {
+            if ($this->canReuseExistingTranslation($targetLocale, $existingTranslation)) {
+                Log::warning('Partner content translation failed and reused the previous translation.', [
+                    'field' => $field,
+                    'target_locale' => $targetLocale,
+                    'message' => $exception->getMessage(),
+                ]);
+
+                return $existingTranslation;
+            }
+
             Log::warning('Partner content translation failed.', [
                 'field' => $field,
                 'target_locale' => $targetLocale,
@@ -410,9 +537,7 @@ class PartnerContentTranslationService
                 'message' => mb_strimwidth($exception->getMessage(), 0, 250, '...'),
             ];
 
-            return is_string($existingFallback) && trim($existingFallback) !== ''
-                ? trim($existingFallback)
-                : $value;
+            return $existingTranslation ?? $value;
         }
     }
 
@@ -425,6 +550,49 @@ class PartnerContentTranslationService
         $normalized = trim($value);
 
         return $normalized === '' ? null : $normalized;
+    }
+
+    private function translationField(array $translationState, string $field): mixed
+    {
+        $fields = data_get($translationState, 'fields');
+
+        if (! is_array($fields)) {
+            return null;
+        }
+
+        return $fields[$field] ?? null;
+    }
+
+    private function existingStringFieldTranslation(array $existingFields, string $field, string $targetLocale): mixed
+    {
+        $translations = $existingFields[$field] ?? null;
+
+        if (! is_array($translations)) {
+            return null;
+        }
+
+        return $translations[$targetLocale] ?? null;
+    }
+
+    private function existingListFieldTranslation(
+        array $existingFields,
+        string $field,
+        string $targetLocale,
+        int $index,
+    ): mixed {
+        $translations = $existingFields[$field] ?? null;
+
+        if (! is_array($translations)) {
+            return null;
+        }
+
+        $localeValues = $translations[$targetLocale] ?? null;
+
+        if (! is_array($localeValues)) {
+            return null;
+        }
+
+        return $localeValues[$index] ?? null;
     }
 
     /**
@@ -459,5 +627,144 @@ class PartnerContentTranslationService
     private function isList(mixed $value): bool
     {
         return is_array($value) && array_is_list($value);
+    }
+
+    /**
+     * @param  array<string, mixed>  $normalizedFields
+     * @param  array<string, mixed>  $existingState
+     */
+    private function shouldReuseExistingState(
+        array $normalizedFields,
+        array $existingState,
+        string $sourceHash,
+    ): bool {
+        if ($sourceHash !== (string) data_get($existingState, 'source_hash')) {
+            return false;
+        }
+
+        $existingFields = data_get($existingState, 'fields');
+
+        if (! is_array($existingFields)) {
+            return false;
+        }
+
+        $sourceLocale = Locale::normalize((string) data_get($existingState, 'source_locale', ''))
+            ?? $this->detectSourceLocale($normalizedFields, []);
+
+        foreach ($normalizedFields as $field => $value) {
+            $translations = $existingFields[$field] ?? null;
+
+            if (is_string($value)) {
+                if (! $this->stringFieldStateLooksReusable($field, $value, $sourceLocale, $translations)) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (is_array($value) && ! $this->listFieldStateLooksReusable($value, $sourceLocale, $translations)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function stringFieldStateLooksReusable(
+        string $field,
+        string $sourceValue,
+        string $sourceLocale,
+        mixed $translations,
+    ): bool {
+        if (! is_array($translations)) {
+            return false;
+        }
+
+        foreach (Locale::supported() as $targetLocale) {
+            $translatedValue = $translations[$targetLocale] ?? null;
+
+            if (! is_string($translatedValue) || trim($translatedValue) === '') {
+                return false;
+            }
+
+            if ($targetLocale === $sourceLocale && trim($translatedValue) !== $sourceValue) {
+                return false;
+            }
+
+            if (
+                $targetLocale !== $sourceLocale
+                && in_array($field, self::REQUIRED_TRANS_FIELDS, true)
+                && $this->looksLikeUntranslatedCopy($sourceValue, $translatedValue)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<int, string>  $sourceValues
+     */
+    private function listFieldStateLooksReusable(
+        array $sourceValues,
+        string $sourceLocale,
+        mixed $translations,
+    ): bool {
+        if (! is_array($translations)) {
+            return false;
+        }
+
+        foreach (Locale::supported() as $targetLocale) {
+            $translatedValues = $translations[$targetLocale] ?? null;
+
+            if (! is_array($translatedValues)) {
+                return false;
+            }
+
+            if ($targetLocale === $sourceLocale && $translatedValues !== $sourceValues) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function looksLikeUntranslatedCopy(string $sourceValue, string $translatedValue): bool
+    {
+        $normalizedSource = trim($sourceValue);
+        $normalizedTranslated = trim($translatedValue);
+
+        if ($normalizedSource === '' || $normalizedTranslated === '') {
+            return false;
+        }
+
+        if ($normalizedSource !== $normalizedTranslated) {
+            return false;
+        }
+
+        return mb_strlen($normalizedSource) >= 20
+            || preg_match('/\s/u', $normalizedSource) === 1;
+    }
+
+    private function canReuseExistingTranslation(string $targetLocale, ?string $existingTranslation): bool
+    {
+        return $existingTranslation !== null && $targetLocale !== 'fr';
+    }
+
+    private function isAllowedFrenchSourceMatch(string $field, string $value): bool
+    {
+        if ($field !== 'title') {
+            return false;
+        }
+
+        $normalized = Str::of($value)
+            ->lower()
+            ->ascii()
+            ->replaceMatches('/[^a-z0-9]+/', ' ')
+            ->squish()
+            ->value();
+
+        return in_array($normalized, self::TITLE_SOURCE_MATCH_ALLOWLIST, true);
     }
 }

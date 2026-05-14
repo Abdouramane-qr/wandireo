@@ -6,13 +6,22 @@ use App\Models\AvailabilitySlot;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\FareHarbor\FareHarborAvailabilityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\TestCase;
 
 class BookingAvailabilityTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+
+        parent::tearDown();
+    }
 
     private function expectedClientPrice(Service $service): float
     {
@@ -132,5 +141,37 @@ class BookingAvailabilityTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('participants');
+    }
+
+    public function test_external_service_init_falls_back_when_provider_is_unavailable(): void
+    {
+        $client = User::factory()->create(['role' => 'CLIENT']);
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'booking_mode' => 'EXTERNAL_REDIRECT',
+                'payment_mode' => 'EXTERNAL_REDIRECT',
+            ]);
+
+        $availability = Mockery::mock(FareHarborAvailabilityService::class);
+        $availability
+            ->shouldReceive('forService')
+            ->once()
+            ->andThrow(new \RuntimeException('provider unavailable'));
+        $this->app->instance(FareHarborAvailabilityService::class, $availability);
+
+        Sanctum::actingAs($client);
+
+        $response = $this->postJson('/api/bookings/init', [
+            'serviceId' => $service->id,
+            'startDate' => now()->addDays(3)->toDateString(),
+            'participants' => 2,
+            'paymentMode' => 'EXTERNAL_REDIRECT',
+        ]);
+
+        $response->assertOk();
+        $this->assertGreaterThan(0, (float) $response->json('amountOnline'));
     }
 }

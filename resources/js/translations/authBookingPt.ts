@@ -87,7 +87,7 @@ export function buildAuthBookingPtTranslations(): Record<string, string> {
         "cart.payment_mode.external_redirect.label": "Reserva externa",
         "cart.payment_mode.external_redirect.description":
             "A reserva é finalizada fora do sistema da Wandireo.",
-        "cart.price.partner": "Preço do fornecedor",
+        "cart.price.partner": "Preço base",
         "cart.price.extras": "Extras",
         "cart.price.fees": "Taxas de serviço",
         "cart.price.onsite": "A pagar no local",

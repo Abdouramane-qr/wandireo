@@ -8,3 +8,725 @@
 #5 /app/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #6 {main}
 "} 
+[2026-04-28 19:13:08] testing.ERROR: Invalid API Key provided: sk_test_*******************_CLE {"userId":1,"exception":"[object] (Stripe\\Exception\\AuthenticationException(code: 0): Invalid API Key provided: sk_test_*******************_CLE at /var/www/vendor/stripe/stripe-php/lib/Exception/ApiErrorException.php:38)
+[stacktrace]
+#0 /var/www/vendor/stripe/stripe-php/lib/ApiRequestor.php(216): Stripe\\Exception\\ApiErrorException::factory('Invalid API Key...', 401, '{\\n  \"error\": {\\n...', Array, Object(Stripe\\Util\\CaseInsensitiveArray), NULL)
+#1 /var/www/vendor/stripe/stripe-php/lib/ApiRequestor.php(175): Stripe\\ApiRequestor::_specificAPIError('{\\n  \"error\": {\\n...', 401, Object(Stripe\\Util\\CaseInsensitiveArray), Array, Array)
+#2 /var/www/vendor/stripe/stripe-php/lib/ApiRequestor.php(556): Stripe\\ApiRequestor->handleErrorResponse('{\\n  \"error\": {\\n...', 401, Object(Stripe\\Util\\CaseInsensitiveArray), Array)
+#3 /var/www/vendor/stripe/stripe-php/lib/ApiRequestor.php(124): Stripe\\ApiRequestor->_interpretResponse('{\\n  \"error\": {\\n...', 401, Object(Stripe\\Util\\CaseInsensitiveArray))
+#4 /var/www/vendor/stripe/stripe-php/lib/ApiOperations/Request.php(78): Stripe\\ApiRequestor->request('post', '/v1/payment_int...', Array, Array)
+#5 /var/www/vendor/stripe/stripe-php/lib/ApiOperations/Create.php(25): Stripe\\ApiResource::_staticRequest('post', '/v1/payment_int...', Array, NULL)
+#6 /var/www/app/Http/Controllers/Api/BookingController.php(87): Stripe\\PaymentIntent::create(Array)
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\Api\\BookingController->init(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(269): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Api\\BookingController), 'init')
+#9 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(215): Illuminate\\Routing\\Route->runController()
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#12 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#13 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#14 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#15 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#17 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#19 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequestUsingNamedLimiter(Object(Illuminate\\Http\\Request), Object(Closure), 'api', Object(Closure))
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'api')
+#22 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#23 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#24 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#25 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->{closure:Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful::handle():25}(Object(Illuminate\\Http\\Request))
+#26 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#27 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#35 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#37 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#40 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#55 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#56 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#57 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#58 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/bookings/i...', Array, Array, Array, Array, '{\"serviceId\":\"0...')
+#59 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/bookings/i...', Array, Array, 0)
+#60 /var/www/tests/Feature/FareHarborIntegrationTest.php(71): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/bookings/i...', Array)
+#61 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\FareHarborIntegrationTest->test_external_fareharbor_service_can_use_the_local_booking_flow_when_price_is_known()
+#62 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#63 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#64 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\FareHarborIntegrationTest))
+#65 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#66 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#67 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#68 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#69 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#70 {main}
+"} 
+[2026-05-09 17:42:12] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0dd5-23c7-71b7-91b3-76a180b21d07","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-09 17:42:12] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e0dd5-23f9-7376-af71-d1b716fcc21c","start_date":"2026-05-10","end_date":"2026-05-10","participants":2,"error":"provider unavailable"} 
+[2026-05-09 17:42:12] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0dd5-23ff-729f-8655-bd4d157a4f95","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-09 17:42:12] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0dd5-2413-7035-a6dd-6ebba8780ca5","session_id":"cs_test_paid"} 
+[2026-05-09 17:42:12] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-09 17:42:45] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0dd5-a2bc-702c-a8c2-eb5f233b980d","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-09 17:42:45] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e0dd5-a2d9-71d8-82a9-88e55b33b0f0","start_date":"2026-05-10","end_date":"2026-05-10","participants":2,"error":"provider unavailable"} 
+[2026-05-09 17:42:45] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0dd5-a2df-7301-9251-e7494d53dca2","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-09 17:42:45] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0dd5-a2ef-731c-9c59-24ad154f40b1","session_id":"cs_test_paid"} 
+[2026-05-09 17:42:45] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0dd5-a306-70cd-a37e-e1465d90a72c","session_id":"cs_test_external_paid"} 
+[2026-05-09 17:42:45] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e0dd5-a31c-7390-9bcb-1607864586f5","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-09 17:42:45] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0dd5-a336-72fe-bbe2-da0af935992a","session_id":"cs_test_external_idempotent"} 
+[2026-05-09 17:42:45] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-09 17:42:45] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-09 18:35:41] testing.INFO: external_booking.created {"booking_id":"019e0e06-19ea-7198-a92e-745fcef550cb","service_id":"019e0e06-19e5-7151-ab74-08ee285fca5f","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-09 18:35:41] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0e06-1a6c-7319-acd6-98bb92e252b1","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-09 18:35:41] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e0e06-1a82-7281-9577-1e7a0c924b21","start_date":"2026-05-10","end_date":"2026-05-10","participants":2,"error":"provider unavailable"} 
+[2026-05-09 18:35:41] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0e06-1a89-7138-920f-7dd7ba0962d6","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-09 18:35:41] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e06-1aa0-73b3-ab72-556d302e4624","session_id":"cs_test_paid"} 
+[2026-05-09 18:35:41] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e06-1ab7-7013-b58c-09928d32b61a","session_id":"cs_test_external_paid"} 
+[2026-05-09 18:35:41] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e0e06-1ad1-72c2-8862-b1b199194a7a","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-09 18:35:41] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e06-1aeb-73fe-aa04-587344a48d51","session_id":"cs_test_external_idempotent"} 
+[2026-05-09 18:35:41] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-09 18:35:41] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-09 18:37:16] testing.INFO: external_booking.created {"booking_id":"019e0e07-8ed2-703b-88f1-f3f645631ab7","service_id":"019e0e07-8ed0-72fc-9cc1-bae07bca1f4d","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-09 18:37:16] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0e07-8f32-710b-9e3e-39773ac035f2","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-09 18:37:16] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e0e07-8f43-73f1-8e7f-5cb6de4a0ca8","start_date":"2026-05-10","end_date":"2026-05-10","participants":2,"error":"provider unavailable"} 
+[2026-05-09 18:37:17] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e0e07-8f48-735d-a160-d3f3d23d6acc","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-09 18:37:17] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e07-8f5e-7078-a60a-0e5a91908cbd","session_id":"cs_test_paid"} 
+[2026-05-09 18:37:17] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e07-8f75-7381-9c92-b4fe3e7cc7b0","session_id":"cs_test_external_paid"} 
+[2026-05-09 18:37:17] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e0e07-8f88-70fd-a11a-e09193c4e7cc","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-09 18:37:17] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e0e07-8f9d-7049-96f6-576901e0221e","session_id":"cs_test_external_idempotent"} 
+[2026-05-09 18:37:17] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-09 18:37:17] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 18:13:41] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1318-518c-713a-a3d9-bba5ef11c5e2","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 18:13:41] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1318-51ce-7218-9d5c-22813ab09e00","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 18:13:41] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1318-51d5-7186-8f20-eba0682fa438","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:17:42] testing.ERROR: The HTTP status code "0" is not valid. {"exception":"[object] (InvalidArgumentException(code: 0): The HTTP status code \"0\" is not valid. at /var/www/vendor/symfony/http-foundation/Response.php:480)
+[stacktrace]
+#0 /var/www/vendor/symfony/http-foundation/Response.php(206): Symfony\\Component\\HttpFoundation\\Response->setStatusCode(0)
+#1 /var/www/vendor/symfony/http-foundation/RedirectResponse.php(37): Symfony\\Component\\HttpFoundation\\Response->__construct('', 0, Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(210): Symfony\\Component\\HttpFoundation\\RedirectResponse->__construct('https://tripano...', 0, Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(113): Illuminate\\Routing\\Redirector->createRedirect('https://tripano...', false, Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(153): Illuminate\\Routing\\Redirector->to('https://tripano...', false, Array)
+#5 /var/www/app/Http/Responses/FortifyPasswordResetResponse.php(22): Illuminate\\Routing\\Redirector->route('login', Array, false)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(921): App\\Http\\Responses\\FortifyPasswordResetResponse->toResponse(Object(Illuminate\\Http\\Request))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(906): Illuminate\\Routing\\Router::toResponse(Object(Illuminate\\Http\\Request), Object(App\\Http\\Responses\\FortifyPasswordResetResponse))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Routing\\Router->prepareResponse(Object(Illuminate\\Http\\Request), Object(App\\Http\\Responses\\FortifyPasswordResetResponse))
+#9 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/RedirectIfAuthenticated.php(47): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\RedirectIfAuthenticated->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'web')
+#12 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#13 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#14 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/AddLinkHeadersForPreloadedAssets.php(32): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#15 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\AddLinkHeadersForPreloadedAssets->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 /var/www/app/Http/Middleware/HandleAppearance.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#17 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\HandleAppearance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#19 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#23 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 /var/www/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#25 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 /var/www/vendor/inertiajs/inertia-laravel/src/Middleware.php(138): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#27 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest(Object(Illuminate\\Http\\Request), Object(Illuminate\\Session\\Store), Object(Closure))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Session\\Middleware\\StartSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#37 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#38 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#40 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#55 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#56 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#57 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#58 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#59 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#60 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#61 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#62 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#63 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#64 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(397): Illuminate\\Foundation\\Testing\\TestCase->call('POST', 'https://tripano...', Array, Array, Array, Array)
+#65 /var/www/tests/Feature/Auth/PasswordResetTest.php(67): Illuminate\\Foundation\\Testing\\TestCase->post('https://tripano...', Array, Array)
+#66 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(261): Tests\\Feature\\Auth\\PasswordResetTest->{closure:Tests\\Feature\\Auth\\PasswordResetTest::test_password_can_be_reset_with_valid_token():66}(Object(Illuminate\\Auth\\Notifications\\ResetPassword), Array, Object(App\\Models\\User), NULL)
+#67 [internal function]: Illuminate\\Support\\Testing\\Fakes\\NotificationFake->{closure:Illuminate\\Support\\Testing\\Fakes\\NotificationFake::sent():261}(Array, 0)
+#68 /var/www/vendor/laravel/framework/src/Illuminate/Collections/Arr.php(1240): array_filter(Array, Object(Closure), 1)
+#69 /var/www/vendor/laravel/framework/src/Illuminate/Collections/Collection.php(415): Illuminate\\Support\\Arr::where(Array, Object(Closure))
+#70 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(260): Illuminate\\Support\\Collection->filter(Object(Closure))
+#71 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(90): Illuminate\\Support\\Testing\\Fakes\\NotificationFake->sent(Object(App\\Models\\User), 'Illuminate\\\\Auth...', Object(Closure))
+#72 /var/www/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Support\\Testing\\Fakes\\NotificationFake->assertSentTo(Object(App\\Models\\User), 'Illuminate\\\\Auth...', Object(Closure))
+#73 /var/www/tests/Feature/Auth/PasswordResetTest.php(66): Illuminate\\Support\\Facades\\Facade::__callStatic('assertSentTo', Array)
+#74 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\Auth\\PasswordResetTest->test_password_can_be_reset_with_valid_token()
+#75 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#76 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#77 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Auth\\PasswordResetTest))
+#78 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#79 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#80 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#81 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#82 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#83 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#84 {main}
+"} 
+[2026-05-10 20:17:43] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1389-df4f-72ba-99b5-1262ef5dbbc7","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:17:43] testing.INFO: external_booking.created {"booking_id":"019e1389-dfca-7024-92c5-e0390793d781","service_id":"019e1389-dfc9-7196-b3c3-0497237103aa","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-10 20:21:04] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e138c-f023-7200-97fa-97f25fe58160","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:21:04] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e138c-f062-7284-a560-61e6d0897740","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:21:04] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e138c-f069-7245-841d-93a87a450427","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:24:06] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e138f-b97f-72e1-8b31-21c65555825f","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:24:06] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e138f-b9c0-73fb-9384-1ab0f1c2a47e","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:24:06] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e138f-b9d6-7209-8bc6-00f1d2d31731","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:24:06] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e138f-ba48-7144-89d7-838cde55e0b0","session_id":"cs_test_paid"} 
+[2026-05-10 20:24:07] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e138f-ba68-70bc-b401-4393248f353b","session_id":"cs_test_external_paid"} 
+[2026-05-10 20:24:07] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e138f-ba7f-70f0-be79-4f6467011035","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 20:24:07] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e138f-ba97-73d5-a728-f8e90445b722","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 20:24:07] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 20:24:07] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 20:24:53] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1390-70a6-70bb-bf54-d63d84f7e1ad","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:24:53] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1390-70bb-70ad-9083-97dfc34d481e","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:24:53] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1390-70c2-7167-8255-a1720c3490ad","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:24:53] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1390-7101-7203-9e0a-6fd64bd73db2","session_id":"cs_test_paid"} 
+[2026-05-10 20:24:53] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1390-7116-70c0-a9b4-80bc21c8b052","session_id":"cs_test_external_paid"} 
+[2026-05-10 20:24:53] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1390-712a-7159-becb-80eb079514fa","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 20:24:53] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1390-713d-726d-9dc6-aa897bb2a88d","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 20:24:53] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 20:24:53] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 20:29:49] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1394-f3e6-7318-bc40-fdcaff7c495e","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:29:49] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1394-f3f9-70eb-9832-76985414a9f1","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:29:49] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1394-f3ff-71f9-b1e0-d9cc422baaa8","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:29:49] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1394-f43c-70b3-aedd-5b47c4fff2ef","session_id":"cs_test_paid"} 
+[2026-05-10 20:29:49] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1394-f44f-71df-9e40-8c3c44e2c331","session_id":"cs_test_external_paid"} 
+[2026-05-10 20:29:49] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1394-f462-70d1-b507-55546c80f5de","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 20:29:49] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1394-f476-712e-8f27-9b3fd0735cf2","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 20:29:49] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 20:29:49] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 20:30:40] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1395-ba95-71f8-9fbb-85cbb6a89054","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:30:40] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1395-bab7-73d7-a509-5e054a842b21","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:30:40] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1395-babd-737c-8e5d-06353b30c109","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:30:40] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1395-bafc-72c7-bc72-540fddec4f70","session_id":"cs_test_paid"} 
+[2026-05-10 20:30:40] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1395-bb19-7223-8bdc-14360ce636e3","session_id":"cs_test_external_paid"} 
+[2026-05-10 20:30:40] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1395-bb32-72d3-9805-9c154152aea6","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 20:30:40] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1395-bb4e-72d7-99aa-635544eee56b","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 20:30:40] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 20:30:40] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 20:31:00] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1396-0b56-7200-a96d-cc6219d6f4b5","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:31:00] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1396-0b73-73a9-bd12-f2395a738805","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 20:31:00] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1396-0b7c-724e-8e59-64c1e47c5f64","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 20:31:01] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1396-0bcb-71e7-b470-6b4333d7789f","session_id":"cs_test_paid"} 
+[2026-05-10 20:31:01] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1396-0be5-7132-ac54-21560dc78b7d","session_id":"cs_test_external_paid"} 
+[2026-05-10 20:31:01] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1396-0bfd-7359-9256-02c2a5d335be","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 20:31:01] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1396-0c1a-7049-8223-2c6c646ac532","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 20:31:01] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 20:31:01] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 20:44:39] testing.ERROR: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: bookings.partner_id (Connection: sqlite, Database: :memory:, SQL: insert into "bookings" ("client_id", "partner_id", "service_id", "status", "payment_status", "start_date", "end_date", "participants", "unit_price", "total_price", "currency", "payment_mode", "amount_paid_online", "extra_data", "stripe_payment_intent_id", "notes", "id", "updated_at", "created_at") values (1, ?, 019e13a2-89f6-729f-a810-5327e80be7db, AWAITING_PAYMENT, PENDING, 2026-05-13 00:00:00, ?, 2, 120, 240, EUR, FULL_ONLINE, 240, {"selected_extras":[],"extras_total":0,"pricing":{"quantity":2,"partner_unit_price":100,"partner_subtotal":200,"commission_total":40,"client_total":240,"client_unit_price":120,"applied_rules":[]}}, ?, ?, 019e13a2-8a2a-7047-9b87-a93e6fed56d0, 2026-05-10 20:44:39, 2026-05-10 20:44:39)) {"userId":1,"exception":"[object] (Illuminate\\Database\\QueryException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: bookings.partner_id (Connection: sqlite, Database: :memory:, SQL: insert into \"bookings\" (\"client_id\", \"partner_id\", \"service_id\", \"status\", \"payment_status\", \"start_date\", \"end_date\", \"participants\", \"unit_price\", \"total_price\", \"currency\", \"payment_mode\", \"amount_paid_online\", \"extra_data\", \"stripe_payment_intent_id\", \"notes\", \"id\", \"updated_at\", \"created_at\") values (1, ?, 019e13a2-89f6-729f-a810-5327e80be7db, AWAITING_PAYMENT, PENDING, 2026-05-13 00:00:00, ?, 2, 120, 240, EUR, FULL_ONLINE, 240, {\"selected_extras\":[],\"extras_total\":0,\"pricing\":{\"quantity\":2,\"partner_unit_price\":100,\"partner_subtotal\":200,\"commission_total\":40,\"client_total\":240,\"client_unit_price\":120,\"applied_rules\":[]}}, ?, ?, 019e13a2-8a2a-7047-9b87-a93e6fed56d0, 2026-05-10 20:44:39, 2026-05-10 20:44:39)) at /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php:841)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(797): Illuminate\\Database\\Connection->runQueryCallback('insert into \"bo...', Array, Object(Closure))
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(576): Illuminate\\Database\\Connection->run('insert into \"bo...', Array, Object(Closure))
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(540): Illuminate\\Database\\Connection->statement('insert into \"bo...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4153): Illuminate\\Database\\Connection->insert('insert into \"bo...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2242): Illuminate\\Database\\Query\\Builder->insert(Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1507): Illuminate\\Database\\Eloquent\\Builder->__call('insert', Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1300): Illuminate\\Database\\Eloquent\\Model->performInsert(Object(Illuminate\\Database\\Eloquent\\Builder))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1224): Illuminate\\Database\\Eloquent\\Model->save()
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1223}(Object(App\\Models\\Booking))
+#9 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1223): tap(Object(App\\Models\\Booking), Object(Closure))
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create(Array)
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2723): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'create', Array)
+#12 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2739): Illuminate\\Database\\Eloquent\\Model->__call('create', Array)
+#13 /var/www/app/Http/Controllers/Api/BookingController.php(198): Illuminate\\Database\\Eloquent\\Model::__callStatic('create', Array)
+#14 /var/www/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\\Http\\Controllers\\Api\\BookingController->{closure:App\\Http\\Controllers\\Api\\BookingController::confirm():177}(Object(Illuminate\\Database\\SQLiteConnection))
+#15 /var/www/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(496): Illuminate\\Database\\Connection->transaction(Object(Closure))
+#16 /var/www/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Database\\DatabaseManager->__call('transaction', Array)
+#17 /var/www/app/Http/Controllers/Api/BookingController.php(177): Illuminate\\Support\\Facades\\Facade::__callStatic('transaction', Array)
+#18 /var/www/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\Api\\BookingController->confirm(Object(Illuminate\\Http\\Request))
+#19 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(269): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Api\\BookingController), 'confirm')
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(215): Illuminate\\Routing\\Route->runController()
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#22 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#23 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#24 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#26 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequestUsingNamedLimiter(Object(Illuminate\\Http\\Request), Object(Closure), 'api', Object(Closure))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'api')
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#35 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->{closure:Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful::handle():25}(Object(Illuminate\\Http\\Request))
+#37 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#38 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#55 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#56 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#57 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#58 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#59 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#60 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#61 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#62 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#63 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#64 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#65 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#66 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#67 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#68 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#69 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/bookings/c...', Array, Array, Array, Array, '{\"serviceId\":\"0...')
+#70 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/bookings/c...', Array, Array, 0)
+#71 /var/www/tests/Feature/FareHarborIntegrationTest.php(80): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/bookings/c...', Array)
+#72 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\FareHarborIntegrationTest->test_external_fareharbor_service_can_use_the_local_booking_flow_when_price_is_known()
+#73 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#74 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#75 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\FareHarborIntegrationTest))
+#76 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#77 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#78 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#79 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#80 /var/www/vendor/bin/phpunit(122): include('/var/www/vendor...')
+#81 {main}
+
+[previous exception] [object] (PDOException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: bookings.partner_id at /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php:587)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(587): PDOStatement->execute()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(830): Illuminate\\Database\\Connection->{closure:Illuminate\\Database\\Connection::statement():576}('insert into \"bo...', Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(797): Illuminate\\Database\\Connection->runQueryCallback('insert into \"bo...', Array, Object(Closure))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(576): Illuminate\\Database\\Connection->run('insert into \"bo...', Array, Object(Closure))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Database/Connection.php(540): Illuminate\\Database\\Connection->statement('insert into \"bo...', Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4153): Illuminate\\Database\\Connection->insert('insert into \"bo...', Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2242): Illuminate\\Database\\Query\\Builder->insert(Array)
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1507): Illuminate\\Database\\Eloquent\\Builder->__call('insert', Array)
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1300): Illuminate\\Database\\Eloquent\\Model->performInsert(Object(Illuminate\\Database\\Eloquent\\Builder))
+#9 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1224): Illuminate\\Database\\Eloquent\\Model->save()
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1223}(Object(App\\Models\\Booking))
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1223): tap(Object(App\\Models\\Booking), Object(Closure))
+#12 /var/www/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create(Array)
+#13 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2723): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'create', Array)
+#14 /var/www/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2739): Illuminate\\Database\\Eloquent\\Model->__call('create', Array)
+#15 /var/www/app/Http/Controllers/Api/BookingController.php(198): Illuminate\\Database\\Eloquent\\Model::__callStatic('create', Array)
+#16 /var/www/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\\Http\\Controllers\\Api\\BookingController->{closure:App\\Http\\Controllers\\Api\\BookingController::confirm():177}(Object(Illuminate\\Database\\SQLiteConnection))
+#17 /var/www/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(496): Illuminate\\Database\\Connection->transaction(Object(Closure))
+#18 /var/www/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Database\\DatabaseManager->__call('transaction', Array)
+#19 /var/www/app/Http/Controllers/Api/BookingController.php(177): Illuminate\\Support\\Facades\\Facade::__callStatic('transaction', Array)
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\Api\\BookingController->confirm(Object(Illuminate\\Http\\Request))
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(269): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Api\\BookingController), 'confirm')
+#22 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(215): Illuminate\\Routing\\Route->runController()
+#23 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#24 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#25 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#26 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequestUsingNamedLimiter(Object(Illuminate\\Http\\Request), Object(Closure), 'api', Object(Closure))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'api')
+#35 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#37 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#38 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->{closure:Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful::handle():25}(Object(Illuminate\\Http\\Request))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#40 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#55 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#56 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#57 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#58 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#59 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#60 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#61 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#62 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#63 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#64 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#65 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#66 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#67 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#68 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#69 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#70 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#71 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/bookings/c...', Array, Array, Array, Array, '{\"serviceId\":\"0...')
+#72 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/bookings/c...', Array, Array, 0)
+#73 /var/www/tests/Feature/FareHarborIntegrationTest.php(80): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/bookings/c...', Array)
+#74 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\FareHarborIntegrationTest->test_external_fareharbor_service_can_use_the_local_booking_flow_when_price_is_known()
+#75 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#76 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#77 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\FareHarborIntegrationTest))
+#78 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#79 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#80 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#81 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#82 /var/www/vendor/bin/phpunit(122): include('/var/www/vendor...')
+#83 {main}
+"} 
+[2026-05-10 20:44:39] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13a2-8a7f-7200-8e95-ff15c0ac8bc0","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 20:45:16] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 20:51:06] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13a8-722e-7360-83b7-7f0ed711f87e","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 20:51:26] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 20:52:08] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13a9-63d7-7144-aead-00161d9ad50a","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 20:52:15] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13a9-7ebd-7208-9c68-868ca11c8f81","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:52:20] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13a9-8ff1-72fa-93ff-a5ad70109c88","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:52:27] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 20:52:31] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13a9-bb23-70bd-807e-80967d2acee3","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:52:35] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13a9-cbcf-73b3-8cef-6674dac7af94","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:52:35] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13a9-cbcf-73b3-8cef-6674dac7af94","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:54:36] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13ab-a4ed-70c5-b1dd-bfaa050fd8ae","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 20:54:41] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ab-b6f3-7013-9326-bad059eda3c3","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:54:44] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ab-c4de-7344-9913-9ddb8fa2d53d","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:54:52] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 20:54:56] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ab-f27b-7224-a20f-f51632b37af0","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:55:00] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ac-0336-715b-9bda-d8ef1f1c8d5f","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:55:00] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ac-0336-715b-9bda-d8ef1f1c8d5f","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:55:48] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13ac-bec8-7339-80c0-2af190fa3354","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 20:55:52] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ac-cbd3-70f7-9600-94e35b522445","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:56:02] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ac-f3d2-71b7-9f74-7fcdef2122f8","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:56:09] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 20:56:13] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ad-2022-70cb-88ed-bdb83ae7797f","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:56:17] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ad-3065-72ac-b5f6-ca9903c775d2","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:56:17] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13ad-3065-72ac-b5f6-ca9903c775d2","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 20:59:11] testing.ERROR: The HTTP status code "0" is not valid. {"exception":"[object] (InvalidArgumentException(code: 0): The HTTP status code \"0\" is not valid. at /var/www/vendor/symfony/http-foundation/Response.php:480)
+[stacktrace]
+#0 /var/www/vendor/symfony/http-foundation/Response.php(206): Symfony\\Component\\HttpFoundation\\Response->setStatusCode(0)
+#1 /var/www/vendor/symfony/http-foundation/RedirectResponse.php(37): Symfony\\Component\\HttpFoundation\\Response->__construct('', 0, Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(210): Symfony\\Component\\HttpFoundation\\RedirectResponse->__construct('https://tripano...', 0, Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(113): Illuminate\\Routing\\Redirector->createRedirect('https://tripano...', false, Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Redirector.php(153): Illuminate\\Routing\\Redirector->to('https://tripano...', false, Array)
+#5 /var/www/app/Http/Responses/FortifyPasswordResetResponse.php(22): Illuminate\\Routing\\Redirector->route('login', Array, false)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(921): App\\Http\\Responses\\FortifyPasswordResetResponse->toResponse(Object(Illuminate\\Http\\Request))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(906): Illuminate\\Routing\\Router::toResponse(Object(Illuminate\\Http\\Request), Object(App\\Http\\Responses\\FortifyPasswordResetResponse))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Routing\\Router->prepareResponse(Object(Illuminate\\Http\\Request), Object(App\\Http\\Responses\\FortifyPasswordResetResponse))
+#9 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/RedirectIfAuthenticated.php(47): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\RedirectIfAuthenticated->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'web')
+#12 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#13 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#14 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/AddLinkHeadersForPreloadedAssets.php(32): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#15 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\AddLinkHeadersForPreloadedAssets->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 /var/www/app/Http/Middleware/HandleAppearance.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#17 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\HandleAppearance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#19 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#23 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 /var/www/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#25 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 /var/www/vendor/inertiajs/inertia-laravel/src/Middleware.php(138): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#27 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest(Object(Illuminate\\Http\\Request), Object(Illuminate\\Session\\Store), Object(Closure))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Session\\Middleware\\StartSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#37 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#38 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#40 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#55 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#56 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#57 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#58 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#59 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#60 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#61 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#62 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#63 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#64 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(397): Illuminate\\Foundation\\Testing\\TestCase->call('POST', 'https://tripano...', Array, Array, Array, Array)
+#65 /var/www/tests/Feature/Auth/PasswordResetTest.php(67): Illuminate\\Foundation\\Testing\\TestCase->post('https://tripano...', Array, Array)
+#66 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(261): Tests\\Feature\\Auth\\PasswordResetTest->{closure:Tests\\Feature\\Auth\\PasswordResetTest::test_password_can_be_reset_with_valid_token():66}(Object(Illuminate\\Auth\\Notifications\\ResetPassword), Array, Object(App\\Models\\User), NULL)
+#67 [internal function]: Illuminate\\Support\\Testing\\Fakes\\NotificationFake->{closure:Illuminate\\Support\\Testing\\Fakes\\NotificationFake::sent():261}(Array, 0)
+#68 /var/www/vendor/laravel/framework/src/Illuminate/Collections/Arr.php(1240): array_filter(Array, Object(Closure), 1)
+#69 /var/www/vendor/laravel/framework/src/Illuminate/Collections/Collection.php(415): Illuminate\\Support\\Arr::where(Array, Object(Closure))
+#70 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(260): Illuminate\\Support\\Collection->filter(Object(Closure))
+#71 /var/www/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php(90): Illuminate\\Support\\Testing\\Fakes\\NotificationFake->sent(Object(App\\Models\\User), 'Illuminate\\\\Auth...', Object(Closure))
+#72 /var/www/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Support\\Testing\\Fakes\\NotificationFake->assertSentTo(Object(App\\Models\\User), 'Illuminate\\\\Auth...', Object(Closure))
+#73 /var/www/tests/Feature/Auth/PasswordResetTest.php(66): Illuminate\\Support\\Facades\\Facade::__callStatic('assertSentTo', Array)
+#74 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\Auth\\PasswordResetTest->test_password_can_be_reset_with_valid_token()
+#75 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#76 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#77 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Auth\\PasswordResetTest))
+#78 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#79 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#80 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#81 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#82 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#83 /var/www/vendor/bin/phpunit(122): include('/var/www/vendor...')
+#84 {main}
+"} 
+[2026-05-10 21:06:48] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13b6-cf61-71ad-a152-a5e4ccb4cac9","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:10:44] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13ba-6be2-7332-ae42-b02c572332ed","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:16:08] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13bf-5b9f-7213-b861-7a4bcbdc11fc","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:16:08] testing.INFO: external_booking.created {"booking_id":"019e13bf-5c2f-7061-a19e-3990d9cb795f","service_id":"019e13bf-5c2d-70da-b94e-e8fdcace172b","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-10 21:16:08] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13bf-5cb0-72e3-8a77-03e7a48c4f5a","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 21:16:12] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13bf-6a74-70a6-94d3-1bfe0f4d0d40","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:16:17] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13bf-7e65-7347-8459-1086e02f4c17","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:16:25] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 21:16:28] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13bf-ab83-700b-bfd9-1fafcff11e3f","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:16:31] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13bf-b5cc-72f0-b06d-14101cd0a2c5","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:16:31] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13bf-b5cc-72f0-b06d-14101cd0a2c5","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:16:32] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e13bf-b8f0-70bf-a4d5-d3bae86cda54","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 21:16:32] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13bf-b903-72be-8b1e-8b8b1f6604b7","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:16:32] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e13bf-b909-721d-a7e8-f8f2c5827adc","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 21:16:32] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13bf-b94d-734b-a598-f54f7f638c7c","session_id":"cs_test_paid"} 
+[2026-05-10 21:16:32] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13bf-b96b-7372-8d8b-f2d19b735a1c","session_id":"cs_test_external_paid"} 
+[2026-05-10 21:16:32] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e13bf-b97f-72e9-a520-5d8af6a79838","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 21:16:32] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13bf-b993-73cc-9a2a-85c1ff632bd0","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 21:16:32] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 21:16:32] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-10 21:17:17] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13c0-6a5c-73dc-979d-1a927939013d","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 21:17:21] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c0-7841-73f4-93da-653705ea035e","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:17:25] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c0-872f-73f5-a3da-024423563175","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:17:31] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 21:17:34] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c0-ad38-72bc-a495-2529dd187d12","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:17:38] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c0-b96b-71ae-9b17-9a463e1b4b6d","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:17:38] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c0-b96b-71ae-9b17-9a463e1b4b6d","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:14] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13c1-49bd-7119-90ad-2de37ec49fdf","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:18:15] testing.INFO: external_booking.created {"booking_id":"019e13c1-4a50-7370-97e0-d8fba12a9dff","service_id":"019e13c1-4a4f-7178-ad69-1f6dc0b28644","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-10 21:18:15] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e13c1-4acb-73c6-ba08-25bc965ea95c","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-10 21:18:20] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c1-5e36-7160-9faf-7307f6e7ee23","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:23] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c1-6c94-7261-875c-68f49917887b","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:30] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-10 21:18:34] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c1-95c3-7245-af45-4fe0dca8b185","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:38] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c1-a537-739f-a666-2a27b2773c52","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:38] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e13c1-a537-739f-a666-2a27b2773c52","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-10 21:18:39] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e13c1-a87b-7019-b3f4-449848bb7818","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-10 21:18:39] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e13c1-a88e-733c-af1e-062e216bf2e2","start_date":"2026-05-11","end_date":"2026-05-11","participants":2,"error":"provider unavailable"} 
+[2026-05-10 21:18:39] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e13c1-a894-7317-a662-f825aee2f9c6","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-10 21:18:39] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13c1-a8db-7256-8f19-7e85d3df7f71","session_id":"cs_test_paid"} 
+[2026-05-10 21:18:39] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13c1-a8f8-7181-9ed0-fa98425385f3","session_id":"cs_test_external_paid"} 
+[2026-05-10 21:18:39] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e13c1-a90f-709a-99ff-4d14642216b2","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-10 21:18:39] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e13c1-a925-7067-b46d-06dae764d60d","session_id":"cs_test_external_idempotent"} 
+[2026-05-10 21:18:39] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-10 21:18:39] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-12 12:05:44] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c14-2afe-73f9-9269-4ee1ceea2a16","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 12:05:44] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c14-2b44-712b-b6b3-dc3709190e91","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 12:05:44] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c14-2b4d-7254-9f17-4feb0adbbe9f","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 12:05:44] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c14-2b9f-7354-87dd-3ac4db0c027e","session_id":"cs_test_paid"} 
+[2026-05-12 12:05:44] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c14-2bca-720c-91d5-925527082be8","session_id":"cs_test_external_paid"} 
+[2026-05-12 12:05:44] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1c14-2beb-710f-be29-4e506a148adc","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-12 12:05:44] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c14-2c09-72bf-8006-be99adc7918c","session_id":"cs_test_external_idempotent"} 
+[2026-05-12 12:05:44] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-12 12:05:44] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-12 12:05:44] testing.INFO: external_booking.created {"booking_id":"019e1c14-2c6a-724d-87ac-ef51973f888d","service_id":"019e1c14-2c69-725f-81c5-824691686744","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-12 12:05:44] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c14-2d59-72a3-baa6-e3eaa6682615","start_date":"2026-05-15","end_date":"2026-05-15","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:35:25] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c66-466b-715f-8d24-01b0308d98ef","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:35:25] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c66-468b-72f2-af2a-e153773feba7","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:35:25] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c66-4692-725a-990a-98be8d6d1916","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:35:25] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c66-46d1-71e6-9a0e-cacc4d0c0aee","session_id":"cs_test_paid"} 
+[2026-05-12 13:35:25] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c66-46ef-731d-bbfd-14c1ffeaaa9b","session_id":"cs_test_external_paid"} 
+[2026-05-12 13:35:25] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1c66-470b-7134-bc1b-b06c9bb58448","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-12 13:35:25] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c66-472c-706e-b05d-7ededd7b2393","session_id":"cs_test_external_idempotent"} 
+[2026-05-12 13:35:25] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-12 13:35:25] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-12 13:35:25] testing.INFO: external_booking.created {"booking_id":"019e1c66-476b-735a-bf6c-af8f91a8c486","service_id":"019e1c66-476a-7116-9cdd-420c3d0a3737","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-12 13:35:25] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c66-4879-72bb-8b97-40574aee8cc6","start_date":"2026-05-15","end_date":"2026-05-15","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:46:07] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c70-1170-7358-bbf0-84554108422d","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:46:07] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c70-1194-7202-b909-aaf740f9bd1d","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:46:07] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c70-119c-724d-8c49-abc9797b023b","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:46:07] testing.ERROR: Undefined variable $stripeEnabled {"userId":1,"exception":"[object] (ErrorException(code: 0): Undefined variable $stripeEnabled at /var/www/app/Http/Controllers/Api/BookingController.php:169)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'Undefined varia...', '/var/www/app/Ht...', 169)
+#1 /var/www/app/Http/Controllers/Api/BookingController.php(169): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->{closure:Illuminate\\Foundation\\Bootstrap\\HandleExceptions::forwardsTo():257}(2, 'Undefined varia...', '/var/www/app/Ht...', 169)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\Api\\BookingController->confirm(Object(Illuminate\\Http\\Request))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(269): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Api\\BookingController), 'confirm')
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(215): Illuminate\\Routing\\Route->runController()
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}(Object(Illuminate\\Http\\Request))
+#7 /var/www/app/Http/Middleware/SetSecurityHeaders.php(20): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetSecurityHeaders->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#9 /var/www/app/Http/Middleware/SetLocale.php(25): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#10 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\SetLocale->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#11 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#12 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#13 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#14 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#15 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequestUsingNamedLimiter(Object(Illuminate\\Http\\Request), Object(Closure), 'api', Object(Closure))
+#16 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'api')
+#17 /var/www/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#18 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#19 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#20 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->{closure:Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful::handle():25}(Object(Illuminate\\Http\\Request))
+#21 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#22 /var/www/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#23 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#25 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#26 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#27 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#28 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#29 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#30 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}(Object(Illuminate\\Http\\Request))
+#31 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}(Object(Illuminate\\Http\\Request))
+#32 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#35 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#38 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#40 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#42 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#44 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#46 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#48 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 /var/www/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}(Object(Illuminate\\Http\\Request))
+#50 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#51 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#52 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#53 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/bookings/c...', Array, Array, Array, Array, '{\"serviceId\":\"0...')
+#54 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/bookings/c...', Array, Array, 0)
+#55 /var/www/tests/Feature/StripeCheckoutTest.php(227): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/bookings/c...', Array)
+#56 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(1332): Tests\\Feature\\StripeCheckoutTest->test_external_online_booking_confirms_without_stripe_when_stripe_is_not_configured()
+#57 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\\Framework\\TestCase->runTest()
+#58 /var/www/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#59 /var/www/vendor/phpunit/phpunit/src/Framework/TestCase.php(359): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\StripeCheckoutTest))
+#60 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#61 /var/www/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#62 /var/www/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#63 /var/www/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#64 /var/www/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#65 /var/www/vendor/bin/phpunit(122): include('/var/www/vendor...')
+#66 {main}
+"} 
+[2026-05-12 13:47:27] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c71-4b66-705c-a923-65f9fea9e30f","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:47:27] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c71-4b82-71e2-87b6-5235293e7527","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:47:27] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c71-4b89-73e3-9838-078f797e54c4","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:47:27] testing.ERROR: payments.checkout.failed {"user_id":1,"service_id":"019e1c71-4bc5-7006-87a6-d039714b200f","error":""} 
+[2026-05-12 13:47:27] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-4c02-72d7-ad67-18cf864bd78f","session_id":"cs_test_paid"} 
+[2026-05-12 13:47:27] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-4c17-7296-8b79-bc5045a42431","session_id":"cs_test_external_paid"} 
+[2026-05-12 13:47:27] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1c71-4c2c-7359-b31d-761c5d293c2e","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-12 13:47:27] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-4c43-7089-9c56-181d7d950ec7","session_id":"cs_test_external_idempotent"} 
+[2026-05-12 13:47:27] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-12 13:47:27] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-12 13:47:59] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c71-c972-71f8-a807-139bf65761ff","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:47:59] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c71-c994-7316-95a6-2f0cfe79f851","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:47:59] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c71-c99c-714f-b318-eb952498be51","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:47:59] testing.ERROR: payments.checkout.failed {"user_id":1,"service_id":"019e1c71-c9e0-721c-9f09-43a8d44b7b76","error":""} 
+[2026-05-12 13:47:59] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-ca1f-703e-8c65-a652404bdd8c","session_id":"cs_test_paid"} 
+[2026-05-12 13:47:59] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-ca34-72e5-9ac3-9bc69d119988","session_id":"cs_test_external_paid"} 
+[2026-05-12 13:47:59] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1c71-ca4c-71ef-a06d-98848b7c5ed6","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-12 13:47:59] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c71-ca61-72ab-986c-136c615465cd","session_id":"cs_test_external_idempotent"} 
+[2026-05-12 13:47:59] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-12 13:48:00] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-12 13:48:00] testing.INFO: external_booking.created {"booking_id":"019e1c71-ca9c-71b7-bae8-f1d7ba351f1f","service_id":"019e1c71-ca9b-7258-a10a-582f16420ca9","provider":"FAREHARBOR","reference":"ext-booking-123","status":"CONFIRMED"} 
+[2026-05-12 13:48:00] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c71-cbcb-7207-b574-ca1c328c0f23","start_date":"2026-05-15","end_date":"2026-05-15","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:55:00] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c78-335c-704f-b028-16646254641a","session_id":"cs_test_123","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:55:00] testing.WARNING: availability.fareharbor.fallback {"service_id":"019e1c78-337b-70bb-90b9-ee7c548299c8","start_date":"2026-05-13","end_date":"2026-05-13","participants":2,"error":"provider unavailable"} 
+[2026-05-12 13:55:00] testing.INFO: stripe.checkout.created {"payment_id":1,"booking_id":"019e1c78-3383-725b-8994-ffc7a61004ea","session_id":"cs_test_external","amount":"240.00","currency":"EUR"} 
+[2026-05-12 13:55:00] testing.ERROR: payments.checkout.failed {"user_id":1,"service_id":"019e1c78-33d4-71f9-bfbd-77454d7fc91e","error":""} 
+[2026-05-12 13:55:00] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c78-341c-7244-b037-fe40c4131e32","session_id":"cs_test_paid"} 
+[2026-05-12 13:55:00] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c78-3438-73b7-936e-641ea6170e29","session_id":"cs_test_external_paid"} 
+[2026-05-12 13:55:00] testing.ERROR: external_booking.sync_failed {"payment_id":1,"booking_id":"019e1c78-3452-7390-9686-b509da0e8087","session_id":"cs_test_external_failed","error":"Partner stock sync failed.","context":[]} 
+[2026-05-12 13:55:00] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c78-346d-7125-a1d5-03fa3cd3fb24","session_id":"cs_test_external_idempotent"} 
+[2026-05-12 13:55:00] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
+[2026-05-12 13:55:00] testing.WARNING: stripe.webhook.invalid_signature  

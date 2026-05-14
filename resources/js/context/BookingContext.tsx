@@ -38,6 +38,7 @@ export interface BookingDraft {
     clientTotal: number;
     currency: string;
     paymentMode: PaymentMode;
+    requiresStripeCheckout?: boolean;
     amountDueOnline: number;
     amountDueOnSite: number;
     selectedExtras: BookingExtraSelection[];
@@ -192,6 +193,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
             draft.paymentMode === PaymentModeNames.FULL_CASH_ON_SITE
                 ? clientTotal
                 : +(clientTotal - amountDueOnline).toFixed(2);
+        const requiresStripeCheckout =
+            response.requiresStripeCheckout ?? amountDueOnline > 0;
 
         setDraft((current) =>
             current
@@ -200,6 +203,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
                       partnerTotal,
                       commissionTotal,
                       clientTotal,
+                      requiresStripeCheckout,
                       amountDueOnline,
                       amountDueOnSite,
                       selectedExtras: normalizedExtras,

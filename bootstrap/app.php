@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withSchedule(function (Schedule $schedule): void {
+        $schedule
+            ->command('bookings:expire-stale-checkouts')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping()
+            ->onOneServer();
+
         if (! config('services.fareharbor.autosync_enabled')) {
             return;
         }
@@ -39,8 +45,6 @@ return Application::configure(basePath: dirname(__DIR__))
         };
     })
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
-
         $middleware->redirectGuestsTo(function (Request $request): string {
             $locale = Locale::negotiateFromRequest($request);
 

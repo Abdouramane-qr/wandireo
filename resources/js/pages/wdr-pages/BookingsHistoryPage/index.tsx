@@ -34,6 +34,7 @@ import "./BookingsHistoryPage.css";
 interface ServiceSummary {
     title: string;
     location: string;
+    isExternalRedirect: boolean;
 }
 
 // ============================================================
@@ -74,8 +75,21 @@ function getBookingStatusBadge(
         return { label: t("history.status.cancelled"), modifier: "cancelled" };
     }
 
+    if (booking.status === BookingStatusNames.AWAITING_PAYMENT) {
+        return {
+            label: t("history.status.awaiting_payment"),
+            modifier: "pending",
+        };
+    }
+
     if (booking.status === BookingStatusNames.PENDING) {
-        return { label: t("history.status.pending"), modifier: "pending" };
+        return {
+            label:
+                booking.paymentStatus === PaymentStatusNames.PENDING
+                    ? t("history.status.awaiting_payment")
+                    : t("history.status.pending"),
+            modifier: "pending",
+        };
     }
 
     if (booking.status === BookingStatusNames.CONFIRMED) {
@@ -281,6 +295,11 @@ const BookingCard: React.FC<BookingCardProps> = ({
                             {service.location}
                         </p>
                     )}
+                    {service?.isExternalRedirect && (
+                        <p className="wdr-history__card-source">
+                            {t("history.source.external")}
+                        </p>
+                    )}
                 </div>
                 <div className="wdr-history__card-badges">
                     <span
@@ -314,6 +333,21 @@ const BookingCard: React.FC<BookingCardProps> = ({
             {extrasSummary && (
                 <p className="wdr-history__extras">
                     {t("history.extras")}: {extrasSummary}
+                </p>
+            )}
+
+            {booking.externalBookingStatus && (
+                <p className="wdr-history__card-source">
+                    External: {booking.externalBookingStatus}
+                    {booking.externalBookingReference
+                        ? ` · ${booking.externalBookingReference}`
+                        : ""}
+                </p>
+            )}
+
+            {booking.externalErrorMessage && (
+                <p className="wdr-history__card-source">
+                    {booking.externalErrorMessage}
                 </p>
             )}
 
@@ -474,6 +508,7 @@ export const BookingsHistoryPage: React.FC = () => {
                     {
                         title: s.title,
                         location: `${s.location.city}, ${s.location.country}`,
+                        isExternalRedirect: Boolean(s.isExternalRedirect),
                     },
                 ]),
             ),

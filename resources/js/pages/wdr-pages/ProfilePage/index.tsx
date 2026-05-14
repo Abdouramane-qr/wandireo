@@ -4,6 +4,8 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
+import { router } from "@inertiajs/react";
+import { usersApi } from "@/api/users";
 import { Button } from "@/components/wdr";
 import { useToast } from "@/components/wdr/Toast/ToastProvider";
 import { useUser } from "@/context/UserContext";
@@ -80,6 +82,7 @@ interface ProfileFieldProps {
     readOnly?: boolean;
     autoComplete?: string;
     readOnlyNote?: string;
+    error?: string;
 }
 
 const ProfileField: React.FC<ProfileFieldProps> = ({
@@ -91,6 +94,7 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
     readOnly = false,
     autoComplete,
     readOnlyNote,
+    error,
 }) => (
     <div className="wdr-profile__field">
         <label htmlFor={id} className="wdr-profile__label">
@@ -99,12 +103,13 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
         <input
             id={id}
             type={type}
-            className={`wdr-profile__input${readOnly ? " wdr-profile__input--readonly" : ""}`}
+            className={`wdr-profile__input${readOnly ? " wdr-profile__input--readonly" : ""}${error ? " wdr-profile__input--error" : ""}`}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             readOnly={readOnly}
             autoComplete={autoComplete}
         />
+        {error && <span className="wdr-profile__field-error">{error}</span>}
         {readOnly && readOnlyNote && (
             <span className="wdr-profile__readonly-note">{readOnlyNote}</span>
         )}
@@ -117,6 +122,7 @@ interface ProfileSelectProps {
     value: string;
     options: { value: string; label: string }[];
     onChange: (value: string) => void;
+    error?: string;
 }
 
 const ProfileSelect: React.FC<ProfileSelectProps> = ({
@@ -125,6 +131,7 @@ const ProfileSelect: React.FC<ProfileSelectProps> = ({
     value,
     options,
     onChange,
+    error,
 }) => (
     <div className="wdr-profile__field">
         <label htmlFor={id} className="wdr-profile__label">
@@ -132,7 +139,7 @@ const ProfileSelect: React.FC<ProfileSelectProps> = ({
         </label>
         <select
             id={id}
-            className="wdr-profile__select"
+            className={`wdr-profile__select${error ? " wdr-profile__input--error" : ""}`}
             value={value}
             onChange={(e) => onChange(e.target.value)}
         >
@@ -142,8 +149,11 @@ const ProfileSelect: React.FC<ProfileSelectProps> = ({
                 </option>
             ))}
         </select>
+        {error && <span className="wdr-profile__field-error">{error}</span>}
     </div>
 );
+
+type ProfileFormErrors = Partial<Record<keyof ProfileFormState, string>>;
 
 export const ProfilePage: React.FC = () => {
     const { currentUser, logout } = useUser();
@@ -183,22 +193,105 @@ export const ProfilePage: React.FC = () => {
         preferredCurrency: preferredCurrency ?? "EUR",
     });
     const [isSaving, setIsSaving] = useState(false);
+    const [formErrors, setFormErrors] = useState<ProfileFormErrors>({});
+    const [submitError, setSubmitError] = useState("");
+
+    useEffect(() => {
+        setForm({
+            firstName: currentUser?.firstName ?? "",
+            lastName: currentUser?.lastName ?? "",
+            email: currentUser?.email ?? "",
+            phoneNumber: currentUser?.phoneNumber ?? "",
+            language: currentUser?.language ?? "fr",
+            preferredCurrency:
+                currentUser?.role === "CLIENT"
+                    ? (currentUser.preferredCurrency ?? "EUR")
+                    : "EUR",
+        });
+        setFormErrors({});
+        setSubmitError("");
+    }, [currentUser]);
 
     const handleChange = useCallback(
         (field: keyof ProfileFormState) => (value: string) => {
             setForm((prev) => ({ ...prev, [field]: value }));
+            setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+            setSubmitError("");
         },
         [],
     );
 
     const handleSave = useCallback(async () => {
         setIsSaving(true);
-        await new Promise<void>((resolve) => setTimeout(resolve, 800));
-        setIsSaving(false);
-        toast.success(t("profile.save_success_desc"), {
-            title: t("profile.save_success_title"),
-        });
-    }, [t, toast]);
+        setFormErrors({});
+        setSubmitError("");
+        try {
+            await usersApi.updateMe({
+                firstName: form.firstName.trim(),
+                lastName: form.lastName.trim(),
+                phoneNumber: form.phoneNumber.trim() || undefined,
+                language: form.language,
+                preferredCurrency:
+                    currentUser?.role === "CLIENT"
+                        ? form.preferredCurrency
+                        : undefined,
+            });
+            router.reload({ only: ["auth"] });
+            toast.success(t("profile.save_success_desc"), {
+                title: t("profile.save_success_title"),
+            });
+        } catch (error) {
+            const payload =
+                typeof error === "object" &&
+                error !== null &&
+                "response" in error &&
+                typeof error.response === "object" &&
+                error.response !== null &&
+                "data" in error.response &&
+                typeof error.response.data === "object" &&
+                error.response.data !== null
+                    ? (error.response.data as {
+                          message?: string;
+                          errors?: Record<string, string | string[]>;
+                      })
+                    : null;
+
+            const validationErrors = payload?.errors ?? {};
+            const nextErrors: ProfileFormErrors = {};
+
+            const firstError = (value: string | string[] | undefined) =>
+                Array.isArray(value) ? value[0] : value;
+
+            nextErrors.firstName = firstError(validationErrors.first_name);
+            nextErrors.lastName = firstError(validationErrors.last_name);
+            nextErrors.phoneNumber = firstError(validationErrors.phone_number);
+            nextErrors.language = firstError(validationErrors.language);
+            nextErrors.preferredCurrency = firstError(
+                validationErrors.preferred_currency,
+            );
+
+            const hasFieldErrors = Object.values(nextErrors).some(Boolean);
+
+            if (hasFieldErrors) {
+                setFormErrors(nextErrors);
+                setSubmitError(
+                    payload?.message || t("profile.save_validation_error"),
+                );
+
+                return;
+            }
+
+            toast.error(
+                payload?.message ||
+                    "Impossible d'enregistrer votre profil pour le moment.",
+                {
+                    title: t("profile.save"),
+                },
+            );
+        } finally {
+            setIsSaving(false);
+        }
+    }, [currentUser?.role, form, t, toast]);
 
     if (!currentUser) {
         return null;
@@ -259,6 +352,12 @@ export const ProfilePage: React.FC = () => {
                     </div>
                 </header>
 
+                {submitError ? (
+                    <p className="wdr-profile__submit-error" role="alert">
+                        {submitError}
+                    </p>
+                ) : null}
+
                 <section
                     className="wdr-profile__section"
                     aria-label={t("profile.personal")}
@@ -279,6 +378,7 @@ export const ProfilePage: React.FC = () => {
                             value={form.firstName}
                             onChange={handleChange("firstName")}
                             autoComplete="given-name"
+                            error={formErrors.firstName}
                         />
                         <ProfileField
                             id="profile-lastname"
@@ -286,6 +386,7 @@ export const ProfilePage: React.FC = () => {
                             value={form.lastName}
                             onChange={handleChange("lastName")}
                             autoComplete="family-name"
+                            error={formErrors.lastName}
                         />
                         <ProfileField
                             id="profile-email"
@@ -304,6 +405,7 @@ export const ProfilePage: React.FC = () => {
                             value={form.phoneNumber}
                             onChange={handleChange("phoneNumber")}
                             autoComplete="tel"
+                            error={formErrors.phoneNumber}
                         />
                     </div>
                 </section>
@@ -328,6 +430,7 @@ export const ProfilePage: React.FC = () => {
                             value={form.language}
                             options={languageOptions}
                             onChange={handleChange("language")}
+                            error={formErrors.language}
                         />
                         <ProfileSelect
                             id="profile-currency"
@@ -335,6 +438,7 @@ export const ProfilePage: React.FC = () => {
                             value={form.preferredCurrency}
                             options={currencyOptions}
                             onChange={handleChange("preferredCurrency")}
+                            error={formErrors.preferredCurrency}
                         />
                     </div>
                 </section>

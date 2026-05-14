@@ -218,16 +218,36 @@
     box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.12);
 }
 
+.wdr-profile__input--error {
+    border-color: #d14343;
+    box-shadow: 0 0 0 3px rgba(209, 67, 67, 0.12);
+}
+
 .wdr-profile__input--readonly {
     background: var(--bg-subtle);
     color: var(--text-muted);
     cursor: not-allowed;
 }
 
+.wdr-profile__field-error {
+    font-size: 0.76rem;
+    color: #b42318;
+}
+
 .wdr-profile__readonly-note {
     font-size: 0.72rem;
     color: var(--text-muted);
     font-style: italic;
+}
+
+.wdr-profile__submit-error {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(180, 35, 24, 0.18);
+    border-radius: var(--radius-md);
+    background: #fff5f4;
+    color: #b42318;
+    font-size: 0.9rem;
 }
 
 /* ============================================================

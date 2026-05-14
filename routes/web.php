@@ -9,18 +9,11 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 Route::pattern('locale', implode('|', Locale::supported()));
 
-$localizedPath = static function (Request $request, string $path): string {
-    $locale = Locale::negotiateFromRequest($request);
-
-    return '/' . $locale . '/' . ltrim($path, '/');
-};
-
-Route::get('/connexion', fn (Request $request) => redirect($localizedPath($request, '/connexion')));
-Route::post('/connexion', [AuthenticatedSessionController::class, 'store'])
-    ->middleware(['guest', 'throttle:login']);
-Route::get('/mon-espace', fn (Request $request) => redirect($localizedPath($request, '/mon-espace')));
-Route::get('/partenaire', fn (Request $request) => redirect($localizedPath($request, '/partenaire')));
-Route::get('/admin', fn (Request $request) => redirect($localizedPath($request, '/admin')));
+Route::get('/recherche', [PageController::class, 'search']);
+Route::get('/services/{id}', [PageController::class, 'serviceShow']);
+Route::get('/blog', [PageController::class, 'blogIndex']);
+Route::get('/blog/{slug}', [PageController::class, 'blogShow']);
+Route::get('/sitemap.xml', SitemapController::class);
 
 // ============================================================
 // Pages publiques
@@ -55,6 +48,8 @@ Route::prefix('{locale?}')->group(function () {
         Route::get('/panier', [PageController::class, 'cart'])->name('cart');
         Route::get('/commande', [PageController::class, 'checkout'])->name('checkout');
         Route::get('/paiement', [PageController::class, 'payment'])->name('payment');
+        Route::get('/paiement/succes', [PageController::class, 'paymentSuccess'])->name('payment.success');
+        Route::get('/paiement/annulation', [PageController::class, 'paymentCancel'])->name('payment.cancel');
         Route::get('/confirmation/{bookingId}', [PageController::class, 'confirmation'])->name('confirmation');
     });
 

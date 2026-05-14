@@ -16,10 +16,12 @@ import type { ServiceExtraInputType } from './service';
 /**
  * Représente le cycle de vie complet d'une réservation.
  *
- * Flux standard : PENDING -> CONFIRMED
- * Flux d'annulation : PENDING | CONFIRMED -> CANCELLED
+ * Flux standard : AWAITING_PAYMENT -> PENDING -> CONFIRMED
+ * Flux d'annulation : AWAITING_PAYMENT | PENDING | CONFIRMED -> CANCELLED
  */
 export const BookingStatusNames = {
+    /** Checkout initialise mais paiement non encore confirme. */
+    AWAITING_PAYMENT: 'AWAITING_PAYMENT',
     /** En attente de confirmation par le partenaire ou de paiement du client. */
     PENDING: 'PENDING',
     /** Réservation validée par le partenaire et paiement accepté. */
@@ -140,4 +142,8 @@ export interface Booking {
 
     /** Date de la dernière mise à jour du statut ou des informations. */
     updatedAt: Date;
+
+    externalBookingReference?: string;
+    externalBookingStatus?: string;
+    externalErrorMessage?: string;
 }

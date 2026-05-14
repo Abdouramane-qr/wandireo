@@ -52,6 +52,16 @@ class PublicSeoTest extends TestCase
         );
     }
 
+    public function test_search_page_normalizes_category_labels_from_query_into_category_props(): void
+    {
+        $response = $this->get('/en/recherche?q=Activities');
+
+        $response->assertOk();
+        $response->assertSee('"locale":"en"', false);
+        $response->assertSee('"q":""', false);
+        $response->assertSee('"category":"ACTIVITE"', false);
+    }
+
     public function test_service_page_uses_service_specific_seo_tags(): void
     {
         $service = Service::factory()

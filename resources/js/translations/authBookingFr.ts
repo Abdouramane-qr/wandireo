@@ -87,7 +87,7 @@ export function buildAuthBookingFrTranslations(): Record<string, string> {
         "cart.payment_mode.external_redirect.label": "Réservation externe",
         "cart.payment_mode.external_redirect.description":
             "La réservation est finalisée en dehors du tunnel Wandireo.",
-        "cart.price.partner": "Prix prestataire",
+        "cart.price.partner": "Prix de base",
         "cart.price.extras": "Extras",
         "cart.price.fees": "Frais de service",
         "cart.price.onsite": "À régler sur place",

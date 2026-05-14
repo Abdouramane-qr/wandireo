@@ -33,6 +33,19 @@ export interface InitBookingResponse {
     clientSecret: string | null;
     bookingDraftId: string;
     amountOnline: number;
+    requiresStripeCheckout?: boolean;
+    pricing?: {
+        quantity: number;
+        partner_total?: number;
+        partner_subtotal?: number;
+        partnerSubtotal?: number;
+        commission_total?: number;
+        commissionTotal?: number;
+        client_total?: number;
+        clientTotal?: number;
+        client_unit_price?: number;
+        clientUnitPrice?: number;
+    };
     selectedExtras?: Array<{
         id: string;
         name: string;
@@ -49,9 +62,14 @@ export interface InitBookingResponse {
 
 export interface BookingsParams {
     status?: BookingStatus;
+    paymentStatus?: string;
+    externalBookingStatus?: string;
     page?: number;
     limit?: number;
     serviceId?: string;
+    clientId?: string;
+    partnerId?: string;
+    q?: string;
 }
 
 export const bookingsApi = {
@@ -75,9 +93,7 @@ export const bookingsApi = {
             .get<unknown[]>('/bookings/partner-incoming', { params })
             .then((response) => response.data.map(normalizeBooking)),
 
-    adminList: (
-        params?: BookingsParams & { clientId?: string; partnerId?: string },
-    ) =>
+    adminList: (params?: BookingsParams) =>
         api
             .get<{ data: unknown[]; total: number }>('/bookings', { params })
             .then((response) => ({

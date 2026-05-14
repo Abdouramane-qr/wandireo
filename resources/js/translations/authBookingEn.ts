@@ -87,7 +87,7 @@ export function buildAuthBookingEnTranslations(): Record<string, string> {
         "cart.payment_mode.external_redirect.label": "External booking",
         "cart.payment_mode.external_redirect.description":
             "The booking is finalized outside the Wandireo tunnel.",
-        "cart.price.partner": "Provider price",
+        "cart.price.partner": "Base price",
         "cart.price.extras": "Extras",
         "cart.price.fees": "Service fees",
         "cart.price.onsite": "To be paid on site",

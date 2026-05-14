@@ -136,10 +136,13 @@ function statusLabel(
     switch (status) {
         case BookingStatusNames.CONFIRMED:
             return t("partner.bookings.status.confirmed");
+        case BookingStatusNames.AWAITING_PAYMENT:
         case BookingStatusNames.PENDING:
             return t("partner.bookings.status.pending");
         case BookingStatusNames.CANCELLED:
             return t("partner.bookings.status.cancelled");
+        default:
+            return status;
     }
 }
 
@@ -583,6 +586,16 @@ export const PartnerBookingsPage: React.FC = () => {
                                         <blockquote className="wdr-partner-bk__card-notes">
                                             {booking.notes}
                                         </blockquote>
+                                    )}
+
+                                    {booking.externalBookingStatus && (
+                                        <p className="wdr-partner-bk__card-extras">
+                                            External:{" "}
+                                            {booking.externalBookingStatus}
+                                            {booking.externalBookingReference
+                                                ? ` · ${booking.externalBookingReference}`
+                                                : ""}
+                                        </p>
                                     )}
 
                                     {isCancelled &&

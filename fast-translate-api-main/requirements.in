@@ -1,0 +1,12 @@
+# ---------------------------------------------------------------------------
+# Direct (top-level) dependencies only.
+# Run `pip-compile requirements.in -o requirements.txt` to regenerate the
+# pinned lock-file.  Commit requirements.txt to version control.
+# ---------------------------------------------------------------------------
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic-settings>=2.7.0
+deep-translator>=1.11.4
+langdetect>=1.0.9
+python-dotenv>=1.1.0

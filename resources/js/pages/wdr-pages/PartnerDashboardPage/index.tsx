@@ -184,6 +184,7 @@ function statusLabel(status: string, t: (key: string) => string): string {
     switch (status) {
         case BookingStatusNames.CONFIRMED:
             return t("partner.dashboard.status.confirmed");
+        case BookingStatusNames.AWAITING_PAYMENT:
         case BookingStatusNames.PENDING:
             return t("partner.dashboard.status.pending");
         case BookingStatusNames.CANCELLED:

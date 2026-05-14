@@ -445,6 +445,12 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.filter.partner_all": "Tous les partenaires",
         "admin.transactions.filter.status_all": "Tous les statuts",
         "admin.transactions.filter.partner": "Filtrer par partenaire",
+        "admin.transactions.filter.booking_status": "Filtrer par statut de réservation",
+        "admin.transactions.filter.payment_status": "Filtrer par statut de paiement",
+        "admin.transactions.filter.provider_status": "Filtrer par statut prestataire",
+        "admin.transactions.filter.provider_all": "Tous les statuts prestataire",
+        "admin.transactions.filter.search": "Rechercher une réservation",
+        "admin.transactions.filter.search_placeholder": "Réf., client, service, partenaire, erreur externe",
         "admin.transactions.no_match": "Aucune transaction ne correspond aux critères.",
         
         "admin.transactions.col.id": "Réf.",
@@ -470,6 +476,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.payment.paid": "Payé",
         "admin.transactions.payment.pending": "En attente",
         "admin.transactions.payment.refunded": "Remboursé",
+        "admin.transactions.external.confirmed": "Prestataire confirmé",
+        "admin.transactions.external.failed": "Prestataire en échec",
+        "admin.transactions.external.none": "Sans statut prestataire",
 
         "admin.transactions.details.title": "Détail de la transaction",
         "admin.transactions.details.aria": "Fenêtre de détail",

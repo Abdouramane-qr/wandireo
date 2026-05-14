@@ -9,6 +9,7 @@
 
 
 
+
 # Stratégies de Traduction des Activités FareHarbor
 
 Ce document compare les deux approches envisagées pour la traduction française des activités importées automatiquement depuis FareHarbor.

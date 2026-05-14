@@ -137,6 +137,12 @@ class ServiceController extends Controller
             });
         }
 
+        if ($request->filled('partnerId') && ! $request->filled('q') && ! $request->filled('destination')) {
+            $query->orderBy('is_available')->latest('created_at');
+
+            return $query;
+        }
+
         match ($request->get('sort', 'created_at_desc')) {
             'price_asc' => $query->orderBy('client_price'),
             'price_desc' => $query->orderByDesc('client_price'),
@@ -159,9 +165,14 @@ class ServiceController extends Controller
     /** GET /api/services/{id} */
     public function show(string $id): JsonResponse
     {
-        $service = Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])
-            ->findOrFail($id)
-            ->toArray();
+        $serviceModel = Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])
+            ->findOrFail($id);
+
+        if (! $serviceModel->is_available && ! $this->canAccessHiddenService(request(), $serviceModel)) {
+            abort(404);
+        }
+
+        $service = $serviceModel->toArray();
 
         if (! in_array(request()->user()?->role, ['ADMIN', 'PARTNER'], true)) {
             $this->analyticsTracker->track(request(), 'service_viewed', [
@@ -468,6 +479,21 @@ class ServiceController extends Controller
                 response()->json(['message' => 'You can only manage your own services.'], 403)
             );
         }
+    }
+
+    private function canAccessHiddenService(Request $request, Service $service): bool
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->role === 'ADMIN') {
+            return true;
+        }
+
+        return $user->role === 'PARTNER' && $service->partner_id === $user->id;
     }
 
     private function trackSearchIfEligible(Request $request): void

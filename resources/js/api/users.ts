@@ -11,6 +11,7 @@ export interface UpdateMeRequest {
     lastName?: string;
     phoneNumber?: string;
     language?: string;
+    preferredCurrency?: string;
     profilePicture?: string;
 }
 
@@ -93,7 +94,23 @@ export const usersApi = {
 
     updateMe: (data: UpdateMeRequest | UpdatePartnerRequest) =>
         api
-            .patch<unknown>('/users/me', data)
+            .patch<unknown>('/users/me', {
+                first_name: 'firstName' in data ? data.firstName : undefined,
+                last_name: 'lastName' in data ? data.lastName : undefined,
+                phone_number:
+                    'phoneNumber' in data ? data.phoneNumber : undefined,
+                language: 'language' in data ? data.language : undefined,
+                preferred_currency:
+                    'preferredCurrency' in data
+                        ? data.preferredCurrency
+                        : undefined,
+                company_name:
+                    'companyName' in data ? data.companyName : undefined,
+                business_address:
+                    'businessAddress' in data
+                        ? data.businessAddress
+                        : undefined,
+            })
             .then((r) => normalizeUser(r.data)),
 
     changePassword: (oldPassword: string, newPassword: string) =>
@@ -111,6 +128,36 @@ export const usersApi = {
                 ...r.data,
                 data: r.data.data.map(normalizeUser),
             })),
+
+    adminListAll: async (params?: UsersParams) => {
+        const firstPage = await usersApi.adminList({
+            ...params,
+            page: 1,
+            limit: params?.limit ?? 100,
+        });
+
+        const currentPage = Number((firstPage as { current_page?: number }).current_page ?? 1);
+        const lastPage = Number((firstPage as { last_page?: number }).last_page ?? 1);
+
+        if (lastPage <= 1) {
+            return firstPage;
+        }
+
+        const remainingPages = await Promise.all(
+            Array.from({ length: lastPage - currentPage }, (_, index) =>
+                usersApi.adminList({
+                    ...params,
+                    page: index + currentPage + 1,
+                    limit: params?.limit ?? 100,
+                }),
+            ),
+        );
+
+        return {
+            ...firstPage,
+            data: [firstPage, ...remainingPages].flatMap((page) => page.data),
+        };
+    },
 
     /** Admin : modifier un utilisateur (commission, suspension). */
     adminUpdate: (id: string, data: AdminUpdateUserRequest) =>

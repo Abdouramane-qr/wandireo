@@ -36,10 +36,11 @@ return [
     ],
 
     'stripe' => [
-        'key'            => env('STRIPE_PUBLISHABLE_KEY'),
-        'secret'         => env('STRIPE_SECRET_KEY'),
+        'key'            => env('STRIPE_KEY', env('STRIPE_PUBLISHABLE_KEY')),
+        'secret'         => env('STRIPE_SECRET', env('STRIPE_SECRET_KEY')),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
         'currency'       => env('STRIPE_CURRENCY', 'eur'),
+        'booking_hold_minutes' => env('STRIPE_BOOKING_HOLD_MINUTES', 30),
     ],
 
     'geoip' => [

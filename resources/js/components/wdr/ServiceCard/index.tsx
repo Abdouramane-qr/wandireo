@@ -163,8 +163,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         durationMinutes,
         rating,
         reviewCount,
-        partnerName,
-        partnerAvatar,
         isAvailable,
         isFeatured,
         highlights,
@@ -184,7 +182,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         .filter(Boolean)
         .join(" ");
 
-    const partnerInitial = partnerName.charAt(0).toUpperCase();
     const hasImportedPriceState =
         sourceProvider === "FAREHARBOR" ||
         typeof externalPriceStatus === "string";
@@ -392,30 +389,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                             </span>
                         </span>
                     )}
-                </div>
-
-                {/* Partenaire */}
-                <div className="wdr-card__partner">
-                    {partnerAvatar ? (
-                        <img
-                            src={partnerAvatar}
-                            alt={t("service.card.partner_avatar_alt").replace(
-                                "{partnerName}",
-                                partnerName,
-                            )}
-                            className="wdr-card__partner-avatar"
-                            width="24"
-                            height="24"
-                        />
-                    ) : (
-                        <div
-                            className="wdr-card__partner-initial"
-                            aria-hidden="true"
-                        >
-                            {partnerInitial}
-                        </div>
-                    )}
-                    <span>{partnerName}</span>
                 </div>
             </div>
 

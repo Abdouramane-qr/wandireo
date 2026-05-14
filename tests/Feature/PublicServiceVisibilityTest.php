@@ -60,4 +60,62 @@ class PublicServiceVisibilityTest extends TestCase
             ->assertJsonPath('data.0.id', (string) $unavailable->id)
             ->assertJsonPath('data.1.id', (string) $available->id);
     }
+
+    public function test_public_service_detail_api_returns_404_for_unavailable_services(): void
+    {
+        $service = Service::factory()->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $this->getJson("/api/services/{$service->id}")
+            ->assertNotFound();
+    }
+
+    public function test_public_service_page_returns_404_for_unavailable_services(): void
+    {
+        $service = Service::factory()->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $this->get("/services/{$service->id}")
+            ->assertNotFound();
+    }
+
+    public function test_partner_owner_can_access_hidden_service_in_api(): void
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+        $service = Service::factory()->for($partner, 'partner')->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $this->actingAs($partner)
+            ->getJson("/api/services/{$service->id}")
+            ->assertOk()
+            ->assertJsonPath('id', (string) $service->id);
+    }
+
+    public function test_admin_can_access_hidden_service_in_public_page(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'ADMIN',
+        ]);
+        $service = Service::factory()->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get("/services/{$service->id}")
+            ->assertOk();
+    }
 }
