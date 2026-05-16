@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import PaymentButton from "@/components/PaymentButton";
 import { Button } from "@/components/wdr";
 import { useBooking } from "@/context/BookingContext";
@@ -15,6 +15,33 @@ export const PaymentPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [submitError, setSubmitError] = useState("");
+    const lastSyncKeyRef = useRef<string | null>(null);
+    const syncKey = useMemo(() => {
+        if (!draft) {
+            return null;
+        }
+
+        const extrasKey = draft.selectedExtras
+            .map((extra) => `${extra.id}:${extra.quantity}`)
+            .sort()
+            .join("|");
+
+        return [
+            draft.service.id,
+            draft.dateFrom,
+            draft.dateTo ?? "",
+            draft.participants,
+            draft.paymentMode,
+            extrasKey,
+        ].join("::");
+    }, [
+        draft?.dateFrom,
+        draft?.dateTo,
+        draft?.participants,
+        draft?.paymentMode,
+        draft?.selectedExtras,
+        draft?.service.id,
+    ]);
 
     useEffect(() => {
         if (!draft) {
@@ -28,10 +55,15 @@ export const PaymentPage: React.FC = () => {
     }, [draft, travelerInfo, navigate]);
 
     useEffect(() => {
-        if (!draft || !travelerInfo) {
+        if (!draft || !travelerInfo || !syncKey) {
             return;
         }
 
+        if (lastSyncKeyRef.current === syncKey) {
+            return;
+        }
+
+        lastSyncKeyRef.current = syncKey;
         let cancelled = false;
 
         void (async () => {
@@ -55,13 +87,8 @@ export const PaymentPage: React.FC = () => {
             cancelled = true;
         };
     }, [
-        draft?.dateFrom,
-        draft?.dateTo,
-        draft?.participants,
-        draft?.paymentMode,
-        draft?.selectedExtras,
-        draft?.service.id,
         syncDraftPricing,
+        syncKey,
         t,
         travelerInfo,
     ]);
