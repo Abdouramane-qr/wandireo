@@ -201,5 +201,189 @@ export function buildServiceFrTranslations(): Record<string, string> {
             "Ajoutez les limites importantes: âge minimum, caution, kilométrage et assurance.",
         "service.form.guidance.car.3":
             "Gardez un texte simple et direct, sans jargon interne ni promesses imprécises.",
+        "service.form.breadcrumb.catalog": "Catalogue",
+        "service.form.breadcrumb.catalog_admin": "Catalogue admin",
+        "service.form.breadcrumb.edit": "Modifier",
+        "service.form.breadcrumb.new": "Nouveau service",
+        "service.form.title.create": "Créer un service",
+        "service.form.title.edit": "Modifier le service",
+        "service.form.subtitle.create":
+            "Renseignez les informations nécessaires pour publier une nouvelle offre.",
+        "service.form.subtitle.edit":
+            "Mettez à jour les informations opérationnelles et commerciales de cette offre.",
+        "service.form.external.title": "Service externe synchronisé",
+        "service.form.external.subtitle":
+            "Les champs provider restent pilotés par l'intégration externe. Les modifications locales concernent la présentation, la visibilité et les règles Wandireo.",
+        "service.form.section.general": "Informations générales",
+        "service.form.section.dynamic_attributes": "Champs spécifiques",
+        "service.form.section.location": "Localisation",
+        "service.form.section.pricing": "Tarification",
+        "service.form.section.media": "Médias",
+        "service.form.section.ical": "Synchronisation calendrier",
+        "service.form.partner_optional": "Partenaire",
+        "service.form.partner.none_assigned": "Aucun partenaire assigné",
+        "service.form.partner.none_available": "Aucun partenaire disponible",
+        "service.form.partner.hint_none":
+            "Sélectionnez un partenaire avant de créer ce service.",
+        "service.form.partner.hint_optional":
+            "Si aucun partenaire n'est choisi, le premier partenaire disponible sera utilisé.",
+        "service.form.label.title": "Titre",
+        "service.form.label.description": "Description",
+        "service.form.label.category": "Type de service",
+        "service.form.label.detailed_category": "Catégorie détaillée",
+        "service.form.label.subcategory": "Sous-catégorie",
+        "service.form.label.city": "Ville",
+        "service.form.label.country": "Pays",
+        "service.form.label.region": "Région",
+        "service.form.label.price": "Prix partenaire",
+        "service.form.label.pricing_unit": "Unité de prix",
+        "service.form.label.payment_mode": "Mode de paiement",
+        "service.form.label.booking_mode": "Mode de réservation",
+        "service.form.label.images": "Images",
+        "service.form.label.video": "Vidéo",
+        "service.form.label.tags": "Tags",
+        "service.form.placeholder.title": "Ex: Excursion privée en bateau",
+        "service.form.placeholder.description":
+            "Décrivez l'expérience, les inclusions, les conditions et les points importants pour le client.",
+        "service.form.placeholder.country": "Ex: Portugal",
+        "service.form.placeholder.region": "Ex: Algarve",
+        "service.form.placeholder.price": "Ex: 120",
+        "service.form.choose": "Choisir",
+        "service.form.choose_category": "Choisir une catégorie",
+        "service.form.choose_subcategory": "Choisir une sous-catégorie",
+        "service.form.no_admin_category":
+            "Aucune catégorie active disponible pour ce type de service.",
+        "service.form.available": "Service disponible publiquement",
+        "service.form.featured": "Mettre en avant",
+        "service.form.pricing_unit.person": "Par personne",
+        "service.form.pricing_unit.group": "Par groupe",
+        "service.form.pricing_unit.day": "Par jour",
+        "service.form.pricing_unit.night": "Par nuit",
+        "service.form.pricing_unit.week": "Par semaine",
+        "service.form.pricing_unit.half_day": "Par demi-journée",
+        "service.form.city.choose": "Choisir une ville",
+        "service.form.city.lagos": "Lagos",
+        "service.form.city.alvor": "Alvor",
+        "service.form.city.portimao": "Portimão",
+        "service.form.city.silves": "Silves",
+        "service.form.city.benagil": "Benagil",
+        "service.form.city.armacao_de_pera": "Armação de Pêra",
+        "service.form.city.vilamoura": "Vilamoura",
+        "service.form.city.albufeira": "Albufeira",
+        "service.form.client_price": "Prix client estimé",
+        "service.form.client_price_note":
+            "Calculé avec la commission partenaire actuelle. Le montant final est recalculé côté serveur.",
+        "service.form.dynamic_rules": "Règles de prix",
+        "service.form.dynamic_rules_hint_create":
+            "Les règles de prix avancées seront disponibles après la création du service.",
+        "service.form.rule.name": "Nom de la règle",
+        "service.form.rule.name_placeholder": "Ex: Week-end haute saison",
+        "service.form.rule.type": "Type de règle",
+        "service.form.rule.adjustment": "Ajustement",
+        "service.form.rule.value": "Valeur",
+        "service.form.rule.value_placeholder": "Ex: 15",
+        "service.form.rule.priority": "Priorité",
+        "service.form.rule.start": "Début",
+        "service.form.rule.end": "Fin",
+        "service.form.rule.min_units": "Unités minimum",
+        "service.form.rule.min_units_placeholder": "Ex: 3",
+        "service.form.rule.backend_hint":
+            "Les règles sont appliquées côté serveur lors du calcul de prix.",
+        "service.form.rule.add": "Ajouter la règle",
+        "service.form.rule.adding": "Ajout...",
+        "service.form.rule.min_units_display": "{count} unité(s) minimum",
+        "service.form.rule.priority_display": "Priorité {priority}",
+        "service.form.rule_type.weekend": "Week-end",
+        "service.form.rule_type.seasonal": "Saisonnier",
+        "service.form.rule_type.duration": "Durée",
+        "service.form.adjustment.percentage": "Pourcentage",
+        "service.form.adjustment.fixed": "Montant fixe",
+        "service.form.booking_mode.request": "Demande à valider",
+        "service.form.booking_mode.instant": "Confirmation instantanée",
+        "service.form.images_hint":
+            "Ajoutez des images nettes et cohérentes. La première image sert de couverture.",
+        "service.form.images_uploading": "Téléversement des images...",
+        "service.form.image.alt": "Image du service",
+        "service.form.image.primary": "Image principale",
+        "service.form.image.label": "Image {index}",
+        "service.form.image.cover": "Définir comme couverture",
+        "service.form.delete": "Supprimer",
+        "service.form.url_placeholder": "https://...",
+        "service.form.tags_placeholder": "bateau, privé, coucher de soleil",
+        "service.form.tags_hint":
+            "Séparez les tags par des virgules. Ils aident à qualifier l'offre.",
+        "service.form.field.required": "Obligatoire",
+        "service.form.field.optional": "Optionnel",
+        "service.form.ical.create_hint":
+            "Créez d'abord le service pour activer la synchronisation calendrier.",
+        "service.form.ical.unavailable_hint":
+            "La synchronisation iCal est disponible pour les hébergements et bateaux.",
+        "service.form.ical.import_url": "URL d'import iCal",
+        "service.form.ical.import_hint":
+            "Utilisée pour importer les indisponibilités depuis un calendrier externe.",
+        "service.form.ical.export_url": "URL d'export iCal",
+        "service.form.ical.export_placeholder": "URL générée après activation",
+        "service.form.ical.export_hint":
+            "Partagez cette URL avec un outil calendrier externe pour exporter les réservations.",
+        "service.form.ical.save_url": "Enregistrer l'URL",
+        "service.form.ical.saving": "Enregistrement...",
+        "service.form.ical.sync_now": "Synchroniser maintenant",
+        "service.form.ical.syncing": "Synchronisation...",
+        "service.form.ical.copy_export": "Copier l'URL d'export",
+        "service.form.actions.cancel": "Annuler",
+        "service.form.actions.create": "Créer le service",
+        "service.form.actions.save_changes": "Enregistrer les modifications",
+        "service.form.actions.saving": "Enregistrement...",
+        "service.form.actions.uploading": "Téléversement...",
+        "service.form.error.title_required": "Le titre est obligatoire.",
+        "service.form.error.fr_title_required":
+            "Le titre français est obligatoire.",
+        "service.form.error.description_required":
+            "La description est obligatoire.",
+        "service.form.error.fr_description_required":
+            "La description française est obligatoire.",
+        "service.form.error.category_required":
+            "Veuillez sélectionner une catégorie détaillée.",
+        "service.form.error.city_required": "La ville est obligatoire.",
+        "service.form.error.country_required": "Le pays est obligatoire.",
+        "service.form.error.price_positive":
+            "Le prix doit être un nombre positif.",
+        "service.form.error.image_required":
+            "Ajoutez au moins une image pour ce service.",
+        "service.form.error.required_attributes":
+            "Veuillez renseigner les champs obligatoires de la structure.",
+        "service.form.error.fix_before_continue":
+            "Corrigez les erreurs du formulaire avant de continuer.",
+        "service.form.error.rule_name_value":
+            "Renseignez un nom et une valeur valide pour la règle.",
+        "service.form.error.rule_dates":
+            "Renseignez une date de début et de fin pour la règle saisonnière.",
+        "service.form.error.rule_min_units":
+            "Renseignez un nombre d'unités minimum pour cette règle.",
+        "service.form.toast.save_create": "Service créé.",
+        "service.form.toast.save_update": "Service mis à jour.",
+        "service.form.toast.save_error":
+            "Impossible d'enregistrer le service.",
+        "service.form.toast.images_uploaded_one": "Image téléversée.",
+        "service.form.toast.images_uploaded_other":
+            "{count} images téléversées.",
+        "service.form.toast.images_upload_error":
+            "Impossible de téléverser les images.",
+        "service.form.toast.rule_created": "Règle de prix créée.",
+        "service.form.toast.rule_create_error":
+            "Impossible de créer la règle de prix.",
+        "service.form.toast.rule_deleted": "Règle de prix supprimée.",
+        "service.form.toast.rule_delete_error":
+            "Impossible de supprimer la règle de prix.",
+        "service.form.toast.ical_saved": "Configuration iCal enregistrée.",
+        "service.form.toast.ical_save_error":
+            "Impossible d'enregistrer la configuration iCal.",
+        "service.form.toast.ical_sync_result":
+            "Synchronisation terminée: {count} événement(s) importé(s).",
+        "service.form.toast.ical_sync_error":
+            "Impossible de synchroniser le calendrier.",
+        "service.form.toast.ical_copy": "URL d'export copiée.",
+        "service.form.toast.ical_copy_error":
+            "Impossible de copier l'URL d'export.",
     };
 }
