@@ -13,6 +13,7 @@ import type {
     AdminCreateUserRequest,
     AdminCreatePartnerRequest,
     AdminUpdateUserRequest,
+    PartnerContractSignRequest,
     UsersParams,
 } from '@/api/users';
 import type { User } from '@/types/wdr-user';
@@ -48,6 +49,7 @@ export function useAdminUpdateUserData() {
         }) => usersApi.adminUpdate(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+            queryClient.invalidateQueries({ queryKey: ['services'] });
         },
     });
 }
@@ -84,5 +86,23 @@ export function useAdminUploadPartnerContractData() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
         },
+    });
+}
+
+export function useAdminMarkPartnerContractSignedData() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id }: { id: string }) => usersApi.adminMarkContractSigned(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+        },
+    });
+}
+
+export function usePartnerSignContractData() {
+    return useMutation({
+        mutationFn: (data: PartnerContractSignRequest) =>
+            usersApi.partnerSignContract(data),
     });
 }

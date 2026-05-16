@@ -24,7 +24,9 @@ import {
 } from "@/hooks/useServiceStructureData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
+import { LOCALE_LABELS, SUPPORTED_LOCALES, type Locale } from "@/lib/locale";
 import {
+    type LocalizedTextMap,
     ServiceCategoryLabels,
     ServiceCategoryNames,
     type ServiceAttributeDefinition,
@@ -449,16 +451,20 @@ function getDefaultExtraPresets(t: TranslateFn): Record<
 interface CategoryFormState {
     serviceType: (typeof ServiceCategoryNames)[keyof typeof ServiceCategoryNames];
     name: string;
+    nameTranslations: LocalizedTextMap;
     slug: string;
     description: string;
+    descriptionTranslations: LocalizedTextMap;
     isActive: boolean;
     sortOrder: string;
 }
 
 interface SubcategoryFormState {
     name: string;
+    nameTranslations: LocalizedTextMap;
     slug: string;
     description: string;
+    descriptionTranslations: LocalizedTextMap;
     isActive: boolean;
     sortOrder: string;
 }
@@ -486,19 +492,70 @@ interface ExtraFormState {
 const defaultCategoryForm = (): CategoryFormState => ({
     serviceType: ServiceCategoryNames.BATEAU,
     name: "",
+    nameTranslations: {},
     slug: "",
     description: "",
+    descriptionTranslations: {},
     isActive: true,
     sortOrder: "0",
 });
 
 const defaultSubcategoryForm = (): SubcategoryFormState => ({
     name: "",
+    nameTranslations: {},
     slug: "",
     description: "",
+    descriptionTranslations: {},
     isActive: true,
     sortOrder: "0",
 });
+
+function buildLocalizedTextMap(
+    value: LocalizedTextMap | undefined,
+    fallback = "",
+): LocalizedTextMap {
+    if (value && Object.keys(value).length > 0) {
+        return { ...value };
+    }
+
+    return fallback.trim() ? { fr: fallback.trim() } : {};
+}
+
+function writeLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+    value: string,
+): LocalizedTextMap {
+    const normalized = value.trim();
+    const next = { ...translations };
+
+    if (normalized) {
+        next[locale] = value;
+    } else {
+        delete next[locale];
+    }
+
+    return next;
+}
+
+function readLocalizedValue(
+    translations: LocalizedTextMap,
+    locale: Locale,
+): string {
+    return translations[locale] ?? "";
+}
+
+function getLocalizedStructureValue(
+    translations: LocalizedTextMap | undefined,
+    locale: Locale,
+    fallback: string,
+): string {
+    if (!translations) {
+        return fallback;
+    }
+
+    return translations[locale] ?? translations.fr ?? fallback;
+}
 
 const defaultAttributeForm = (): AttributeFormState => ({
     label: "",
@@ -543,7 +600,7 @@ export const AdminServiceStructurePage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
     const { success, error } = useToast();
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const { categories, isLoading } = useServiceStructureData();
     const createCategory = useCreateServiceCategoryData();
     const updateCategory = useUpdateServiceCategoryData();
@@ -675,8 +732,16 @@ export const AdminServiceStructurePage: React.FC = () => {
         setCategoryForm({
             serviceType: category.serviceType,
             name: category.name,
+            nameTranslations: buildLocalizedTextMap(
+                category.nameTranslations,
+                category.name,
+            ),
             slug: category.slug,
             description: category.description ?? "",
+            descriptionTranslations: buildLocalizedTextMap(
+                category.descriptionTranslations,
+                category.description ?? "",
+            ),
             isActive: category.isActive,
             sortOrder: String(category.sortOrder),
         });
@@ -686,8 +751,16 @@ export const AdminServiceStructurePage: React.FC = () => {
         setEditingSubcategoryId(subcategory.id);
         setSubcategoryForm({
             name: subcategory.name,
+            nameTranslations: buildLocalizedTextMap(
+                subcategory.nameTranslations,
+                subcategory.name,
+            ),
             slug: subcategory.slug,
             description: subcategory.description ?? "",
+            descriptionTranslations: buildLocalizedTextMap(
+                subcategory.descriptionTranslations,
+                subcategory.description ?? "",
+            ),
             isActive: subcategory.isActive,
             sortOrder: String(subcategory.sortOrder),
         });
@@ -728,8 +801,10 @@ export const AdminServiceStructurePage: React.FC = () => {
             const payload = {
                 serviceType: categoryForm.serviceType,
                 name: categoryForm.name.trim(),
+                nameTranslations: categoryForm.nameTranslations,
                 slug: categoryForm.slug.trim() || undefined,
                 description: categoryForm.description.trim() || undefined,
+                descriptionTranslations: categoryForm.descriptionTranslations,
                 isActive: categoryForm.isActive,
                 sortOrder: Number(categoryForm.sortOrder || 0),
             };
@@ -765,8 +840,11 @@ export const AdminServiceStructurePage: React.FC = () => {
             const payload = {
                 serviceCategoryId: selectedCategory.id,
                 name: subcategoryForm.name.trim(),
+                nameTranslations: subcategoryForm.nameTranslations,
                 slug: subcategoryForm.slug.trim() || undefined,
                 description: subcategoryForm.description.trim() || undefined,
+                descriptionTranslations:
+                    subcategoryForm.descriptionTranslations,
                 isActive: subcategoryForm.isActive,
                 sortOrder: Number(subcategoryForm.sortOrder || 0),
             };
@@ -1061,12 +1139,16 @@ export const AdminServiceStructurePage: React.FC = () => {
     return (
         <div className="wdr-admin-structure">
             <section className="wdr-admin-structure__hero">
-                <div>
+                <div className="wdr-admin-structure__hero-content">
                     <p className="wdr-admin-structure__eyebrow">
                         {t("admin.structure.eyebrow")}
                     </p>
-                    <h1>{t("admin.structure.title")}</h1>
-                    <p>{t("admin.structure.subtitle")}</p>
+                    <h1 className="wdr-admin-structure__hero-title">
+                        {t("admin.structure.title")}
+                    </h1>
+                    <p className="wdr-admin-structure__hero-subtitle">
+                        {t("admin.structure.subtitle")}
+                    </p>
                 </div>
                 <div className="wdr-admin-structure__hero-actions">
                     <Button
@@ -1142,7 +1224,13 @@ export const AdminServiceStructurePage: React.FC = () => {
                                         setSelectedCategoryId(category.id)
                                     }
                                 >
-                                    <strong>{category.name}</strong>
+                                    <strong>
+                                        {getLocalizedStructureValue(
+                                            category.nameTranslations,
+                                            locale,
+                                            category.name,
+                                        )}
+                                    </strong>
                                     <span>
                                         {
                                             ServiceCategoryLabels[
@@ -1225,6 +1313,33 @@ export const AdminServiceStructurePage: React.FC = () => {
                                 }
                             />
                         </label>
+                        <div className="wdr-admin-structure__translations">
+                            {SUPPORTED_LOCALES.map((translationLocale) => (
+                                <label
+                                    key={`category-name-${translationLocale}`}
+                                    className="wdr-admin-structure__label"
+                                >
+                                    {`${t("admin.structure.label.name")} (${LOCALE_LABELS[translationLocale]})`}
+                                    <Input
+                                        value={readLocalizedValue(
+                                            categoryForm.nameTranslations,
+                                            translationLocale,
+                                        )}
+                                        onChange={(event) =>
+                                            setCategoryForm((prev) => ({
+                                                ...prev,
+                                                nameTranslations:
+                                                    writeLocalizedValue(
+                                                        prev.nameTranslations,
+                                                        translationLocale,
+                                                        event.target.value,
+                                                    ),
+                                            }))
+                                        }
+                                    />
+                                </label>
+                            ))}
+                        </div>
                         <label className="wdr-admin-structure__label">
                             {t("admin.structure.label.slug")}
                             <Input
@@ -1251,6 +1366,35 @@ export const AdminServiceStructurePage: React.FC = () => {
                                 }
                             />
                         </label>
+                        <div className="wdr-admin-structure__translations">
+                            {SUPPORTED_LOCALES.map((translationLocale) => (
+                                <label
+                                    key={`category-description-${translationLocale}`}
+                                    className="wdr-admin-structure__label"
+                                >
+                                    {`${t("admin.structure.label.description")} (${LOCALE_LABELS[translationLocale]})`}
+                                    <textarea
+                                        className="wdr-admin-structure__textarea"
+                                        rows={3}
+                                        value={readLocalizedValue(
+                                            categoryForm.descriptionTranslations,
+                                            translationLocale,
+                                        )}
+                                        onChange={(event) =>
+                                            setCategoryForm((prev) => ({
+                                                ...prev,
+                                                descriptionTranslations:
+                                                    writeLocalizedValue(
+                                                        prev.descriptionTranslations,
+                                                        translationLocale,
+                                                        event.target.value,
+                                                    ),
+                                            }))
+                                        }
+                                    />
+                                </label>
+                            ))}
+                        </div>
                         <label className="wdr-admin-structure__label">
                             {t("admin.structure.label.order")}
                             <Input
@@ -1312,7 +1456,13 @@ export const AdminServiceStructurePage: React.FC = () => {
                             <div className="wdr-admin-structure__panel">
                                 <div className="wdr-admin-structure__panel-header">
                                     <div>
-                                        <h2>{selectedCategory.name}</h2>
+                                        <h2>
+                                            {getLocalizedStructureValue(
+                                                selectedCategory.nameTranslations,
+                                                locale,
+                                                selectedCategory.name,
+                                            )}
+                                        </h2>
                                         <p className="wdr-admin-structure__panel-subtitle">
                                             {
                                                 ServiceCategoryLabels[
@@ -1352,7 +1502,11 @@ export const AdminServiceStructurePage: React.FC = () => {
                                 </div>
                                 {selectedCategory.description && (
                                     <p className="wdr-admin-structure__description">
-                                        {selectedCategory.description}
+                                        {getLocalizedStructureValue(
+                                            selectedCategory.descriptionTranslations,
+                                            locale,
+                                            selectedCategory.description,
+                                        )}
                                     </p>
                                 )}
                             </div>
@@ -1392,7 +1546,11 @@ export const AdminServiceStructurePage: React.FC = () => {
                                                 >
                                                     <div>
                                                         <strong>
-                                                            {subcategory.name}
+                                                            {getLocalizedStructureValue(
+                                                                subcategory.nameTranslations,
+                                                                locale,
+                                                                subcategory.name,
+                                                            )}
                                                         </strong>
                                                         <span>
                                                             {subcategory.slug}
@@ -1444,6 +1602,37 @@ export const AdminServiceStructurePage: React.FC = () => {
                                             }
                                         />
                                     </label>
+                                    <div className="wdr-admin-structure__translations">
+                                        {SUPPORTED_LOCALES.map(
+                                            (translationLocale) => (
+                                                <label
+                                                    key={`subcategory-name-${translationLocale}`}
+                                                    className="wdr-admin-structure__label"
+                                                >
+                                                    {`${t("admin.structure.label.name")} (${LOCALE_LABELS[translationLocale]})`}
+                                                    <Input
+                                                        value={readLocalizedValue(
+                                                            subcategoryForm.nameTranslations,
+                                                            translationLocale,
+                                                        )}
+                                                        onChange={(event) =>
+                                                            setSubcategoryForm(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    nameTranslations:
+                                                                        writeLocalizedValue(
+                                                                            prev.nameTranslations,
+                                                                            translationLocale,
+                                                                            event.target.value,
+                                                                        ),
+                                                                }),
+                                                            )
+                                                        }
+                                                    />
+                                                </label>
+                                            ),
+                                        )}
+                                    </div>
                                     <label className="wdr-admin-structure__label">
                                         {t("admin.structure.label.slug")}
                                         <Input
@@ -1471,6 +1660,39 @@ export const AdminServiceStructurePage: React.FC = () => {
                                             }
                                         />
                                     </label>
+                                    <div className="wdr-admin-structure__translations">
+                                        {SUPPORTED_LOCALES.map(
+                                            (translationLocale) => (
+                                                <label
+                                                    key={`subcategory-description-${translationLocale}`}
+                                                    className="wdr-admin-structure__label"
+                                                >
+                                                    {`${t("admin.structure.label.description")} (${LOCALE_LABELS[translationLocale]})`}
+                                                    <textarea
+                                                        className="wdr-admin-structure__textarea"
+                                                        rows={3}
+                                                        value={readLocalizedValue(
+                                                            subcategoryForm.descriptionTranslations,
+                                                            translationLocale,
+                                                        )}
+                                                        onChange={(event) =>
+                                                            setSubcategoryForm(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    descriptionTranslations:
+                                                                        writeLocalizedValue(
+                                                                            prev.descriptionTranslations,
+                                                                            translationLocale,
+                                                                            event.target.value,
+                                                                        ),
+                                                                }),
+                                                            )
+                                                        }
+                                                    />
+                                                </label>
+                                            ),
+                                        )}
+                                    </div>
                                     <label className="wdr-admin-structure__label">
                                         {t("admin.structure.label.order")}
                                         <Input

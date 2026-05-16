@@ -130,6 +130,35 @@ function getPaymentStatusBadge(
     }
 }
 
+function getExternalBookingSummary(
+    booking: Booking,
+    t: (key: string) => string,
+): string | null {
+    if (!booking.externalBookingStatus) {
+        return null;
+    }
+
+    const normalizedStatus = booking.externalBookingStatus.toUpperCase();
+
+    const label = (() => {
+        switch (normalizedStatus) {
+            case "CONFIRMED":
+                return t("history.provider.confirmed");
+            case "FAILED":
+                return t("history.provider.failed");
+            case "PENDING":
+            default:
+                return t("history.provider.pending");
+        }
+    })();
+
+    if (!booking.externalBookingReference) {
+        return label;
+    }
+
+    return `${label} · ${t("history.provider.reference")} ${booking.externalBookingReference}`;
+}
+
 // ============================================================
 // Icones SVG internes
 // ============================================================
@@ -272,6 +301,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const extrasSummary = formatExtrasSummary(booking);
+    const externalBookingSummary = getExternalBookingSummary(booking, t);
     const formattedStartDate = new Intl.DateTimeFormat(intlLocale, {
         day: "numeric",
         month: "long",
@@ -336,18 +366,15 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 </p>
             )}
 
-            {booking.externalBookingStatus && (
+            {externalBookingSummary && (
                 <p className="wdr-history__card-source">
-                    External: {booking.externalBookingStatus}
-                    {booking.externalBookingReference
-                        ? ` · ${booking.externalBookingReference}`
-                        : ""}
+                    {externalBookingSummary}
                 </p>
             )}
 
             {booking.externalErrorMessage && (
                 <p className="wdr-history__card-source">
-                    {booking.externalErrorMessage}
+                    {t("history.provider.error")} {booking.externalErrorMessage}
                 </p>
             )}
 

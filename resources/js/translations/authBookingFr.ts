@@ -137,7 +137,7 @@ export function buildAuthBookingFrTranslations(): Record<string, string> {
         "checkout.back": "Retour au panier",
         "checkout.continue": "Continuer vers le paiement",
         "checkout.order": "Votre réservation",
-        "checkout.partner_price": "Prix prestataire",
+        "checkout.partner_price": "Prix de base",
         "checkout.extras": "Extras",
         "checkout.service_fee": "Frais de service",
         "checkout.total_vat": "Total TTC",
@@ -175,7 +175,7 @@ export function buildAuthBookingFrTranslations(): Record<string, string> {
         "payment.confirm": "Confirmer et réserver",
         "payment.order": "Votre réservation",
         "payment.customer": "Voyageur principal",
-        "payment.partner_price": "Prix prestataire",
+        "payment.partner_price": "Prix de base",
         "payment.service_fee": "Frais de service",
         "payment.total_vat": "Total TTC",
 
@@ -206,7 +206,7 @@ export function buildAuthBookingFrTranslations(): Record<string, string> {
         "confirmation.nationality": "Nationalité",
         "confirmation.requests": "Informations complémentaires",
         "confirmation.payment_summary": "Résumé du paiement",
-        "confirmation.partner_price": "Prix prestataire",
+        "confirmation.partner_price": "Prix de base",
         "confirmation.service_fee": "Frais de service",
         "confirmation.total": "Total TTC",
         "confirmation.paid_online": "Payé en ligne",
@@ -219,7 +219,7 @@ export function buildAuthBookingFrTranslations(): Record<string, string> {
         "confirmation.next1_title": "Confirmation par e-mail",
         "confirmation.next1_desc":
             "Vous recevrez un récapitulatif complet par e-mail dans les prochaines minutes.",
-        "confirmation.next2_title": "Prise de contact du prestataire",
+        "confirmation.next2_title": "Confirmation finale",
         "confirmation.next2_desc":
             "Le partenaire pourra vous recontacter si un détail pratique doit être précisé.",
         "confirmation.next3_title": "Profitez de votre expérience",

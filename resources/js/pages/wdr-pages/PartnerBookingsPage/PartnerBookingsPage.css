@@ -152,6 +152,37 @@
     padding: 2rem 1.5rem;
 }
 
+.wdr-partner-bk__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.wdr-partner-bk__summary-card {
+    background: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 1.1rem;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.wdr-partner-bk__summary-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.wdr-partner-bk__summary-value {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    color: var(--text-main);
+}
+
 /* ============================================================
    Etat vide
    ============================================================ */
@@ -266,6 +297,7 @@
     font-weight: 700;
     color: var(--text-main);
     margin: 0;
+    overflow-wrap: anywhere;
 }
 
 /* Details (date, participants, montant) */
@@ -294,6 +326,17 @@
     margin: -0.15rem 0 0;
     font-size: 0.82rem;
     color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+.wdr-partner-bk__card-external {
+    margin: -0.1rem 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.7rem;
+    overflow-wrap: anywhere;
 }
 
 /* Notes du client */
@@ -429,6 +472,10 @@
         padding: 1rem;
     }
 
+    .wdr-partner-bk__summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .wdr-partner-bk__card-header {
         flex-direction: column;
         align-items: flex-start;
@@ -447,5 +494,11 @@
     .wdr-partner-bk__modal-actions {
         flex-direction: column-reverse;
         align-items: stretch;
+    }
+}
+
+@media (max-width: 400px) {
+    .wdr-partner-bk__summary {
+        grid-template-columns: 1fr;
     }
 }

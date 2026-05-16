@@ -48,10 +48,13 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 0.25rem;
     color: var(--text-muted);
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
     transition: color var(--transition-base);
 }
 
@@ -125,4 +128,16 @@
     margin: 0.5rem 0 0;
     padding-left: 1.25rem;
     line-height: 1.8;
+}
+
+@media (max-width: 480px) {
+    .wdr-login {
+        min-height: auto;
+        padding: 1.5rem 0.875rem;
+    }
+
+    .wdr-login__card {
+        padding: 1.5rem 1rem;
+        gap: 1.25rem;
+    }
 }

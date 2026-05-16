@@ -146,6 +146,22 @@ function statusLabel(
     }
 }
 
+function externalStatusLabel(
+    status: string,
+    t: (key: string) => string,
+): string {
+    switch (status.toUpperCase()) {
+        case "CONFIRMED":
+            return t("partner.bookings.external.status.confirmed");
+        case "PENDING":
+            return t("partner.bookings.external.status.pending");
+        case "FAILED":
+            return t("partner.bookings.external.status.failed");
+        default:
+            return status;
+    }
+}
+
 interface ModalRefusProps {
     bookingId: string;
     onConfirm: (reason: string) => void;
@@ -297,6 +313,20 @@ export const PartnerBookingsPage: React.FC = () => {
         () =>
             bookings.filter(
                 (booking) => booking.status === BookingStatusNames.PENDING,
+            ).length,
+        [bookings],
+    );
+    const confirmedCount = useMemo(
+        () =>
+            bookings.filter(
+                (booking) => booking.status === BookingStatusNames.CONFIRMED,
+            ).length,
+        [bookings],
+    );
+    const cancelledCount = useMemo(
+        () =>
+            bookings.filter(
+                (booking) => booking.status === BookingStatusNames.CANCELLED,
             ).length,
         [bookings],
     );
@@ -455,6 +485,43 @@ export const PartnerBookingsPage: React.FC = () => {
             </div>
 
             <div className="wdr-partner-bk__body">
+                {bookings.length > 0 && (
+                    <section className="wdr-partner-bk__summary">
+                        <article className="wdr-partner-bk__summary-card">
+                            <span className="wdr-partner-bk__summary-label">
+                                {t("partner.bookings.summary.total")}
+                            </span>
+                            <strong className="wdr-partner-bk__summary-value">
+                                {bookings.length}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-bk__summary-card">
+                            <span className="wdr-partner-bk__summary-label">
+                                {t("partner.bookings.summary.pending")}
+                            </span>
+                            <strong className="wdr-partner-bk__summary-value">
+                                {pendingCount}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-bk__summary-card">
+                            <span className="wdr-partner-bk__summary-label">
+                                {t("partner.bookings.summary.confirmed")}
+                            </span>
+                            <strong className="wdr-partner-bk__summary-value">
+                                {confirmedCount}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-bk__summary-card">
+                            <span className="wdr-partner-bk__summary-label">
+                                {t("partner.bookings.summary.cancelled")}
+                            </span>
+                            <strong className="wdr-partner-bk__summary-value">
+                                {cancelledCount}
+                            </strong>
+                        </article>
+                    </section>
+                )}
+
                 {filteredBookings.length === 0 ? (
                     <div className="wdr-partner-bk__empty">
                         <p>
@@ -589,12 +656,24 @@ export const PartnerBookingsPage: React.FC = () => {
                                     )}
 
                                     {booking.externalBookingStatus && (
-                                        <p className="wdr-partner-bk__card-extras">
-                                            External:{" "}
-                                            {booking.externalBookingStatus}
-                                            {booking.externalBookingReference
-                                                ? ` · ${booking.externalBookingReference}`
-                                                : ""}
+                                        <p className="wdr-partner-bk__card-external">
+                                            {t(
+                                                "partner.bookings.external.label",
+                                            )
+                                                .replace(
+                                                    "{status}",
+                                                    externalStatusLabel(
+                                                        booking.externalBookingStatus,
+                                                        t,
+                                                    ),
+                                                )
+                                                .replace(
+                                                    "{reference}",
+                                                    booking.externalBookingReference ??
+                                                        t(
+                                                            "partner.bookings.external.reference_missing",
+                                                        ),
+                                                )}
                                         </p>
                                     )}
 

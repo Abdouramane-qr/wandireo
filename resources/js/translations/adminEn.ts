@@ -150,6 +150,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.users.quick.approve": "Approve",
         "admin.users.quick.approve_success": "Partner approved.",
         "admin.users.quick.contract_signed": "Mark signed",
+        "admin.users.quick.contract_signed_confirm":
+            "Confirm that this contract has been signed?",
         "admin.users.quick.contract_signed_success":
             "Contract marked as signed.",
         "admin.users.quick.suspend": "Suspend",
@@ -300,6 +302,10 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.services.fareharbor.stats.imported": "Imported",
         "admin.services.fareharbor.stats.listed": "Published",
         "admin.services.fareharbor.stats.health": "Sync Health",
+        "admin.services.fareharbor.last_attempt": "Last attempt",
+        "admin.services.fareharbor.last_error": "Last error:",
+        "admin.services.fareharbor.toast.sync_all_partial":
+            "{failed} synchronizations out of {total} failed.",
 
         "admin.services.toast.activated": "Service activated.",
         "admin.services.toast.deactivated": "Service deactivated.",

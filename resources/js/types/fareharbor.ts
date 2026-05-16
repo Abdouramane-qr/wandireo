@@ -13,3 +13,11 @@ export interface FareHarborCompany {
     lastImportedItemsCount: number;
     lastError?: string;
 }
+
+export interface FareHarborSyncResult {
+    company: string;
+    companyId: string;
+    importedCount: number;
+    status: "SUCCESS" | "FAILED";
+    error: string | null;
+}

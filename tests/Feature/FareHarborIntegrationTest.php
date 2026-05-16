@@ -49,7 +49,7 @@ class FareHarborIntegrationTest extends TestCase
         $availabilityService = Mockery::mock(FareHarborAvailabilityService::class);
         $availabilityService
             ->shouldReceive('forService')
-            ->times(3)
+            ->times(2)
             ->withArgs(fn (Service $candidate): bool => $candidate->is($service))
             ->andReturn([
                 [
@@ -82,10 +82,10 @@ class FareHarborIntegrationTest extends TestCase
             'startDate' => now()->addDays(3)->toDateString(),
             'participants' => 2,
             'paymentMode' => 'FULL_ONLINE',
-        ])->assertCreated()
+        ])->assertStatus(422)
             ->assertJsonPath(
-                'service.id',
-                $service->id,
+                'message',
+                'External online bookings must be completed through Stripe Checkout before confirmation.',
             );
     }
 
@@ -968,8 +968,8 @@ class FareHarborIntegrationTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'ADMIN']);
         $company = FareHarborCompany::query()->create([
-            'display_name' => 'Seafaris',
-            'company_slug' => 'seafaris',
+            'display_name' => 'Moments Watersports',
+            'company_slug' => 'momentswatersports',
             'is_enabled' => true,
             'sync_items_enabled' => true,
             'sync_details_enabled' => true,
@@ -979,8 +979,9 @@ class FareHarborIntegrationTest extends TestCase
 
         $this->postJson("/api/fareharbor/companies/{$company->id}/partner-account")
             ->assertCreated()
-            ->assertJsonPath('company.company_slug', 'seafaris')
-            ->assertJsonPath('company.partner.company_name', 'Seafaris');
+            ->assertJsonPath('company.company_slug', 'momentswatersports')
+            ->assertJsonPath('company.partner.company_name', 'Moments Watersports')
+            ->assertJsonPath('partner_credentials.email', 'info@momentswatersports.com');
 
         $company->refresh();
 
@@ -988,7 +989,8 @@ class FareHarborIntegrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $company->partner_id,
             'role' => 'PARTNER',
-            'company_name' => 'Seafaris',
+            'company_name' => 'Moments Watersports',
+            'email' => 'info@momentswatersports.com',
         ]);
     }
 
@@ -1010,7 +1012,7 @@ class FareHarborIntegrationTest extends TestCase
 
         $this->artisan('fareharbor:bootstrap-companies')->assertSuccessful();
 
-        $this->assertSame(10, FareHarborCompany::query()->count());
+        $this->assertSame(17, FareHarborCompany::query()->count());
     }
 
     /**

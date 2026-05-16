@@ -101,6 +101,25 @@
     min-width: 0;
 }
 
+@media (max-width: 768px) {
+    .wdr-admin-dash__hero {
+        padding: 2rem 1rem;
+    }
+
+    .wdr-admin-dash__hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wdr-admin-dash__hero-right {
+        align-items: flex-start;
+    }
+
+    .wdr-admin-dash__body {
+        padding: 1.5rem 1rem 3rem;
+    }
+}
+
 .wdr-admin-dash__hero-text {
     flex: 1;
     min-width: 0;
@@ -137,6 +156,8 @@
     opacity: 0.75;
     margin: 0;
     text-transform: capitalize;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 .wdr-admin-dash__hero-right {
@@ -167,6 +188,14 @@
     font-size: 0.8rem;
     opacity: 0.85;
     text-align: center;
+}
+
+.wdr-admin-dash__table-partner {
+    margin-top: 0.35rem;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
 }
 
 .wdr-admin-dash__logout-btn {
@@ -346,6 +375,7 @@
 .wdr-admin-dash__shortcut small {
     font-size: 0.75rem;
     color: var(--text-muted);
+    line-height: 1.5;
 }
 
 /* ============================================================
@@ -424,6 +454,59 @@
 .wdr-admin-dash__table-commission {
     color: var(--success);
     font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .wdr-admin-dash__table {
+        min-width: 0;
+    }
+
+    .wdr-admin-dash__table thead {
+        display: none;
+    }
+
+    .wdr-admin-dash__table,
+    .wdr-admin-dash__table tbody,
+    .wdr-admin-dash__table tr,
+    .wdr-admin-dash__table td {
+        display: block;
+        width: 100%;
+    }
+
+    .wdr-admin-dash__table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .wdr-admin-dash__table tr {
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+        border-radius: 18px;
+        background: var(--bg-elevated);
+    }
+
+    .wdr-admin-dash__table td {
+        padding: 0.85rem 1rem;
+        white-space: normal;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .wdr-admin-dash__table td:last-child {
+        border-bottom: none;
+    }
+
+    .wdr-admin-dash__table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
 }
 
 /* ============================================================

@@ -1,5 +1,8 @@
 import api from "./client";
-import type { FareHarborCompany } from "@/types/fareharbor";
+import type {
+    FareHarborCompany,
+    FareHarborSyncResult,
+} from "@/types/fareharbor";
 
 function normalizeFareHarborCompany(
     raw: Record<string, unknown>,
@@ -61,6 +64,21 @@ export interface FareHarborCompanyPayload {
 export interface FareHarborPartnerCredentials {
     email: string;
     temporaryPassword: string;
+}
+
+function normalizeSyncResult(
+    raw: Record<string, unknown>,
+): FareHarborSyncResult {
+    return {
+        company: String(raw.company ?? ""),
+        companyId: String(raw.companyId ?? raw.company_id ?? ""),
+        importedCount: Number(raw.importedCount ?? raw.imported_count ?? 0),
+        status:
+            String(raw.status ?? "SUCCESS").toUpperCase() === "FAILED"
+                ? "FAILED"
+                : "SUCCESS",
+        error: String(raw.error ?? "") || null,
+    };
 }
 
 export const fareHarborApi = {
@@ -136,5 +154,18 @@ export const fareHarborApi = {
                 },
             })),
 
-    syncAll: () => api.post("/fareharbor/companies/sync-all").then((r) => r.data),
+    syncAll: () =>
+        api
+            .post<{
+                data: Record<string, unknown>[];
+                summary: {
+                    total: number;
+                    failed: number;
+                    succeeded: number;
+                };
+            }>("/fareharbor/companies/sync-all")
+            .then((response) => ({
+                data: response.data.data.map(normalizeSyncResult),
+                summary: response.data.summary,
+            })),
 };

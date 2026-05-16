@@ -122,6 +122,7 @@
 
 .wdr-field__icon--right {
     right: 0.75rem;
+    pointer-events: auto;
 }
 
 /* Decalage de l'input quand une icone est presente */

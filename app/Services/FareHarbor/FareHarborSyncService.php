@@ -138,6 +138,7 @@ class FareHarborSyncService
             ];
         } catch (\Throwable $exception) {
             $company->update([
+                'last_synced_at' => now(),
                 'last_status' => 'FAILED',
                 'last_error' => Str::limit($exception->getMessage(), 1500),
             ]);
@@ -169,7 +170,24 @@ class FareHarborSyncService
             ->where('is_enabled', true)
             ->orderBy('display_name')
             ->get()
-            ->map(fn (FareHarborCompany $company) => $this->syncCompany($company))
+            ->map(function (FareHarborCompany $company) {
+                try {
+                    return [
+                        ...$this->syncCompany($company),
+                        'companyId' => (string) $company->id,
+                        'status' => 'SUCCESS',
+                        'error' => null,
+                    ];
+                } catch (\Throwable $exception) {
+                    return [
+                        'company' => $company->company_slug,
+                        'companyId' => (string) $company->id,
+                        'importedCount' => 0,
+                        'status' => 'FAILED',
+                        'error' => Str::limit($exception->getMessage(), 1500),
+                    ];
+                }
+            })
             ->all();
     }
 

@@ -9,13 +9,11 @@ import api from './client';
 export interface UpdateMeRequest {
     firstName?: string;
     lastName?: string;
+    email?: string;
     phoneNumber?: string;
     language?: string;
     preferredCurrency?: string;
     profilePicture?: string;
-}
-
-export interface UpdatePartnerRequest {
     companyName?: string;
     businessAddress?: string;
 }
@@ -81,6 +79,10 @@ export interface AdminCreateUserRequest {
     mandateContractFilePath?: string;
 }
 
+export interface PartnerContractSignRequest {
+    accepted: boolean;
+}
+
 export interface UsersParams {
     search?: string;
     role?: string;
@@ -92,24 +94,17 @@ export interface UsersParams {
 export const usersApi = {
     me: () => api.get<unknown>('/users/me').then((r) => normalizeUser(r.data)),
 
-    updateMe: (data: UpdateMeRequest | UpdatePartnerRequest) =>
+    updateMe: (data: UpdateMeRequest) =>
         api
             .patch<unknown>('/users/me', {
-                first_name: 'firstName' in data ? data.firstName : undefined,
-                last_name: 'lastName' in data ? data.lastName : undefined,
-                phone_number:
-                    'phoneNumber' in data ? data.phoneNumber : undefined,
-                language: 'language' in data ? data.language : undefined,
-                preferred_currency:
-                    'preferredCurrency' in data
-                        ? data.preferredCurrency
-                        : undefined,
-                company_name:
-                    'companyName' in data ? data.companyName : undefined,
-                business_address:
-                    'businessAddress' in data
-                        ? data.businessAddress
-                        : undefined,
+                first_name: data.firstName,
+                last_name: data.lastName,
+                email: data.email,
+                phone_number: data.phoneNumber,
+                language: data.language,
+                preferred_currency: data.preferredCurrency,
+                company_name: data.companyName,
+                business_address: data.businessAddress,
             })
             .then((r) => normalizeUser(r.data)),
 
@@ -230,4 +225,16 @@ export const usersApi = {
             })
             .then((r) => normalizeUser(r.data));
     },
+
+    adminMarkContractSigned: (id: string) =>
+        api
+            .post<unknown>(`/users/${id}/contract/mark-signed`)
+            .then((r) => normalizeUser(r.data)),
+
+    partnerSignContract: (data: PartnerContractSignRequest) =>
+        api
+            .post<unknown>('/partner/contract/sign', {
+                accepted: data.accepted,
+            })
+            .then((r) => normalizeUser(r.data)),
 };

@@ -95,8 +95,9 @@ class ServiceController extends Controller
     {
         $query = Service::with(['partner', 'serviceCategory', 'serviceSubcategory']);
         $operator = $this->likeOperator();
+        $canSeeHiddenPartnerCatalog = $this->canSeeHiddenPartnerCatalog($request);
         $shouldRestrictToPublicCatalog = ! $request->boolean('adminAll')
-            && ! $request->filled('partnerId');
+            && ! $canSeeHiddenPartnerCatalog;
 
         if ($shouldRestrictToPublicCatalog) {
             $query->where('is_available', true);
@@ -264,6 +265,7 @@ class ServiceController extends Controller
             'location_region' => 'sometimes|nullable|string',
             'partner_id' => 'sometimes|nullable|integer|exists:users,id',
             'partner_price' => 'sometimes|numeric|min:0',
+            'commission_rate' => 'sometimes|nullable|numeric|between:0,1',
             'pricing_unit' => 'sometimes|string',
             'payment_mode' => 'sometimes|nullable|string',
             'booking_mode' => 'sometimes|in:INSTANT,REQUEST,EXTERNAL_REDIRECT',
@@ -496,6 +498,26 @@ class ServiceController extends Controller
         return $user->role === 'PARTNER' && $service->partner_id === $user->id;
     }
 
+    private function canSeeHiddenPartnerCatalog(Request $request): bool
+    {
+        if (! $request->filled('partnerId')) {
+            return false;
+        }
+
+        $user = $request->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->role === 'ADMIN') {
+            return true;
+        }
+
+        return $user->role === 'PARTNER'
+            && (string) $request->partnerId === (string) $user->id;
+    }
+
     private function trackSearchIfEligible(Request $request): void
     {
         if (in_array($request->user()?->role, ['ADMIN', 'PARTNER'], true)) {
@@ -688,6 +710,7 @@ class ServiceController extends Controller
                 'location_country',
                 'location_region',
                 'partner_price',
+                'commission_rate',
                 'pricing_unit',
                 'payment_mode',
                 'booking_mode',

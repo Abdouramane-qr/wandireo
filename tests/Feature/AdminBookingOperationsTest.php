@@ -51,6 +51,23 @@ class AdminBookingOperationsTest extends TestCase
             'external_error_message' => 'Partner stock sync failed.',
         ]);
 
+        $pendingProviderBooking = Booking::query()->create([
+            'client_id' => $client->id,
+            'partner_id' => $partner->id,
+            'service_id' => $service->id,
+            'status' => 'PENDING',
+            'payment_status' => 'PAID',
+            'start_date' => now()->addDays(2)->toDateString(),
+            'participants' => 2,
+            'unit_price' => 120.00,
+            'total_price' => 240.00,
+            'currency' => 'EUR',
+            'payment_mode' => 'EXTERNAL_REDIRECT',
+            'amount_paid_online' => 240.00,
+            'external_booking_reference' => 'fh-pending-234',
+            'external_booking_status' => 'PENDING',
+        ]);
+
         Booking::query()->create([
             'client_id' => $client->id,
             'partner_id' => $partner->id,
@@ -80,6 +97,11 @@ class AdminBookingOperationsTest extends TestCase
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.external_booking_reference', 'fh-failed-123');
 
+        $this->getJson('/api/bookings?externalBookingStatus=PENDING')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', (string) $pendingProviderBooking->id);
+
         $this->getJson('/api/bookings?q=stock%20sync')
             ->assertOk()
             ->assertJsonCount(1, 'data')
@@ -87,6 +109,50 @@ class AdminBookingOperationsTest extends TestCase
 
         $this->getJson('/api/bookings?q=Ocean%20Trails')
             ->assertOk()
-            ->assertJsonCount(2, 'data');
+            ->assertJsonCount(3, 'data');
+    }
+
+    public function test_admin_cannot_manually_confirm_external_booking(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $client = User::factory()->create(['role' => 'CLIENT']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+        $service = Service::factory()
+            ->for($partner, 'partner')
+            ->create([
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+            ]);
+        $booking = Booking::query()->create([
+            'client_id' => $client->id,
+            'partner_id' => $partner->id,
+            'service_id' => $service->id,
+            'status' => 'PENDING',
+            'payment_status' => 'PAID',
+            'start_date' => now()->addDay()->toDateString(),
+            'participants' => 2,
+            'unit_price' => 120.00,
+            'total_price' => 240.00,
+            'currency' => 'EUR',
+            'payment_mode' => 'EXTERNAL_REDIRECT',
+            'amount_paid_online' => 240.00,
+            'external_booking_status' => 'PENDING',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson("/api/bookings/{$booking->id}/status", [
+            'status' => 'CONFIRMED',
+        ])->assertStatus(422)
+            ->assertJsonPath('message', 'External bookings cannot be confirmed manually.');
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'PENDING',
+            'external_booking_status' => 'PENDING',
+        ]);
     }
 }

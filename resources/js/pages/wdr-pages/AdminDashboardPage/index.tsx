@@ -191,6 +191,26 @@ function getStatusClass(status: string): string {
     return "cancelled";
 }
 
+function getExternalStatusSummary(booking: {
+    externalBookingStatus?: string;
+    externalBookingReference?: string;
+    externalErrorMessage?: string;
+}, t: (key: string) => string): string | null {
+    if (booking.externalErrorMessage) {
+        return booking.externalErrorMessage;
+    }
+
+    if (!booking.externalBookingStatus) {
+        return null;
+    }
+
+    return `${t("admin.dashboard.external_status")}: ${booking.externalBookingStatus}${
+        booking.externalBookingReference
+            ? ` · ${booking.externalBookingReference}`
+            : ""
+    }`;
+}
+
 // ============================================================
 // Composant principal
 // ============================================================
@@ -694,14 +714,27 @@ export const AdminDashboardPage: React.FC = () => {
                                                     : "—"}
                                             </td>
                                             <td data-label={t("admin.dashboard.table.status")}>
-                                                <span
-                                                    className={`wdr-admin-dash__status wdr-admin-dash__status--${getStatusClass(booking.status)}`}
-                                                >
-                                                    {getStatusLabel(
-                                                        booking.status,
+                                                <div>
+                                                    <span
+                                                        className={`wdr-admin-dash__status wdr-admin-dash__status--${getStatusClass(booking.status)}`}
+                                                    >
+                                                        {getStatusLabel(
+                                                            booking.status,
+                                                            t,
+                                                        )}
+                                                    </span>
+                                                    {getExternalStatusSummary(
+                                                        booking,
                                                         t,
+                                                    ) && (
+                                                        <div className="wdr-admin-dash__table-partner">
+                                                            {getExternalStatusSummary(
+                                                                booking,
+                                                                t,
+                                                            )}
+                                                        </div>
                                                     )}
-                                                </span>
+                                                </div>
                                             </td>
                                         </tr>
                                     );

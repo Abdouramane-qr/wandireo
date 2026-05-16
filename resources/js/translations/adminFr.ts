@@ -2,9 +2,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
     return {
         // Admin Dashboard
         "admin.dashboard.title": "Administration",
-        "admin.dashboard.subtitle": "Aperçu global de la plateforme et indicateurs clés.",
+        "admin.dashboard.subtitle": "Suivez les indicateurs clés, les réservations récentes et l'état opérationnel de la plateforme.",
         "admin.dashboard.logout": "Déconnexion",
-        "admin.dashboard.badge": "Admin",
+        "admin.dashboard.badge": "Pilotage",
         "admin.dashboard.avatar_label": "Avatar administrateur",
         "admin.dashboard.recent.title": "Dernières réservations",
         "admin.dashboard.recent.view_all": "Tout voir",
@@ -13,8 +13,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.dashboard.table.client": "Client",
         "admin.dashboard.table.partner": "Partenaire",
         "admin.dashboard.table.amount": "Total",
-        "admin.dashboard.table.commission": "Comm.",
+        "admin.dashboard.table.commission": "Commission",
         "admin.dashboard.table.status": "Statut",
+        "admin.dashboard.external_status": "Statut externe",
         "admin.dashboard.status.pending": "En attente",
         "admin.dashboard.status.confirmed": "Confirmée",
         "admin.dashboard.status.cancelled": "Annulée",
@@ -105,8 +106,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.blog.toast.status_error": "Erreur lors du changement de statut.",
 
         // Admin Reviews
-        "admin.reviews.title": "Modération des Avis",
-        "admin.reviews.subtitle": "Gérez les retours clients et la visibilité des avis sur la plateforme.",
+        "admin.reviews.title": "Modération des avis",
+        "admin.reviews.subtitle": "Relisez, validez ou rejetez les avis clients avant leur mise en ligne.",
+        "admin.reviews.badge": "Avis",
         "admin.reviews.search": "Rechercher un avis...",
         "admin.reviews.empty": "Aucun avis à modérer.",
         "admin.reviews.rating": "Note",
@@ -131,7 +133,7 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.reviews.delete_error": "Erreur lors de la suppression de l'avis.",
 
         // Admin Users
-        "admin.users.badge": "Utilisateurs",
+        "admin.users.badge": "Comptes",
         "admin.users.title": "Gestion des utilisateurs",
         "admin.users.subtitle":
             "Pilotez les comptes clients, partenaires et administrateurs de la plateforme.",
@@ -145,7 +147,7 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.metric.commission": "Commission",
         "admin.users.metric.partner_net": "Net partenaire",
         "admin.users.metric.bookings": "Réservations",
-        "admin.users.folder": "Dossier",
+        "admin.users.folder": "Suivi admin",
         "admin.users.contract_prefix": " · Contrat : ",
         "admin.users.stripe_id": "ID Stripe",
         "admin.users.stripe_missing": "Non connecté",
@@ -156,6 +158,8 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.quick.approve": "Approuver",
         "admin.users.quick.approve_success": "Partenaire approuvé.",
         "admin.users.quick.contract_signed": "Marquer signé",
+        "admin.users.quick.contract_signed_confirm":
+            "Confirmer que ce contrat a bien été signé ?",
         "admin.users.quick.contract_signed_success":
             "Contrat marqué comme signé.",
         "admin.users.quick.suspend": "Suspendre",
@@ -256,8 +260,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.csv.first_name": "prénom",
 
         // Admin Services
-        "admin.services.title": "Gestion du Catalogue",
-        "admin.services.subtitle": "Gérez l'ensemble des services proposés sur Wandireo.",
+        "admin.services.title": "Gestion du catalogue",
+        "admin.services.subtitle":
+            "Suivez {active} services visibles sur {total} fiches locales ou synchronisées.",
         "admin.services.search_placeholder": "Rechercher un service, un partenaire...",
         "admin.services.search_aria": "Rechercher dans le catalogue",
         "admin.services.results": "{count} services trouvés",
@@ -265,7 +270,7 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.services.export_csv": "Exporter CSV",
         "admin.services.configure_structure": "Configurer la structure",
         "admin.services.empty": "Aucun service trouvé.",
-        "admin.services.badge": "Service",
+        "admin.services.badge": "Catalogue",
         "admin.services.filters_aria": "Filtres du catalogue",
         "admin.services.table_aria": "Tableau des services",
         "admin.services.col.service": "Service",
@@ -273,9 +278,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.services.col.category": "Catégorie",
         "admin.services.col.source": "Source",
         "admin.services.col.client_price": "Prix client",
-        "admin.services.col.partner_net": "Net part.",
-        "admin.services.col.commission": "Comm.",
-        "admin.services.col.availability": "Dispo.",
+        "admin.services.col.partner_net": "Net partenaire",
+        "admin.services.col.commission": "Commission",
+        "admin.services.col.availability": "Disponibilité",
         "admin.services.col.rating": "Note",
         "admin.services.col.action": "Action",
 
@@ -304,15 +309,19 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.services.fareharbor.stats.imported": "Importés",
         "admin.services.fareharbor.stats.listed": "Publiés",
         "admin.services.fareharbor.stats.health": "Santé Sync",
+        "admin.services.fareharbor.last_attempt": "Dernière tentative",
+        "admin.services.fareharbor.last_error": "Dernière erreur :",
+        "admin.services.fareharbor.toast.sync_all_partial":
+            "{failed} synchronisations sur {total} ont échoué.",
 
         "admin.services.toast.activated": "Service activé.",
         "admin.services.toast.deactivated": "Service désactivé.",
         "admin.services.toast.error": "Erreur lors du changement de statut.",
 
         // Admin Structure (Dynamic Fields)
-        "admin.structure.title": "Structure du Catalogue",
+        "admin.structure.title": "Structure du catalogue",
         "admin.structure.subtitle": "Définissez les catégories, sous-catégories, attributs et options disponibles.",
-        "admin.structure.eyebrow": "Configuration système",
+        "admin.structure.eyebrow": "Structure",
         "admin.structure.back_catalog": "Retour au catalogue",
         "admin.structure.categories": "Catégories",
         "admin.structure.extras": "Options (Extras)",
@@ -437,9 +446,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.structure.update": "Mettre à jour la structure",
 
         // Admin Transactions
-        "admin.transactions.title": "Transactions & Finances",
-        "admin.transactions.subtitle": "Suivi des paiements, commissions et flux financiers de la plateforme.",
-        "admin.transactions.badge": "Transaction",
+        "admin.transactions.title": "Transactions et finances",
+        "admin.transactions.subtitle": "Suivez les paiements, les remboursements, les commissions et les statuts externes utiles aux opérations.",
+        "admin.transactions.badge": "Finances",
         "admin.transactions.count": "{count} transactions",
         "admin.transactions.filters_aria": "Filtres financiers",
         "admin.transactions.filter.partner_all": "Tous les partenaires",
@@ -460,9 +469,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.col.partner": "Partenaire",
         "admin.transactions.col.volume": "Volume TTC",
         "admin.transactions.col.rate": "Taux",
-        "admin.transactions.col.commission": "Comm.",
+        "admin.transactions.col.commission": "Commission",
         "admin.transactions.col.provider": "Prestataire",
-        "admin.transactions.col.bookings": "Résas",
+        "admin.transactions.col.bookings": "Réservations",
         "admin.transactions.col.stripe_id": "ID Stripe",
 
         "admin.transactions.total.volume": "Volume total d'affaires",
@@ -476,8 +485,10 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.payment.paid": "Payé",
         "admin.transactions.payment.pending": "En attente",
         "admin.transactions.payment.refunded": "Remboursé",
+        "admin.transactions.external.label": "Statut prestataire",
         "admin.transactions.external.confirmed": "Prestataire confirmé",
         "admin.transactions.external.failed": "Prestataire en échec",
+        "admin.transactions.external.pending": "Prestataire en attente",
         "admin.transactions.external.none": "Sans statut prestataire",
 
         "admin.transactions.details.title": "Détail de la transaction",

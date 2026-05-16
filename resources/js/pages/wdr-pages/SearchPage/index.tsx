@@ -18,6 +18,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import type { Route } from "@/hooks/useWdrRouter";
 import { formatPrice } from "@/lib/formatters";
+import { buildPublicDestinationOptions } from "@/lib/publicDestinations";
 import { inferCategoryFromSearchTerm } from "@/lib/searchCategory";
 import { toServiceCardData } from "@/lib/serviceAdapter";
 import type {
@@ -59,17 +60,6 @@ interface DynamicFilterGroup {
 }
 
 const ITEMS_PER_PAGE = 6;
-const ALGARVE_CITIES = [
-    "Lagos",
-    "Alvor",
-    "Portimão",
-    "Silves",
-    "Benagil",
-    "Armação de Pêra",
-    "Vilamoura",
-    "Albufeira",
-];
-
 const ALL_CATEGORIES: ServiceCategory[] = [
     ServiceCategoryNames.ACTIVITE,
     ServiceCategoryNames.BATEAU,
@@ -121,6 +111,16 @@ function normalizeText(value: string): string {
         .toLowerCase()
         .normalize("NFD")
         .replace(/\p{Diacritic}/gu, "");
+}
+
+function slugifyStructureLabel(value: string): string {
+    return value
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 }
 
 function getServiceAttributes(service: Service): Record<string, unknown> {
@@ -436,35 +436,19 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         }
     }, [activeVertical, t]);
 
+    const translateStructureLabel = (
+        type: "subcategory" | "attribute",
+        rawLabel: string,
+        slug?: string,
+    ): string => {
+        const translationKey = `search.${type}.${slugifyStructureLabel(slug || rawLabel)}`;
+        const translated = t(translationKey);
+
+        return translated === translationKey ? rawLabel : translated;
+    };
+
     const destinationOptions = useMemo(() => {
-        const algarveSet = new Set(ALGARVE_CITIES);
-        const extraCities = new Map<string, Set<string>>();
-
-        for (const service of allServices) {
-            if (algarveSet.has(service.location.city)) {
-                continue;
-            }
-
-            if (!extraCities.has(service.location.country)) {
-                extraCities.set(service.location.country, new Set());
-            }
-
-            extraCities
-                .get(service.location.country)
-                ?.add(service.location.city);
-        }
-
-        return [
-            { country: "Algarve", cities: ALGARVE_CITIES },
-            ...Array.from(extraCities.entries())
-                .sort(([a], [b]) => a.localeCompare(b, "fr"))
-                .map(([country, cities]) => ({
-                    country,
-                    cities: Array.from(cities).sort((a, b) =>
-                        a.localeCompare(b, "fr"),
-                    ),
-                })),
-        ].sort((a, b) => {
+        return buildPublicDestinationOptions(allServices).sort((a, b) => {
             if (a.country === "Algarve") {
                 return -1;
             }
@@ -1132,7 +1116,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                                                     )
                                                 }
                                             />
-                                            {entry.name}
+                                            {translateStructureLabel(
+                                                "subcategory",
+                                                entry.name,
+                                                entry.slug,
+                                            )}
                                         </label>
                                     </li>
                                 ))}
@@ -1146,7 +1134,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                             className="wdr-search__filter-group wdr-search__filter-group--specific"
                         >
                             <h3 className="wdr-search__filter-label wdr-search__filter-label--specific">
-                                {group.attribute.label}
+                                {translateStructureLabel(
+                                    "attribute",
+                                    group.attribute.label,
+                                    group.attribute.key,
+                                )}
                             </h3>
                             <ul
                                 className="wdr-search__checkbox-list"

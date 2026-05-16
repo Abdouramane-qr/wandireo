@@ -150,6 +150,8 @@ export function buildAdminEsTranslations(): Record<string, string> {
         "admin.users.quick.approve": "Aprobar",
         "admin.users.quick.approve_success": "Socio aprobado.",
         "admin.users.quick.contract_signed": "Marcar firmado",
+        "admin.users.quick.contract_signed_confirm":
+            "¿Confirma que este contrato ha sido firmado?",
         "admin.users.quick.contract_signed_success":
             "Contrato marcado como firmado.",
         "admin.users.quick.suspend": "Suspender",

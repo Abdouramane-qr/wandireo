@@ -143,5 +143,63 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.form.ical.status.running": "Synchronisation en cours",
         "service.form.ical.status.success": "Synchronisée",
         "service.form.ical.status.failed": "Échec",
+        "service.form.structure.title": "Structure du service",
+        "service.form.structure.subtitle":
+            "Vérifiez la catégorie active, les sous-catégories et les champs dynamiques qui seront affichés dans ce formulaire.",
+        "service.form.structure.manage": "Gérer le catalogue",
+        "service.form.structure.choose_hint":
+            "Sélectionnez d'abord une structure active pour afficher ses sous-catégories, attributs et options.",
+        "service.form.structure.none_active":
+            "Aucune structure active n'est disponible pour cette catégorie pour le moment.",
+        "service.form.structure.active": "Structure active",
+        "service.form.structure.subcategories": "Sous-catégories",
+        "service.form.structure.selected": "Sélectionnée",
+        "service.form.structure.none_subcategories":
+            "Aucune sous-catégorie active disponible.",
+        "service.form.structure.attributes": "Attributs",
+        "service.form.structure.required_count":
+            "{required} obligatoire(s) sur {total} attribut(s)",
+        "service.form.structure.required": "Obligatoire",
+        "service.form.structure.optional": "Optionnel",
+        "service.form.structure.filter": "Filtre",
+        "service.form.structure.none_attributes":
+            "Aucun attribut dynamique configuré.",
+        "service.form.structure.extras": "Extras",
+        "service.form.structure.none_extras":
+            "Aucun extra actif configuré.",
+        "service.form.section.guidance": "Conseils de saisie",
+        "service.form.guidance.structure": "Structure active : {name}",
+        "service.form.guidance.activity.title":
+            "Décrivez l'expérience de façon concrète",
+        "service.form.guidance.activity.1":
+            "Mettez en avant le déroulé de l'activité, la durée et le niveau attendu.",
+        "service.form.guidance.activity.2":
+            "Précisez les points de rendez-vous, équipements inclus et contraintes de participation.",
+        "service.form.guidance.activity.3":
+            "Évitez les descriptions vagues: le client doit comprendre ce qu'il réserve en quelques secondes.",
+        "service.form.guidance.boat.title":
+            "Présentez clairement le bateau et l'usage",
+        "service.form.guidance.boat.1":
+            "Indiquez la capacité réelle, le type de sortie et les conditions d'accès à bord.",
+        "service.form.guidance.boat.2":
+            "Précisez si skipper, carburant ou équipements sont inclus ou proposés en option.",
+        "service.form.guidance.boat.3":
+            "Mentionnez sans ambiguïté le permis, la caution et les horaires de départ ou de retour.",
+        "service.form.guidance.stay.title":
+            "Cadrez le séjour avec des informations opérationnelles",
+        "service.form.guidance.stay.1":
+            "Renseignez la capacité, les horaires d'arrivée et de départ, ainsi que les conditions de séjour.",
+        "service.form.guidance.stay.2":
+            "Mettez en avant les équipements différenciants et les règles qui évitent les malentendus.",
+        "service.form.guidance.stay.3":
+            "Décrivez le logement avec un niveau de détail cohérent avec le prix et le positionnement.",
+        "service.form.guidance.car.title":
+            "Donnez les informations clés avant réservation",
+        "service.form.guidance.car.1":
+            "Précisez la transmission, le carburant, la capacité et les conditions de retrait.",
+        "service.form.guidance.car.2":
+            "Ajoutez les limites importantes: âge minimum, caution, kilométrage et assurance.",
+        "service.form.guidance.car.3":
+            "Gardez un texte simple et direct, sans jargon interne ni promesses imprécises.",
     };
 }

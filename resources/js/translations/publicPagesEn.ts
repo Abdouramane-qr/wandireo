@@ -88,6 +88,11 @@ export function buildPublicPagesEnTranslations(): Record<string, string> {
         "history.tab.cancelled": "Cancelled bookings",
         "history.reference": "Ref.",
         "history.payment.pending": "Payment pending",
+        "history.provider.pending": "Booking validation in progress",
+        "history.provider.confirmed": "Booking confirmed",
+        "history.provider.failed": "Validation failed",
+        "history.provider.reference": "Validation ref.",
+        "history.provider.error": "Details:",
         "history.review_done": "Review already sent",
         "history.review_title": "Share your review",
         "history.review_placeholder":

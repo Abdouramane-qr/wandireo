@@ -342,6 +342,8 @@
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .wdr-home__sdivider {
@@ -815,6 +817,11 @@
         overflow: visible;
         text-overflow: unset;
         min-height: 1.5rem;
+    }
+
+    .wdr-home__date-placeholder {
+        white-space: normal;
+        max-width: 100%;
     }
 }
 

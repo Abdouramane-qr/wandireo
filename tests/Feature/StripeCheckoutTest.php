@@ -224,6 +224,10 @@ class StripeCheckoutTest extends TestCase
 
                 return new ExternalBookingResult('fh-no-stripe-123', 'CONFIRMED');
             });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(true);
         $this->app->instance(ExternalBookingService::class, $externalBookingService);
 
         Sanctum::actingAs($client);
@@ -245,6 +249,44 @@ class StripeCheckoutTest extends TestCase
             'external_booking_reference' => 'fh-no-stripe-123',
             'external_booking_status' => 'CONFIRMED',
         ]);
+    }
+
+    public function test_external_online_booking_requires_checkout_when_stripe_is_configured(): void
+    {
+        config()->set('services.stripe.secret', 'sk_test_123');
+
+        $client = User::factory()->create(['role' => 'CLIENT']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'partner_id' => $partner->id,
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'payment_mode' => 'EXTERNAL_REDIRECT',
+            ]);
+
+        $externalBookingService = Mockery::mock(ExternalBookingService::class);
+        $externalBookingService->shouldNotReceive('syncOrFail');
+        $this->app->instance(ExternalBookingService::class, $externalBookingService);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/bookings/confirm', [
+            'serviceId' => $service->id,
+            'startDate' => now()->addDay()->toDateString(),
+            'participants' => 2,
+            'paymentMode' => 'EXTERNAL_REDIRECT',
+        ])->assertStatus(422)
+            ->assertJsonPath(
+                'message',
+                'External online bookings must be completed through Stripe Checkout before confirmation.',
+            );
+
+        $this->assertDatabaseCount('bookings', 0);
     }
 
     public function test_checkout_rejects_fareharbor_deposit_only_services_for_online_payment(): void
@@ -320,6 +362,10 @@ class StripeCheckoutTest extends TestCase
 
                 return new ExternalBookingResult('fh-offline-123', 'CONFIRMED');
             });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(true);
         $this->app->instance(ExternalBookingService::class, $externalBookingService);
 
         Sanctum::actingAs($client);
@@ -340,6 +386,65 @@ class StripeCheckoutTest extends TestCase
             'payment_status' => 'PENDING',
             'external_booking_reference' => 'fh-offline-123',
             'external_booking_status' => 'CONFIRMED',
+        ]);
+    }
+
+    public function test_external_offline_booking_remains_pending_when_provider_status_is_not_final(): void
+    {
+        $client = User::factory()->create(['role' => 'CLIENT']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'partner_id' => $partner->id,
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'payment_mode' => 'FULL_CASH_ON_SITE',
+            ]);
+
+        $externalBookingService = Mockery::mock(ExternalBookingService::class);
+        $externalBookingService
+            ->shouldReceive('requiresExternalBooking')
+            ->once()
+            ->andReturn(true);
+        $externalBookingService
+            ->shouldReceive('syncOrFail')
+            ->once()
+            ->andReturnUsing(function (Booking $booking): ExternalBookingResult {
+                $booking->update([
+                    'external_booking_reference' => 'fh-offline-pending',
+                    'external_booking_status' => 'PENDING',
+                ]);
+
+                return new ExternalBookingResult('fh-offline-pending', 'PENDING');
+            });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(false);
+        $this->app->instance(ExternalBookingService::class, $externalBookingService);
+
+        Sanctum::actingAs($client);
+
+        $response = $this->postJson('/api/bookings/confirm', [
+            'serviceId' => $service->id,
+            'startDate' => now()->addDay()->toDateString(),
+            'participants' => 2,
+            'paymentMode' => 'FULL_CASH_ON_SITE',
+        ]);
+
+        $response->assertCreated();
+        $bookingId = (string) $response->json('id');
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $bookingId,
+            'status' => 'PENDING',
+            'payment_status' => 'PENDING',
+            'external_booking_reference' => 'fh-offline-pending',
+            'external_booking_status' => 'PENDING',
         ]);
     }
 
@@ -550,6 +655,10 @@ class StripeCheckoutTest extends TestCase
                     ['id' => 'fh-booking-123'],
                 );
             });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(true);
         $this->app->instance(ExternalBookingService::class, $externalBookingService);
 
         $payload = json_encode([
@@ -585,6 +694,113 @@ class StripeCheckoutTest extends TestCase
             'payment_status' => 'PAID',
             'external_booking_reference' => 'fh-booking-123',
             'external_booking_status' => 'CONFIRMED',
+        ]);
+    }
+
+    public function test_stripe_webhook_keeps_external_booking_pending_when_provider_status_is_not_final(): void
+    {
+        config()->set('services.stripe.webhook_secret', 'whsec_test_123');
+
+        $user = User::factory()->create(['role' => 'CLIENT']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'partner_id' => $partner->id,
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'payment_mode' => 'EXTERNAL_REDIRECT',
+            ]);
+        $booking = Booking::query()->create([
+            'client_id' => $user->id,
+            'partner_id' => $partner->id,
+            'service_id' => $service->id,
+            'status' => 'AWAITING_PAYMENT',
+            'payment_status' => 'PENDING',
+            'start_date' => now()->addDay()->toDateString(),
+            'participants' => 2,
+            'unit_price' => 120.00,
+            'total_price' => 240.00,
+            'currency' => 'EUR',
+            'payment_mode' => 'EXTERNAL_REDIRECT',
+            'amount_paid_online' => 240.00,
+            'extra_data' => [],
+        ]);
+        Payment::query()->create([
+            'user_id' => $user->id,
+            'stripe_session_id' => 'cs_test_external_pending',
+            'amount' => 240.00,
+            'currency' => 'EUR',
+            'status' => 'pending',
+            'metadata' => [
+                'booking_id' => $booking->id,
+            ],
+        ]);
+
+        $externalBookingService = Mockery::mock(ExternalBookingService::class);
+        $externalBookingService
+            ->shouldReceive('requiresExternalBooking')
+            ->once()
+            ->andReturn(true);
+        $externalBookingService
+            ->shouldReceive('syncOrFail')
+            ->once()
+            ->withArgs(fn (Booking $candidate): bool => $candidate->is($booking))
+            ->andReturnUsing(function (Booking $candidate): ExternalBookingResult {
+                $candidate->update([
+                    'external_booking_reference' => 'fh-booking-pending',
+                    'external_booking_status' => 'PENDING',
+                    'external_booking_payload' => ['id' => 'fh-booking-pending'],
+                ]);
+
+                return new ExternalBookingResult(
+                    'fh-booking-pending',
+                    'PENDING',
+                    ['id' => 'fh-booking-pending'],
+                );
+            });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(false);
+        $this->app->instance(ExternalBookingService::class, $externalBookingService);
+
+        $payload = json_encode([
+            'id' => 'evt_test_external_pending',
+            'object' => 'event',
+            'type' => 'checkout.session.completed',
+            'data' => [
+                'object' => [
+                    'id' => 'cs_test_external_pending',
+                    'payment_status' => 'paid',
+                ],
+            ],
+        ], JSON_THROW_ON_ERROR);
+        $timestamp = time();
+        $signature = hash_hmac('sha256', "{$timestamp}.{$payload}", 'whsec_test_123');
+
+        $this->call(
+            'POST',
+            '/api/stripe/webhook',
+            [],
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Stripe-Signature' => "t={$timestamp},v1={$signature}",
+            ],
+            $payload,
+        )->assertOk();
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'PENDING',
+            'payment_status' => 'PAID',
+            'external_booking_reference' => 'fh-booking-pending',
+            'external_booking_status' => 'PENDING',
         ]);
     }
 
@@ -758,6 +974,10 @@ class StripeCheckoutTest extends TestCase
                     ['id' => 'fh-booking-once'],
                 );
             });
+        $externalBookingService
+            ->shouldReceive('hasConfirmedExternalBooking')
+            ->once()
+            ->andReturn(true);
         $this->app->instance(ExternalBookingService::class, $externalBookingService);
 
         $payload = json_encode([

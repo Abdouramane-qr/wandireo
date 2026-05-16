@@ -143,5 +143,63 @@ export function buildServicePtTranslations(): Record<string, string> {
         "service.form.ical.status.running": "Sincronização em curso",
         "service.form.ical.status.success": "Sincronizada",
         "service.form.ical.status.failed": "Falhou",
+        "service.form.structure.title": "Estrutura do serviço",
+        "service.form.structure.subtitle":
+            "Reveja a categoria ativa, as subcategorias e os campos dinâmicos que serão apresentados neste formulário.",
+        "service.form.structure.manage": "Gerir catálogo",
+        "service.form.structure.choose_hint":
+            "Selecione primeiro uma estrutura ativa para apresentar as respetivas subcategorias, atributos e opções.",
+        "service.form.structure.none_active":
+            "Nenhuma estrutura ativa está atualmente disponível para esta categoria.",
+        "service.form.structure.active": "Estrutura ativa",
+        "service.form.structure.subcategories": "Subcategorias",
+        "service.form.structure.selected": "Selecionada",
+        "service.form.structure.none_subcategories":
+            "Nenhuma subcategoria ativa disponível.",
+        "service.form.structure.attributes": "Atributos",
+        "service.form.structure.required_count":
+            "{required} obrigatórios em {total} atributos",
+        "service.form.structure.required": "Obrigatório",
+        "service.form.structure.optional": "Opcional",
+        "service.form.structure.filter": "Filtro",
+        "service.form.structure.none_attributes":
+            "Nenhum atributo dinâmico configurado.",
+        "service.form.structure.extras": "Extras",
+        "service.form.structure.none_extras":
+            "Nenhum extra ativo configurado.",
+        "service.form.section.guidance": "Guia de escrita",
+        "service.form.guidance.structure": "Estrutura ativa: {name}",
+        "service.form.guidance.activity.title":
+            "Descreva a experiência de forma concreta",
+        "service.form.guidance.activity.1":
+            "Explique como decorre a atividade, a sua duração e o nível esperado.",
+        "service.form.guidance.activity.2":
+            "Esclareça pontos de encontro, equipamento incluído e restrições de participação.",
+        "service.form.guidance.activity.3":
+            "Evite descrições vagas: o viajante deve perceber a oferta em segundos.",
+        "service.form.guidance.boat.title":
+            "Apresente claramente a embarcação e a utilização prevista",
+        "service.form.guidance.boat.1":
+            "Indique a capacidade real, o tipo de passeio e as condições de embarque.",
+        "service.form.guidance.boat.2":
+            "Especifique se skipper, combustível ou equipamento estão incluídos ou são opcionais.",
+        "service.form.guidance.boat.3":
+            "Mencione de forma clara licença, depósito e horários de partida ou regresso.",
+        "service.form.guidance.stay.title":
+            "Enquadre a estadia com detalhes operacionais",
+        "service.form.guidance.stay.1":
+            "Indique capacidade, horários de check-in/check-out e condições da estadia.",
+        "service.form.guidance.stay.2":
+            "Destaque comodidades diferenciadoras e regras que evitem mal-entendidos.",
+        "service.form.guidance.stay.3":
+            "Descreva o alojamento com um nível de detalhe coerente com o seu preço e posicionamento.",
+        "service.form.guidance.car.title":
+            "Dê os detalhes-chave antes da reserva",
+        "service.form.guidance.car.1":
+            "Especifique transmissão, combustível, capacidade e condições de recolha.",
+        "service.form.guidance.car.2":
+            "Adicione os limites importantes: idade mínima, depósito, quilometragem e seguro.",
+        "service.form.guidance.car.3":
+            "Mantenha o texto simples e direto, sem jargão interno nem promessas vagas.",
     };
 }

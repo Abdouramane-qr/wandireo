@@ -25,7 +25,10 @@ export function usePartnerApprovalGuard(enabled = true): {
             return;
         }
 
-        if (currentUser.partnerStatus !== 'APPROVED') {
+        if (
+            currentUser.partnerStatus !== 'APPROVED' ||
+            currentUser.mandateContractStatus !== 'SIGNED'
+        ) {
             navigate({ name: 'partner-pending' });
         }
     }, [currentUser, enabled, navigate]);
@@ -34,7 +37,8 @@ export function usePartnerApprovalGuard(enabled = true): {
         isBlocked: enabled
             ? !currentUser ||
               currentUser.role !== 'PARTNER' ||
-              currentUser.partnerStatus !== 'APPROVED'
+              currentUser.partnerStatus !== 'APPROVED' ||
+              currentUser.mandateContractStatus !== 'SIGNED'
             : false,
     };
 }

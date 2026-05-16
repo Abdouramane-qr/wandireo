@@ -474,6 +474,22 @@ export function buildFareHarborTranslations(
                     "Chargement de la configuration FareHarbor...",
                 "admin.services.fareharbor.empty":
                     "Aucune entreprise FareHarbor configurée.",
+                "admin.services.fareharbor.stats.companies_note":
+                    "{count} synchronisation(s) active(s)",
+                "admin.services.fareharbor.stats.imported_note":
+                    "Services importés depuis les comptes connectés",
+                "admin.services.fareharbor.stats.listed_note":
+                    "Services actuellement publiés dans le catalogue",
+                "admin.services.fareharbor.stats.health_note":
+                    "{count} compte(s) en erreur ou à contrôler",
+                "admin.services.fareharbor.card.imported":
+                    "{count} service(s) importé(s)",
+                "admin.services.fareharbor.card.listed":
+                    "{count} publié(s)",
+                "admin.services.fareharbor.card.sync_enabled":
+                    "Synchronisation active",
+                "admin.services.fareharbor.card.sync_disabled":
+                    "Synchronisation désactivée",
                 "admin.services.fareharbor.items_count": "{count} élément(s)",
                 "admin.services.fareharbor.last_sync":
                     "Dernière synchronisation :",

@@ -915,7 +915,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     onSubmit,
 }) => {
     const formId = useId();
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
 
     const [form, setForm] = useState<ServiceFormState>(() =>
         editingService ? initFormFromService(editingService) : DEFAULT_FORM,
@@ -2702,7 +2702,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
 
 /** Affiche les details specifiques a la categorie dans la liste. */
 const ServiceMeta: React.FC<{ service: Service }> = ({ service }) => {
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
 
     const activityTypeLabels: Record<ActivityType, string> = {
         RANDONNEE: t("partner.catalog.activity_type.hiking"),
@@ -2973,7 +2973,7 @@ export const PartnerCatalogPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
     const { success, error } = useToast();
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const { isBlocked } = usePartnerApprovalGuard();
     const queryClient = useQueryClient();
     const partnerUser = currentUser?.role === "PARTNER" ? currentUser : null;
@@ -2986,6 +2986,16 @@ export const PartnerCatalogPage: React.FC = () => {
     const [modalMode, setModalMode] = useState<"new" | Service | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [busyId, setBusyId] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState<
+        "ALL" | ServiceCategory
+    >("ALL");
+    const [statusFilter, setStatusFilter] = useState<
+        "ALL" | "ACTIVE" | "INACTIVE"
+    >("ALL");
+    const [sourceFilter, setSourceFilter] = useState<
+        "ALL" | "LOCAL" | "EXTERNAL"
+    >("ALL");
 
     useEffect(() => {
         if (!currentUser) {
@@ -3003,6 +3013,73 @@ export const PartnerCatalogPage: React.FC = () => {
         () => services.filter((s) => s.isAvailable).length,
         [services],
     );
+    const externalCount = useMemo(
+        () => services.filter((s) => s.sourceType === "EXTERNAL").length,
+        [services],
+    );
+    const inactiveCount = useMemo(
+        () => services.filter((s) => !s.isAvailable).length,
+        [services],
+    );
+    const filteredServices = useMemo(() => {
+        const normalizedQuery = searchTerm.trim().toLowerCase();
+
+        return [...services]
+            .filter((service) => {
+                if (
+                    categoryFilter !== "ALL" &&
+                    service.category !== categoryFilter
+                ) {
+                    return false;
+                }
+
+                if (
+                    statusFilter === "ACTIVE" &&
+                    !service.isAvailable
+                ) {
+                    return false;
+                }
+
+                if (
+                    statusFilter === "INACTIVE" &&
+                    service.isAvailable
+                ) {
+                    return false;
+                }
+
+                if (
+                    sourceFilter !== "ALL" &&
+                    (service.sourceType ?? "LOCAL") !== sourceFilter
+                ) {
+                    return false;
+                }
+
+                if (!normalizedQuery) {
+                    return true;
+                }
+
+                return [
+                    service.title,
+                    service.description,
+                    service.location.city,
+                    service.location.country,
+                    service.location.region,
+                    service.serviceSubcategoryName,
+                    service.sourceProvider,
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(normalizedQuery);
+            })
+            .sort((left, right) => {
+                if (left.isAvailable !== right.isAvailable) {
+                    return left.isAvailable ? -1 : 1;
+                }
+
+                return right.updatedAt.getTime() - left.updatedAt.getTime();
+            });
+    }, [categoryFilter, searchTerm, services, sourceFilter, statusFilter]);
 
     const refreshServices = useCallback(async () => {
         await queryClient.invalidateQueries({ queryKey: ["services"] });
@@ -3146,6 +3223,170 @@ export const PartnerCatalogPage: React.FC = () => {
 
             {/* Corps */}
             <div className="wdr-catalog__body">
+                {services.length > 0 && (
+                    <>
+                        <section className="wdr-catalog__summary">
+                            <article className="wdr-catalog__summary-card">
+                                <span className="wdr-catalog__summary-label">
+                                    {t("partner.catalog.summary.total")}
+                                </span>
+                                <strong className="wdr-catalog__summary-value">
+                                    {services.length}
+                                </strong>
+                            </article>
+                            <article className="wdr-catalog__summary-card">
+                                <span className="wdr-catalog__summary-label">
+                                    {t("partner.catalog.summary.active")}
+                                </span>
+                                <strong className="wdr-catalog__summary-value">
+                                    {activeCount}
+                                </strong>
+                            </article>
+                            <article className="wdr-catalog__summary-card">
+                                <span className="wdr-catalog__summary-label">
+                                    {t("partner.catalog.summary.external")}
+                                </span>
+                                <strong className="wdr-catalog__summary-value">
+                                    {externalCount}
+                                </strong>
+                            </article>
+                            <article className="wdr-catalog__summary-card">
+                                <span className="wdr-catalog__summary-label">
+                                    {t("partner.catalog.summary.hidden")}
+                                </span>
+                                <strong className="wdr-catalog__summary-value">
+                                    {inactiveCount}
+                                </strong>
+                            </article>
+                        </section>
+
+                        <section
+                            className="wdr-catalog__toolbar"
+                            aria-label={t("partner.catalog.filters.aria")}
+                        >
+                            <div className="wdr-catalog__toolbar-grid">
+                                <label className="wdr-catalog__toolbar-field">
+                                    <span className="wdr-catalog__toolbar-label">
+                                        {t("partner.catalog.filters.search")}
+                                    </span>
+                                    <input
+                                        type="search"
+                                        className="wdr-catalog__toolbar-input"
+                                        value={searchTerm}
+                                        onChange={(event) =>
+                                            setSearchTerm(event.target.value)
+                                        }
+                                        placeholder={t(
+                                            "partner.catalog.filters.search_placeholder",
+                                        )}
+                                    />
+                                </label>
+                                <label className="wdr-catalog__toolbar-field">
+                                    <span className="wdr-catalog__toolbar-label">
+                                        {t("partner.catalog.field.category")}
+                                    </span>
+                                    <select
+                                        className="wdr-catalog__toolbar-select"
+                                        value={categoryFilter}
+                                        onChange={(event) =>
+                                            setCategoryFilter(
+                                                event.target
+                                                    .value as typeof categoryFilter,
+                                            )
+                                        }
+                                    >
+                                        <option value="ALL">
+                                            {t(
+                                                "partner.catalog.filters.all_categories",
+                                            )}
+                                        </option>
+                                        <option value="ACTIVITE">
+                                            {categoryLabels.ACTIVITE}
+                                        </option>
+                                        <option value="BATEAU">
+                                            {categoryLabels.BATEAU}
+                                        </option>
+                                        <option value="HEBERGEMENT">
+                                            {categoryLabels.HEBERGEMENT}
+                                        </option>
+                                        <option value="VOITURE">
+                                            {categoryLabels.VOITURE}
+                                        </option>
+                                    </select>
+                                </label>
+                                <label className="wdr-catalog__toolbar-field">
+                                    <span className="wdr-catalog__toolbar-label">
+                                        {t("partner.catalog.filters.status")}
+                                    </span>
+                                    <select
+                                        className="wdr-catalog__toolbar-select"
+                                        value={statusFilter}
+                                        onChange={(event) =>
+                                            setStatusFilter(
+                                                event.target
+                                                    .value as typeof statusFilter,
+                                            )
+                                        }
+                                    >
+                                        <option value="ALL">
+                                            {t(
+                                                "partner.catalog.filters.all_statuses",
+                                            )}
+                                        </option>
+                                        <option value="ACTIVE">
+                                            {t("partner.catalog.status.active")}
+                                        </option>
+                                        <option value="INACTIVE">
+                                            {t(
+                                                "partner.catalog.status.inactive",
+                                            )}
+                                        </option>
+                                    </select>
+                                </label>
+                                <label className="wdr-catalog__toolbar-field">
+                                    <span className="wdr-catalog__toolbar-label">
+                                        {t("partner.catalog.filters.source")}
+                                    </span>
+                                    <select
+                                        className="wdr-catalog__toolbar-select"
+                                        value={sourceFilter}
+                                        onChange={(event) =>
+                                            setSourceFilter(
+                                                event.target
+                                                    .value as typeof sourceFilter,
+                                            )
+                                        }
+                                    >
+                                        <option value="ALL">
+                                            {t(
+                                                "partner.catalog.filters.all_sources",
+                                            )}
+                                        </option>
+                                        <option value="LOCAL">
+                                            {t("partner.catalog.card.local")}
+                                        </option>
+                                        <option value="EXTERNAL">
+                                            {t("partner.catalog.card.external")}
+                                        </option>
+                                    </select>
+                                </label>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    setCategoryFilter("ALL");
+                                    setStatusFilter("ALL");
+                                    setSourceFilter("ALL");
+                                }}
+                            >
+                                {t("partner.catalog.filters.reset")}
+                            </Button>
+                        </section>
+                    </>
+                )}
+
                 {services.length === 0 ? (
                     <div className="wdr-catalog__empty">
                         <p className="wdr-catalog__empty-title">
@@ -3162,15 +3403,50 @@ export const PartnerCatalogPage: React.FC = () => {
                             {t("partner.catalog.action.add_service")}
                         </Button>
                     </div>
+                ) : filteredServices.length === 0 ? (
+                    <div className="wdr-catalog__empty">
+                        <p className="wdr-catalog__empty-title">
+                            {t("partner.catalog.filters.empty_title")}
+                        </p>
+                        <p className="wdr-catalog__empty-sub">
+                            {t("partner.catalog.filters.empty_subtitle")}
+                        </p>
+                    </div>
                 ) : (
                     <ul className="wdr-catalog__list" role="list">
-                        {services.map((service) => (
+                        {filteredServices.map((service) => (
                             <li key={service.id} className="wdr-catalog__item">
-                                <span
-                                    className={`wdr-catalog__category wdr-catalog__category--${service.category.toLowerCase()}`}
-                                >
-                                    {categoryLabels[service.category]}
-                                </span>
+                                <div className="wdr-catalog__item-topline">
+                                    <span
+                                        className={`wdr-catalog__category wdr-catalog__category--${service.category.toLowerCase()}`}
+                                    >
+                                        {categoryLabels[service.category]}
+                                    </span>
+                                    <div className="wdr-catalog__badges">
+                                        <span
+                                            className={`wdr-catalog__status-badge ${service.isAvailable ? "wdr-catalog__status-badge--active" : "wdr-catalog__status-badge--inactive"}`}
+                                        >
+                                            {service.isAvailable
+                                                ? t(
+                                                      "partner.catalog.status.active",
+                                                  )
+                                                : t(
+                                                      "partner.catalog.status.inactive",
+                                                  )}
+                                        </span>
+                                        <span
+                                            className={`wdr-catalog__source-badge ${service.sourceType === "EXTERNAL" ? "wdr-catalog__source-badge--external" : "wdr-catalog__source-badge--local"}`}
+                                        >
+                                            {service.sourceType === "EXTERNAL"
+                                                ? t(
+                                                      "partner.catalog.card.external",
+                                                  )
+                                                : t(
+                                                      "partner.catalog.card.local",
+                                                  )}
+                                        </span>
+                                    </div>
+                                </div>
 
                                 <div className="wdr-catalog__item-main">
                                     <h2 className="wdr-catalog__item-title">
@@ -3183,6 +3459,16 @@ export const PartnerCatalogPage: React.FC = () => {
                                     <ServiceMeta service={service} />
                                     <p className="wdr-catalog__item-desc">
                                         {service.description}
+                                    </p>
+                                    <p className="wdr-catalog__item-updated">
+                                        {t("partner.catalog.card.updated").replace(
+                                            "{date}",
+                                            new Intl.DateTimeFormat(intlLocale, {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            }).format(service.updatedAt),
+                                        )}
                                     </p>
                                 </div>
 
@@ -3235,7 +3521,7 @@ export const PartnerCatalogPage: React.FC = () => {
 
                                 <div className="wdr-catalog__item-actions">
                                     {service.sourceType === "EXTERNAL" && (
-                                        <span className="wdr-catalog__toggle-label">
+                                        <span className="wdr-catalog__readonly-note">
                                             {t(
                                                 "partner.catalog.card.read_only_offer",
                                             )}
@@ -3285,6 +3571,20 @@ export const PartnerCatalogPage: React.FC = () => {
                                     </label>
 
                                     <div className="wdr-catalog__item-btns">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() =>
+                                                navigate({
+                                                    name: "service",
+                                                    id: service.id,
+                                                })
+                                            }
+                                        >
+                                            {t(
+                                                "partner.catalog.card.open_public",
+                                            )}
+                                        </Button>
                                         <Button
                                             variant="ghost"
                                             size="sm"

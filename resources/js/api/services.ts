@@ -46,6 +46,7 @@ export interface ServiceUpsertPayload {
     location_country: string;
     location_region?: string;
     partner_price: number;
+    commission_rate?: number;
     pricing_unit: string;
     payment_mode: string;
     booking_mode?: "INSTANT" | "REQUEST" | "EXTERNAL_REDIRECT";

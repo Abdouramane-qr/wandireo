@@ -29,6 +29,18 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.profile.add_service": "Añadir un servicio",
         "partner.profile.first_service": "Cree su primer servicio para comenzar.",
         "partner.profile.empty": "No hay servicios activos en este momento.",
+        "partner.profile.account_title": "Datos de contacto del socio",
+        "partner.profile.account_subtitle": "Actualiza el correo real utilizado para la comunicación con el socio, así como los datos de contacto usados por el equipo de Wandireo.",
+        "partner.profile.field.company_name": "Empresa",
+        "partner.profile.field.email": "Correo del socio",
+        "partner.profile.field.phone": "Teléfono",
+        "partner.profile.field.business_address": "Dirección profesional",
+        "partner.profile.save": "Guardar información",
+        "partner.profile.save_loading": "Guardando...",
+        "partner.profile.save_success_title": "Perfil actualizado",
+        "partner.profile.save_success_desc": "Los datos del socio se han guardado correctamente.",
+        "partner.profile.save_error_title": "No se pudo actualizar",
+        "partner.profile.save_error_desc": "No se pudieron actualizar los datos del socio en este momento.",
 
         // Pending & Validation
         "partner.pending.title.pending": "Solicitud en revisión",
@@ -37,6 +49,7 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.pending.title.suspended": "Cuenta suspendida",
         "partner.pending.message.pending": "Su solicitud está siendo revisada por nuestro equipo. Nos pondremos en contacto con usted muy pronto.",
         "partner.pending.message.approved": "Su cuenta ha sido validada. Ya puede acceder a su panel de control.",
+        "partner.pending.message.approved_unsigned": "Su cuenta ha sido validada. Firme el contrato para desbloquear su panel de socio.",
         "partner.pending.message.rejected": "Lamentablemente, su solicitud no fue aceptada.",
         "partner.pending.message.rejected_with_reason": "Su solicitud fue rechazada por el siguiente motivo: {reason}",
         "partner.pending.message.suspended": "Su cuenta ha sido suspendida temporalmente. Por favor, contacte con el soporte.",
@@ -59,6 +72,19 @@ export function buildPartnerEsTranslations(): Record<string, string> {
             "Firma pendiente",
         "partner.pending.status.contract.signed": "Firmado",
         "partner.pending.status.contract.rejected": "Rechazado",
+        "partner.pending.contract_sign_title": "Firmar el contrato",
+        "partner.pending.contract_sign_message":
+            "Descargue el contrato si lo necesita y confirme su aceptación para desbloquear su acceso de socio.",
+        "partner.pending.contract_sign_acknowledge":
+            "Confirmo que he leído y aceptado el contrato de socio.",
+        "partner.pending.contract_sign_cta": "Firmar contrato",
+        "partner.pending.contract_sign_loading": "Firma en curso...",
+        "partner.pending.contract_sign_success":
+            "Contrato firmado correctamente.",
+        "partner.pending.contract_sign_error":
+            "No se puede firmar el contrato en este momento.",
+        "partner.pending.contract_accept_required":
+            "Debe confirmar la aceptación del contrato antes de firmar.",
 
         // Bookings Management
         "partner.bookings.title": "Gestión de Reservas",
@@ -258,6 +284,7 @@ export function buildPartnerEsTranslations(): Record<string, string> {
 
         // Preview
         "partner.catalog.preview.client_price": "Precio de visualización cliente (IVA incl.)",
+        "partner.catalog.preview.commission": "Comisión Wandireo",
 
         // Toasts & Errors
         "partner.catalog.toast.service_created": "Oferta creada con éxito.",
@@ -278,6 +305,81 @@ export function buildPartnerEsTranslations(): Record<string, string> {
         "partner.catalog.error.brand_required": "La marca es obligatoria.",
         "partner.catalog.error.model_required": "El modelo es obligatorio.",
         "partner.catalog.error.boat_name_required": "El nombre del barco es obligatorio.",
+
+        "partner.dashboard.title": "Panel del partner",
+        "partner.dashboard.action_required": "Acción requerida",
+        "partner.dashboard.avatar_label": "Avatar de {company}",
+        "partner.dashboard.catalog_aria": "Abrir catálogo del partner",
+        "partner.dashboard.bookings_aria": "Abrir reservas del partner",
+        "partner.dashboard.active_service_one": "oferta activa",
+        "partner.dashboard.active_service_other": "ofertas activas",
+        "partner.dashboard.process_one": "{count} reserva por gestionar",
+        "partner.dashboard.process_other": "{count} reservas por gestionar",
+        "partner.dashboard.pending_badge": "{count} solicitudes pendientes",
+        "partner.dashboard.status.confirmed": "Confirmada",
+        "partner.dashboard.status.pending": "Pendiente",
+        "partner.dashboard.status.cancelled": "Cancelada",
+        "partner.dashboard.offers_overview": "Resumen del catálogo",
+        "partner.dashboard.active_services": "Ofertas activas",
+        "partner.dashboard.inactive_services": "Ofertas ocultas",
+        "partner.dashboard.external_services": "Ofertas sincronizadas",
+        "partner.dashboard.action_new_offer": "Añadir oferta",
+        "partner.dashboard.action_profile": "Ver perfil",
+        "partner.profile.active_services": "Ofertas activas",
+        "partner.profile.imported_services": "Ofertas sincronizadas",
+        "partner.profile.hidden_services": "Ofertas ocultas",
+        "partner.profile.catalog_edit": "Editar",
+        "partner.bookings.booking_id": "Reserva {id}",
+        "partner.bookings.received_on": "Recibida el {date}",
+        "partner.bookings.participants_one": "participante",
+        "partner.bookings.participants_other": "participantes",
+        "partner.bookings.extras": "Extras: {summary}",
+        "partner.bookings.reason": "Motivo: {reason}",
+        "partner.bookings.pending_badge": "{count} pendientes",
+        "partner.bookings.status_aria": "Estado {status}",
+        "partner.bookings.reject_modal.placeholder":
+            "Ej.: falta de disponibilidad, clima, mantenimiento...",
+        "partner.bookings.summary.total": "Total",
+        "partner.bookings.summary.pending": "Por confirmar",
+        "partner.bookings.summary.confirmed": "Confirmadas",
+        "partner.bookings.summary.cancelled": "Canceladas",
+        "partner.bookings.external.label":
+            "Reserva externa: {status} · Ref. {reference}",
+        "partner.bookings.external.reference_missing": "no disponible",
+        "partner.bookings.external.status.confirmed": "confirmada",
+        "partner.bookings.external.status.pending": "pendiente",
+        "partner.bookings.external.status.failed": "fallida",
+        "partner.catalog.card.partner_price": "Precio partner",
+        "partner.catalog.card.client_price": "Precio cliente",
+        "partner.catalog.card.commission": "Comisión {rate}%",
+        "partner.catalog.card.read_only_offer":
+            "Oferta sincronizada: editar desde la fuente del partner.",
+        "partner.catalog.card.open_public": "Abrir página pública",
+        "partner.catalog.card.local": "Local",
+        "partner.catalog.card.external": "Sincronizada",
+        "partner.catalog.card.updated": "Actualizada: {date}",
+        "partner.catalog.action.confirm_delete": "Confirmar",
+        "partner.catalog.delete.confirm_prompt":
+            "¿Eliminar esta oferta de forma definitiva?",
+        "partner.catalog.filters.aria": "Filtros del catálogo partner",
+        "partner.catalog.filters.search": "Buscar",
+        "partner.catalog.filters.search_placeholder":
+            "Título, ciudad, categoría, origen...",
+        "partner.catalog.filters.status": "Estado",
+        "partner.catalog.filters.source": "Origen",
+        "partner.catalog.filters.all_categories": "Todas las categorías",
+        "partner.catalog.filters.all_statuses": "Todos los estados",
+        "partner.catalog.filters.all_sources": "Todos los orígenes",
+        "partner.catalog.filters.reset": "Restablecer",
+        "partner.catalog.filters.empty_title": "No hay ofertas coincidentes",
+        "partner.catalog.filters.empty_subtitle":
+            "Ajusta los filtros para encontrar tus productos.",
+        "partner.catalog.summary.total": "Total ofertas",
+        "partner.catalog.summary.active": "Ofertas activas",
+        "partner.catalog.summary.external": "Ofertas sincronizadas",
+        "partner.catalog.summary.hidden": "Ofertas ocultas",
+        "partner.catalog.status.active": "Activa",
+        "partner.catalog.status.inactive": "Oculta",
 
         // Registration
         "partner.register.company": "Información de la empresa",

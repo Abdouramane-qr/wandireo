@@ -33,7 +33,34 @@ class PublicServiceVisibilityTest extends TestCase
             ->assertJsonPath('data.0.id', (string) $available->id);
     }
 
-    public function test_partner_listing_can_include_unavailable_services_when_filtered_by_partner(): void
+    public function test_public_partner_filtered_listing_keeps_unavailable_services_hidden(): void
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+        ]);
+
+        $available = Service::factory()->for($partner, 'partner')->create([
+            'title' => ['fr' => 'Visible'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => true,
+        ]);
+
+        Service::factory()->for($partner, 'partner')->create([
+            'title' => ['fr' => 'Masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $response = $this->getJson("/api/services?partnerId={$partner->id}");
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', (string) $available->id);
+    }
+
+    public function test_partner_owner_listing_can_include_unavailable_services_when_filtered_by_partner(): void
     {
         $partner = User::factory()->create([
             'role' => 'PARTNER',

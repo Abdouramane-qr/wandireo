@@ -150,6 +150,8 @@ export function buildAdminPtTranslations(): Record<string, string> {
         "admin.users.quick.approve": "Aprovar",
         "admin.users.quick.approve_success": "Parceiro aprovado.",
         "admin.users.quick.contract_signed": "Marcar assinado",
+        "admin.users.quick.contract_signed_confirm":
+            "Confirma que este contrato foi assinado?",
         "admin.users.quick.contract_signed_success":
             "Contrato marcado como assinado.",
         "admin.users.quick.suspend": "Suspender",

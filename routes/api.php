@@ -78,6 +78,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ── Profil utilisateur ─────────────────────────────────────────────────
     Route::patch('/users/me',         [UserController::class, 'updateMe']);
+    Route::post('/partner/contract/sign', [UserController::class, 'partnerSignContract'])
+        ->middleware('role:PARTNER');
 
     // ── Reservations (client) ─────────────────────────────────────────────
     Route::post('/bookings/init',                 [BookingController::class, 'init']);
@@ -138,6 +140,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users',                             [UserController::class, 'adminCreate']);
         Route::post('/users/partners',                    [UserController::class, 'adminCreatePartner']);
         Route::post('/users/{id}/contract',               [UserController::class, 'adminUploadContract']);
+        Route::post('/users/{id}/contract/mark-signed',   [UserController::class, 'adminMarkContractSigned']);
         Route::patch('/users/{id}',                       [UserController::class, 'adminUpdate']);
         Route::get('/bookings',                           [BookingController::class, 'adminList']);
         Route::get('/analytics/funnel',                  [AnalyticsController::class, 'funnel']);

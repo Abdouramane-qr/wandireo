@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
 import {
     AdminSectionNav,
     Button,
     Input,
-    Modal,
     useToast,
 } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
 import { useAdminBookingsData } from "@/hooks/useBookingsData";
 import {
     useAdminCreateUserData,
+    useAdminMarkPartnerContractSignedData,
     useAdminUploadPartnerContractData,
     useAdminUpdateUserData,
     useAdminUsersData,
@@ -79,6 +80,9 @@ const DEFAULT_CREATE_FORM: PartnerCreateForm = {
     mandateContractStatus: "NOT_SENT",
 };
 
+const LANGUAGE_OPTIONS = ["fr", "en", "es", "pt", "it", "de"] as const;
+const CURRENCY_OPTIONS = ["EUR", "USD", "GBP", "CHF", "CAD"] as const;
+
 const statusLabel = (
     status: PartnerStatus,
     t: (key: string) => string,
@@ -94,7 +98,7 @@ const statusClass = (status: PartnerStatus): string =>
     ({
         APPROVED: "wdr-admin-users__partner-status--active",
         REJECTED: "wdr-admin-users__partner-status--inactive",
-        SUSPENDED: "wdr-admin-users__partner-status--inactive",
+        SUSPENDED: "wdr-admin-users__partner-status--suspended",
         PENDING: "wdr-admin-users__partner-status--pending",
     })[status];
 
@@ -141,6 +145,7 @@ export const AdminUsersPage: React.FC = () => {
     const updateUserMutation = useAdminUpdateUserData();
     const createUserMutation = useAdminCreateUserData();
     const uploadContractMutation = useAdminUploadPartnerContractData();
+    const markContractSignedMutation = useAdminMarkPartnerContractSignedData();
 
     const partners = useMemo(
         () =>
@@ -238,6 +243,27 @@ export const AdminUsersPage: React.FC = () => {
         { value: "CLIENT", label: t("admin.users.role.client") },
         { value: "ADMIN", label: t("admin.users.role.admin") },
     ];
+
+    useEffect(() => {
+        if (!isCreateModalOpen) {
+            return;
+        }
+
+        const previousOverflow = document.body.style.overflow;
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setIsCreateModalOpen(false);
+            }
+        };
+
+        document.body.style.overflow = "hidden";
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isCreateModalOpen]);
 
     useEffect(() => {
         if (!currentUser) {
@@ -590,7 +616,7 @@ export const AdminUsersPage: React.FC = () => {
 
             <div className="wdr-admin-users__body">
                 <section>
-                    <div className="wdr-admin-users__partner-actions">
+                    <div className="wdr-admin-users__section-head">
                         <h2 className="wdr-admin-users__section-title">
                             {t("admin.users.hero.partners_count").replace(
                                 "{count}",
@@ -645,7 +671,7 @@ export const AdminUsersPage: React.FC = () => {
                             return (
                                 <article
                                     key={partner.id}
-                                    className="wdr-admin-users__partner-card"
+                                    className={`wdr-admin-users__partner-card${partner.partnerStatus === "SUSPENDED" ? " wdr-admin-users__partner-card--suspended" : ""}`}
                                 >
                                     <div className="wdr-admin-users__partner-header">
                                         <div
@@ -841,20 +867,39 @@ export const AdminUsersPage: React.FC = () => {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() =>
-                                                    void applyQuickUpdate(
-                                                        partner,
-                                                        {
-                                                            mandateContractStatus:
-                                                                "SIGNED",
-                                                        },
-                                                        t(
-                                                            "admin.users.quick.contract_signed_success",
-                                                        ),
-                                                    )
-                                                }
+                                                onClick={async () => {
+                                                    const confirmed =
+                                                        window.confirm(
+                                                            t(
+                                                                "admin.users.quick.contract_signed_confirm",
+                                                            ),
+                                                        );
+
+                                                    if (!confirmed) {
+                                                        return;
+                                                    }
+
+                                                    try {
+                                                        await markContractSignedMutation.mutateAsync(
+                                                            {
+                                                                id: partner.id,
+                                                            },
+                                                        );
+                                                        success(
+                                                            t(
+                                                                "admin.users.quick.contract_signed_success",
+                                                            ),
+                                                        );
+                                                    } catch {
+                                                        error(
+                                                            t(
+                                                                "admin.users.toast.quick_action_error",
+                                                            ),
+                                                        );
+                                                    }
+                                                }}
                                                 disabled={
-                                                    updateUserMutation.isPending
+                                                    markContractSignedMutation.isPending
                                                 }
                                             >
                                                 {t(
@@ -1034,16 +1079,48 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             {editingPartner && (
-                <Modal
-                    isOpen={!!editingPartnerId}
-                    onClose={() => setEditingPartnerId(null)}
-                    title={t("admin.users.modal.partner_title").replace(
-                        "{name}",
-                        editingPartner.companyName,
-                    )}
-                    size="md"
+                <div
+                    className="wdr-admin-users__create-overlay"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setEditingPartnerId(null);
+                        }
+                    }}
                 >
-                    <div className="wdr-admin-users__edit-form">
+                    <div
+                        className="wdr-admin-users__create-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="wdr-admin-users-edit-partner-title"
+                    >
+                        <div className="wdr-admin-users__create-header">
+                            <div className="wdr-admin-users__create-badge">
+                                {t("admin.users.edit")}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setEditingPartnerId(null)}
+                                className="wdr-admin-users__create-close"
+                                aria-label={t("common.close")}
+                            >
+                                <X size={18} />
+                            </button>
+                            <h2
+                                id="wdr-admin-users-edit-partner-title"
+                                className="wdr-admin-users__create-title"
+                            >
+                                {t("admin.users.modal.partner_title").replace(
+                                    "{name}",
+                                    editingPartner.companyName,
+                                )}
+                            </h2>
+                            <p className="wdr-admin-users__create-subtitle">
+                                {t("admin.users.section.partner_copy")}
+                            </p>
+                        </div>
+
+                        <div className="wdr-admin-users__create-body">
+                            <div className="wdr-admin-users__edit-form">
                         <div className="wdr-admin-users__edit-field">
                             <label className="wdr-admin-users__edit-label">
                                 {t("admin.users.field.commission")}
@@ -1254,21 +1331,55 @@ export const AdminUsersPage: React.FC = () => {
                                     : t("admin.users.save")}
                             </Button>
                         </div>
+                            </div>
+                        </div>
                     </div>
-                </Modal>
+                </div>
             )}
 
             {editingUser && (
-                <Modal
-                    isOpen={!!editingUserId}
-                    onClose={() => setEditingUserId(null)}
-                    title={t("admin.users.modal.user_title").replace(
-                        "{name}",
-                        `${editingUser.firstName} ${editingUser.lastName}`,
-                    )}
-                    size="md"
+                <div
+                    className="wdr-admin-users__create-overlay"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setEditingUserId(null);
+                        }
+                    }}
                 >
-                    <div className="wdr-admin-users__edit-form">
+                    <div
+                        className="wdr-admin-users__create-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="wdr-admin-users-edit-user-title"
+                    >
+                        <div className="wdr-admin-users__create-header">
+                            <div className="wdr-admin-users__create-badge">
+                                {t("admin.users.edit")}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setEditingUserId(null)}
+                                className="wdr-admin-users__create-close"
+                                aria-label={t("common.close")}
+                            >
+                                <X size={18} />
+                            </button>
+                            <h2
+                                id="wdr-admin-users-edit-user-title"
+                                className="wdr-admin-users__create-title"
+                            >
+                                {t("admin.users.modal.user_title").replace(
+                                    "{name}",
+                                    `${editingUser.firstName} ${editingUser.lastName}`,
+                                )}
+                            </h2>
+                            <p className="wdr-admin-users__create-subtitle">
+                                {t("admin.users.create_intro")}
+                            </p>
+                        </div>
+
+                        <div className="wdr-admin-users__create-body">
+                            <div className="wdr-admin-users__edit-form">
                         <Input
                             placeholder={t(
                                 "admin.users.placeholder.first_name",
@@ -1352,267 +1463,426 @@ export const AdminUsersPage: React.FC = () => {
                                     : t("admin.users.save")}
                             </Button>
                         </div>
-                    </div>
-                </Modal>
-            )}
-
-            <Modal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                title={t("admin.users.modal.create_title")}
-                size="lg"
-            >
-                <div className="wdr-admin-users__edit-form">
-                    <p className="wdr-admin-users__edit-intro">
-                        {t("admin.users.create_intro")}
-                    </p>
-
-                    <div className="wdr-admin-users__form-section">
-                        <div className="wdr-admin-users__form-section-head">
-                            <h3 className="wdr-admin-users__form-section-title">
-                                {t("admin.users.section.account_type")}
-                            </h3>
-                            <span className="wdr-admin-users__role-pill">
-                                {roleOptions.find(
-                                    (option) => option.value === createForm.role,
-                                )?.label ?? createForm.role}
-                            </span>
-                        </div>
-                        <select
-                            className="wdr-admin-users__input"
-                            value={createForm.role}
-                            onChange={(e) =>
-                                setCreateForm((form) => ({
-                                    ...form,
-                                    role: e.target.value as UserRole,
-                                }))
-                            }
-                        >
-                            {roleOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="wdr-admin-users__form-section">
-                        <h3 className="wdr-admin-users__form-section-title">
-                            {t("admin.users.section.identity")}
-                        </h3>
-                        <div className="wdr-admin-users__form-grid">
-                            <Input
-                                placeholder={t(
-                                    "admin.users.placeholder.first_name",
-                                )}
-                                value={createForm.firstName}
-                                onChange={(e) =>
-                                    setCreateForm((form) => ({
-                                        ...form,
-                                        firstName: e.target.value,
-                                    }))
-                                }
-                            />
-                            <Input
-                                placeholder={t(
-                                    "admin.users.placeholder.last_name",
-                                )}
-                                value={createForm.lastName}
-                                onChange={(e) =>
-                                    setCreateForm((form) => ({
-                                        ...form,
-                                        lastName: e.target.value,
-                                    }))
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="wdr-admin-users__form-section">
-                        <h3 className="wdr-admin-users__form-section-title">
-                            {t("admin.users.section.account")}
-                        </h3>
-                        <div className="wdr-admin-users__form-grid">
-                            <Input
-                                type="email"
-                                placeholder={t("admin.users.placeholder.email")}
-                                value={createForm.email}
-                                onChange={(e) =>
-                                    setCreateForm((form) => ({
-                                        ...form,
-                                        email: e.target.value,
-                                    }))
-                                }
-                            />
-                            <Input
-                                type="password"
-                                placeholder={t(
-                                    "admin.users.placeholder.initial_password",
-                                )}
-                                value={createForm.password}
-                                onChange={(e) =>
-                                    setCreateForm((form) => ({
-                                        ...form,
-                                        password: e.target.value,
-                                    }))
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="wdr-admin-users__form-section">
-                        <h3 className="wdr-admin-users__form-section-title">
-                            {t("admin.users.section.profile")}
-                        </h3>
-                        <div className="wdr-admin-users__form-grid">
-                            <Input
-                                placeholder={t(
-                                    "admin.users.placeholder.language",
-                                )}
-                                value={createForm.language}
-                                onChange={(e) =>
-                                    setCreateForm((form) => ({
-                                        ...form,
-                                        language: e.target.value,
-                                    }))
-                                }
-                            />
-                            {isClientCreation && (
-                                <Input
-                                    placeholder={t(
-                                        "admin.users.placeholder.preferred_currency",
-                                    )}
-                                    value={createForm.preferredCurrency}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            preferredCurrency: e.target.value,
-                                        }))
-                                    }
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    {isPartnerCreation && (
-                        <div className="wdr-admin-users__form-section wdr-admin-users__form-section--partner">
-                            <div className="wdr-admin-users__form-section-head">
-                                <h3 className="wdr-admin-users__form-section-title">
-                                    {t("admin.users.section.partner_settings")}
-                                </h3>
-                                <span className="wdr-admin-users__form-section-copy">
-                                    {t("admin.users.section.partner_copy")}
-                                </span>
-                            </div>
-                            <div className="wdr-admin-users__form-grid">
-                                <Input
-                                    placeholder={t(
-                                        "admin.users.placeholder.company",
-                                    )}
-                                    value={createForm.companyName}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            companyName: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <Input
-                                    placeholder={t(
-                                        "admin.users.placeholder.phone",
-                                    )}
-                                    value={createForm.phoneNumber}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            phoneNumber: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <Input
-                                    placeholder={t(
-                                        "admin.users.field.business_address",
-                                    )}
-                                    value={createForm.businessAddress}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            businessAddress: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <Input
-                                    type="number"
-                                    min={20}
-                                    max={30}
-                                    step={1}
-                                    placeholder={t(
-                                        "admin.users.placeholder.commission",
-                                    )}
-                                    value={createForm.commissionRate}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            commissionRate: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <select
-                                    className="wdr-admin-users__input"
-                                    value={createForm.partnerStatus}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            partnerStatus: e.target
-                                                .value as PartnerStatus,
-                                        }))
-                                    }
-                                >
-                                    {partnerStatusOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="wdr-admin-users__input"
-                                    value={createForm.mandateContractStatus}
-                                    onChange={(e) =>
-                                        setCreateForm((form) => ({
-                                            ...form,
-                                            mandateContractStatus: e.target
-                                                .value as MandateContractStatus,
-                                        }))
-                                    }
-                                >
-                                    {contractStatusOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
                             </div>
                         </div>
-                    )}
-
-                    <div className="wdr-admin-users__edit-actions">
-                        <Button
-                            variant="ghost"
-                            onClick={() => setIsCreateModalOpen(false)}
-                        >
-                            {t("admin.users.cancel")}
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => void createUser()}
-                        >
-                            {createUserMutation.isPending
-                                ? t("admin.users.creating")
-                                : t("admin.users.create_account")}
-                        </Button>
                     </div>
                 </div>
-            </Modal>
+            )}
+
+            {isCreateModalOpen && (
+                <div
+                    className="wdr-admin-users__create-overlay"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setIsCreateModalOpen(false);
+                        }
+                    }}
+                >
+                    <div
+                        className="wdr-admin-users__create-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="wdr-admin-users-create-title"
+                    >
+                        <div className="wdr-admin-users__create-header">
+                            <div className="wdr-admin-users__create-badge">
+                                {t("admin.users.modal.create_title")}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="wdr-admin-users__create-close"
+                                aria-label={t("common.close")}
+                            >
+                                <X size={18} />
+                            </button>
+                            <h2
+                                id="wdr-admin-users-create-title"
+                                className="wdr-admin-users__create-title"
+                            >
+                                {t("admin.users.create_account")}
+                            </h2>
+                            <p className="wdr-admin-users__create-subtitle">
+                                {t("admin.users.create_intro")}
+                            </p>
+                        </div>
+
+                        <div className="wdr-admin-users__create-body">
+                            <div className="wdr-admin-users__edit-form">
+                                <div className="wdr-admin-users__form-section">
+                                    <div className="wdr-admin-users__form-section-head">
+                                        <h3 className="wdr-admin-users__form-section-title">
+                                            {t("admin.users.section.account_type")}
+                                        </h3>
+                                        <span className="wdr-admin-users__role-pill">
+                                            {roleOptions.find(
+                                                (option) =>
+                                                    option.value === createForm.role,
+                                            )?.label ?? createForm.role}
+                                        </span>
+                                    </div>
+                                    <label className="wdr-admin-users__select-field">
+                                        <span className="wdr-admin-users__select-label">
+                                            {t("admin.users.section.account_type")}
+                                        </span>
+                                        <select
+                                            className="wdr-admin-users__input"
+                                            value={createForm.role}
+                                            onChange={(e) =>
+                                                setCreateForm((form) => ({
+                                                    ...form,
+                                                    role: e.target.value as UserRole,
+                                                }))
+                                            }
+                                        >
+                                            {roleOptions.map((option) => (
+                                                <option
+                                                    key={option.value}
+                                                    value={option.value}
+                                                >
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+
+                                <div className="wdr-admin-users__form-section">
+                                    <h3 className="wdr-admin-users__form-section-title">
+                                        {t("admin.users.section.identity")}
+                                    </h3>
+                                    <div className="wdr-admin-users__form-grid">
+                                        <label className="wdr-admin-users__select-field">
+                                            <span className="wdr-admin-users__select-label">
+                                                {t("admin.users.placeholder.first_name")}
+                                            </span>
+                                            <Input
+                                                placeholder={t(
+                                                    "admin.users.placeholder.first_name",
+                                                )}
+                                                value={createForm.firstName}
+                                                onChange={(e) =>
+                                                    setCreateForm((form) => ({
+                                                        ...form,
+                                                        firstName: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="wdr-admin-users__select-field">
+                                            <span className="wdr-admin-users__select-label">
+                                                {t("admin.users.placeholder.last_name")}
+                                            </span>
+                                            <Input
+                                                placeholder={t(
+                                                    "admin.users.placeholder.last_name",
+                                                )}
+                                                value={createForm.lastName}
+                                                onChange={(e) =>
+                                                    setCreateForm((form) => ({
+                                                        ...form,
+                                                        lastName: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="wdr-admin-users__form-section">
+                                    <h3 className="wdr-admin-users__form-section-title">
+                                        {t("admin.users.section.account")}
+                                    </h3>
+                                    <div className="wdr-admin-users__form-grid">
+                                        <label className="wdr-admin-users__select-field">
+                                            <span className="wdr-admin-users__select-label">
+                                                {t("admin.users.placeholder.email")}
+                                            </span>
+                                            <Input
+                                                type="email"
+                                                placeholder={t(
+                                                    "admin.users.placeholder.email",
+                                                )}
+                                                value={createForm.email}
+                                                onChange={(e) =>
+                                                    setCreateForm((form) => ({
+                                                        ...form,
+                                                        email: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="wdr-admin-users__select-field">
+                                            <span className="wdr-admin-users__select-label">
+                                                {t(
+                                                    "admin.users.placeholder.initial_password",
+                                                )}
+                                            </span>
+                                            <Input
+                                                type="password"
+                                                placeholder={t(
+                                                    "admin.users.placeholder.initial_password",
+                                                )}
+                                                value={createForm.password}
+                                                onChange={(e) =>
+                                                    setCreateForm((form) => ({
+                                                        ...form,
+                                                        password: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="wdr-admin-users__form-section">
+                                    <h3 className="wdr-admin-users__form-section-title">
+                                        {t("admin.users.section.profile")}
+                                    </h3>
+                                    <div className="wdr-admin-users__form-grid">
+                                        <label className="wdr-admin-users__select-field">
+                                            <span className="wdr-admin-users__select-label">
+                                                {t("admin.users.placeholder.language")}
+                                            </span>
+                                            <select
+                                                className="wdr-admin-users__input"
+                                                value={createForm.language}
+                                                onChange={(e) =>
+                                                    setCreateForm((form) => ({
+                                                        ...form,
+                                                        language: e.target.value,
+                                                    }))
+                                                }
+                                            >
+                                                {LANGUAGE_OPTIONS.map((language) => (
+                                                    <option
+                                                        key={language}
+                                                        value={language}
+                                                    >
+                                                        {language.toUpperCase()}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        {isClientCreation && (
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.placeholder.preferred_currency",
+                                                    )}
+                                                </span>
+                                                <select
+                                                    className="wdr-admin-users__input"
+                                                    value={createForm.preferredCurrency}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            preferredCurrency:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                >
+                                                    {CURRENCY_OPTIONS.map(
+                                                        (currency) => (
+                                                            <option
+                                                                key={currency}
+                                                                value={currency}
+                                                            >
+                                                                {currency}
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {isPartnerCreation && (
+                                    <div className="wdr-admin-users__form-section wdr-admin-users__form-section--partner">
+                                        <div className="wdr-admin-users__form-section-head">
+                                            <h3 className="wdr-admin-users__form-section-title">
+                                                {t(
+                                                    "admin.users.section.partner_settings",
+                                                )}
+                                            </h3>
+                                            <span className="wdr-admin-users__form-section-copy">
+                                                {t(
+                                                    "admin.users.section.partner_copy",
+                                                )}
+                                            </span>
+                                        </div>
+                                        <div className="wdr-admin-users__form-grid">
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.placeholder.company",
+                                                    )}
+                                                </span>
+                                                <Input
+                                                    placeholder={t(
+                                                        "admin.users.placeholder.company",
+                                                    )}
+                                                    value={createForm.companyName}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            companyName:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                            </label>
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.placeholder.phone",
+                                                    )}
+                                                </span>
+                                                <Input
+                                                    placeholder={t(
+                                                        "admin.users.placeholder.phone",
+                                                    )}
+                                                    value={createForm.phoneNumber}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            phoneNumber:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                            </label>
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.field.business_address",
+                                                    )}
+                                                </span>
+                                                <Input
+                                                    placeholder={t(
+                                                        "admin.users.field.business_address",
+                                                    )}
+                                                    value={createForm.businessAddress}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            businessAddress:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                            </label>
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.field.commission",
+                                                    )}
+                                                </span>
+                                                <Input
+                                                    type="number"
+                                                    min={20}
+                                                    max={30}
+                                                    step={1}
+                                                    placeholder={t(
+                                                        "admin.users.placeholder.commission",
+                                                    )}
+                                                    value={createForm.commissionRate}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            commissionRate:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                            </label>
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.field.partner_status",
+                                                    )}
+                                                </span>
+                                                <select
+                                                    className="wdr-admin-users__input"
+                                                    value={createForm.partnerStatus}
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            partnerStatus: e.target
+                                                                .value as PartnerStatus,
+                                                        }))
+                                                    }
+                                                >
+                                                    {partnerStatusOptions.map(
+                                                        (option) => (
+                                                            <option
+                                                                key={option.value}
+                                                                value={option.value}
+                                                            >
+                                                                {option.label}
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            </label>
+                                            <label className="wdr-admin-users__select-field">
+                                                <span className="wdr-admin-users__select-label">
+                                                    {t(
+                                                        "admin.users.field.contract_status",
+                                                    )}
+                                                </span>
+                                                <select
+                                                    className="wdr-admin-users__input"
+                                                    value={
+                                                        createForm.mandateContractStatus
+                                                    }
+                                                    onChange={(e) =>
+                                                        setCreateForm((form) => ({
+                                                            ...form,
+                                                            mandateContractStatus:
+                                                                e.target
+                                                                    .value as MandateContractStatus,
+                                                        }))
+                                                    }
+                                                >
+                                                    {contractStatusOptions.map(
+                                                        (option) => (
+                                                            <option
+                                                                key={option.value}
+                                                                value={option.value}
+                                                            >
+                                                                {option.label}
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="wdr-admin-users__create-actions">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setIsCreateModalOpen(false)}
+                            >
+                                {t("admin.users.cancel")}
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={() => void createUser()}
+                            >
+                                {createUserMutation.isPending
+                                    ? t("admin.users.creating")
+                                    : t("admin.users.create_account")}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

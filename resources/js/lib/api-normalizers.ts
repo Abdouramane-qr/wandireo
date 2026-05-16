@@ -22,6 +22,7 @@ import type {
 } from "@/types/service";
 import { PaymentModeNames } from "@/types/service";
 import type { User } from "@/types/wdr-user";
+import { normalizeCountryName } from "@/lib/countries";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -335,7 +336,9 @@ function baseService(rawInput: unknown): {
         extraData: extra,
         location: {
             city: asString(locationData.city || raw.location_city),
-            country: asString(locationData.country || raw.location_country),
+            country: normalizeCountryName(
+                asString(locationData.country || raw.location_country),
+            ),
             region:
                 asString(locationData.region || raw.location_region) ||
                 undefined,
@@ -423,8 +426,16 @@ export function normalizeServiceSubcategory(
             raw.service_category_id ?? raw.serviceCategoryId,
         ),
         name: asString(raw.name),
+        nameTranslations:
+            asLocalizedTextMap(
+                raw.name_translations ?? raw.nameTranslations,
+            ) || undefined,
         slug: asString(raw.slug),
         description: asString(raw.description) || undefined,
+        descriptionTranslations:
+            asLocalizedTextMap(
+                raw.description_translations ?? raw.descriptionTranslations,
+            ) || undefined,
         isActive: asBoolean(raw.is_active ?? raw.isActive, true),
         sortOrder: asNumber(raw.sort_order ?? raw.sortOrder),
     };
@@ -442,8 +453,16 @@ export function normalizeServiceCategory(
             "ACTIVITE",
         ) as ServiceCategory,
         name: asString(raw.name),
+        nameTranslations:
+            asLocalizedTextMap(
+                raw.name_translations ?? raw.nameTranslations,
+            ) || undefined,
         slug: asString(raw.slug),
         description: asString(raw.description) || undefined,
+        descriptionTranslations:
+            asLocalizedTextMap(
+                raw.description_translations ?? raw.descriptionTranslations,
+            ) || undefined,
         isActive: asBoolean(raw.is_active ?? raw.isActive, true),
         sortOrder: asNumber(raw.sort_order ?? raw.sortOrder),
         subcategories: Array.isArray(raw.subcategories)

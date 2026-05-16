@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
-import { Button } from "@/components/wdr";
+import { router } from "@inertiajs/react";
+import React, { useEffect, useState } from "react";
+import { Button, useToast } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
+import { usePartnerSignContractData } from "@/hooks/useUsersData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import type { MandateContractStatus, PartnerStatus } from "@/types/wdr-user";
@@ -45,7 +47,9 @@ function statusMessage(
 ): string {
     switch (partner.partnerStatus) {
         case "APPROVED":
-            return t("partner.pending.message.approved");
+            return partner.mandateContractStatus === "SIGNED"
+                ? t("partner.pending.message.approved")
+                : t("partner.pending.message.approved_unsigned");
         case "REJECTED":
             return partner.partnerRejectionReason
                 ? t("partner.pending.message.rejected_with_reason").replace(
@@ -98,6 +102,9 @@ export const PartnerPendingPage: React.FC = () => {
     const { currentUser, logout } = useUser();
     const { navigate } = useRouter();
     const { t, intlLocale } = useTranslation();
+    const { success, error } = useToast();
+    const signContractMutation = usePartnerSignContractData();
+    const [acceptedContract, setAcceptedContract] = useState(false);
 
     useEffect(() => {
         if (currentUser && currentUser.role !== "PARTNER") {
@@ -108,6 +115,33 @@ export const PartnerPendingPage: React.FC = () => {
     if (!currentUser || currentUser.role !== "PARTNER") {
         return null;
     }
+
+    const canSelfSign =
+        currentUser.partnerStatus !== "REJECTED" &&
+        currentUser.partnerStatus !== "SUSPENDED" &&
+        currentUser.mandateContractStatus !== "SIGNED" &&
+        Boolean(currentUser.mandateContractFilePath);
+
+    const handleSignContract = async (): Promise<void> => {
+        if (!acceptedContract) {
+            error(t("partner.pending.contract_accept_required"));
+            return;
+        }
+
+        try {
+            await signContractMutation.mutateAsync({ accepted: true });
+            success(t("partner.pending.contract_sign_success"));
+
+            if (currentUser.partnerStatus === "APPROVED") {
+                navigate({ name: "partner-dashboard" });
+                return;
+            }
+
+            router.reload();
+        } catch {
+            error(t("partner.pending.contract_sign_error"));
+        }
+    };
 
     return (
         <section className="wdr-partner-pending">
@@ -180,6 +214,33 @@ export const PartnerPendingPage: React.FC = () => {
                     </div>
                 </div>
 
+                {canSelfSign && (
+                    <div className="wdr-partner-pending__sign-box">
+                        <h2 className="wdr-partner-pending__sign-title">
+                            {t("partner.pending.contract_sign_title")}
+                        </h2>
+                        <p className="wdr-partner-pending__sign-message">
+                            {t("partner.pending.contract_sign_message")}
+                        </p>
+                        <label className="wdr-partner-pending__checkbox">
+                            <input
+                                type="checkbox"
+                                checked={acceptedContract}
+                                onChange={(event) =>
+                                    setAcceptedContract(
+                                        event.target.checked,
+                                    )
+                                }
+                            />
+                            <span>
+                                {t(
+                                    "partner.pending.contract_sign_acknowledge",
+                                )}
+                            </span>
+                        </label>
+                    </div>
+                )}
+
                 <div className="wdr-partner-pending__actions">
                     {currentUser.mandateContractFilePath && (
                         <Button
@@ -195,7 +256,22 @@ export const PartnerPendingPage: React.FC = () => {
                             {t("partner.pending.download_contract")}
                         </Button>
                     )}
-                    {currentUser.partnerStatus === "APPROVED" && (
+                    {canSelfSign && (
+                        <Button
+                            variant="primary"
+                            onClick={() => void handleSignContract()}
+                            disabled={
+                                signContractMutation.isPending ||
+                                !acceptedContract
+                            }
+                        >
+                            {signContractMutation.isPending
+                                ? t("partner.pending.contract_sign_loading")
+                                : t("partner.pending.contract_sign_cta")}
+                        </Button>
+                    )}
+                    {currentUser.partnerStatus === "APPROVED" &&
+                        currentUser.mandateContractStatus === "SIGNED" && (
                         <Button
                             variant="primary"
                             onClick={() =>

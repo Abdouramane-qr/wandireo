@@ -259,11 +259,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                     <span className="wdr-card__badge wdr-card__badge--category">
                         {getCategoryLabel(category, t)}
                     </span>
-                    {isFeatured && (
-                        <span className="wdr-card__badge wdr-card__badge--featured">
-                            {t("service.card.featured_badge")}
-                        </span>
-                    )}
                 </div>
 
                 {/* Bouton favori */}
@@ -422,9 +417,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                             </span>
                             <span className="wdr-card__price-note">
                                 {t("service.external_price_not_provided")}
-                            </span>
-                            <span className="wdr-card__price-note wdr-card__price-note--subtle">
-                                {t("service.external_price_confirmed_partner")}
                             </span>
                         </>
                     )}

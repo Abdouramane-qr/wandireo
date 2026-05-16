@@ -161,6 +161,8 @@ export function buildAdminItTranslations(): Record<string, string> {
         "admin.users.quick.approve": "Approva",
         "admin.users.quick.approve_success": "Partner approvato.",
         "admin.users.quick.contract_signed": "Segna come firmato",
+        "admin.users.quick.contract_signed_confirm":
+            "Confermi che questo contratto è stato firmato?",
         "admin.users.quick.contract_signed_success":
             "Contratto segnato come firmato.",
         "admin.users.quick.suspend": "Sospendi",

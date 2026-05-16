@@ -55,6 +55,7 @@
 .wdr-admin-tx__hero-content {
     max-width: 1440px;
     margin: 0 auto;
+    min-width: 0;
 }
 
 .wdr-admin-tx__hero-badge {
@@ -81,6 +82,7 @@
     font-size: 0.875rem;
     opacity: 0.75;
     margin: 0;
+    line-height: 1.6;
 }
 
 /* ============================================================
@@ -108,6 +110,7 @@
     font-size: 0.8rem;
     color: #2c4a9e;
     line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 /* ============================================================
@@ -194,6 +197,13 @@
     color: var(--text-main);
     cursor: pointer;
     transition: border-color var(--transition-base);
+    min-width: 0;
+    width: auto;
+    flex: 1 1 12rem;
+}
+
+.wdr-admin-tx__filter-search {
+    flex: 2 1 18rem;
 }
 
 .wdr-admin-tx__filter-select:focus {
@@ -206,6 +216,7 @@
     font-size: 0.82rem;
     color: var(--text-muted);
     margin-left: auto;
+    white-space: nowrap;
 }
 
 /* ============================================================
@@ -280,6 +291,7 @@
     max-width: 260px;
     color: var(--text-muted);
     font-size: 0.8rem;
+    overflow-wrap: anywhere;
 }
 
 .wdr-admin-tx__table-extras {
@@ -313,7 +325,8 @@
 
 .wdr-admin-tx__partner-name {
     font-weight: 600;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .wdr-admin-tx__rate-badge {
@@ -399,6 +412,10 @@
         min-height: calc(100svh - 4.25rem);
     }
 
+    .wdr-admin-tx__hero {
+        padding: 2rem 1rem;
+    }
+
     .wdr-admin-tx__body {
         padding: 1.5rem 1rem;
     }
@@ -423,6 +440,8 @@
 
     .wdr-admin-tx__filter-count {
         margin-left: 0;
+        width: 100%;
+        white-space: normal;
     }
 }
 
@@ -521,6 +540,7 @@
         padding: 0.85rem 1rem;
         white-space: normal;
         border-bottom: 1px solid var(--border-light);
+        overflow-wrap: anywhere;
     }
 
     .wdr-admin-tx__table td:last-child {

@@ -3,7 +3,8 @@
    ============================================================ */
 
 .wdr-footer {
-    background-color: var(--bg-subtle);
+    background:
+        linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, #ffffff 100%);
     border-top: 1px solid var(--border-light);
     padding: 3.5rem 1.5rem 2rem;
     font-family: var(--font-family);
@@ -28,6 +29,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
+    padding-right: 1.25rem;
 }
 
 .wdr-footer__logo {
@@ -102,6 +104,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
+    min-width: 0;
 }
 
 .wdr-footer__col-title {
@@ -158,12 +161,14 @@
     font-size: 0.8125rem;
     color: var(--text-muted);
     margin: 0;
+    overflow-wrap: anywhere;
 }
 
 .wdr-footer__legal-links {
     display: flex;
     gap: 1.25rem;
     flex-wrap: wrap;
+    row-gap: 0.5rem;
 }
 
 @media (max-width: 900px) {
@@ -184,10 +189,12 @@
 
     .wdr-footer__brand {
         grid-column: 1;
+        padding-right: 0;
     }
 
     .wdr-footer__bottom {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.75rem;
     }
 }

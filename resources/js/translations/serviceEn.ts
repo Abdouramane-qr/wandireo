@@ -143,5 +143,63 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.form.ical.status.running": "Sync in progress",
         "service.form.ical.status.success": "Synced",
         "service.form.ical.status.failed": "Failed",
+        "service.form.structure.title": "Service structure",
+        "service.form.structure.subtitle":
+            "Review the active category, subcategories and dynamic fields that will be displayed in this form.",
+        "service.form.structure.manage": "Manage catalog",
+        "service.form.structure.choose_hint":
+            "Select an active structure first to display its subcategories, attributes and options.",
+        "service.form.structure.none_active":
+            "No active structure is currently available for this category.",
+        "service.form.structure.active": "Active structure",
+        "service.form.structure.subcategories": "Subcategories",
+        "service.form.structure.selected": "Selected",
+        "service.form.structure.none_subcategories":
+            "No active subcategory available.",
+        "service.form.structure.attributes": "Attributes",
+        "service.form.structure.required_count":
+            "{required} required out of {total} attributes",
+        "service.form.structure.required": "Required",
+        "service.form.structure.optional": "Optional",
+        "service.form.structure.filter": "Filter",
+        "service.form.structure.none_attributes":
+            "No dynamic attribute configured.",
+        "service.form.structure.extras": "Extras",
+        "service.form.structure.none_extras":
+            "No active extra configured.",
+        "service.form.section.guidance": "Writing guidance",
+        "service.form.guidance.structure": "Active structure: {name}",
+        "service.form.guidance.activity.title":
+            "Describe the experience in concrete terms",
+        "service.form.guidance.activity.1":
+            "Highlight how the activity unfolds, its duration and the expected level.",
+        "service.form.guidance.activity.2":
+            "Clarify meeting points, included equipment and participation constraints.",
+        "service.form.guidance.activity.3":
+            "Avoid vague descriptions: the traveler should understand the offer in seconds.",
+        "service.form.guidance.boat.title":
+            "Present the boat and intended use clearly",
+        "service.form.guidance.boat.1":
+            "State real capacity, outing type and boarding conditions.",
+        "service.form.guidance.boat.2":
+            "Specify whether skipper, fuel or equipment are included or optional.",
+        "service.form.guidance.boat.3":
+            "Clearly mention license, deposit and departure or return times.",
+        "service.form.guidance.stay.title":
+            "Frame the stay with operational details",
+        "service.form.guidance.stay.1":
+            "Provide capacity, check-in/check-out times and stay conditions.",
+        "service.form.guidance.stay.2":
+            "Highlight differentiating amenities and rules that prevent misunderstandings.",
+        "service.form.guidance.stay.3":
+            "Describe the property with a level of detail consistent with its pricing and positioning.",
+        "service.form.guidance.car.title":
+            "Give the key details before booking",
+        "service.form.guidance.car.1":
+            "Specify transmission, fuel type, capacity and pickup conditions.",
+        "service.form.guidance.car.2":
+            "Add important limits: minimum age, deposit, mileage and insurance.",
+        "service.form.guidance.car.3":
+            "Keep the copy simple and direct, without internal jargon or vague promises.",
     };
 }

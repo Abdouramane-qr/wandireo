@@ -133,6 +133,37 @@ class ExternalBookingServiceTest extends TestCase
         }
     }
 
+    public function test_it_preserves_a_non_final_provider_status_without_marking_it_confirmed(): void
+    {
+        $booking = $this->makeExternalBooking('FAREHARBOR');
+        $service = new ExternalBookingService(
+            new ExternalBookingGatewayRegistry([
+                new class implements ExternalBookingGateway
+                {
+                    public function provider(): string
+                    {
+                        return 'FAREHARBOR';
+                    }
+
+                    public function createBooking(Booking $booking, Service $service): ExternalBookingResult
+                    {
+                        return new ExternalBookingResult(
+                            'ext-booking-pending',
+                            'PENDING',
+                            ['queued' => true],
+                        );
+                    }
+                },
+            ]),
+        );
+
+        $result = $service->syncOrFail($booking);
+
+        $this->assertSame('PENDING', $result->status);
+        $this->assertSame('PENDING', $booking->fresh()->external_booking_status);
+        $this->assertFalse($service->hasConfirmedExternalBooking($booking->fresh()));
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

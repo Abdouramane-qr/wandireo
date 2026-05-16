@@ -25,11 +25,12 @@ class DashboardTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_approved_partners_can_visit_the_partner_dashboard()
+    public function test_fully_onboarded_partners_can_visit_the_partner_dashboard()
     {
         $partner = User::factory()->create([
             'role' => 'PARTNER',
             'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'SIGNED',
         ]);
 
         $response = $this->actingAs($partner)->get(route('partner.dashboard'));

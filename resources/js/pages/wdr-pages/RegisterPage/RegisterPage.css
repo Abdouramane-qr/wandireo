@@ -108,3 +108,15 @@
 .wdr-register__footer p {
     margin: 0;
 }
+
+@media (max-width: 480px) {
+    .wdr-register {
+        min-height: auto;
+        padding: 1.5rem 0.875rem;
+    }
+
+    .wdr-register__card {
+        padding: 1.5rem 1rem;
+        gap: 1.25rem;
+    }
+}

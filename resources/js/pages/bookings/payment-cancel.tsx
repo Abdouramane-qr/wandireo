@@ -2,6 +2,7 @@ import { usePage } from '@inertiajs/react';
 import { Button } from '@/components/wdr';
 import WdrPageShell from '@/components/wdr/WdrPageShell';
 import { useRouter } from '@/hooks/useWdrRouter';
+import '@/pages/wdr-pages/PaymentPage/PaymentPage.css';
 
 type PaymentCancelProps = Record<string, unknown> & {
     bookingId?: string;

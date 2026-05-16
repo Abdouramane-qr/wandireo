@@ -180,12 +180,32 @@
 /* ---- Responsivite ---- */
 
 @media (max-width: 480px) {
+    .wdr-modal-overlay {
+        align-items: flex-end;
+        padding: 0.5rem;
+    }
+
     .wdr-modal {
         border-radius: var(--radius-md);
+        max-height: calc(100svh - 0.5rem);
+    }
+
+    .wdr-modal--lg,
+    .wdr-modal--xl {
+        max-width: 100%;
+    }
+
+    .wdr-modal__header {
+        padding: 1rem 1rem 0.9rem;
+    }
+
+    .wdr-modal__body {
+        padding: 1rem;
     }
 
     .wdr-modal__footer {
         flex-direction: column-reverse;
+        padding: 0.9rem 1rem 1rem;
     }
 
     .wdr-modal__footer .wdr-btn {

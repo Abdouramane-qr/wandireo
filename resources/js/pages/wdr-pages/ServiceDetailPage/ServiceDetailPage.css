@@ -50,6 +50,12 @@
     text-overflow: ellipsis;
 }
 
+@media (max-width: 640px) {
+    .wdr-detail__breadcrumb-current {
+        max-width: 100%;
+    }
+}
+
 /* ---- Galerie d'images ------------------------------------- */
 .wdr-detail__gallery-wrapper {
     background: #000;

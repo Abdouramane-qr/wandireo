@@ -13,6 +13,10 @@ export function buildServiceDeTranslations(): Record<string, string> {
         "service.reviews_count": "({count} Bewertungen)",
         "service.location": "Ort",
         "service.description": "Informationen zu diesem Angebot",
+        "service.category.activity": "Aktivitaet",
+        "service.category.boat": "Boot",
+        "service.category.stay": "Unterkunft",
+        "service.category.car": "Auto",
         "service.features": "Highlights",
         "service.detail_category": "Detaillierte Kategorie",
         "service.subcategory": "Unterkategorie",
@@ -135,5 +139,63 @@ export function buildServiceDeTranslations(): Record<string, string> {
             "{large} grosses Gepaeck + {small} kleines Gepaeck",
         "service.mileage_per_day": "{count} km/Tag",
         "service.driver_age_min": "Mindestens {age} Jahre",
+        "service.form.structure.title": "Service-Struktur",
+        "service.form.structure.subtitle":
+            "Pruefen Sie die aktive Kategorie, Unterkategorien und dynamischen Felder, die in diesem Formular angezeigt werden.",
+        "service.form.structure.manage": "Katalog verwalten",
+        "service.form.structure.choose_hint":
+            "Waehlen Sie zuerst eine aktive Struktur aus, um Unterkategorien, Attribute und Optionen anzuzeigen.",
+        "service.form.structure.none_active":
+            "Fuer diese Kategorie ist derzeit keine aktive Struktur verfuegbar.",
+        "service.form.structure.active": "Aktive Struktur",
+        "service.form.structure.subcategories": "Unterkategorien",
+        "service.form.structure.selected": "Ausgewaehlt",
+        "service.form.structure.none_subcategories":
+            "Keine aktive Unterkategorie verfuegbar.",
+        "service.form.structure.attributes": "Attribute",
+        "service.form.structure.required_count":
+            "{required} erforderlich von {total} Attributen",
+        "service.form.structure.required": "Erforderlich",
+        "service.form.structure.optional": "Optional",
+        "service.form.structure.filter": "Filter",
+        "service.form.structure.none_attributes":
+            "Kein dynamisches Attribut konfiguriert.",
+        "service.form.structure.extras": "Extras",
+        "service.form.structure.none_extras":
+            "Kein aktives Extra konfiguriert.",
+        "service.form.section.guidance": "Schreibleitfaden",
+        "service.form.guidance.structure": "Aktive Struktur: {name}",
+        "service.form.guidance.activity.title":
+            "Beschreiben Sie das Erlebnis konkret",
+        "service.form.guidance.activity.1":
+            "Erlaeutern Sie Ablauf, Dauer und erwartetes Niveau der Aktivitaet.",
+        "service.form.guidance.activity.2":
+            "Praezisieren Sie Treffpunkte, enthaltene Ausruestung und Teilnahmebedingungen.",
+        "service.form.guidance.activity.3":
+            "Vermeiden Sie vage Beschreibungen: Reisende sollen das Angebot in Sekunden verstehen.",
+        "service.form.guidance.boat.title":
+            "Stellen Sie Boot und Einsatzzweck klar dar",
+        "service.form.guidance.boat.1":
+            "Nennen Sie reale Kapazitaet, Ausflugstyp und Einschiffungsbedingungen.",
+        "service.form.guidance.boat.2":
+            "Geben Sie an, ob Skipper, Treibstoff oder Ausruestung enthalten oder optional sind.",
+        "service.form.guidance.boat.3":
+            "Nennen Sie Fuehrerschein, Kaution sowie Abfahrts- oder Rueckkehrzeiten klar.",
+        "service.form.guidance.stay.title":
+            "Rahmen Sie den Aufenthalt mit operativen Details ein",
+        "service.form.guidance.stay.1":
+            "Nennen Sie Kapazitaet, Check-in-/Check-out-Zeiten und Aufenthaltsbedingungen.",
+        "service.form.guidance.stay.2":
+            "Heben Sie besondere Ausstattungen und Regeln hervor, die Missverstaendnisse vermeiden.",
+        "service.form.guidance.stay.3":
+            "Beschreiben Sie die Unterkunft mit einem Detaillierungsgrad, der zu Preis und Positionierung passt.",
+        "service.form.guidance.car.title":
+            "Nennen Sie die wichtigsten Details vor der Buchung",
+        "service.form.guidance.car.1":
+            "Praezisieren Sie Getriebe, Kraftstoff, Kapazitaet und Abholbedingungen.",
+        "service.form.guidance.car.2":
+            "Ergaenzen Sie wichtige Grenzen: Mindestalter, Kaution, Kilometerleistung und Versicherung.",
+        "service.form.guidance.car.3":
+            "Halten Sie den Text einfach und direkt, ohne internes Vokabular oder vage Versprechen.",
     };
 }

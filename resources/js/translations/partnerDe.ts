@@ -32,6 +32,18 @@ export function buildPartnerDeTranslations(): Record<string, string> {
             "Erstellen Sie Ihren ersten Service, um zu starten.",
         "partner.profile.empty":
             "Derzeit keine aktiven Services.",
+        "partner.profile.account_title": "Partner-Kontaktdaten",
+        "partner.profile.account_subtitle": "Aktualisieren Sie die echte E-Mail-Adresse fuer die Partnerkommunikation sowie die Kontaktdaten, die vom Wandireo-Team verwendet werden.",
+        "partner.profile.field.company_name": "Unternehmen",
+        "partner.profile.field.email": "Partner-E-Mail",
+        "partner.profile.field.phone": "Telefon",
+        "partner.profile.field.business_address": "Geschaeftsadresse",
+        "partner.profile.save": "Informationen speichern",
+        "partner.profile.save_loading": "Wird gespeichert...",
+        "partner.profile.save_success_title": "Profil aktualisiert",
+        "partner.profile.save_success_desc": "Die Partnerdaten wurden erfolgreich gespeichert.",
+        "partner.profile.save_error_title": "Aktualisierung fehlgeschlagen",
+        "partner.profile.save_error_desc": "Die Partnerdaten konnten derzeit nicht aktualisiert werden.",
 
         "partner.pending.title.pending": "Bewerbung wird geprueft",
         "partner.pending.title.approved": "Konto aktiviert!",
@@ -41,6 +53,8 @@ export function buildPartnerDeTranslations(): Record<string, string> {
             "Ihre Bewerbung wird derzeit von unserem Team geprueft. Wir werden Sie sehr bald kontaktieren.",
         "partner.pending.message.approved":
             "Ihr Konto wurde bestaetigt. Sie koennen jetzt auf Ihr Dashboard zugreifen.",
+        "partner.pending.message.approved_unsigned":
+            "Ihr Konto wurde bestaetigt. Unterzeichnen Sie den Vertrag, um Ihr Partner-Dashboard freizuschalten.",
         "partner.pending.message.rejected":
             "Leider wurde Ihre Bewerbung nicht angenommen.",
         "partner.pending.message.rejected_with_reason":
@@ -66,6 +80,19 @@ export function buildPartnerDeTranslations(): Record<string, string> {
             "Unterschrift ausstehend",
         "partner.pending.status.contract.signed": "Unterzeichnet",
         "partner.pending.status.contract.rejected": "Abgelehnt",
+        "partner.pending.contract_sign_title": "Vertrag unterzeichnen",
+        "partner.pending.contract_sign_message":
+            "Laden Sie den Vertrag bei Bedarf herunter und bestaetigen Sie die Annahme, um Ihren Partnerzugang freizuschalten.",
+        "partner.pending.contract_sign_acknowledge":
+            "Ich bestaetige, dass ich den Partnervertrag gelesen und akzeptiert habe.",
+        "partner.pending.contract_sign_cta": "Vertrag unterzeichnen",
+        "partner.pending.contract_sign_loading": "Unterzeichnung laeuft...",
+        "partner.pending.contract_sign_success":
+            "Vertrag erfolgreich unterzeichnet.",
+        "partner.pending.contract_sign_error":
+            "Der Vertrag kann derzeit nicht unterzeichnet werden.",
+        "partner.pending.contract_accept_required":
+            "Sie muessen die Annahme des Vertrags bestaetigen, bevor Sie unterzeichnen.",
 
         "partner.bookings.title": "Buchungsverwaltung",
         "partner.bookings.back_dashboard": "Zurueck zum Dashboard",
@@ -266,6 +293,7 @@ export function buildPartnerDeTranslations(): Record<string, string> {
 
         "partner.catalog.preview.client_price":
             "Angezeigter Kundenpreis (inkl. MwSt.)",
+        "partner.catalog.preview.commission": "Wandireo-Provision",
 
         "partner.catalog.toast.service_created":
             "Angebot erfolgreich erstellt.",
@@ -306,6 +334,82 @@ export function buildPartnerDeTranslations(): Record<string, string> {
             "Das Modell ist erforderlich.",
         "partner.catalog.error.boat_name_required":
             "Der Bootsname ist erforderlich.",
+
+        "partner.dashboard.title": "Partner-Dashboard",
+        "partner.dashboard.action_required": "Aktion erforderlich",
+        "partner.dashboard.avatar_label": "Avatar von {company}",
+        "partner.dashboard.catalog_aria": "Partnerkatalog oeffnen",
+        "partner.dashboard.bookings_aria": "Partnerbuchungen oeffnen",
+        "partner.dashboard.active_service_one": "aktives Angebot",
+        "partner.dashboard.active_service_other": "aktive Angebote",
+        "partner.dashboard.process_one": "{count} Buchung zu bearbeiten",
+        "partner.dashboard.process_other":
+            "{count} Buchungen zu bearbeiten",
+        "partner.dashboard.pending_badge": "{count} offene Anfragen",
+        "partner.dashboard.status.confirmed": "Bestaetigt",
+        "partner.dashboard.status.pending": "Ausstehend",
+        "partner.dashboard.status.cancelled": "Storniert",
+        "partner.dashboard.offers_overview": "Kataloguebersicht",
+        "partner.dashboard.active_services": "Aktive Angebote",
+        "partner.dashboard.inactive_services": "Versteckte Angebote",
+        "partner.dashboard.external_services": "Synchronisierte Angebote",
+        "partner.dashboard.action_new_offer": "Angebot hinzufuegen",
+        "partner.dashboard.action_profile": "Profil ansehen",
+        "partner.profile.active_services": "Aktive Angebote",
+        "partner.profile.imported_services": "Synchronisierte Angebote",
+        "partner.profile.hidden_services": "Versteckte Angebote",
+        "partner.profile.catalog_edit": "Bearbeiten",
+        "partner.bookings.booking_id": "Buchung {id}",
+        "partner.bookings.received_on": "Eingegangen am {date}",
+        "partner.bookings.participants_one": "Teilnehmer",
+        "partner.bookings.participants_other": "Teilnehmer",
+        "partner.bookings.extras": "Extras: {summary}",
+        "partner.bookings.reason": "Grund: {reason}",
+        "partner.bookings.pending_badge": "{count} offen",
+        "partner.bookings.status_aria": "Status {status}",
+        "partner.bookings.reject_modal.placeholder":
+            "Z. B. keine Verfuegbarkeit, Wetter, Wartung...",
+        "partner.bookings.summary.total": "Gesamt",
+        "partner.bookings.summary.pending": "Zu bestaetigen",
+        "partner.bookings.summary.confirmed": "Bestaetigt",
+        "partner.bookings.summary.cancelled": "Storniert",
+        "partner.bookings.external.label":
+            "Externe Buchung: {status} · Ref. {reference}",
+        "partner.bookings.external.reference_missing": "nicht verfuegbar",
+        "partner.bookings.external.status.confirmed": "bestaetigt",
+        "partner.bookings.external.status.pending": "ausstehend",
+        "partner.bookings.external.status.failed": "fehlgeschlagen",
+        "partner.catalog.card.partner_price": "Partnerpreis",
+        "partner.catalog.card.client_price": "Kundenpreis",
+        "partner.catalog.card.commission": "Provision {rate}%",
+        "partner.catalog.card.read_only_offer":
+            "Synchronisiertes Angebot: Bearbeitung in der Partnerquelle.",
+        "partner.catalog.card.open_public": "Oeffentliche Seite oeffnen",
+        "partner.catalog.card.local": "Lokal",
+        "partner.catalog.card.external": "Synchronisiert",
+        "partner.catalog.card.updated": "Aktualisiert: {date}",
+        "partner.catalog.action.confirm_delete": "Bestaetigen",
+        "partner.catalog.delete.confirm_prompt":
+            "Dieses Angebot endgueltig loeschen?",
+        "partner.catalog.filters.aria": "Partnerkatalog-Filter",
+        "partner.catalog.filters.search": "Suche",
+        "partner.catalog.filters.search_placeholder":
+            "Titel, Stadt, Kategorie, Quelle...",
+        "partner.catalog.filters.status": "Status",
+        "partner.catalog.filters.source": "Quelle",
+        "partner.catalog.filters.all_categories": "Alle Kategorien",
+        "partner.catalog.filters.all_statuses": "Alle Status",
+        "partner.catalog.filters.all_sources": "Alle Quellen",
+        "partner.catalog.filters.reset": "Zuruecksetzen",
+        "partner.catalog.filters.empty_title": "Keine passenden Angebote",
+        "partner.catalog.filters.empty_subtitle":
+            "Passen Sie die Filter an, um Ihre Produkte zu finden.",
+        "partner.catalog.summary.total": "Angebote gesamt",
+        "partner.catalog.summary.active": "Aktive Angebote",
+        "partner.catalog.summary.external": "Synchronisierte Angebote",
+        "partner.catalog.summary.hidden": "Versteckte Angebote",
+        "partner.catalog.status.active": "Aktiv",
+        "partner.catalog.status.inactive": "Versteckt",
 
         "partner.register.company": "Unternehmensinformationen",
         "partner.register.company_name": "Firmenname",

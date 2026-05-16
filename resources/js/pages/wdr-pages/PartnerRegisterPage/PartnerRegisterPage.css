@@ -131,3 +131,18 @@
     color: var(--primary-dark);
     text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+    .wdr-partner-register {
+        padding: 1.5rem 0.875rem;
+    }
+
+    .wdr-partner-register__card {
+        padding: 1.5rem 1rem;
+        gap: 1.25rem;
+    }
+
+    .wdr-partner-register__section {
+        padding: 1rem;
+    }
+}

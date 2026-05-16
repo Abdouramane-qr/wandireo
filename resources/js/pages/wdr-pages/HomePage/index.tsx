@@ -11,31 +11,15 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { useUser } from "@/context/UserContext";
 import { todayISO } from "@/lib/formatters";
+import {
+    buildPublicDestinationOptions,
+    PUBLIC_ALGARVE_DESTINATIONS,
+} from "@/lib/publicDestinations";
 import { toServiceCardData } from "@/lib/serviceAdapter";
 import { BlogStatusNames } from "@/types/blog";
 import "./HomePage.css";
 
-const ALGARVE_CITIES = [
-    "Lagos",
-    "Alvor",
-    "Portimão",
-    "Silves",
-    "Benagil",
-    "Armação de Pêra",
-    "Vilamoura",
-    "Albufeira",
-];
-
-const DESTINATION_CARDS = [
-    "Lagos",
-    "Alvor",
-    "Portimão",
-    "Silves",
-    "Benagil",
-    "Armação de Pêra",
-    "Vilamoura",
-    "Albufeira",
-];
+const DESTINATION_CARDS = PUBLIC_ALGARVE_DESTINATIONS;
 
 const WhatsAppIcon: React.FC = () => (
     <svg
@@ -112,34 +96,7 @@ export const HomePage: React.FC = () => {
     );
 
     const destinationOptions = useMemo(() => {
-        const algarveSet = new Set(ALGARVE_CITIES);
-        const extraCities = new Map<string, Set<string>>();
-
-        for (const service of services) {
-            if (algarveSet.has(service.location.city)) {
-                continue;
-            }
-
-            if (!extraCities.has(service.location.country)) {
-                extraCities.set(service.location.country, new Set());
-            }
-
-            extraCities
-                .get(service.location.country)
-                ?.add(service.location.city);
-        }
-
-        return [
-            { country: "Algarve", cities: ALGARVE_CITIES },
-            ...Array.from(extraCities.entries())
-                .sort(([a], [b]) => a.localeCompare(b, "fr"))
-                .map(([country, cities]) => ({
-                    country,
-                    cities: Array.from(cities).sort((a, b) =>
-                        a.localeCompare(b, "fr"),
-                    ),
-                })),
-        ].sort((a, b) => {
+        return buildPublicDestinationOptions(services).sort((a, b) => {
             if (a.country === "Algarve") {
                 return -1;
             }

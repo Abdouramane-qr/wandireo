@@ -95,12 +95,16 @@ export const AdminReviewsPage: React.FC = () => {
     return (
         <div className="wdr-admin-reviews">
             <section className="wdr-admin-reviews__hero">
-                <div>
-                    <p className="wdr-admin-reviews__eyebrow">
-                        {t("nav.admin")}
+                <div className="wdr-admin-reviews__hero-content">
+                    <p className="wdr-admin-reviews__hero-badge">
+                        {t("admin.reviews.badge")}
                     </p>
-                    <h1>{t("admin.reviews.title")}</h1>
-                    <p>{t("admin.reviews.subtitle")}</p>
+                    <h1 className="wdr-admin-reviews__hero-title">
+                        {t("admin.reviews.title")}
+                    </h1>
+                    <p className="wdr-admin-reviews__hero-subtitle">
+                        {t("admin.reviews.subtitle")}
+                    </p>
                 </div>
                 <div className="wdr-admin-reviews__stats">
                     <span>
@@ -137,6 +141,7 @@ export const AdminReviewsPage: React.FC = () => {
                     />
                     <select
                         className="wdr-admin-reviews__select"
+                        aria-label={t("admin.reviews.all_statuses")}
                         value={status}
                         onChange={(event) =>
                             setStatus(event.target.value as StatusFilter)

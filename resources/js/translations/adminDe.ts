@@ -173,6 +173,8 @@ export function buildAdminDeTranslations(): Record<string, string> {
         "admin.users.quick.approve_success": "Partner genehmigt.",
         "admin.users.quick.contract_signed":
             "Als unterschrieben markieren",
+        "admin.users.quick.contract_signed_confirm":
+            "Bestätigen Sie, dass dieser Vertrag unterschrieben wurde?",
         "admin.users.quick.contract_signed_success":
             "Vertrag als unterschrieben markiert.",
         "admin.users.quick.suspend": "Sperren",

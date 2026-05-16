@@ -845,9 +845,6 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
                         <p className="wdr-detail__booking-external-note">
                             {t("service.external_price_not_provided")}
                         </p>
-                        <p className="wdr-detail__booking-external-note">
-                            {t("service.external_price_confirmed_partner")}
-                        </p>
                 </div>
             )}
 

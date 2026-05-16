@@ -78,6 +78,25 @@ function getBookingStatusClass(status: string): string {
     return "cancelled";
 }
 
+function getExternalStatusLabel(
+    status: string,
+    t: (key: string) => string,
+): string {
+    if (status === "CONFIRMED") {
+        return t("admin.transactions.external.confirmed");
+    }
+
+    if (status === "FAILED") {
+        return t("admin.transactions.external.failed");
+    }
+
+    if (status === "PENDING") {
+        return t("admin.transactions.external.pending");
+    }
+
+    return status;
+}
+
 function formatExtrasSummary(entry: {
     selectedExtras?: Array<{ name: string; quantity: number }>;
     extrasTotal?: number;
@@ -117,7 +136,7 @@ export const AdminTransactionsPage: React.FC = () => {
         PaymentStatus | "all"
     >("all");
     const [filterExternalStatus, setFilterExternalStatus] = useState<
-        "all" | "CONFIRMED" | "FAILED" | "NONE"
+        "all" | "CONFIRMED" | "FAILED" | "PENDING" | "NONE"
     >("all");
 
     const { bookings } = useAdminBookingsData({
@@ -497,6 +516,7 @@ export const AdminTransactionsPage: React.FC = () => {
                                     | "all"
                                     | "CONFIRMED"
                                     | "FAILED"
+                                    | "PENDING"
                                     | "NONE",
                             )
                         }
@@ -511,6 +531,9 @@ export const AdminTransactionsPage: React.FC = () => {
                         <option value="FAILED">
                             {t("admin.transactions.external.failed")}
                         </option>
+                        <option value="PENDING">
+                            {t("admin.transactions.external.pending")}
+                        </option>
                         <option value="NONE">
                             {t("admin.transactions.external.none")}
                         </option>
@@ -518,7 +541,7 @@ export const AdminTransactionsPage: React.FC = () => {
 
                     <input
                         type="search"
-                        className="wdr-admin-tx__filter-select"
+                        className="wdr-admin-tx__filter-select wdr-admin-tx__filter-search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         aria-label={t("admin.transactions.filter.search")}
@@ -709,8 +732,13 @@ export const AdminTransactionsPage: React.FC = () => {
                                                         </span>
                                                         {booking.externalBookingStatus ? (
                                                             <div className="wdr-admin-tx__table-extras">
-                                                                External:{" "}
-                                                                {booking.externalBookingStatus}
+                                                                {t(
+                                                                    "admin.transactions.external.label",
+                                                                )}:{" "}
+                                                                {getExternalStatusLabel(
+                                                                    booking.externalBookingStatus,
+                                                                    t,
+                                                                )}
                                                                 {booking.externalBookingReference
                                                                     ? ` · ${booking.externalBookingReference}`
                                                                     : ""}

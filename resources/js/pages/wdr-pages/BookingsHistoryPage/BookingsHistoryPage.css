@@ -162,9 +162,8 @@
     font-weight: 700;
     color: var(--text-main);
     margin: 0 0 0.3rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .wdr-history__card-location {
@@ -186,6 +185,8 @@
     font-weight: 700;
     color: var(--primary);
     background: color-mix(in srgb, var(--primary) 10%, transparent);
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 /* Badges de statut */
@@ -284,6 +285,7 @@
     font-size: 0.75rem;
     color: var(--text-muted);
     font-family: monospace;
+    overflow-wrap: anywhere;
 }
 
 .wdr-history__card-prices {
@@ -382,6 +384,15 @@
     .wdr-history__card-prices {
         gap: 0.5rem;
     }
+
+    .wdr-history__review-actions {
+        flex-direction: column;
+    }
+
+    .wdr-history__review-actions .wdr-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* ============================================================
@@ -438,4 +449,5 @@
 .wdr-history__review-actions {
     display: flex;
     gap: 0.625rem;
+    flex-wrap: wrap;
 }

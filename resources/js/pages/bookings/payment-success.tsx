@@ -4,6 +4,7 @@ import { paymentsApi, type PaymentSessionStatusResponse } from '@/api/payments';
 import { Button } from '@/components/wdr';
 import WdrPageShell from '@/components/wdr/WdrPageShell';
 import { useRouter } from '@/hooks/useWdrRouter';
+import '@/pages/wdr-pages/PaymentPage/PaymentPage.css';
 
 type PaymentSuccessProps = Record<string, unknown> & {
     bookingId?: string;
@@ -62,6 +63,11 @@ export default function PaymentSuccess() {
         };
     }, [sessionId]);
 
+    const isExternalPending =
+        sessionStatus?.status === 'paid'
+        && sessionStatus.externalBookingStatus !== undefined
+        && sessionStatus.externalBookingStatus !== 'CONFIRMED';
+
     return (
         <WdrPageShell>
             <div className="wdr-payment wdr-payment--status">
@@ -91,9 +97,11 @@ export default function PaymentSuccess() {
 
                         {!error && status === 'paid' ? (
                             <p className="wdr-payment__sync-note">
-                                {sessionStatus?.externalBookingReference
-                                    ? 'Paiement et reservation confirmes. Votre reservation apparait maintenant dans votre historique.'
-                                    : 'Paiement confirme. Votre reservation apparait maintenant dans votre historique.'}
+                                {isExternalPending
+                                    ? "Paiement confirme. La reservation est encore en cours de validation et reste visible dans votre historique."
+                                    : sessionStatus?.externalBookingReference
+                                      ? 'Paiement et reservation confirmes. Votre reservation apparait maintenant dans votre historique.'
+                                      : 'Paiement confirme. Votre reservation apparait maintenant dans votre historique.'}
                             </p>
                         ) : null}
 
@@ -105,7 +113,7 @@ export default function PaymentSuccess() {
 
                         {!error && status === 'refunded' ? (
                             <p className="wdr-payment__error" role="alert">
-                                La reservation n'a pas pu etre finalisee chez le partenaire. Le remboursement a ete enclenche.
+                                La reservation n'a pas pu etre finalisee. Le remboursement a ete enclenche.
                             </p>
                         ) : null}
 
@@ -125,7 +133,7 @@ export default function PaymentSuccess() {
 
                         {sessionStatus?.externalBookingReference ? (
                             <p className="wdr-payment__sync-note">
-                                Reference partenaire:{" "}
+                                Reference de validation:{" "}
                                 <strong>
                                     {sessionStatus.externalBookingReference}
                                 </strong>

@@ -28,8 +28,10 @@ import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
 import { useServiceData } from "@/hooks/useServicesData";
 import { useRouter } from "@/hooks/useWdrRouter";
 import {
+    FALLBACK_LOCALE,
     LOCALE_LABELS,
     SUPPORTED_LOCALES,
+    normalizeLocale,
     type Locale,
 } from "@/lib/locale";
 import { formatPrice } from "@/lib/formatters";
@@ -199,6 +201,27 @@ function hasLocaleTranslation(
 ): boolean {
     return typeof translations[locale] === "string"
         && translations[locale]!.trim() !== "";
+}
+
+function getLocalizedStructureValue(
+    translations: LocalizedTextMap | undefined,
+    locale: Locale,
+    fallback: string,
+): string {
+    if (translations) {
+        const localized =
+            translations[locale]?.trim() ||
+            translations[FALLBACK_LOCALE]?.trim() ||
+            Object.values(translations).find(
+                (value) => typeof value === "string" && value.trim() !== "",
+            );
+
+        if (localized) {
+            return localized;
+        }
+    }
+
+    return fallback;
 }
 
 function buildInitialState(existingService?: Service): ServiceFormState {
@@ -432,6 +455,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             ) ?? null,
         [availableStructureCategories, form.serviceCategoryId],
     );
+    const structureLocale = normalizeLocale(intlLocale) ?? FALLBACK_LOCALE;
 
     const availableSubcategories =
         selectedStructureCategory?.subcategories ?? [];
@@ -777,6 +801,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
             location_country: form.country,
             location_region: form.region || undefined,
             partner_price: price,
+            commission_rate: selectedPartner?.commissionRate,
             pricing_unit: form.pricingUnit,
             payment_mode: isExternalService
                 ? PaymentModeNames.EXTERNAL_REDIRECT
@@ -1207,7 +1232,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         ...availableStructureCategories.map(
                                             (entry) => ({
                                                 value: entry.id,
-                                                label: entry.name,
+                                                label: getLocalizedStructureValue(
+                                                    entry.nameTranslations,
+                                                    structureLocale,
+                                                    entry.name,
+                                                ),
                                             }),
                                         ),
                                     ]}
@@ -1272,7 +1301,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         ...availableSubcategories.map(
                                             (entry) => ({
                                                 value: entry.id,
-                                                label: entry.name,
+                                                label: getLocalizedStructureValue(
+                                                    entry.nameTranslations,
+                                                    structureLocale,
+                                                    entry.name,
+                                                ),
                                             }),
                                         ),
                                     ]}
@@ -1330,7 +1363,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                             {t("service.form.structure.active")}
                                         </span>
                                         <strong className="wdr-sform__structure-name">
-                                            {selectedStructureCategory.name}
+                                            {getLocalizedStructureValue(
+                                                selectedStructureCategory.nameTranslations,
+                                                structureLocale,
+                                                selectedStructureCategory.name,
+                                            )}
                                         </strong>
                                         <p className="wdr-sform__structure-meta">
                                             {
@@ -1343,9 +1380,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         </p>
                                         {selectedStructureCategory.description && (
                                             <p className="wdr-sform__structure-copy">
-                                                {
-                                                    selectedStructureCategory.description
-                                                }
+                                                {getLocalizedStructureValue(
+                                                    selectedStructureCategory.descriptionTranslations,
+                                                    structureLocale,
+                                                    selectedStructureCategory.description,
+                                                )}
                                             </p>
                                         )}
                                     </section>
@@ -1365,9 +1404,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                                             className="wdr-sform__structure-item"
                                                         >
                                                             <span>
-                                                                {
-                                                                    subcategory.name
-                                                                }
+                                                                {getLocalizedStructureValue(
+                                                                    subcategory.nameTranslations,
+                                                                    structureLocale,
+                                                                    subcategory.name,
+                                                                )}
                                                             </span>
                                                             {form.serviceSubcategoryId ===
                                                                 subcategory.id && (

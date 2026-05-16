@@ -207,7 +207,10 @@ export const PartnerDashboardPage: React.FC = () => {
 
     // Hooks avant retours conditionnels
     const { bookings } = usePartnerBookingsData(currentUser?.id ?? "");
-    const { services } = useServicesData();
+    const { services } = useServicesData({
+        partnerId: partnerUser?.id,
+        limit: 200,
+    });
 
     useEffect(() => {
         if (!currentUser) {
@@ -265,11 +268,18 @@ export const PartnerDashboardPage: React.FC = () => {
 
     /* Nombre de services actifs dans le catalogue */
     const activeServicesCount = useMemo(
+        () => services.filter((service) => service.isAvailable).length,
+        [services],
+    );
+    const inactiveServicesCount = useMemo(
+        () => services.filter((service) => !service.isAvailable).length,
+        [services],
+    );
+    const externalServicesCount = useMemo(
         () =>
-            services.filter(
-                (s) => s.partnerId === (partnerUser?.id ?? "") && s.isAvailable,
-            ).length,
-        [services, partnerUser?.id],
+            services.filter((service) => service.sourceType === "EXTERNAL")
+                .length,
+        [services],
     );
 
     /* 5 dernieres reservations pour l'apercu d'activite recente */
@@ -422,6 +432,63 @@ export const PartnerDashboardPage: React.FC = () => {
                                 {pendingCount}
                             </span>
                         )}
+                    </div>
+                </section>
+
+                <section
+                    className="wdr-partner-dash__section"
+                    aria-label={t("partner.dashboard.offers_overview")}
+                >
+                    <div className="wdr-partner-dash__section-header">
+                        <h2 className="wdr-partner-dash__section-title">
+                            {t("partner.dashboard.offers_overview")}
+                        </h2>
+                    </div>
+                    <div className="wdr-partner-dash__overview-grid">
+                        <article className="wdr-partner-dash__overview-card">
+                            <span className="wdr-partner-dash__overview-label">
+                                {t("partner.dashboard.active_services")}
+                            </span>
+                            <strong className="wdr-partner-dash__overview-value">
+                                {activeServicesCount}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-dash__overview-card">
+                            <span className="wdr-partner-dash__overview-label">
+                                {t("partner.dashboard.inactive_services")}
+                            </span>
+                            <strong className="wdr-partner-dash__overview-value">
+                                {inactiveServicesCount}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-dash__overview-card">
+                            <span className="wdr-partner-dash__overview-label">
+                                {t("partner.dashboard.external_services")}
+                            </span>
+                            <strong className="wdr-partner-dash__overview-value">
+                                {externalServicesCount}
+                            </strong>
+                        </article>
+                        <article className="wdr-partner-dash__overview-card wdr-partner-dash__overview-card--actions">
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() =>
+                                    navigate({ name: "partner-service-form" })
+                                }
+                            >
+                                {t("partner.dashboard.action_new_offer")}
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                    navigate({ name: "partner-profile" })
+                                }
+                            >
+                                {t("partner.dashboard.action_profile")}
+                            </Button>
+                        </article>
                     </div>
                 </section>
 

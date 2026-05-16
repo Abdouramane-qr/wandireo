@@ -69,8 +69,10 @@ export interface ServiceSubcategoryDefinition {
     id: string;
     serviceCategoryId: string;
     name: string;
+    nameTranslations?: LocalizedTextMap;
     slug: string;
     description?: string;
+    descriptionTranslations?: LocalizedTextMap;
     isActive: boolean;
     sortOrder: number;
 }
@@ -79,8 +81,10 @@ export interface ServiceCategoryDefinition {
     id: string;
     serviceType: ServiceCategory;
     name: string;
+    nameTranslations?: LocalizedTextMap;
     slug: string;
     description?: string;
+    descriptionTranslations?: LocalizedTextMap;
     isActive: boolean;
     sortOrder: number;
     subcategories: ServiceSubcategoryDefinition[];

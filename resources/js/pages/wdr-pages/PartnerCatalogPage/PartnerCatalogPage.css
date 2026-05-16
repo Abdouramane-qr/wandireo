@@ -94,6 +94,78 @@
     padding: 2rem 1.5rem;
 }
 
+.wdr-catalog__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.wdr-catalog__summary-card,
+.wdr-catalog__toolbar {
+    background: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.wdr-catalog__summary-card {
+    padding: 1rem 1.1rem;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.wdr-catalog__summary-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.wdr-catalog__summary-value {
+    font-family: var(--font-heading);
+    font-size: 1.45rem;
+    color: var(--text-main);
+}
+
+.wdr-catalog__toolbar {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.wdr-catalog__toolbar-grid {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.wdr-catalog__toolbar-field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.wdr-catalog__toolbar-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.wdr-catalog__toolbar-input,
+.wdr-catalog__toolbar-select {
+    width: 100%;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.8rem;
+    font: inherit;
+    color: var(--text-main);
+    background: var(--bg-elevated);
+}
+
 /* ============================================================
    Etat vide
    ============================================================ */
@@ -155,9 +227,24 @@
     box-shadow: var(--shadow-md);
 }
 
+.wdr-catalog__item-topline {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.wdr-catalog__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
 /* Categorie sur toute la premiere ligne */
 .wdr-catalog__category {
-    grid-column: 1 / -1;
     display: inline-flex;
     align-items: center;
     font-size: 0.72rem;
@@ -184,6 +271,36 @@
 .wdr-catalog__category--voiture {
     background: #fff3e0;
     color: var(--secondary);
+}
+
+.wdr-catalog__status-badge,
+.wdr-catalog__source-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.wdr-catalog__status-badge--active {
+    background: #e6f9ef;
+    color: var(--success-dark);
+}
+
+.wdr-catalog__status-badge--inactive {
+    background: #fff3e0;
+    color: var(--secondary);
+}
+
+.wdr-catalog__source-badge--local {
+    background: #e8f2ff;
+    color: var(--primary);
+}
+
+.wdr-catalog__source-badge--external {
+    background: #f0ebff;
+    color: var(--brand-purple);
 }
 
 /* Contenu principal */
@@ -217,6 +334,13 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.wdr-catalog__item-updated,
+.wdr-catalog__meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
 }
 
 /* Prix */
@@ -273,6 +397,12 @@
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+}
+
+.wdr-catalog__readonly-note {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
 }
 
 /* Confirmation de suppression */
@@ -546,6 +676,11 @@
         padding: 1.5rem 1rem;
     }
 
+    .wdr-catalog__summary,
+    .wdr-catalog__toolbar-grid {
+        grid-template-columns: 1fr;
+    }
+
     .wdr-catalog__item {
         grid-template-columns: 1fr;
         padding: 1rem;
@@ -578,6 +713,17 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.2rem;
+    }
+
+    .wdr-catalog__item-actions {
+        align-items: stretch;
+    }
+
+    .wdr-catalog__item-btns,
+    .wdr-catalog__item-btns .wdr-btn,
+    .wdr-catalog__item-actions > .wdr-btn,
+    .wdr-catalog__delete-confirm {
+        width: 100%;
     }
 
     .wdr-catalog-modal__overlay {

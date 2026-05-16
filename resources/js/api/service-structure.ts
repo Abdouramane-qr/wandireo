@@ -5,6 +5,7 @@ import {
     normalizeServiceSubcategory,
 } from '@/lib/api-normalizers';
 import type {
+    LocalizedTextMap,
     ServiceAttributeDefinition,
     ServiceCategory,
     ServiceCategoryDefinition,
@@ -16,8 +17,10 @@ import api from './client';
 export interface ServiceCategoryPayload {
     serviceType: ServiceCategory;
     name: string;
+    nameTranslations?: LocalizedTextMap;
     slug?: string;
     description?: string;
+    descriptionTranslations?: LocalizedTextMap;
     isActive?: boolean;
     sortOrder?: number;
 }
@@ -25,8 +28,10 @@ export interface ServiceCategoryPayload {
 export interface ServiceSubcategoryPayload {
     serviceCategoryId: string;
     name: string;
+    nameTranslations?: LocalizedTextMap;
     slug?: string;
     description?: string;
+    descriptionTranslations?: LocalizedTextMap;
     isActive?: boolean;
     sortOrder?: number;
 }
@@ -70,8 +75,10 @@ export const serviceStructureApi = {
             .post<unknown>('/service-structure/categories', {
                 service_type: payload.serviceType,
                 name: payload.name,
+                name_translations: payload.nameTranslations,
                 slug: payload.slug,
                 description: payload.description,
+                description_translations: payload.descriptionTranslations,
                 is_active: payload.isActive,
                 sort_order: payload.sortOrder,
             })
@@ -82,8 +89,10 @@ export const serviceStructureApi = {
             .patch<unknown>(`/service-structure/categories/${id}`, {
                 service_type: payload.serviceType,
                 name: payload.name,
+                name_translations: payload.nameTranslations,
                 slug: payload.slug,
                 description: payload.description,
+                description_translations: payload.descriptionTranslations,
                 is_active: payload.isActive,
                 sort_order: payload.sortOrder,
             })
@@ -97,8 +106,10 @@ export const serviceStructureApi = {
             .post<unknown>('/service-structure/subcategories', {
                 service_category_id: payload.serviceCategoryId,
                 name: payload.name,
+                name_translations: payload.nameTranslations,
                 slug: payload.slug,
                 description: payload.description,
+                description_translations: payload.descriptionTranslations,
                 is_active: payload.isActive,
                 sort_order: payload.sortOrder,
             })
@@ -112,8 +123,10 @@ export const serviceStructureApi = {
             .patch<unknown>(`/service-structure/subcategories/${id}`, {
                 service_category_id: payload.serviceCategoryId,
                 name: payload.name,
+                name_translations: payload.nameTranslations,
                 slug: payload.slug,
                 description: payload.description,
+                description_translations: payload.descriptionTranslations,
                 is_active: payload.isActive,
                 sort_order: payload.sortOrder,
             })

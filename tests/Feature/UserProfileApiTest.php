@@ -70,6 +70,47 @@ class UserProfileApiTest extends TestCase
         ]);
     }
 
+    public function test_partner_can_update_email_and_company_fields_in_own_space(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+            'name' => 'Partner Owner',
+            'email' => 'old-partner@example.com',
+            'email_verified_at' => now(),
+            'company_name' => 'Old Company',
+            'business_address' => 'Old Address',
+            'phone_number' => null,
+            'preferred_currency' => null,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->patchJson('/api/users/me', [
+            'email' => 'new-partner@example.com',
+            'phone_number' => '+351900000001',
+            'company_name' => 'New Company',
+            'business_address' => 'New Address 12',
+            'preferred_currency' => 'USD',
+        ])->assertOk()
+            ->assertJsonPath('email', 'new-partner@example.com')
+            ->assertJsonPath('phoneNumber', '+351900000001')
+            ->assertJsonPath('companyName', 'New Company')
+            ->assertJsonPath('businessAddress', 'New Address 12')
+            ->assertJsonPath('preferredCurrency', null);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'email' => 'new-partner@example.com',
+            'phone_number' => '+351900000001',
+            'company_name' => 'New Company',
+            'business_address' => 'New Address 12',
+            'preferred_currency' => null,
+        ]);
+
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
     public function test_profile_api_returns_validation_errors_for_invalid_fields(): void
     {
         $user = User::factory()->create([

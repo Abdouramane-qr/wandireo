@@ -9,6 +9,7 @@ import { useServicesDataWithOptions } from "@/hooks/useServicesData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAdminUsersData } from "@/hooks/useUsersData";
 import { useRouter } from "@/hooks/useWdrRouter";
+import { normalizeCountryName } from "@/lib/countries";
 import { formatPrice } from "@/lib/formatters";
 import type { FareHarborCompany } from "@/types/fareharbor";
 import { ServiceCategoryNames } from "@/types/service";
@@ -52,6 +53,30 @@ const EyeIcon: React.FC = () => (
 
 type AvailabilityFilter = "all" | "active" | "inactive";
 type SourceFilter = "all" | "LOCAL" | "EXTERNAL";
+
+function extractApiErrorMessage(errorValue: unknown): string | null {
+    if (
+        !errorValue ||
+        typeof errorValue !== "object" ||
+        !("response" in errorValue)
+    ) {
+        return null;
+    }
+
+    const response = (
+        errorValue as {
+            response?: {
+                data?: {
+                    message?: string;
+                };
+            };
+        }
+    ).response;
+
+    const message = response?.data?.message?.trim();
+
+    return message ? message : null;
+}
 
 export const AdminServicesPage: React.FC = () => {
     const { currentUser } = useUser();
@@ -322,12 +347,20 @@ export const AdminServicesPage: React.FC = () => {
                     company.displayName,
                 ),
             );
-        } catch {
+        } catch (caughtError) {
+            await refreshFareHarborData();
+            const syncMessage =
+                extractApiErrorMessage(caughtError) ?? company.lastError;
             error(
-                t("admin.services.fareharbor.toast.sync_error").replace(
-                    "{name}",
-                    company.displayName,
-                ),
+                syncMessage
+                    ? `${t("admin.services.fareharbor.toast.sync_error").replace(
+                          "{name}",
+                          company.displayName,
+                      )} ${syncMessage}`
+                    : t("admin.services.fareharbor.toast.sync_error").replace(
+                          "{name}",
+                          company.displayName,
+                      ),
             );
         } finally {
             setFareHarborBusyId(null);
@@ -338,9 +371,20 @@ export const AdminServicesPage: React.FC = () => {
         setIsFareHarborSyncAllBusy(true);
 
         try {
-            await fareHarborApi.syncAll();
+            const result = await fareHarborApi.syncAll();
             await refreshFareHarborData();
-            success(t("admin.services.fareharbor.toast.sync_all_success"));
+            if (result.summary.failed > 0) {
+                error(
+                    t("admin.services.fareharbor.toast.sync_all_partial")
+                        .replace("{failed}", String(result.summary.failed))
+                        .replace(
+                            "{total}",
+                            String(result.summary.total),
+                        ),
+                );
+            } else {
+                success(t("admin.services.fareharbor.toast.sync_all_success"));
+            }
         } catch {
             error(t("admin.services.fareharbor.toast.sync_all_error"));
         } finally {
@@ -901,7 +945,7 @@ export const AdminServicesPage: React.FC = () => {
                                         <div className="wdr-admin-svc__fareharbor-meta">
                                             <span>
                                                 {company.lastSyncedAt
-                                                    ? `${t("admin.services.fareharbor.last_sync")} ${company.lastSyncedAt.toLocaleString(intlLocale)}`
+                                                    ? `${company.lastStatus.toLowerCase() === "failed" ? t("admin.services.fareharbor.last_attempt") : t("admin.services.fareharbor.last_sync")} ${company.lastSyncedAt.toLocaleString(intlLocale)}`
                                                     : t(
                                                           "admin.services.fareharbor.never_synced",
                                                       )}
@@ -921,6 +965,9 @@ export const AdminServicesPage: React.FC = () => {
 
                                         {company.lastError ? (
                                             <p className="wdr-admin-svc__fareharbor-error">
+                                                {t(
+                                                    "admin.services.fareharbor.last_error",
+                                                )}{" "}
                                                 {company.lastError}
                                             </p>
                                         ) : null}
@@ -1164,7 +1211,9 @@ export const AdminServicesPage: React.FC = () => {
                                                 </span>
                                                 <span className="wdr-admin-svc__service-location">
                                                     {service.location.city},{" "}
-                                                    {service.location.country}
+                                                    {normalizeCountryName(
+                                                        service.location.country,
+                                                    )}
                                                 </span>
                                             </td>
                                             <td data-label={t("admin.services.col.category")}>
