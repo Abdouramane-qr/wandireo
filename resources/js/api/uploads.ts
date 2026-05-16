@@ -8,7 +8,7 @@ import api from './client';
 export interface PresignRequest {
     fileName: string;
     contentType: string;
-    folder?: 'services' | 'blog' | 'avatars';
+    folder?: 'services' | 'blog' | 'avatars' | 'uploads';
 }
 
 export interface PresignResponse {
