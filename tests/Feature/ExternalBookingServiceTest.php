@@ -18,6 +18,13 @@ class ExternalBookingServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['services.external_bookings.dry_run' => false]);
+    }
+
     public function test_it_persists_external_booking_details_for_supported_external_providers(): void
     {
         $booking = $this->makeExternalBooking('FAREHARBOR');
@@ -162,6 +169,49 @@ class ExternalBookingServiceTest extends TestCase
         $this->assertSame('PENDING', $result->status);
         $this->assertSame('PENDING', $booking->fresh()->external_booking_status);
         $this->assertFalse($service->hasConfirmedExternalBooking($booking->fresh()));
+    }
+
+    public function test_dry_run_confirms_without_calling_the_external_gateway(): void
+    {
+        config(['services.external_bookings.dry_run' => true]);
+
+        $booking = $this->makeExternalBooking('FAREHARBOR');
+        $counter = new stdClass();
+        $counter->count = 0;
+
+        $service = new ExternalBookingService(
+            new ExternalBookingGatewayRegistry([
+                new class($counter) implements ExternalBookingGateway
+                {
+                    public function __construct(
+                        private stdClass $counter,
+                    ) {
+                    }
+
+                    public function provider(): string
+                    {
+                        return 'FAREHARBOR';
+                    }
+
+                    public function createBooking(Booking $booking, Service $service): ExternalBookingResult
+                    {
+                        $this->counter->count++;
+
+                        return new ExternalBookingResult('should-not-run', 'CONFIRMED');
+                    }
+                },
+            ]),
+        );
+
+        $result = $service->syncOrFail($booking);
+        $freshBooking = $booking->fresh();
+
+        $this->assertSame(0, $counter->count);
+        $this->assertSame('CONFIRMED', $result->status);
+        $this->assertStringStartsWith('DRYRUN-FAREHARBOR-', $result->reference);
+        $this->assertSame($result->reference, $freshBooking->external_booking_reference);
+        $this->assertSame('CONFIRMED', $freshBooking->external_booking_status);
+        $this->assertTrue($freshBooking->external_booking_payload['dry_run']);
     }
 
     /**

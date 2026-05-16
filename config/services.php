@@ -58,6 +58,10 @@ return [
         'autosync_timezone' => env('FAREHARBOR_AUTOSYNC_TIMEZONE', 'UTC'),
     ],
 
+    'external_bookings' => [
+        'dry_run' => env('EXTERNAL_BOOKINGS_DRY_RUN', false),
+    ],
+
     'fast_translate' => [
         'enabled' => env('FAST_TRANSLATE_ENABLED', false),
         'base_url' => env('FAST_TRANSLATE_BASE_URL'),
