@@ -154,8 +154,14 @@ export const DashboardPage: React.FC = () => {
             return;
         }
 
-        if (currentUser.role !== "CLIENT") {
+        if (currentUser.role === "PARTNER") {
             navigate({ name: "partner-dashboard" });
+
+            return;
+        }
+
+        if (currentUser.role === "ADMIN") {
+            navigate({ name: "admin-dashboard" });
         }
     }, [currentUser, navigate]);
 

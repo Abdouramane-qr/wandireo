@@ -219,8 +219,14 @@ export const PartnerDashboardPage: React.FC = () => {
             return;
         }
 
-        if (currentUser.role !== "PARTNER") {
+        if (currentUser.role === "CLIENT") {
             navigate({ name: "dashboard" });
+
+            return;
+        }
+
+        if (currentUser.role === "ADMIN") {
+            navigate({ name: "admin-dashboard" });
         }
     }, [currentUser, navigate]);
 
@@ -337,10 +343,9 @@ export const PartnerDashboardPage: React.FC = () => {
                     <div className="wdr-partner-dash__hero-right">
                         <div
                             className="wdr-partner-dash__hero-avatar"
-                            aria-label={t("partner.dashboard.avatar_label").replace(
-                                "{company}",
-                                currentUser.companyName,
-                            )}
+                            aria-label={t(
+                                "partner.dashboard.avatar_label",
+                            ).replace("{company}", currentUser.companyName)}
                         >
                             {initials}
                         </div>
@@ -571,10 +576,9 @@ export const PartnerDashboardPage: React.FC = () => {
                             {pendingCount > 0 && (
                                 <span
                                     className="wdr-partner-dash__shortcut-badge"
-                                    aria-label={t("partner.dashboard.pending_badge").replace(
-                                        "{count}",
-                                        String(pendingCount),
-                                    )}
+                                    aria-label={t(
+                                        "partner.dashboard.pending_badge",
+                                    ).replace("{count}", String(pendingCount))}
                                 >
                                     {pendingCount}
                                 </span>
@@ -618,7 +622,10 @@ export const PartnerDashboardPage: React.FC = () => {
                                                 booking.serviceId}
                                         </span>
                                         <span className="wdr-partner-dash__activity-date">
-                                            {formatDateShort(booking.createdAt, intlLocale)}
+                                            {formatDateShort(
+                                                booking.createdAt,
+                                                intlLocale,
+                                            )}
                                         </span>
                                     </div>
                                     <div className="wdr-partner-dash__activity-footer">

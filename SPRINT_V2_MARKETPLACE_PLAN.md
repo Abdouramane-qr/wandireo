@@ -584,6 +584,13 @@ composer test
     - `npm run types:check`
     - targeted `npx prettier --check ...` for document and moderation UI files
     - `npm run build` passed after elevated rerun because the sandbox could not remove `public/build/assets`
+- Post-commit production/container follow-up:
+    - sprint migrations `2026_05_17_000001`, `2026_05_17_000002`, and `2026_05_17_000003` were applied in the Docker app with `php artisan migrate --force`
+    - `php artisan optimize:clear` was run in the Docker app after migrations
+    - targeted service creation regression was checked with `ServiceModerationTest --filter=partner_created_service_starts_as_draft_and_hidden`
+    - partner/client/admin dashboard guards were corrected to avoid `/partenaire` <-> `/mon-espace` redirects when an admin enters the partner area
+    - current source does not contain a `fonts.googleapis.com` import; the CSP warning seen in the browser is likely from stale built assets, cache, or an injected extension/script, while the redirect loop was caused by role routing
+    - `npm run types:check`, targeted Prettier check, and `npm run build` passed after the dashboard guard fix
 
 ### Non-goals for slice 1
 
