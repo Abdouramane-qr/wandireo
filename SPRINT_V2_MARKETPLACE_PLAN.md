@@ -605,6 +605,7 @@ composer test
     - frontend audit API, type, and React Query hook were added
     - document/user/service mutations invalidate the audit log query so admin can see recent governance actions
     - validation passed: `npm run types:check`, targeted Prettier check, and `npm run build`
+    - Docker app image was rebuilt and app container recreated after the UI audit feed, with `optimize:clear` run and no pending audit migration
 
 ### Non-goals for slice 1
 
