@@ -9,6 +9,7 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
 use App\Models\User;
 use App\Services\Analytics\ProductAnalyticsTracker;
+use App\Services\Audit\AuditLogger;
 use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Support\Locale;
 use Illuminate\Cache\TaggableStore;
@@ -28,6 +29,7 @@ class ServiceController extends Controller
     public function __construct(
         private readonly ProductAnalyticsTracker $analyticsTracker,
         private readonly PartnerContentProviderRegistry $partnerContentProviders,
+        private readonly AuditLogger $auditLogger,
     ) {}
 
     /** GET /api/services */
@@ -249,6 +251,18 @@ class ServiceController extends Controller
         $service = Service::create($data);
         $service->refresh();
         $this->recordModerationEvent($service, $request->user(), 'CREATED', null, $service->moderation_status);
+        $this->auditLogger->record(
+            $request,
+            'service_moderation',
+            'CREATED',
+            $service,
+            'Service created.',
+            [
+                'to_status' => $service->moderation_status,
+                'is_available' => $service->is_available,
+                'partner_id' => $service->partner_id,
+            ],
+        );
         $this->flushServicesCache();
 
         return response()->json($service->load(['partner', 'serviceCategory', 'serviceSubcategory']), 201);
@@ -367,6 +381,7 @@ class ServiceController extends Controller
         ]);
 
         $this->transitionServiceModeration(
+            $request,
             $service,
             $request->user(),
             'SUBMITTED',
@@ -394,6 +409,7 @@ class ServiceController extends Controller
         ]);
 
         $this->transitionServiceModeration(
+            $request,
             $service,
             $request->user(),
             'APPROVED',
@@ -419,6 +435,7 @@ class ServiceController extends Controller
         ]);
 
         $this->transitionServiceModeration(
+            $request,
             $service,
             $request->user(),
             'PUBLISHED',
@@ -443,6 +460,7 @@ class ServiceController extends Controller
         ]);
 
         $this->transitionServiceModeration(
+            $request,
             $service,
             $request->user(),
             'REJECTED',
@@ -468,6 +486,7 @@ class ServiceController extends Controller
         ]);
 
         $this->transitionServiceModeration(
+            $request,
             $service,
             $request->user(),
             'SUSPENDED',
@@ -572,6 +591,7 @@ class ServiceController extends Controller
      * @param  array<string, mixed>  $extraUpdates
      */
     private function transitionServiceModeration(
+        Request $request,
         Service $service,
         ?User $actor,
         string $action,
@@ -589,6 +609,21 @@ class ServiceController extends Controller
         ], $extraUpdates))->save();
 
         $this->recordModerationEvent($service, $actor, $action, $fromStatus, $toStatus, $reason);
+        $this->auditLogger->record(
+            $request,
+            'service_moderation',
+            $action,
+            $service,
+            'Service moderation status changed.',
+            [
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+                'reason' => $reason,
+                'is_available' => $service->is_available,
+                'partner_id' => $service->partner_id,
+            ],
+            $actor,
+        );
         $service->refresh();
         $this->flushServicesCache();
     }

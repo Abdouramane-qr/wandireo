@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     /** GET /api/users/me */
     public function me(Request $request): JsonResponse
     {
@@ -38,7 +41,7 @@ class UserController extends Controller
             $parts = preg_split('/\s+/', trim($user->name)) ?: [];
             $firstName = $data['first_name'] ?? ($parts[0] ?? '');
             $lastName = $data['last_name'] ?? trim(implode(' ', array_slice($parts, 1)));
-            $data['name'] = trim($firstName . ' ' . $lastName);
+            $data['name'] = trim($firstName.' '.$lastName);
             unset($data['first_name'], $data['last_name']);
         }
 
@@ -116,6 +119,19 @@ class UserController extends Controller
             $request->user()->id,
         );
 
+        $this->auditLogger->record(
+            $request,
+            'partner_governance',
+            'PARTNER_CREATED',
+            $user,
+            'Admin created partner account.',
+            [
+                'partner_status' => $user->partner_status,
+                'mandate_contract_status' => $user->mandate_contract_status,
+                'commission_rate' => $user->commission_rate,
+            ],
+        );
+
         return response()->json($this->formatUser($user), 201);
     }
 
@@ -154,11 +170,24 @@ class UserController extends Controller
             $request->user()->id,
         );
 
+        $this->auditLogger->record(
+            $request,
+            $user->role === 'PARTNER' ? 'partner_governance' : 'user_governance',
+            'USER_CREATED',
+            $user,
+            'Admin created user account.',
+            [
+                'role' => $user->role,
+                'partner_status' => $user->partner_status,
+                'mandate_contract_status' => $user->mandate_contract_status,
+            ],
+        );
+
         return response()->json($this->formatUser($user), 201);
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function createAdminManagedUser(array $data, string $role, int|string $adminId): User
     {
@@ -167,7 +196,7 @@ class UserController extends Controller
         $isPartner = $role === 'PARTNER';
 
         return User::create([
-            'name' => trim($data['first_name'] . ' ' . $data['last_name']),
+            'name' => trim($data['first_name'].' '.$data['last_name']),
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $role,
@@ -191,6 +220,14 @@ class UserController extends Controller
     public function adminUpdate(Request $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id);
+        $original = $user->only([
+            'role',
+            'partner_status',
+            'partner_rejection_reason',
+            'mandate_contract_status',
+            'commission_rate',
+            'stripe_connected_account_id',
+        ]);
         $data = $request->validate([
             'first_name' => 'sometimes|string|max:255',
             'last_name' => 'sometimes|string|max:255',
@@ -212,7 +249,7 @@ class UserController extends Controller
         if (array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
             $firstName = $data['first_name'] ?? explode(' ', $user->name)[0] ?? '';
             $lastName = $data['last_name'] ?? trim(implode(' ', array_slice(explode(' ', $user->name), 1)));
-            $data['name'] = trim($firstName . ' ' . $lastName);
+            $data['name'] = trim($firstName.' '.$lastName);
         }
 
         if (array_key_exists('partner_status', $data)) {
@@ -275,7 +312,34 @@ class UserController extends Controller
                 ]);
         }
 
-        return response()->json($this->formatUser($user->fresh()));
+        $freshUser = $user->fresh();
+        $trackedChanges = [];
+
+        foreach ($original as $field => $fromValue) {
+            $toValue = $freshUser->{$field};
+
+            if ((string) $fromValue !== (string) $toValue) {
+                $trackedChanges[$field] = [
+                    'from' => $fromValue,
+                    'to' => $toValue,
+                ];
+            }
+        }
+
+        if ($trackedChanges !== []) {
+            $this->auditLogger->record(
+                $request,
+                $freshUser->role === 'PARTNER' ? 'partner_governance' : 'user_governance',
+                'USER_UPDATED',
+                $freshUser,
+                'Admin updated sensitive user governance fields.',
+                [
+                    'changes' => $trackedChanges,
+                ],
+            );
+        }
+
+        return response()->json($this->formatUser($freshUser));
     }
 
     /** POST /api/users/{id}/contract/mark-signed (admin) */
@@ -288,6 +352,18 @@ class UserController extends Controller
         }
 
         $user->update($this->buildSignedContractUpdatePayload($user));
+
+        $this->auditLogger->record(
+            $request,
+            'partner_governance',
+            'CONTRACT_MARKED_SIGNED',
+            $user,
+            'Admin marked partner contract as signed.',
+            [
+                'partner_id' => $user->id,
+                'mandate_contract_status' => 'SIGNED',
+            ],
+        );
 
         return response()->json($this->formatUser($user->fresh()));
     }
@@ -316,6 +392,18 @@ class UserController extends Controller
 
         $user->update($updates);
 
+        $this->auditLogger->record(
+            $request,
+            'partner_governance',
+            'CONTRACT_UPLOADED',
+            $user,
+            'Admin uploaded partner contract.',
+            [
+                'partner_id' => $user->id,
+                'mandate_contract_status' => $updates['mandate_contract_status'] ?? $user->mandate_contract_status,
+            ],
+        );
+
         return response()->json($this->formatUser($user->fresh()));
     }
 
@@ -334,6 +422,18 @@ class UserController extends Controller
         }
 
         $user->update($this->buildSignedContractUpdatePayload($user));
+
+        $this->auditLogger->record(
+            $request,
+            'partner_governance',
+            'CONTRACT_SIGNED',
+            $user,
+            'Partner signed mandate contract.',
+            [
+                'partner_id' => $user->id,
+                'mandate_contract_status' => 'SIGNED',
+            ],
+        );
 
         return response()->json($this->formatUser($user->fresh()));
     }

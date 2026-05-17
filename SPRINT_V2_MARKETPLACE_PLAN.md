@@ -591,6 +591,14 @@ composer test
     - partner/client/admin dashboard guards were corrected to avoid `/partenaire` <-> `/mon-espace` redirects when an admin enters the partner area
     - current source does not contain a `fonts.googleapis.com` import; the CSP warning seen in the browser is likely from stale built assets, cache, or an injected extension/script, while the redirect loop was caused by role routing
     - `npm run types:check`, targeted Prettier check, and `npm run build` passed after the dashboard guard fix
+- Audit log foundation is in progress:
+    - `audit_log_entries` table added for generic sensitive-action traceability
+    - admin read endpoint added at `GET /api/admin/audit-log`
+    - partner document upload/review actions write audit entries
+    - partner governance actions write audit entries for creation, status/contract/commission updates, contract upload, and contract signing
+    - service moderation creation and status transitions write audit entries in addition to `service_moderation_events`
+    - targeted feature coverage added in `AuditLogTest`
+    - validation passed: `AuditLogTest`, `PartnerDocumentTest`, `ServiceModerationTest`, `PartnerContractSigningTest`, `AdminUserManagementTest`, and targeted Pint check
 
 ### Non-goals for slice 1
 

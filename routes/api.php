@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminServiceStructureController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BlogController;
@@ -142,6 +143,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/service-structure/extras', [AdminServiceStructureController::class, 'storeExtra']);
         Route::patch('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'updateExtra']);
         Route::delete('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'destroyExtra']);
+        Route::get('/admin/audit-log', [AuditLogController::class, 'index']);
         Route::get('/admin/services/moderation', [ServiceController::class, 'moderationQueue']);
         Route::post('/services/{id}/approve', [ServiceController::class, 'approve']);
         Route::post('/services/{id}/publish', [ServiceController::class, 'publish']);

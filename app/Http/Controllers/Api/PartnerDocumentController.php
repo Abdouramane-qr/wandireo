@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\PartnerDocument;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class PartnerDocumentController extends Controller
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     /** GET /api/partner/documents */
     public function partnerIndex(Request $request): JsonResponse
     {
@@ -51,6 +54,19 @@ class PartnerDocumentController extends Controller
             'expires_at' => $data['expires_at'] ?? null,
         ]);
 
+        $this->auditLogger->record(
+            $request,
+            'partner_document',
+            'UPLOADED',
+            $document,
+            'Partner uploaded compliance document.',
+            [
+                'partner_id' => $partner->id,
+                'document_type' => $document->document_type,
+                'status' => $document->status,
+            ],
+        );
+
         return response()->json($this->formatDocument($document->fresh()), 201);
     }
 
@@ -78,6 +94,7 @@ class PartnerDocumentController extends Controller
     public function adminUpdate(Request $request, int $id): JsonResponse
     {
         $document = PartnerDocument::findOrFail($id);
+        $previousStatus = $document->status;
 
         $data = $request->validate([
             'status' => ['required', Rule::in([
@@ -104,6 +121,23 @@ class PartnerDocumentController extends Controller
             'reviewed_at' => now(),
             'expires_at' => $data['expires_at'] ?? $document->expires_at,
         ]);
+
+        $this->auditLogger->record(
+            $request,
+            'partner_document',
+            $data['status'],
+            $document,
+            'Admin reviewed partner compliance document.',
+            [
+                'partner_id' => $document->partner_id,
+                'document_type' => $document->document_type,
+                'from_status' => $previousStatus,
+                'to_status' => $data['status'],
+                'rejection_reason' => $data['status'] === PartnerDocument::STATUS_REJECTED
+                    ? $data['rejection_reason']
+                    : null,
+            ],
+        );
 
         return response()->json($this->formatDocument($document->fresh(['partner', 'uploadedBy', 'reviewedBy'])));
     }
