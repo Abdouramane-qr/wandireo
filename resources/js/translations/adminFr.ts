@@ -283,6 +283,36 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.documents.review_success": "Document mis à jour.",
         "admin.users.documents.review_error":
             "Erreur lors de la mise à jour du document.",
+        "admin.users.audit.title": "{count} événements audit",
+        "admin.users.audit.subtitle":
+            "Suivez les actions sensibles sur les partenaires, documents et services.",
+        "admin.users.audit.all_categories": "Toutes les catégories",
+        "admin.users.audit.loading": "Chargement du journal audit...",
+        "admin.users.audit.empty": "Aucun événement audit trouvé.",
+        "admin.users.audit.no_summary": "Action enregistrée.",
+        "admin.users.audit.system_actor": "Système",
+        "admin.users.audit.category.partner_governance":
+            "Gouvernance partenaire",
+        "admin.users.audit.category.partner_document": "Document partenaire",
+        "admin.users.audit.category.service_moderation": "Modération service",
+        "admin.users.audit.category.user_governance": "Gouvernance utilisateur",
+        "admin.users.audit.action.uploaded": "Document téléversé",
+        "admin.users.audit.action.validated": "Validé",
+        "admin.users.audit.action.rejected": "Rejeté",
+        "admin.users.audit.action.expired": "Expiré",
+        "admin.users.audit.action.under_review": "Mise en revue",
+        "admin.users.audit.action.partner_created": "Partenaire créé",
+        "admin.users.audit.action.user_created": "Utilisateur créé",
+        "admin.users.audit.action.user_updated": "Utilisateur mis à jour",
+        "admin.users.audit.action.contract_uploaded": "Contrat téléversé",
+        "admin.users.audit.action.contract_marked_signed":
+            "Contrat marqué signé",
+        "admin.users.audit.action.contract_signed": "Contrat signé",
+        "admin.users.audit.action.created": "Service créé",
+        "admin.users.audit.action.submitted": "Service soumis",
+        "admin.users.audit.action.approved": "Service approuvé",
+        "admin.users.audit.action.published": "Service publié",
+        "admin.users.audit.action.suspended": "Service suspendu",
 
         // Admin Services
         "admin.services.title": "Gestion du catalogue",

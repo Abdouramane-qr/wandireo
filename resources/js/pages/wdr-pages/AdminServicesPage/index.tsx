@@ -385,6 +385,7 @@ export const AdminServicesPage: React.FC = () => {
             }
 
             await queryClient.invalidateQueries({ queryKey: ["services"] });
+            await queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         } catch (errorValue) {
             error(
                 extractApiErrorMessage(errorValue) ??

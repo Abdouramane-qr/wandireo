@@ -42,6 +42,9 @@ export function usePartnerDocumentUploadData() {
             queryClient.invalidateQueries({
                 queryKey: ["partner-documents", "admin"],
             });
+            queryClient.invalidateQueries({
+                queryKey: ["audit-log"],
+            });
         },
     });
 }
@@ -90,6 +93,9 @@ export function useAdminPartnerDocumentReviewData() {
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["partner-documents"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["audit-log"],
             });
         },
     });

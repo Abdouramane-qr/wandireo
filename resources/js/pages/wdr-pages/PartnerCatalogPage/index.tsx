@@ -3139,6 +3139,7 @@ export const PartnerCatalogPage: React.FC = () => {
 
     const refreshServices = useCallback(async () => {
         await queryClient.invalidateQueries({ queryKey: ["services"] });
+        await queryClient.invalidateQueries({ queryKey: ["audit-log"] });
     }, [queryClient]);
 
     const handleToggleAvailability = useCallback(

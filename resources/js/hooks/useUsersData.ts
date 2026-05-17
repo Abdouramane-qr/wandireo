@@ -3,20 +3,16 @@
  * @description Couche de donnees utilisateurs basee sur l'API Laravel.
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-    usersApi
-    
-    
-} from '@/api/users';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usersApi } from "@/api/users";
 import type {
     AdminCreateUserRequest,
     AdminCreatePartnerRequest,
     AdminUpdateUserRequest,
     PartnerContractSignRequest,
     UsersParams,
-} from '@/api/users';
-import type { User } from '@/types/wdr-user';
+} from "@/api/users";
+import type { User } from "@/types/wdr-user";
 
 export function useAdminUsersData(
     params?: UsersParams,
@@ -26,7 +22,7 @@ export function useAdminUsersData(
     isLoading: boolean;
 } {
     const query = useQuery({
-        queryKey: ['users', 'admin', params ?? {}],
+        queryKey: ["users", "admin", params ?? {}],
         queryFn: async () => (await usersApi.adminListAll(params)).data,
         staleTime: 60_000,
         retry: 1,
@@ -48,8 +44,9 @@ export function useAdminUpdateUserData() {
             data: AdminUpdateUserRequest;
         }) => usersApi.adminUpdate(id, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
-            queryClient.invalidateQueries({ queryKey: ['services'] });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["services"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
 }
@@ -61,7 +58,8 @@ export function useAdminCreatePartnerData() {
         mutationFn: (data: AdminCreatePartnerRequest) =>
             usersApi.adminCreatePartner(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
 }
@@ -70,9 +68,11 @@ export function useAdminCreateUserData() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: AdminCreateUserRequest) => usersApi.adminCreate(data),
+        mutationFn: (data: AdminCreateUserRequest) =>
+            usersApi.adminCreate(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
 }
@@ -84,7 +84,8 @@ export function useAdminUploadPartnerContractData() {
         mutationFn: ({ id, file }: { id: string; file: File }) =>
             usersApi.adminUploadContract(id, file),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
 }
@@ -93,9 +94,11 @@ export function useAdminMarkPartnerContractSignedData() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id }: { id: string }) => usersApi.adminMarkContractSigned(id),
+        mutationFn: ({ id }: { id: string }) =>
+            usersApi.adminMarkContractSigned(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users', 'admin'] });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
 }

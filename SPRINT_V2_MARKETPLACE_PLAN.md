@@ -600,6 +600,11 @@ composer test
     - targeted feature coverage added in `AuditLogTest`
     - validation passed: `AuditLogTest`, `PartnerDocumentTest`, `ServiceModerationTest`, `PartnerContractSigningTest`, `AdminUserManagementTest`, and targeted Pint check
     - Docker app image was rebuilt, app container was recreated, migration `2026_05_17_000004` was applied, `optimize:clear` was run, and `GET /api/admin/audit-log` is visible in route list
+- Audit log admin UI is in progress:
+    - admin users page now includes a compact audit feed with category filtering
+    - frontend audit API, type, and React Query hook were added
+    - document/user/service mutations invalidate the audit log query so admin can see recent governance actions
+    - validation passed: `npm run types:check`, targeted Prettier check, and `npm run build`
 
 ### Non-goals for slice 1
 

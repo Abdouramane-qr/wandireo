@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { AdminSectionNav, Button, Input, useToast } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
+import { useAdminAuditLogData } from "@/hooks/useAuditLogData";
 import { useAdminBookingsData } from "@/hooks/useBookingsData";
 import {
     useAdminCreateUserData,
@@ -24,6 +25,7 @@ import {
     PARTNER_DOCUMENT_STATUSES,
 } from "@/lib/partner-documents";
 import { BookingStatusNames } from "@/types/booking";
+import type { AuditLogEntry } from "@/types/audit-log";
 import type {
     PartnerDocument,
     PartnerDocumentStatus,
@@ -98,6 +100,12 @@ const DEFAULT_CREATE_FORM: PartnerCreateForm = {
 
 const LANGUAGE_OPTIONS = ["fr", "en", "es", "pt", "it", "de"] as const;
 const CURRENCY_OPTIONS = ["EUR", "USD", "GBP", "CHF", "CAD"] as const;
+const AUDIT_LOG_CATEGORIES = [
+    "partner_governance",
+    "partner_document",
+    "service_moderation",
+    "user_governance",
+] as const;
 
 const statusLabel = (
     status: PartnerStatus,
@@ -142,6 +150,22 @@ const formatDate = (
           }).format(date)
         : fallback;
 
+const auditCategoryLabel = (
+    category: string,
+    t: (key: string) => string,
+): string => t(`admin.users.audit.category.${category}`);
+
+const auditActionLabel = (action: string, t: (key: string) => string): string =>
+    t(`admin.users.audit.action.${action.toLowerCase()}`);
+
+const auditSubjectLabel = (entry: AuditLogEntry): string => {
+    if (!entry.subjectType || !entry.subjectId) {
+        return "-";
+    }
+
+    return `${entry.subjectType.split("\\").pop() ?? entry.subjectType} #${entry.subjectId}`;
+};
+
 export const AdminUsersPage: React.FC = () => {
     const { currentUser } = useUser();
     const { navigate } = useRouter();
@@ -153,6 +177,9 @@ export const AdminUsersPage: React.FC = () => {
     const [documentStatusFilter, setDocumentStatusFilter] = useState<
         PartnerDocumentStatus | "all"
     >("UPLOADED");
+    const [auditCategoryFilter, setAuditCategoryFilter] = useState<
+        (typeof AUDIT_LOG_CATEGORIES)[number] | "all"
+    >("all");
     const [searchTerm, setSearchTerm] = useState("");
     const { users: allUsers } = useAdminUsersData({
         ...(partnerStatusFilter === "all"
@@ -173,6 +200,16 @@ export const AdminUsersPage: React.FC = () => {
                 ? {}
                 : { status: documentStatusFilter }),
         });
+    const {
+        entries: auditEntries,
+        total: auditEntriesTotal,
+        isLoading: isLoadingAuditEntries,
+    } = useAdminAuditLogData({
+        limit: 10,
+        ...(auditCategoryFilter === "all"
+            ? {}
+            : { category: auditCategoryFilter }),
+    });
 
     const partners = useMemo(
         () =>
@@ -847,6 +884,92 @@ export const AdminUsersPage: React.FC = () => {
                                             )}
                                         </div>
                                     </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                <section>
+                    <div className="wdr-admin-users__section-head">
+                        <div>
+                            <h2 className="wdr-admin-users__section-title">
+                                {t("admin.users.audit.title").replace(
+                                    "{count}",
+                                    String(auditEntriesTotal),
+                                )}
+                            </h2>
+                            <p className="wdr-admin-users__section-copy">
+                                {t("admin.users.audit.subtitle")}
+                            </p>
+                        </div>
+                        <div className="wdr-admin-users__toolbar">
+                            <select
+                                className="wdr-admin-users__input"
+                                value={auditCategoryFilter}
+                                onChange={(event) =>
+                                    setAuditCategoryFilter(
+                                        event.target.value as
+                                            | (typeof AUDIT_LOG_CATEGORIES)[number]
+                                            | "all",
+                                    )
+                                }
+                            >
+                                <option value="all">
+                                    {t("admin.users.audit.all_categories")}
+                                </option>
+                                {AUDIT_LOG_CATEGORIES.map((category) => (
+                                    <option key={category} value={category}>
+                                        {auditCategoryLabel(category, t)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {isLoadingAuditEntries ? (
+                        <p className="wdr-admin-users__audit-empty">
+                            {t("admin.users.audit.loading")}
+                        </p>
+                    ) : auditEntries.length === 0 ? (
+                        <p className="wdr-admin-users__audit-empty">
+                            {t("admin.users.audit.empty")}
+                        </p>
+                    ) : (
+                        <div className="wdr-admin-users__audit-list">
+                            {auditEntries.map((entry) => (
+                                <article
+                                    key={entry.id}
+                                    className="wdr-admin-users__audit-row"
+                                >
+                                    <div className="wdr-admin-users__audit-main">
+                                        <span className="wdr-admin-users__audit-action">
+                                            {auditActionLabel(entry.action, t)}
+                                        </span>
+                                        <span className="wdr-admin-users__audit-summary">
+                                            {entry.summary ??
+                                                t(
+                                                    "admin.users.audit.no_summary",
+                                                )}
+                                        </span>
+                                        <span className="wdr-admin-users__audit-meta">
+                                            {entry.actorName ??
+                                                t(
+                                                    "admin.users.audit.system_actor",
+                                                )}
+                                            {" · "}
+                                            {formatDate(
+                                                entry.createdAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            )}
+                                            {" · "}
+                                            {auditSubjectLabel(entry)}
+                                        </span>
+                                    </div>
+                                    <span className="wdr-admin-users__audit-category">
+                                        {auditCategoryLabel(entry.category, t)}
+                                    </span>
                                 </article>
                             ))}
                         </div>

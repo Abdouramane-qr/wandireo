@@ -241,6 +241,64 @@
 }
 
 /* ============================================================
+   Journal audit
+   ============================================================ */
+
+.wdr-admin-users__audit-empty {
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+}
+
+.wdr-admin-users__audit-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.wdr-admin-users__audit-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-sm);
+}
+
+.wdr-admin-users__audit-main {
+    min-width: 0;
+    display: grid;
+    gap: 0.22rem;
+}
+
+.wdr-admin-users__audit-action {
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.wdr-admin-users__audit-summary,
+.wdr-admin-users__audit-meta {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.wdr-admin-users__audit-category {
+    align-self: flex-start;
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 0.22rem 0.65rem;
+    background: var(--bg-subtle);
+    color: var(--text-main);
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* ============================================================
    Grille partenaires
    ============================================================ */
 
@@ -849,11 +907,16 @@
     }
 
     .wdr-admin-users__document-card,
+    .wdr-admin-users__audit-row,
     .wdr-admin-users__document-side {
         align-items: stretch;
     }
 
     .wdr-admin-users__document-card {
+        flex-direction: column;
+    }
+
+    .wdr-admin-users__audit-row {
         flex-direction: column;
     }
 
@@ -910,6 +973,8 @@
 :is(.dark) .wdr-admin-users__partner-card,
 :is(.dark) .wdr-admin-users__document-card,
 :is(.dark) .wdr-admin-users__documents-empty,
+:is(.dark) .wdr-admin-users__audit-row,
+:is(.dark) .wdr-admin-users__audit-empty,
 :is(.dark) .wdr-admin-users__table-wrapper,
 :is(.dark) .wdr-admin-users .wdr-modal__body,
 :is(.dark) .wdr-admin-users__input,
