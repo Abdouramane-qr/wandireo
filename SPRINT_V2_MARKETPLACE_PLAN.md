@@ -599,6 +599,7 @@ composer test
     - service moderation creation and status transitions write audit entries in addition to `service_moderation_events`
     - targeted feature coverage added in `AuditLogTest`
     - validation passed: `AuditLogTest`, `PartnerDocumentTest`, `ServiceModerationTest`, `PartnerContractSigningTest`, `AdminUserManagementTest`, and targeted Pint check
+    - Docker app image was rebuilt, app container was recreated, migration `2026_05_17_000004` was applied, `optimize:clear` was run, and `GET /api/admin/audit-log` is visible in route list
 
 ### Non-goals for slice 1
 
