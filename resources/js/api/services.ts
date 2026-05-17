@@ -5,7 +5,11 @@
 
 import { normalizeService } from "@/lib/api-normalizers";
 import type { Locale } from "@/lib/locale";
-import type { Service, ServiceCategory } from "@/types/service";
+import type {
+    Service,
+    ServiceCategory,
+    ServiceModerationStatus,
+} from "@/types/service";
 import api from "./client";
 
 export type LocalizedTextInput = string | Partial<Record<Locale, string>>;
@@ -33,6 +37,16 @@ export interface ServicesResponse {
     page: number;
     limit: number;
     totalPages: number;
+}
+
+export interface ServiceModerationParams {
+    status?: ServiceModerationStatus;
+    page?: number;
+    limit?: number;
+}
+
+export interface ServiceModerationActionPayload {
+    reason?: string;
 }
 
 export interface ServiceUpsertPayload {
@@ -129,4 +143,46 @@ export const servicesApi = {
                 isAvailable: boolean;
             }>(`/services/${id}/toggle-availability`, { isAvailable })
             .then((r) => r.data),
+
+    moderationQueue: (params?: ServiceModerationParams) =>
+        api
+            .get<{
+                data: unknown[];
+                total: number;
+                current_page: number;
+                per_page: number;
+                last_page: number;
+            }>("/admin/services/moderation", { params })
+            .then((r) => ({
+                data: r.data.data.map(normalizeService),
+                total: r.data.total,
+                page: r.data.current_page,
+                limit: r.data.per_page,
+                totalPages: r.data.last_page,
+            })),
+
+    submitReview: (id: string, data?: ServiceModerationActionPayload) =>
+        api
+            .post<unknown>(`/services/${id}/submit-review`, data ?? {})
+            .then((r) => normalizeService(r.data)),
+
+    approve: (id: string, data?: ServiceModerationActionPayload) =>
+        api
+            .post<unknown>(`/services/${id}/approve`, data ?? {})
+            .then((r) => normalizeService(r.data)),
+
+    publish: (id: string, data?: ServiceModerationActionPayload) =>
+        api
+            .post<unknown>(`/services/${id}/publish`, data ?? {})
+            .then((r) => normalizeService(r.data)),
+
+    reject: (id: string, data: ServiceModerationActionPayload) =>
+        api
+            .post<unknown>(`/services/${id}/reject`, data)
+            .then((r) => normalizeService(r.data)),
+
+    suspend: (id: string, data: ServiceModerationActionPayload) =>
+        api
+            .post<unknown>(`/services/${id}/suspend`, data)
+            .then((r) => normalizeService(r.data)),
 };

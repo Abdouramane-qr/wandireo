@@ -50,6 +50,7 @@ import type {
     TransmissionType,
     FuelType,
     DayOfWeek,
+    ServiceModerationStatus,
 } from "@/types/service";
 import "./PartnerCatalogPage.css";
 
@@ -849,6 +850,61 @@ function getCategoryLabels(t: TranslateFn): Record<ServiceCategory, string> {
     };
 }
 
+function moderationStatusLabel(
+    status: ServiceModerationStatus | undefined,
+    t: TranslateFn,
+): string {
+    switch (status) {
+        case "DRAFT":
+            return t("partner.catalog.moderation.status.draft");
+        case "PENDING_REVIEW":
+            return t("partner.catalog.moderation.status.pending_review");
+        case "APPROVED":
+            return t("partner.catalog.moderation.status.approved");
+        case "PUBLISHED":
+            return t("partner.catalog.moderation.status.published");
+        case "REJECTED":
+            return t("partner.catalog.moderation.status.rejected");
+        case "SUSPENDED":
+            return t("partner.catalog.moderation.status.suspended");
+        default:
+            return t("partner.catalog.moderation.status.unreviewed");
+    }
+}
+
+function moderationStatusTone(
+    status: ServiceModerationStatus | undefined,
+): string {
+    switch (status) {
+        case "PUBLISHED":
+            return "published";
+        case "APPROVED":
+            return "approved";
+        case "PENDING_REVIEW":
+            return "pending";
+        case "REJECTED":
+        case "SUSPENDED":
+            return "blocked";
+        default:
+            return "draft";
+    }
+}
+
+function canSubmitForReview(service: Service): boolean {
+    return (
+        service.sourceType !== "EXTERNAL" &&
+        (service.moderationStatus === "DRAFT" ||
+            service.moderationStatus === "REJECTED")
+    );
+}
+
+function canToggleCatalogAvailability(service: Service): boolean {
+    return (
+        service.sourceType !== "EXTERNAL" &&
+        (service.isAvailable || service.moderationStatus === "PUBLISHED")
+    );
+}
+
 function getPricingUnitsByCategory(
     t: TranslateFn,
 ): Record<
@@ -1272,15 +1328,21 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                                 {sel("currency", [
                                     {
                                         value: "EUR",
-                                        label: t("partner.catalog.currency.eur"),
+                                        label: t(
+                                            "partner.catalog.currency.eur",
+                                        ),
                                     },
                                     {
                                         value: "USD",
-                                        label: t("partner.catalog.currency.usd"),
+                                        label: t(
+                                            "partner.catalog.currency.usd",
+                                        ),
                                     },
                                     {
                                         value: "GBP",
-                                        label: t("partner.catalog.currency.gbp"),
+                                        label: t(
+                                            "partner.catalog.currency.gbp",
+                                        ),
                                     },
                                 ])}
                             </div>
@@ -3033,17 +3095,11 @@ export const PartnerCatalogPage: React.FC = () => {
                     return false;
                 }
 
-                if (
-                    statusFilter === "ACTIVE" &&
-                    !service.isAvailable
-                ) {
+                if (statusFilter === "ACTIVE" && !service.isAvailable) {
                     return false;
                 }
 
-                if (
-                    statusFilter === "INACTIVE" &&
-                    service.isAvailable
-                ) {
+                if (statusFilter === "INACTIVE" && service.isAvailable) {
                     return false;
                 }
 
@@ -3087,6 +3143,14 @@ export const PartnerCatalogPage: React.FC = () => {
 
     const handleToggleAvailability = useCallback(
         async (service: Service) => {
+            if (!canToggleCatalogAvailability(service)) {
+                error(
+                    "Ce service doit etre publie par l'administration avant activation.",
+                );
+
+                return;
+            }
+
             setBusyId(service.id);
 
             try {
@@ -3102,6 +3166,23 @@ export const PartnerCatalogPage: React.FC = () => {
                 );
             } catch {
                 error(t("partner.catalog.toast.toggle_error"));
+            } finally {
+                setBusyId(null);
+            }
+        },
+        [error, refreshServices, success, t],
+    );
+
+    const handleSubmitForReview = useCallback(
+        async (service: Service) => {
+            setBusyId(service.id);
+
+            try {
+                await servicesApi.submitReview(service.id);
+                await refreshServices();
+                success(t("partner.catalog.moderation.toast.submitted"));
+            } catch {
+                error(t("partner.catalog.moderation.toast.submit_error"));
             } finally {
                 setBusyId(null);
             }
@@ -3445,6 +3526,14 @@ export const PartnerCatalogPage: React.FC = () => {
                                                       "partner.catalog.card.local",
                                                   )}
                                         </span>
+                                        <span
+                                            className={`wdr-catalog__moderation-badge wdr-catalog__moderation-badge--${moderationStatusTone(service.moderationStatus)}`}
+                                        >
+                                            {moderationStatusLabel(
+                                                service.moderationStatus,
+                                                t,
+                                            )}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -3461,15 +3550,25 @@ export const PartnerCatalogPage: React.FC = () => {
                                         {service.description}
                                     </p>
                                     <p className="wdr-catalog__item-updated">
-                                        {t("partner.catalog.card.updated").replace(
+                                        {t(
+                                            "partner.catalog.card.updated",
+                                        ).replace(
                                             "{date}",
-                                            new Intl.DateTimeFormat(intlLocale, {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            }).format(service.updatedAt),
+                                            new Intl.DateTimeFormat(
+                                                intlLocale,
+                                                {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                },
+                                            ).format(service.updatedAt),
                                         )}
                                     </p>
+                                    {service.moderationReason && (
+                                        <p className="wdr-catalog__moderation-reason">
+                                            {service.moderationReason}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="wdr-catalog__item-pricing">
@@ -3550,8 +3649,9 @@ export const PartnerCatalogPage: React.FC = () => {
                                             }
                                             disabled={
                                                 busyId === service.id ||
-                                                service.sourceType ===
-                                                    "EXTERNAL"
+                                                !canToggleCatalogAvailability(
+                                                    service,
+                                                )
                                             }
                                             aria-label={`${service.isAvailable ? t("partner.catalog.action.disable") : t("partner.catalog.action.enable")} ${service.title}`}
                                         />
@@ -3571,6 +3671,22 @@ export const PartnerCatalogPage: React.FC = () => {
                                     </label>
 
                                     <div className="wdr-catalog__item-btns">
+                                        {canSubmitForReview(service) && (
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() =>
+                                                    void handleSubmitForReview(
+                                                        service,
+                                                    )
+                                                }
+                                                disabled={busyId === service.id}
+                                            >
+                                                {t(
+                                                    "partner.catalog.moderation.action.submit",
+                                                )}
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="sm"

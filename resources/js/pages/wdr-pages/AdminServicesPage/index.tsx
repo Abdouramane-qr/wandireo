@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { fareHarborApi, type FareHarborCompanyPayload } from "@/api/fareharbor";
 import { servicesApi } from "@/api/services";
-import { AdminSectionNav, Button, useToast } from "@/components/wdr";
+import { AdminSectionNav, Button, Modal, useToast } from "@/components/wdr";
 import { useFareHarborCompaniesData } from "@/hooks/useFareHarborData";
 import { useUser } from "@/context/UserContext";
 import { useServicesDataWithOptions } from "@/hooks/useServicesData";
@@ -13,7 +13,11 @@ import { normalizeCountryName } from "@/lib/countries";
 import { formatPrice } from "@/lib/formatters";
 import type { FareHarborCompany } from "@/types/fareharbor";
 import { ServiceCategoryNames } from "@/types/service";
-import type { ServiceCategory } from "@/types/service";
+import type {
+    Service,
+    ServiceCategory,
+    ServiceModerationStatus,
+} from "@/types/service";
 import "./AdminServicesPage.css";
 
 const EyeOffIcon: React.FC = () => (
@@ -53,6 +57,66 @@ const EyeIcon: React.FC = () => (
 
 type AvailabilityFilter = "all" | "active" | "inactive";
 type SourceFilter = "all" | "LOCAL" | "EXTERNAL";
+type ModerationFilter = ServiceModerationStatus | "all";
+type ModerationAction = "approve" | "publish" | "reject" | "suspend";
+
+interface ModerationDialogState {
+    service: Service;
+    action: Extract<ModerationAction, "reject" | "suspend">;
+}
+
+const MODERATION_STATUSES: ServiceModerationStatus[] = [
+    "DRAFT",
+    "PENDING_REVIEW",
+    "APPROVED",
+    "PUBLISHED",
+    "REJECTED",
+    "SUSPENDED",
+];
+
+function moderationStatusLabel(
+    status: ServiceModerationStatus | undefined,
+    t: (key: string) => string,
+): string {
+    switch (status) {
+        case "DRAFT":
+            return t("admin.services.moderation.status.draft");
+        case "PENDING_REVIEW":
+            return t("admin.services.moderation.status.pending_review");
+        case "APPROVED":
+            return t("admin.services.moderation.status.approved");
+        case "PUBLISHED":
+            return t("admin.services.moderation.status.published");
+        case "REJECTED":
+            return t("admin.services.moderation.status.rejected");
+        case "SUSPENDED":
+            return t("admin.services.moderation.status.suspended");
+        default:
+            return t("admin.services.moderation.status.unreviewed");
+    }
+}
+
+function moderationStatusTone(
+    status: ServiceModerationStatus | undefined,
+): string {
+    switch (status) {
+        case "PUBLISHED":
+            return "published";
+        case "APPROVED":
+            return "approved";
+        case "PENDING_REVIEW":
+            return "pending";
+        case "REJECTED":
+        case "SUSPENDED":
+            return "blocked";
+        default:
+            return "draft";
+    }
+}
+
+function canActivateService(service: Service): boolean {
+    return service.isAvailable || service.moderationStatus === "PUBLISHED";
+}
 
 function extractApiErrorMessage(errorValue: unknown): string | null {
     if (
@@ -109,11 +173,19 @@ export const AdminServicesPage: React.FC = () => {
     const [filterAvailability, setFilterAvailability] =
         useState<AvailabilityFilter>("all");
     const [filterSource, setFilterSource] = useState<SourceFilter>("all");
+    const [filterModeration, setFilterModeration] =
+        useState<ModerationFilter>("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [busyId, setBusyId] = useState<string | null>(null);
     const [fareHarborBusyId, setFareHarborBusyId] = useState<string | null>(
         null,
     );
+    const [moderationDialog, setModerationDialog] =
+        useState<ModerationDialogState | null>(null);
+    const [moderationReason, setModerationReason] = useState("");
+    const [moderationReasonError, setModerationReasonError] = useState<
+        string | null
+    >(null);
     const [isFareHarborSyncAllBusy, setIsFareHarborSyncAllBusy] =
         useState(false);
     const [newFareHarborCompany, setNewFareHarborCompany] =
@@ -172,6 +244,13 @@ export const AdminServicesPage: React.FC = () => {
                     return false;
                 }
 
+                if (
+                    filterModeration !== "all" &&
+                    service.moderationStatus !== filterModeration
+                ) {
+                    return false;
+                }
+
                 if (filterAvailability === "active" && !service.isAvailable) {
                     return false;
                 }
@@ -186,6 +265,7 @@ export const AdminServicesPage: React.FC = () => {
             allServices,
             filterAvailability,
             filterCategory,
+            filterModeration,
             filterPartner,
             filterSource,
             searchTerm,
@@ -194,6 +274,12 @@ export const AdminServicesPage: React.FC = () => {
 
     const activeCount = allServices.filter(
         (service) => service.isAvailable,
+    ).length;
+    const pendingModerationCount = allServices.filter(
+        (service) => service.moderationStatus === "PENDING_REVIEW",
+    ).length;
+    const blockedModerationCount = allServices.filter((service) =>
+        ["REJECTED", "SUSPENDED"].includes(service.moderationStatus ?? ""),
     ).length;
     const externalServices = useMemo(
         () =>
@@ -249,6 +335,16 @@ export const AdminServicesPage: React.FC = () => {
         serviceId: string,
         currentValue: boolean,
     ): Promise<void> {
+        const service = allServices.find(
+            (candidate) => candidate.id === serviceId,
+        );
+
+        if (service && !currentValue && !canActivateService(service)) {
+            error(t("admin.services.moderation.activate_blocked"));
+
+            return;
+        }
+
         setBusyId(serviceId);
 
         try {
@@ -264,6 +360,77 @@ export const AdminServicesPage: React.FC = () => {
         } finally {
             setBusyId(null);
         }
+    }
+
+    async function runModerationAction(
+        service: Service,
+        action: ModerationAction,
+        reason?: string,
+    ): Promise<void> {
+        setBusyId(service.id);
+
+        try {
+            if (action === "approve") {
+                await servicesApi.approve(service.id);
+                success(t("admin.services.moderation.toast.approved"));
+            } else if (action === "publish") {
+                await servicesApi.publish(service.id);
+                success(t("admin.services.moderation.toast.published"));
+            } else if (action === "reject") {
+                await servicesApi.reject(service.id, { reason: reason ?? "" });
+                success(t("admin.services.moderation.toast.rejected"));
+            } else {
+                await servicesApi.suspend(service.id, { reason: reason ?? "" });
+                success(t("admin.services.moderation.toast.suspended"));
+            }
+
+            await queryClient.invalidateQueries({ queryKey: ["services"] });
+        } catch (errorValue) {
+            error(
+                extractApiErrorMessage(errorValue) ??
+                    t("admin.services.moderation.toast.error"),
+            );
+        } finally {
+            setBusyId(null);
+        }
+    }
+
+    function openModerationReasonDialog(
+        service: Service,
+        action: Extract<ModerationAction, "reject" | "suspend">,
+    ): void {
+        setModerationDialog({ service, action });
+        setModerationReason("");
+        setModerationReasonError(null);
+    }
+
+    function closeModerationReasonDialog(): void {
+        setModerationDialog(null);
+        setModerationReason("");
+        setModerationReasonError(null);
+    }
+
+    async function submitModerationReason(): Promise<void> {
+        if (!moderationDialog) {
+            return;
+        }
+
+        const reason = moderationReason.trim();
+
+        if (!reason) {
+            setModerationReasonError(
+                t("admin.services.moderation.modal.reason_required"),
+            );
+
+            return;
+        }
+
+        await runModerationAction(
+            moderationDialog.service,
+            moderationDialog.action,
+            reason,
+        );
+        closeModerationReasonDialog();
     }
 
     async function refreshFareHarborData(): Promise<void> {
@@ -353,10 +520,9 @@ export const AdminServicesPage: React.FC = () => {
                 extractApiErrorMessage(caughtError) ?? company.lastError;
             error(
                 syncMessage
-                    ? `${t("admin.services.fareharbor.toast.sync_error").replace(
-                          "{name}",
-                          company.displayName,
-                      )} ${syncMessage}`
+                    ? `${t(
+                          "admin.services.fareharbor.toast.sync_error",
+                      ).replace("{name}", company.displayName)} ${syncMessage}`
                     : t("admin.services.fareharbor.toast.sync_error").replace(
                           "{name}",
                           company.displayName,
@@ -377,10 +543,7 @@ export const AdminServicesPage: React.FC = () => {
                 error(
                     t("admin.services.fareharbor.toast.sync_all_partial")
                         .replace("{failed}", String(result.summary.failed))
-                        .replace(
-                            "{total}",
-                            String(result.summary.total),
-                        ),
+                        .replace("{total}", String(result.summary.total)),
                 );
             } else {
                 success(t("admin.services.fareharbor.toast.sync_all_success"));
@@ -452,6 +615,8 @@ export const AdminServicesPage: React.FC = () => {
                 "pays",
                 "prix_client",
                 "commission",
+                "moderation_status",
+                "moderation_reason",
                 "actif",
             ],
             ...filteredServices.map((service) => [
@@ -464,6 +629,8 @@ export const AdminServicesPage: React.FC = () => {
                 service.location.country,
                 String(service.clientPrice),
                 String(service.commissionAmount),
+                service.moderationStatus ?? "",
+                service.moderationReason ?? "",
                 service.isAvailable ? "1" : "0",
             ]),
         ];
@@ -596,6 +763,26 @@ export const AdminServicesPage: React.FC = () => {
                         </option>
                     </select>
 
+                    <select
+                        className="wdr-admin-svc__filter-select"
+                        value={filterModeration}
+                        onChange={(e) =>
+                            setFilterModeration(
+                                e.target.value as ModerationFilter,
+                            )
+                        }
+                        aria-label={t("admin.services.filter.moderation")}
+                    >
+                        <option value="all">
+                            {t("admin.services.filter.all_moderation")}
+                        </option>
+                        {MODERATION_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                                {moderationStatusLabel(status, t)}
+                            </option>
+                        ))}
+                    </select>
+
                     <div
                         className="wdr-admin-svc__filter-tabs"
                         role="group"
@@ -619,10 +806,16 @@ export const AdminServicesPage: React.FC = () => {
                     </div>
 
                     <span className="wdr-admin-svc__filter-count">
-                        {t("admin.services.results").replace(
-                            "{count}",
-                            String(filteredServices.length),
-                        )}
+                        {t("admin.services.results")
+                            .replace("{count}", String(filteredServices.length))
+                            .replace(
+                                "{pending}",
+                                String(pendingModerationCount),
+                            )
+                            .replace(
+                                "{blocked}",
+                                String(blockedModerationCount),
+                            )}
                     </span>
                     <Button
                         variant="ghost"
@@ -1205,18 +1398,43 @@ export const AdminServicesPage: React.FC = () => {
                                                     : ""
                                             }
                                         >
-                                            <td className="wdr-admin-svc__table-title" data-label={t("admin.services.col.service")}>
+                                            <td
+                                                className="wdr-admin-svc__table-title"
+                                                data-label={t(
+                                                    "admin.services.col.service",
+                                                )}
+                                            >
                                                 <span className="wdr-admin-svc__service-title">
                                                     {service.title}
                                                 </span>
                                                 <span className="wdr-admin-svc__service-location">
                                                     {service.location.city},{" "}
                                                     {normalizeCountryName(
-                                                        service.location.country,
+                                                        service.location
+                                                            .country,
                                                     )}
                                                 </span>
+                                                <span
+                                                    className={`wdr-admin-svc__moderation wdr-admin-svc__moderation--${moderationStatusTone(service.moderationStatus)}`}
+                                                >
+                                                    {moderationStatusLabel(
+                                                        service.moderationStatus,
+                                                        t,
+                                                    )}
+                                                </span>
+                                                {service.moderationReason && (
+                                                    <span className="wdr-admin-svc__moderation-reason">
+                                                        {
+                                                            service.moderationReason
+                                                        }
+                                                    </span>
+                                                )}
                                             </td>
-                                            <td data-label={t("admin.services.col.category")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.services.col.category",
+                                                )}
+                                            >
                                                 <span
                                                     className={`wdr-admin-svc__category-badge wdr-admin-svc__category-badge--${service.category.toLowerCase()}`}
                                                 >
@@ -1233,7 +1451,12 @@ export const AdminServicesPage: React.FC = () => {
                                                         "LOCAL"}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-partner" data-label={t("admin.services.col.partner")}>
+                                            <td
+                                                className="wdr-admin-svc__table-partner"
+                                                data-label={t(
+                                                    "admin.services.col.partner",
+                                                )}
+                                            >
                                                 {partner?.role === "PARTNER"
                                                     ? partner.companyName
                                                     : service.partnerId ||
@@ -1241,7 +1464,11 @@ export const AdminServicesPage: React.FC = () => {
                                                           "admin.services.unassigned",
                                                       )}
                                             </td>
-                                            <td data-label={t("admin.services.col.source")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.services.col.source",
+                                                )}
+                                            >
                                                 <span
                                                     className={`wdr-admin-svc__availability${service.sourceType === "EXTERNAL" ? " wdr-admin-svc__availability--inactive" : " wdr-admin-svc__availability--active"}`}
                                                 >
@@ -1249,7 +1476,12 @@ export const AdminServicesPage: React.FC = () => {
                                                         "LOCAL"}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-price" data-label={t("admin.services.col.client_price")}>
+                                            <td
+                                                className="wdr-admin-svc__table-price"
+                                                data-label={t(
+                                                    "admin.services.col.client_price",
+                                                )}
+                                            >
                                                 {formatPrice(
                                                     service.clientPrice,
                                                     service.currency,
@@ -1261,7 +1493,12 @@ export const AdminServicesPage: React.FC = () => {
                                                         .toLowerCase()}
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-commission" data-label={t("admin.services.col.commission")}>
+                                            <td
+                                                className="wdr-admin-svc__table-commission"
+                                                data-label={t(
+                                                    "admin.services.col.commission",
+                                                )}
+                                            >
                                                 {formatPrice(
                                                     service.commissionAmount,
                                                     service.currency,
@@ -1275,13 +1512,22 @@ export const AdminServicesPage: React.FC = () => {
                                                     %)
                                                 </span>
                                             </td>
-                                            <td className="wdr-admin-svc__table-net" data-label={t("admin.services.col.partner_net")}>
+                                            <td
+                                                className="wdr-admin-svc__table-net"
+                                                data-label={t(
+                                                    "admin.services.col.partner_net",
+                                                )}
+                                            >
                                                 {formatPrice(
                                                     service.partnerPrice,
                                                     service.currency,
                                                 )}
                                             </td>
-                                            <td data-label={t("admin.services.col.rating")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.services.col.rating",
+                                                )}
+                                            >
                                                 {service.rating != null ? (
                                                     <span className="wdr-admin-svc__rating">
                                                         {service.rating.toFixed(
@@ -1301,7 +1547,11 @@ export const AdminServicesPage: React.FC = () => {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td data-label={t("admin.services.col.availability")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.services.col.availability",
+                                                )}
+                                            >
                                                 <span
                                                     className={`wdr-admin-svc__availability${service.isAvailable ? "wdr-admin-svc__availability--active" : "wdr-admin-svc__availability--inactive"}`}
                                                 >
@@ -1314,7 +1564,11 @@ export const AdminServicesPage: React.FC = () => {
                                                           )}
                                                 </span>
                                             </td>
-                                            <td data-label={t("admin.services.col.action")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.services.col.action",
+                                                )}
+                                            >
                                                 <div className="wdr-admin-svc__table-actions">
                                                     <Button
                                                         variant="ghost"
@@ -1346,7 +1600,11 @@ export const AdminServicesPage: React.FC = () => {
                                                         }
                                                         disabled={
                                                             busyId ===
-                                                            service.id
+                                                                service.id ||
+                                                            (!service.isAvailable &&
+                                                                !canActivateService(
+                                                                    service,
+                                                                ))
                                                         }
                                                         aria-label={
                                                             service.isAvailable
@@ -1380,6 +1638,107 @@ export const AdminServicesPage: React.FC = () => {
                                                             </>
                                                         )}
                                                     </Button>
+                                                    {service.moderationStatus ===
+                                                        "PENDING_REVIEW" && (
+                                                        <>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    void runModerationAction(
+                                                                        service,
+                                                                        "approve",
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    busyId ===
+                                                                    service.id
+                                                                }
+                                                            >
+                                                                {t(
+                                                                    "admin.services.moderation.action.approve",
+                                                                )}
+                                                            </Button>
+                                                            <Button
+                                                                variant="primary"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    void runModerationAction(
+                                                                        service,
+                                                                        "publish",
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    busyId ===
+                                                                    service.id
+                                                                }
+                                                            >
+                                                                {t(
+                                                                    "admin.services.moderation.action.publish",
+                                                                )}
+                                                            </Button>
+                                                            <Button
+                                                                variant="danger"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    openModerationReasonDialog(
+                                                                        service,
+                                                                        "reject",
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    busyId ===
+                                                                    service.id
+                                                                }
+                                                            >
+                                                                {t(
+                                                                    "admin.services.moderation.action.reject",
+                                                                )}
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    {service.moderationStatus ===
+                                                        "APPROVED" && (
+                                                        <Button
+                                                            variant="primary"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                void runModerationAction(
+                                                                    service,
+                                                                    "publish",
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                busyId ===
+                                                                service.id
+                                                            }
+                                                        >
+                                                            {t(
+                                                                "admin.services.moderation.action.publish",
+                                                            )}
+                                                        </Button>
+                                                    )}
+                                                    {service.moderationStatus ===
+                                                        "PUBLISHED" && (
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                openModerationReasonDialog(
+                                                                    service,
+                                                                    "suspend",
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                busyId ===
+                                                                service.id
+                                                            }
+                                                        >
+                                                            {t(
+                                                                "admin.services.moderation.action.suspend",
+                                                            )}
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -1390,6 +1749,65 @@ export const AdminServicesPage: React.FC = () => {
                     </table>
                 </div>
             </div>
+            <Modal
+                isOpen={moderationDialog !== null}
+                onClose={closeModerationReasonDialog}
+                title={
+                    moderationDialog?.action === "suspend"
+                        ? t("admin.services.moderation.modal.suspend_title")
+                        : t("admin.services.moderation.modal.reject_title")
+                }
+                size="sm"
+                closeOnOverlayClick={busyId !== moderationDialog?.service.id}
+                closeOnEsc={busyId !== moderationDialog?.service.id}
+                footer={
+                    <>
+                        <Button
+                            variant="ghost"
+                            onClick={closeModerationReasonDialog}
+                            disabled={busyId === moderationDialog?.service.id}
+                        >
+                            {t("admin.services.moderation.modal.cancel")}
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={() => void submitModerationReason()}
+                            loading={busyId === moderationDialog?.service.id}
+                        >
+                            {t("admin.services.moderation.modal.confirm")}
+                        </Button>
+                    </>
+                }
+            >
+                <div className="wdr-admin-svc__moderation-modal">
+                    <p className="wdr-admin-svc__moderation-modal-copy">
+                        {moderationDialog?.service.title}
+                    </p>
+                    <label className="wdr-admin-svc__moderation-modal-field">
+                        <span>
+                            {t("admin.services.moderation.modal.reason")}
+                        </span>
+                        <textarea
+                            className={`wdr-admin-svc__moderation-modal-textarea${moderationReasonError ? " wdr-admin-svc__moderation-modal-textarea--error" : ""}`}
+                            value={moderationReason}
+                            onChange={(event) => {
+                                setModerationReason(event.target.value);
+                                setModerationReasonError(null);
+                            }}
+                            rows={5}
+                            disabled={busyId === moderationDialog?.service.id}
+                            placeholder={t(
+                                "admin.services.moderation.modal.placeholder",
+                            )}
+                        />
+                    </label>
+                    {moderationReasonError && (
+                        <p className="wdr-admin-svc__moderation-modal-error">
+                            {moderationReasonError}
+                        </p>
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };

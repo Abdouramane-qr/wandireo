@@ -27,10 +27,12 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.profile.catalog_title": "Catalogue de services",
         "partner.profile.catalog_manage": "Gérer le catalogue",
         "partner.profile.add_service": "Ajouter un service",
-        "partner.profile.first_service": "Créez votre premier service pour commencer.",
+        "partner.profile.first_service":
+            "Créez votre premier service pour commencer.",
         "partner.profile.empty": "Aucun service actif pour le moment.",
         "partner.profile.account_title": "Coordonnées du partenaire",
-        "partner.profile.account_subtitle": "Mettez à jour l'email réel utilisé pour les échanges, ainsi que les informations de contact visibles par l'équipe Wandireo.",
+        "partner.profile.account_subtitle":
+            "Mettez à jour l'email réel utilisé pour les échanges, ainsi que les informations de contact visibles par l'équipe Wandireo.",
         "partner.profile.field.company_name": "Entreprise",
         "partner.profile.field.email": "Email partenaire",
         "partner.profile.field.phone": "Téléphone",
@@ -38,21 +40,55 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.profile.save": "Enregistrer les informations",
         "partner.profile.save_loading": "Enregistrement...",
         "partner.profile.save_success_title": "Profil mis à jour",
-        "partner.profile.save_success_desc": "Les informations du partenaire ont bien été enregistrées.",
+        "partner.profile.save_success_desc":
+            "Les informations du partenaire ont bien été enregistrées.",
         "partner.profile.save_error_title": "Mise à jour impossible",
-        "partner.profile.save_error_desc": "Impossible de mettre à jour les informations du partenaire pour le moment.",
+        "partner.profile.save_error_desc":
+            "Impossible de mettre à jour les informations du partenaire pour le moment.",
+        "partner.documents.title": "Documents de conformité",
+        "partner.documents.subtitle":
+            "Ajoutez les justificatifs nécessaires au suivi administratif de votre compte partenaire.",
+        "partner.documents.field.type": "Type de document",
+        "partner.documents.field.expires_at": "Date d'expiration",
+        "partner.documents.field.file": "Fichier PDF ou image",
+        "partner.documents.upload": "Téléverser",
+        "partner.documents.uploading": "Téléversement...",
+        "partner.documents.upload_missing": "Veuillez sélectionner un fichier.",
+        "partner.documents.upload_success": "Document téléversé.",
+        "partner.documents.upload_error":
+            "Impossible de téléverser ce document.",
+        "partner.documents.loading": "Chargement des documents...",
+        "partner.documents.empty": "Aucun document téléversé pour le moment.",
+        "partner.documents.file": "Document",
+        "partner.documents.type.business_registration":
+            "Extrait d'immatriculation",
+        "partner.documents.type.tax_certificate": "Attestation fiscale",
+        "partner.documents.type.insurance": "Assurance",
+        "partner.documents.type.identity": "Pièce d'identité",
+        "partner.documents.type.other": "Autre document",
+        "partner.documents.status.uploaded": "Téléversé",
+        "partner.documents.status.under_review": "En revue",
+        "partner.documents.status.validated": "Validé",
+        "partner.documents.status.rejected": "Rejeté",
+        "partner.documents.status.expired": "Expiré",
 
         // Pending & Validation
         "partner.pending.title.pending": "Dossier en cours de validation",
         "partner.pending.title.approved": "Compte activé !",
         "partner.pending.title.rejected": "Dossier refusé",
         "partner.pending.title.suspended": "Compte suspendu",
-        "partner.pending.message.pending": "Votre dossier est en cours de revue par notre équipe. Nous vous contacterons très prochainement.",
-        "partner.pending.message.approved": "Votre compte a été validé. Vous pouvez maintenant accéder à votre tableau de bord.",
-        "partner.pending.message.approved_unsigned": "Votre compte a été validé. Signez le contrat pour débloquer votre tableau de bord partenaire.",
-        "partner.pending.message.rejected": "Malheureusement, votre dossier n'a pas été retenu.",
-        "partner.pending.message.rejected_with_reason": "Votre dossier a été refusé pour la raison suivante : {reason}",
-        "partner.pending.message.suspended": "Votre compte a été suspendu temporairement. Veuillez contacter le support.",
+        "partner.pending.message.pending":
+            "Votre dossier est en cours de revue par notre équipe. Nous vous contacterons très prochainement.",
+        "partner.pending.message.approved":
+            "Votre compte a été validé. Vous pouvez maintenant accéder à votre tableau de bord.",
+        "partner.pending.message.approved_unsigned":
+            "Votre compte a été validé. Signez le contrat pour débloquer votre tableau de bord partenaire.",
+        "partner.pending.message.rejected":
+            "Malheureusement, votre dossier n'a pas été retenu.",
+        "partner.pending.message.rejected_with_reason":
+            "Votre dossier a été refusé pour la raison suivante : {reason}",
+        "partner.pending.message.suspended":
+            "Votre compte a été suspendu temporairement. Veuillez contacter le support.",
         "partner.pending.admin_validation": "Validation administrateur",
         "partner.pending.contract_status": "Statut du contrat",
         "partner.pending.account_status": "Statut du compte",
@@ -79,8 +115,7 @@ export function buildPartnerFrTranslations(): Record<string, string> {
             "Je confirme avoir lu et accepté le contrat partenaire.",
         "partner.pending.contract_sign_cta": "Signer le contrat",
         "partner.pending.contract_sign_loading": "Signature en cours...",
-        "partner.pending.contract_sign_success":
-            "Contrat signé avec succès.",
+        "partner.pending.contract_sign_success": "Contrat signé avec succès.",
         "partner.pending.contract_sign_error":
             "Impossible de signer le contrat pour le moment.",
         "partner.pending.contract_accept_required":
@@ -104,14 +139,17 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.bookings.status.cancelled": "Annulée",
         "partner.bookings.accept": "Confirmer",
         "partner.bookings.reject": "Refuser",
-        "partner.bookings.toast.confirm_success": "Réservation confirmée avec succès.",
-        "partner.bookings.toast.confirm_error": "Erreur lors de la confirmation.",
+        "partner.bookings.toast.confirm_success":
+            "Réservation confirmée avec succès.",
+        "partner.bookings.toast.confirm_error":
+            "Erreur lors de la confirmation.",
         "partner.bookings.toast.reject_success": "Réservation refusée.",
         "partner.bookings.toast.reject_error": "Erreur lors du refus.",
 
         // Reject Modal
         "partner.bookings.reject_modal.title": "Refuser la réservation",
-        "partner.bookings.reject_modal.description": "Veuillez indiquer la raison du refus (indisponibilité, problème technique, etc.). Le client en sera informé.",
+        "partner.bookings.reject_modal.description":
+            "Veuillez indiquer la raison du refus (indisponibilité, problème technique, etc.). Le client en sera informé.",
         "partner.bookings.reject_modal.submit": "Confirmer le refus",
         "partner.bookings.reject_modal.cancel": "Annuler",
         "partner.bookings.reject_modal.submitting": "Traitement...",
@@ -119,7 +157,8 @@ export function buildPartnerFrTranslations(): Record<string, string> {
 
         // Catalog Management
         "partner.catalog.page_title": "Mon Catalogue",
-        "partner.catalog.page_subtitle": "Gérez vos offres, prix et disponibilités en temps réel.",
+        "partner.catalog.page_subtitle":
+            "Gérez vos offres, prix et disponibilités en temps réel.",
         "partner.catalog.back_dashboard": "Retour au tableau de bord",
         "partner.catalog.action.add_service": "Ajouter une offre",
         "partner.catalog.action.edit": "Modifier",
@@ -128,8 +167,21 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.catalog.action.create": "Créer l'offre",
         "partner.catalog.action.save": "Enregistrer les modifications",
         "partner.catalog.action.cancel": "Annuler",
+        "partner.catalog.moderation.status.draft": "Brouillon",
+        "partner.catalog.moderation.status.pending_review": "En revue",
+        "partner.catalog.moderation.status.approved": "Approuvé",
+        "partner.catalog.moderation.status.published": "Publié",
+        "partner.catalog.moderation.status.rejected": "Rejeté",
+        "partner.catalog.moderation.status.suspended": "Suspendu",
+        "partner.catalog.moderation.status.unreviewed": "Non revu",
+        "partner.catalog.moderation.action.submit": "Soumettre",
+        "partner.catalog.moderation.toast.submitted":
+            "Service soumis à la modération.",
+        "partner.catalog.moderation.toast.submit_error":
+            "Impossible de soumettre ce service pour revue.",
         "partner.catalog.empty.title": "Votre catalogue est vide",
-        "partner.catalog.empty.subtitle": "Commencez par ajouter votre première activité, bateau ou hébergement pour recevoir vos premières réservations.",
+        "partner.catalog.empty.subtitle":
+            "Commencez par ajouter votre première activité, bateau ou hébergement pour recevoir vos premières réservations.",
 
         // Categories
         "partner.catalog.category.activity": "Activité",
@@ -196,7 +248,8 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.catalog.field.week_charter": "Location à la semaine",
 
         // Placeholders
-        "partner.catalog.placeholder.title": "Ex: Excursion aux grottes de Benagil",
+        "partner.catalog.placeholder.title":
+            "Ex: Excursion aux grottes de Benagil",
         "partner.catalog.placeholder.country": "Portugal",
         "partner.catalog.placeholder.region": "Algarve",
         "partner.catalog.placeholder.city": "Albufeira",
@@ -212,9 +265,11 @@ export function buildPartnerFrTranslations(): Record<string, string> {
 
         // Payment Modes
         "partner.catalog.payment_mode.full_online": "Paiement 100% en ligne",
-        "partner.catalog.payment_mode.commission_online": "Commission en ligne, solde sur place",
+        "partner.catalog.payment_mode.commission_online":
+            "Commission en ligne, solde sur place",
         "partner.catalog.payment_mode.on_site": "Paiement intégral sur place",
-        "partner.catalog.payment_mode.connected_account": "Compte Stripe connecté",
+        "partner.catalog.payment_mode.connected_account":
+            "Compte Stripe connecté",
 
         // Boat Types
         "partner.catalog.boat_type.catamaran": "Catamaran",
@@ -287,14 +342,18 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.catalog.preview.commission": "Commission Wandireo",
 
         // Toasts & Errors
-        "partner.catalog.toast.service_created": "L'offre a été créée avec succès.",
-        "partner.catalog.toast.service_updated": "Les modifications ont été enregistrées.",
+        "partner.catalog.toast.service_created":
+            "L'offre a été créée avec succès.",
+        "partner.catalog.toast.service_updated":
+            "Les modifications ont été enregistrées.",
         "partner.catalog.toast.service_deleted": "L'offre a été supprimée.",
-        "partner.catalog.toast.service_enabled": "L'offre est maintenant active.",
+        "partner.catalog.toast.service_enabled":
+            "L'offre est maintenant active.",
         "partner.catalog.toast.service_disabled": "L'offre a été désactivée.",
         "partner.catalog.toast.save_error": "Erreur lors de l'enregistrement.",
         "partner.catalog.toast.delete_error": "Erreur lors de la suppression.",
-        "partner.catalog.toast.toggle_error": "Erreur lors du changement de statut.",
+        "partner.catalog.toast.toggle_error":
+            "Erreur lors du changement de statut.",
 
         "partner.catalog.error.title_required": "Le titre est obligatoire.",
         "service.form.error.fr_title_required": "Le titre FR est obligatoire.",
@@ -303,13 +362,15 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "service.form.field.required": "Obligatoire",
         "service.form.field.optional": "Optionnel",
         "service.form.url_placeholder": "https://...",
-        "partner.catalog.error.description_required": "La description est obligatoire.",
+        "partner.catalog.error.description_required":
+            "La description est obligatoire.",
         "partner.catalog.error.price_positive": "Le prix doit être positif.",
         "partner.catalog.error.city_required": "La ville est obligatoire.",
         "partner.catalog.error.country_required": "Le pays est obligatoire.",
         "partner.catalog.error.brand_required": "La marque est obligatoire.",
         "partner.catalog.error.model_required": "Le modèle est obligatoire.",
-        "partner.catalog.error.boat_name_required": "Le nom du bateau est obligatoire.",
+        "partner.catalog.error.boat_name_required":
+            "Le nom du bateau est obligatoire.",
 
         // Missing dashboard labels
         "partner.dashboard.title": "Tableau de bord partenaire",

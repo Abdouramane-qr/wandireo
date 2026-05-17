@@ -10,10 +10,22 @@ import { Breadcrumb, Button } from "@/components/wdr";
 import { useToast } from "@/components/wdr/Toast/ToastProvider";
 import { useUser } from "@/context/UserContext";
 import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
+import {
+    usePartnerDocumentsData,
+    usePartnerDocumentUploadData,
+} from "@/hooks/usePartnerDocumentsData";
 import { useServicesData } from "@/hooks/useServicesData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { formatPrice } from "@/lib/formatters";
+import {
+    formatPartnerDocumentSize,
+    getPartnerDocumentStatusClass,
+    getPartnerDocumentStatusLabel,
+    getPartnerDocumentTypeLabel,
+    PARTNER_DOCUMENT_TYPES,
+} from "@/lib/partner-documents";
+import type { PartnerDocumentType } from "@/types/partner-document";
 import type { Service } from "@/types/service";
 import type { PartnerUser } from "@/types/wdr-user";
 import "./PartnerProfilePage.css";
@@ -41,7 +53,14 @@ interface PartnerProfileFormState {
     businessAddress: string;
 }
 
-type PartnerProfileFormErrors = Partial<Record<keyof PartnerProfileFormState, string>>;
+interface PartnerDocumentUploadFormState {
+    documentType: PartnerDocumentType;
+    expiresAt: string;
+}
+
+type PartnerProfileFormErrors = Partial<
+    Record<keyof PartnerProfileFormState, string>
+>;
 
 interface PartnerProfileFieldProps {
     id: string;
@@ -83,13 +102,16 @@ export const PartnerProfilePage: React.FC = () => {
     const { currentUser } = useUser();
     const { isBlocked } = usePartnerApprovalGuard();
     const toast = useToast();
-    const { t } = useTranslation();
+    const { t, intlLocale } = useTranslation();
     const partner =
         currentUser?.role === "PARTNER" ? (currentUser as PartnerUser) : null;
     const { services } = useServicesData({
         partnerId: partner?.id ?? "__missing_partner__",
         limit: 200,
     });
+    const { documents, isLoading: isLoadingDocuments } =
+        usePartnerDocumentsData();
+    const uploadDocumentMutation = usePartnerDocumentUploadData();
     const partnerServices = services;
 
     const [form, setForm] = useState<PartnerProfileFormState>({
@@ -101,6 +123,12 @@ export const PartnerProfilePage: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [formErrors, setFormErrors] = useState<PartnerProfileFormErrors>({});
     const [submitError, setSubmitError] = useState("");
+    const [documentForm, setDocumentForm] =
+        useState<PartnerDocumentUploadFormState>({
+            documentType: "BUSINESS_REGISTRATION",
+            expiresAt: "",
+        });
+    const [documentFile, setDocumentFile] = useState<File | null>(null);
 
     useEffect(() => {
         setForm({
@@ -163,7 +191,9 @@ export const PartnerProfilePage: React.FC = () => {
             const nextErrors: PartnerProfileFormErrors = {};
 
             if (validationErrors.company_name) {
-                nextErrors.companyName = Array.isArray(validationErrors.company_name)
+                nextErrors.companyName = Array.isArray(
+                    validationErrors.company_name,
+                )
                     ? validationErrors.company_name[0]
                     : validationErrors.company_name;
             }
@@ -175,7 +205,9 @@ export const PartnerProfilePage: React.FC = () => {
             }
 
             if (validationErrors.phone_number) {
-                nextErrors.phoneNumber = Array.isArray(validationErrors.phone_number)
+                nextErrors.phoneNumber = Array.isArray(
+                    validationErrors.phone_number,
+                )
                     ? validationErrors.phone_number[0]
                     : validationErrors.phone_number;
             }
@@ -189,10 +221,15 @@ export const PartnerProfilePage: React.FC = () => {
             }
 
             setFormErrors(nextErrors);
-            setSubmitError(payload?.message ?? t("partner.profile.save_error_desc"));
-            toast.error(payload?.message ?? t("partner.profile.save_error_desc"), {
-                title: t("partner.profile.save_error_title"),
-            });
+            setSubmitError(
+                payload?.message ?? t("partner.profile.save_error_desc"),
+            );
+            toast.error(
+                payload?.message ?? t("partner.profile.save_error_desc"),
+                {
+                    title: t("partner.profile.save_error_title"),
+                },
+            );
         } finally {
             setIsSaving(false);
         }
@@ -204,8 +241,9 @@ export const PartnerProfilePage: React.FC = () => {
     );
     const importedCount = useMemo(
         () =>
-            partnerServices.filter((service) => service.sourceType === "EXTERNAL")
-                .length,
+            partnerServices.filter(
+                (service) => service.sourceType === "EXTERNAL",
+            ).length,
         [partnerServices],
     );
     const hiddenCount = useMemo(
@@ -213,7 +251,9 @@ export const PartnerProfilePage: React.FC = () => {
         [partnerServices],
     );
     const avgRating = useMemo(() => {
-        const rated = partnerServices.filter((service) => service.rating !== undefined);
+        const rated = partnerServices.filter(
+            (service) => service.rating !== undefined,
+        );
 
         if (rated.length === 0) {
             return null;
@@ -224,6 +264,29 @@ export const PartnerProfilePage: React.FC = () => {
             rated.length
         );
     }, [partnerServices]);
+
+    const handleDocumentUpload = useCallback(async () => {
+        if (!documentFile) {
+            toast.error(t("partner.documents.upload_missing"));
+            return;
+        }
+
+        try {
+            await uploadDocumentMutation.mutateAsync({
+                documentType: documentForm.documentType,
+                document: documentFile,
+                expiresAt: documentForm.expiresAt || undefined,
+            });
+            setDocumentFile(null);
+            setDocumentForm({
+                documentType: "BUSINESS_REGISTRATION",
+                expiresAt: "",
+            });
+            toast.success(t("partner.documents.upload_success"));
+        } catch {
+            toast.error(t("partner.documents.upload_error"));
+        }
+    }, [documentFile, documentForm, t, toast, uploadDocumentMutation]);
 
     if (isBlocked || !partner) {
         return null;
@@ -455,6 +518,152 @@ export const PartnerProfilePage: React.FC = () => {
                 </div>
             </section>
 
+            <section className="wdr-pprofile__documents">
+                <div className="wdr-pprofile__documents-inner">
+                    <div className="wdr-pprofile__documents-header">
+                        <div>
+                            <h2 className="wdr-pprofile__documents-title">
+                                {t("partner.documents.title")}
+                            </h2>
+                            <p className="wdr-pprofile__documents-subtitle">
+                                {t("partner.documents.subtitle")}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="wdr-pprofile__documents-panel">
+                        <div className="wdr-pprofile__document-upload">
+                            <label className="wdr-pprofile__document-field">
+                                <span>{t("partner.documents.field.type")}</span>
+                                <select
+                                    className="wdr-pprofile__document-input"
+                                    value={documentForm.documentType}
+                                    onChange={(event) =>
+                                        setDocumentForm((current) => ({
+                                            ...current,
+                                            documentType: event.target
+                                                .value as PartnerDocumentType,
+                                        }))
+                                    }
+                                >
+                                    {PARTNER_DOCUMENT_TYPES.map((type) => (
+                                        <option key={type} value={type}>
+                                            {getPartnerDocumentTypeLabel(
+                                                type,
+                                                t,
+                                            )}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="wdr-pprofile__document-field">
+                                <span>
+                                    {t("partner.documents.field.expires_at")}
+                                </span>
+                                <input
+                                    className="wdr-pprofile__document-input"
+                                    type="date"
+                                    value={documentForm.expiresAt}
+                                    onChange={(event) =>
+                                        setDocumentForm((current) => ({
+                                            ...current,
+                                            expiresAt: event.target.value,
+                                        }))
+                                    }
+                                />
+                            </label>
+                            <label className="wdr-pprofile__document-field">
+                                <span>{t("partner.documents.field.file")}</span>
+                                <input
+                                    className="wdr-pprofile__document-input"
+                                    type="file"
+                                    accept="application/pdf,image/png,image/jpeg"
+                                    onChange={(event) =>
+                                        setDocumentFile(
+                                            event.target.files?.[0] ?? null,
+                                        )
+                                    }
+                                />
+                            </label>
+                            <Button
+                                variant="primary"
+                                onClick={() => void handleDocumentUpload()}
+                                disabled={
+                                    uploadDocumentMutation.isPending ||
+                                    !documentFile
+                                }
+                            >
+                                {uploadDocumentMutation.isPending
+                                    ? t("partner.documents.uploading")
+                                    : t("partner.documents.upload")}
+                            </Button>
+                        </div>
+
+                        {isLoadingDocuments ? (
+                            <p className="wdr-pprofile__documents-empty">
+                                {t("partner.documents.loading")}
+                            </p>
+                        ) : documents.length === 0 ? (
+                            <p className="wdr-pprofile__documents-empty">
+                                {t("partner.documents.empty")}
+                            </p>
+                        ) : (
+                            <div className="wdr-pprofile__documents-list">
+                                {documents.map((document) => (
+                                    <article
+                                        key={document.id}
+                                        className="wdr-pprofile__document-row"
+                                    >
+                                        <div className="wdr-pprofile__document-main">
+                                            <span className="wdr-pprofile__document-type">
+                                                {getPartnerDocumentTypeLabel(
+                                                    document.documentType,
+                                                    t,
+                                                )}
+                                            </span>
+                                            <a
+                                                className="wdr-pprofile__document-link"
+                                                href={document.filePath}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                {document.originalName ??
+                                                    t("partner.documents.file")}
+                                            </a>
+                                            <span className="wdr-pprofile__document-meta">
+                                                {formatPartnerDocumentSize(
+                                                    document.sizeBytes,
+                                                )}
+                                                {" · "}
+                                                {new Intl.DateTimeFormat(
+                                                    intlLocale,
+                                                ).format(document.createdAt)}
+                                            </span>
+                                            {document.rejectionReason && (
+                                                <span className="wdr-pprofile__document-reason">
+                                                    {document.rejectionReason}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span
+                                            className={[
+                                                "wdr-pprofile__document-status",
+                                                `wdr-pprofile__document-status--${getPartnerDocumentStatusClass(document.status)}`,
+                                            ].join(" ")}
+                                        >
+                                            {getPartnerDocumentStatusLabel(
+                                                document.status,
+                                                t,
+                                            )}
+                                        </span>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+
             <div className="wdr-pprofile__catalog">
                 <div className="wdr-pprofile__catalog-inner">
                     <div className="wdr-pprofile__catalog-header">
@@ -493,20 +702,32 @@ export const PartnerProfilePage: React.FC = () => {
                                 >
                                     <div className="wdr-pprofile__service-topline">
                                         <span className="wdr-pprofile__service-category">
-                                            {getCategoryLabel(service.category, t)}
+                                            {getCategoryLabel(
+                                                service.category,
+                                                t,
+                                            )}
                                         </span>
                                         <div className="wdr-pprofile__service-badges">
                                             <span
                                                 className={`wdr-pprofile__service-badge ${service.isAvailable ? "wdr-pprofile__service-badge--active" : "wdr-pprofile__service-badge--inactive"}`}
                                             >
                                                 {service.isAvailable
-                                                    ? t("partner.catalog.status.active")
-                                                    : t("partner.catalog.status.inactive")}
+                                                    ? t(
+                                                          "partner.catalog.status.active",
+                                                      )
+                                                    : t(
+                                                          "partner.catalog.status.inactive",
+                                                      )}
                                             </span>
                                             <span className="wdr-pprofile__service-badge wdr-pprofile__service-badge--source">
-                                                {service.sourceType === "EXTERNAL"
-                                                    ? t("partner.catalog.card.external")
-                                                    : t("partner.catalog.card.local")}
+                                                {service.sourceType ===
+                                                "EXTERNAL"
+                                                    ? t(
+                                                          "partner.catalog.card.external",
+                                                      )
+                                                    : t(
+                                                          "partner.catalog.card.local",
+                                                      )}
                                             </span>
                                         </div>
                                     </div>
@@ -514,7 +735,8 @@ export const PartnerProfilePage: React.FC = () => {
                                         {service.title}
                                     </h3>
                                     <p className="wdr-pprofile__service-location">
-                                        {service.location.city}, {service.location.country}
+                                        {service.location.city},{" "}
+                                        {service.location.country}
                                     </p>
                                     <p className="wdr-pprofile__service-description">
                                         {service.description}
@@ -522,7 +744,9 @@ export const PartnerProfilePage: React.FC = () => {
                                     <div className="wdr-pprofile__service-pricing">
                                         <div>
                                             <span className="wdr-pprofile__service-price-label">
-                                                {t("partner.catalog.card.partner_price")}
+                                                {t(
+                                                    "partner.catalog.card.partner_price",
+                                                )}
                                             </span>
                                             <strong className="wdr-pprofile__service-price-value">
                                                 {formatPrice(
@@ -533,7 +757,9 @@ export const PartnerProfilePage: React.FC = () => {
                                         </div>
                                         <div>
                                             <span className="wdr-pprofile__service-price-label">
-                                                {t("partner.catalog.card.client_price")}
+                                                {t(
+                                                    "partner.catalog.card.client_price",
+                                                )}
                                             </span>
                                             <strong className="wdr-pprofile__service-price-value">
                                                 {formatPrice(
@@ -554,7 +780,9 @@ export const PartnerProfilePage: React.FC = () => {
                                                 })
                                             }
                                         >
-                                            {t("partner.catalog.card.open_public")}
+                                            {t(
+                                                "partner.catalog.card.open_public",
+                                            )}
                                         </Button>
                                         <Button
                                             variant="primary"
@@ -566,7 +794,8 @@ export const PartnerProfilePage: React.FC = () => {
                                                 })
                                             }
                                             disabled={
-                                                service.sourceType === "EXTERNAL"
+                                                service.sourceType ===
+                                                "EXTERNAL"
                                             }
                                         >
                                             {t("partner.profile.catalog_edit")}

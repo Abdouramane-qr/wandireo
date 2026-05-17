@@ -17,6 +17,18 @@ class Service extends Model
 {
     use HasFactory, HasTranslations, HasUuids, SerializesTranslatableAttributes, SoftDeletes;
 
+    public const MODERATION_DRAFT = 'DRAFT';
+
+    public const MODERATION_PENDING_REVIEW = 'PENDING_REVIEW';
+
+    public const MODERATION_APPROVED = 'APPROVED';
+
+    public const MODERATION_PUBLISHED = 'PUBLISHED';
+
+    public const MODERATION_REJECTED = 'REJECTED';
+
+    public const MODERATION_SUSPENDED = 'SUSPENDED';
+
     public array $translatable = [
         'title',
         'description',
@@ -35,26 +47,30 @@ class Service extends Model
         'currency', 'payment_mode', 'booking_mode', 'featured', 'video_url',
         'rating', 'review_count',
         'source_type', 'source_provider', 'source_external_id', 'last_synced_at',
-        'is_available', 'tags', 'extra_data',
+        'is_available', 'moderation_status', 'moderation_reason',
+        'submitted_for_review_at', 'moderated_at', 'moderated_by',
+        'tags', 'extra_data',
     ];
 
     protected function casts(): array
     {
         return [
-            'images'          => 'array',
-            'tags'            => 'array',
-            'extra_data'      => 'array',
-            'title'           => 'array',
-            'description'     => 'array',
-            'partner_price'   => 'decimal:2',
+            'images' => 'array',
+            'tags' => 'array',
+            'extra_data' => 'array',
+            'title' => 'array',
+            'description' => 'array',
+            'partner_price' => 'decimal:2',
             'commission_rate' => 'decimal:4',
             'commission_amount' => 'decimal:2',
-            'client_price'    => 'decimal:2',
-            'rating'          => 'decimal:2',
-            'is_available'    => 'boolean',
-            'featured'        => 'boolean',
-            'last_synced_at'  => 'datetime',
-            'location_latitude'  => 'decimal:7',
+            'client_price' => 'decimal:2',
+            'rating' => 'decimal:2',
+            'is_available' => 'boolean',
+            'featured' => 'boolean',
+            'last_synced_at' => 'datetime',
+            'submitted_for_review_at' => 'datetime',
+            'moderated_at' => 'datetime',
+            'location_latitude' => 'decimal:7',
             'location_longitude' => 'decimal:7',
         ];
     }
@@ -106,15 +122,25 @@ class Service extends Model
         return $this->hasOne(ServiceCalendarSync::class);
     }
 
+    public function moderationEvents(): HasMany
+    {
+        return $this->hasMany(ServiceModerationEvent::class);
+    }
+
+    public function moderatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
+    }
+
     // ── Accesseurs ────────────────────────────────────────────────────────────
 
     /** Localisation normalisée sous forme de tableau. */
     public function getLocationAttribute(): array
     {
         return [
-            'city'        => $this->location_city,
-            'country'     => $this->location_country,
-            'region'      => $this->location_region,
+            'city' => $this->location_city,
+            'country' => $this->location_country,
+            'region' => $this->location_region,
             'addressLine' => $this->location_address_line,
             'coordinates' => $this->location_latitude
                 ? ['latitude' => $this->location_latitude, 'longitude' => $this->location_longitude]

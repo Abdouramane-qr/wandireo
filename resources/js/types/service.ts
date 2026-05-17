@@ -196,6 +196,11 @@ export interface BaseService {
     rating?: number;
     reviewCount: number;
     isAvailable: boolean;
+    moderationStatus?: ServiceModerationStatus;
+    moderationReason?: string;
+    submittedForReviewAt?: Date;
+    moderatedAt?: Date;
+    moderatedBy?: string;
     tags: string[];
     createdAt: Date;
     updatedAt: Date;
@@ -241,6 +246,27 @@ export interface BaseService {
             raw?: Record<string, unknown>;
         };
     };
+}
+
+export type ServiceModerationStatus =
+    | "DRAFT"
+    | "PENDING_REVIEW"
+    | "APPROVED"
+    | "PUBLISHED"
+    | "REJECTED"
+    | "SUSPENDED";
+
+export interface ServiceModerationEvent {
+    id: string;
+    serviceId: string;
+    actorId?: string;
+    fromStatus?: ServiceModerationStatus;
+    toStatus: ServiceModerationStatus;
+    action: string;
+    reason?: string;
+    metadata?: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 // ============================================================

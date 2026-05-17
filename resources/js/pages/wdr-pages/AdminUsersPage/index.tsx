@@ -1,11 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
-import {
-    AdminSectionNav,
-    Button,
-    Input,
-    useToast,
-} from "@/components/wdr";
+import { AdminSectionNav, Button, Input, useToast } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
 import { useAdminBookingsData } from "@/hooks/useBookingsData";
 import {
@@ -15,10 +10,24 @@ import {
     useAdminUpdateUserData,
     useAdminUsersData,
 } from "@/hooks/useUsersData";
+import {
+    useAdminPartnerDocumentReviewData,
+    useAdminPartnerDocumentsData,
+} from "@/hooks/usePartnerDocumentsData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { formatPrice } from "@/lib/formatters";
+import {
+    getPartnerDocumentStatusClass,
+    getPartnerDocumentStatusLabel,
+    getPartnerDocumentTypeLabel,
+    PARTNER_DOCUMENT_STATUSES,
+} from "@/lib/partner-documents";
 import { BookingStatusNames } from "@/types/booking";
+import type {
+    PartnerDocument,
+    PartnerDocumentStatus,
+} from "@/types/partner-document";
 import type {
     AdminUser,
     ClientUser,
@@ -46,6 +55,13 @@ type GeneralEditForm = {
     phoneNumber: string;
     language: string;
     preferredCurrency: string;
+};
+
+type DocumentReviewForm = {
+    document: PartnerDocument;
+    status: Exclude<PartnerDocumentStatus, "UPLOADED">;
+    rejectionReason: string;
+    expiresAt: string;
 };
 
 type PartnerCreateForm = {
@@ -134,6 +150,9 @@ export const AdminUsersPage: React.FC = () => {
     const [partnerStatusFilter, setPartnerStatusFilter] = useState<
         PartnerStatus | "all"
     >("all");
+    const [documentStatusFilter, setDocumentStatusFilter] = useState<
+        PartnerDocumentStatus | "all"
+    >("UPLOADED");
     const [searchTerm, setSearchTerm] = useState("");
     const { users: allUsers } = useAdminUsersData({
         ...(partnerStatusFilter === "all"
@@ -146,6 +165,14 @@ export const AdminUsersPage: React.FC = () => {
     const createUserMutation = useAdminCreateUserData();
     const uploadContractMutation = useAdminUploadPartnerContractData();
     const markContractSignedMutation = useAdminMarkPartnerContractSignedData();
+    const reviewDocumentMutation = useAdminPartnerDocumentReviewData();
+    const { documents: partnerDocuments, total: partnerDocumentsTotal } =
+        useAdminPartnerDocumentsData({
+            limit: 12,
+            ...(documentStatusFilter === "all"
+                ? {}
+                : { status: documentStatusFilter }),
+        });
 
     const partners = useMemo(
         () =>
@@ -176,6 +203,8 @@ export const AdminUsersPage: React.FC = () => {
     );
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [documentReviewForm, setDocumentReviewForm] =
+        useState<DocumentReviewForm | null>(null);
     const [editForm, setEditForm] = useState<PartnerEditForm>({
         commissionRate: "",
         stripeConnectedAccountId: "",
@@ -589,6 +618,50 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
+    const openDocumentReview = (
+        document: PartnerDocument,
+        status: Exclude<PartnerDocumentStatus, "UPLOADED">,
+    ): void => {
+        setDocumentReviewForm({
+            document,
+            status,
+            rejectionReason: document.rejectionReason ?? "",
+            expiresAt: document.expiresAt
+                ? document.expiresAt.toISOString().slice(0, 10)
+                : "",
+        });
+    };
+
+    const saveDocumentReview = async (): Promise<void> => {
+        if (!documentReviewForm) {
+            return;
+        }
+
+        if (
+            documentReviewForm.status === "REJECTED" &&
+            !documentReviewForm.rejectionReason.trim()
+        ) {
+            error(t("admin.users.documents.reject_reason_required"));
+            return;
+        }
+
+        try {
+            await reviewDocumentMutation.mutateAsync({
+                id: documentReviewForm.document.id,
+                status: documentReviewForm.status,
+                rejectionReason:
+                    documentReviewForm.status === "REJECTED"
+                        ? documentReviewForm.rejectionReason.trim()
+                        : undefined,
+                expiresAt: documentReviewForm.expiresAt || undefined,
+            });
+            success(t("admin.users.documents.review_success"));
+            setDocumentReviewForm(null);
+        } catch {
+            error(t("admin.users.documents.review_error"));
+        }
+    };
+
     if (!currentUser || currentUser.role !== "ADMIN") {
         return null;
     }
@@ -617,6 +690,171 @@ export const AdminUsersPage: React.FC = () => {
             <div className="wdr-admin-users__body">
                 <section>
                     <div className="wdr-admin-users__section-head">
+                        <div>
+                            <h2 className="wdr-admin-users__section-title">
+                                {t("admin.users.documents.title").replace(
+                                    "{count}",
+                                    String(partnerDocumentsTotal),
+                                )}
+                            </h2>
+                            <p className="wdr-admin-users__section-copy">
+                                {t("admin.users.documents.subtitle")}
+                            </p>
+                        </div>
+                        <div className="wdr-admin-users__toolbar">
+                            <select
+                                className="wdr-admin-users__input"
+                                value={documentStatusFilter}
+                                onChange={(event) =>
+                                    setDocumentStatusFilter(
+                                        event.target.value as
+                                            | PartnerDocumentStatus
+                                            | "all",
+                                    )
+                                }
+                            >
+                                <option value="all">
+                                    {t("admin.users.documents.all_statuses")}
+                                </option>
+                                {PARTNER_DOCUMENT_STATUSES.map((status) => (
+                                    <option key={status} value={status}>
+                                        {getPartnerDocumentStatusLabel(
+                                            status,
+                                            t,
+                                        )}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {partnerDocuments.length === 0 ? (
+                        <p className="wdr-admin-users__documents-empty">
+                            {t("admin.users.documents.empty")}
+                        </p>
+                    ) : (
+                        <div className="wdr-admin-users__documents-list">
+                            {partnerDocuments.map((document) => (
+                                <article
+                                    key={document.id}
+                                    className="wdr-admin-users__document-card"
+                                >
+                                    <div className="wdr-admin-users__document-main">
+                                        <span className="wdr-admin-users__document-partner">
+                                            {document.partnerName ??
+                                                t(
+                                                    "admin.users.documents.unknown_partner",
+                                                )}
+                                        </span>
+                                        <a
+                                            href={document.filePath}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="wdr-admin-users__document-link"
+                                        >
+                                            {document.originalName ??
+                                                t("admin.users.documents.file")}
+                                        </a>
+                                        <span className="wdr-admin-users__document-meta">
+                                            {getPartnerDocumentTypeLabel(
+                                                document.documentType,
+                                                t,
+                                            )}
+                                            {" · "}
+                                            {formatDate(
+                                                document.createdAt,
+                                                intlLocale,
+                                                t("admin.users.not_provided"),
+                                            )}
+                                        </span>
+                                        {document.rejectionReason && (
+                                            <span className="wdr-admin-users__document-reason">
+                                                {document.rejectionReason}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="wdr-admin-users__document-side">
+                                        <span
+                                            className={[
+                                                "wdr-admin-users__document-status",
+                                                `wdr-admin-users__document-status--${getPartnerDocumentStatusClass(document.status)}`,
+                                            ].join(" ")}
+                                        >
+                                            {getPartnerDocumentStatusLabel(
+                                                document.status,
+                                                t,
+                                            )}
+                                        </span>
+                                        <div className="wdr-admin-users__document-actions">
+                                            {document.status !==
+                                                "UNDER_REVIEW" && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openDocumentReview(
+                                                            document,
+                                                            "UNDER_REVIEW",
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        reviewDocumentMutation.isPending
+                                                    }
+                                                >
+                                                    {t(
+                                                        "admin.users.documents.review",
+                                                    )}
+                                                </Button>
+                                            )}
+                                            {document.status !==
+                                                "VALIDATED" && (
+                                                <Button
+                                                    variant="primary"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openDocumentReview(
+                                                            document,
+                                                            "VALIDATED",
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        reviewDocumentMutation.isPending
+                                                    }
+                                                >
+                                                    {t(
+                                                        "admin.users.documents.validate",
+                                                    )}
+                                                </Button>
+                                            )}
+                                            {document.status !== "REJECTED" && (
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openDocumentReview(
+                                                            document,
+                                                            "REJECTED",
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        reviewDocumentMutation.isPending
+                                                    }
+                                                >
+                                                    {t(
+                                                        "admin.users.documents.reject",
+                                                    )}
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                <section>
+                    <div className="wdr-admin-users__section-head">
                         <h2 className="wdr-admin-users__section-title">
                             {t("admin.users.hero.partners_count").replace(
                                 "{count}",
@@ -642,7 +880,10 @@ export const AdminUsersPage: React.FC = () => {
                                     {t("admin.users.filter.all_statuses")}
                                 </option>
                                 {partnerStatusOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
                                         {option.label}
                                     </option>
                                 ))}
@@ -978,22 +1219,56 @@ export const AdminUsersPage: React.FC = () => {
                                 <tbody>
                                     {clients.map((client) => (
                                         <tr key={client.id}>
-                                            <td data-label={t("admin.users.table.name")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.name",
+                                                )}
+                                            >
                                                 {client.firstName}{" "}
                                                 {client.lastName}
                                             </td>
-                                            <td data-label={t("admin.users.table.email")}>{client.email}</td>
-                                            <td data-label={t("admin.users.table.language")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.email",
+                                                )}
+                                            >
+                                                {client.email}
+                                            </td>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.language",
+                                                )}
+                                            >
                                                 {client.language?.toUpperCase() ??
                                                     "—"}
                                             </td>
-                                            <td data-label={t("admin.users.table.currency")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.currency",
+                                                )}
+                                            >
                                                 {client.preferredCurrency ??
                                                     "—"}
                                             </td>
-                                            <td data-label={t("admin.users.table.bookings")}>{client.bookingsCount ?? 0}</td>
-                                            <td data-label={t("admin.users.table.reviews")}>{client.reviewsCount ?? 0}</td>
-                                            <td data-label={t("admin.users.table.action")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.bookings",
+                                                )}
+                                            >
+                                                {client.bookingsCount ?? 0}
+                                            </td>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.reviews",
+                                                )}
+                                            >
+                                                {client.reviewsCount ?? 0}
+                                            </td>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.action",
+                                                )}
+                                            >
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -1040,23 +1315,45 @@ export const AdminUsersPage: React.FC = () => {
                                 <tbody>
                                     {admins.map((admin) => (
                                         <tr key={admin.id}>
-                                            <td data-label={t("admin.users.table.name")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.name",
+                                                )}
+                                            >
                                                 {admin.firstName}{" "}
                                                 {admin.lastName}
                                             </td>
-                                            <td data-label={t("admin.users.table.email")}>{admin.email}</td>
-                                            <td data-label={t("admin.users.table.language")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.email",
+                                                )}
+                                            >
+                                                {admin.email}
+                                            </td>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.language",
+                                                )}
+                                            >
                                                 {admin.language?.toUpperCase() ??
                                                     "—"}
                                             </td>
-                                            <td data-label={t("admin.users.table.permissions")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.permissions",
+                                                )}
+                                            >
                                                 {admin.permissions.length > 0
                                                     ? admin.permissions.join(
                                                           ", ",
                                                       )
                                                     : "—"}
                                             </td>
-                                            <td data-label={t("admin.users.table.action")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.users.table.action",
+                                                )}
+                                            >
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -1077,6 +1374,165 @@ export const AdminUsersPage: React.FC = () => {
                     </section>
                 )}
             </div>
+
+            {documentReviewForm && (
+                <div
+                    className="wdr-admin-users__create-overlay"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setDocumentReviewForm(null);
+                        }
+                    }}
+                >
+                    <div
+                        className="wdr-admin-users__create-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="wdr-admin-users-document-review-title"
+                    >
+                        <div className="wdr-admin-users__create-header">
+                            <div className="wdr-admin-users__create-badge">
+                                {getPartnerDocumentStatusLabel(
+                                    documentReviewForm.status,
+                                    t,
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setDocumentReviewForm(null)}
+                                className="wdr-admin-users__create-close"
+                                aria-label={t("common.close")}
+                            >
+                                <X size={18} />
+                            </button>
+                            <h2
+                                id="wdr-admin-users-document-review-title"
+                                className="wdr-admin-users__create-title"
+                            >
+                                {t("admin.users.documents.modal_title")}
+                            </h2>
+                            <p className="wdr-admin-users__create-subtitle">
+                                {documentReviewForm.document.originalName ??
+                                    t("admin.users.documents.file")}
+                            </p>
+                        </div>
+
+                        <div className="wdr-admin-users__create-body">
+                            <div className="wdr-admin-users__edit-form">
+                                <label className="wdr-admin-users__edit-field">
+                                    <span className="wdr-admin-users__edit-label">
+                                        {t(
+                                            "admin.users.documents.field.status",
+                                        )}
+                                    </span>
+                                    <select
+                                        className="wdr-admin-users__input"
+                                        value={documentReviewForm.status}
+                                        onChange={(event) =>
+                                            setDocumentReviewForm((current) =>
+                                                current
+                                                    ? {
+                                                          ...current,
+                                                          status: event.target
+                                                              .value as Exclude<
+                                                              PartnerDocumentStatus,
+                                                              "UPLOADED"
+                                                          >,
+                                                      }
+                                                    : current,
+                                            )
+                                        }
+                                    >
+                                        {PARTNER_DOCUMENT_STATUSES.filter(
+                                            (status) => status !== "UPLOADED",
+                                        ).map((status) => (
+                                            <option key={status} value={status}>
+                                                {getPartnerDocumentStatusLabel(
+                                                    status,
+                                                    t,
+                                                )}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <label className="wdr-admin-users__edit-field">
+                                    <span className="wdr-admin-users__edit-label">
+                                        {t(
+                                            "admin.users.documents.field.expires_at",
+                                        )}
+                                    </span>
+                                    <input
+                                        type="date"
+                                        className="wdr-admin-users__input"
+                                        value={documentReviewForm.expiresAt}
+                                        onChange={(event) =>
+                                            setDocumentReviewForm((current) =>
+                                                current
+                                                    ? {
+                                                          ...current,
+                                                          expiresAt:
+                                                              event.target
+                                                                  .value,
+                                                      }
+                                                    : current,
+                                            )
+                                        }
+                                    />
+                                </label>
+                                <label className="wdr-admin-users__edit-field">
+                                    <span className="wdr-admin-users__edit-label">
+                                        {t(
+                                            "admin.users.documents.field.rejection_reason",
+                                        )}
+                                    </span>
+                                    <textarea
+                                        className="wdr-admin-users__input"
+                                        rows={4}
+                                        value={
+                                            documentReviewForm.rejectionReason
+                                        }
+                                        onChange={(event) =>
+                                            setDocumentReviewForm((current) =>
+                                                current
+                                                    ? {
+                                                          ...current,
+                                                          rejectionReason:
+                                                              event.target
+                                                                  .value,
+                                                      }
+                                                    : current,
+                                            )
+                                        }
+                                    />
+                                </label>
+                                <div className="wdr-admin-users__edit-actions">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setDocumentReviewForm(null)
+                                        }
+                                    >
+                                        {t("admin.users.cancel")}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() =>
+                                            void saveDocumentReview()
+                                        }
+                                        disabled={
+                                            reviewDocumentMutation.isPending
+                                        }
+                                    >
+                                        {reviewDocumentMutation.isPending
+                                            ? t("admin.users.saving")
+                                            : t("admin.users.save")}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {editingPartner && (
                 <div
@@ -1121,216 +1577,252 @@ export const AdminUsersPage: React.FC = () => {
 
                         <div className="wdr-admin-users__create-body">
                             <div className="wdr-admin-users__edit-form">
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.commission")}
-                            </label>
-                            <Input
-                                type="number"
-                                min={20}
-                                max={30}
-                                step={1}
-                                value={editForm.commissionRate}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        commissionRate: e.target.value,
-                                    }))
-                                }
-                            />
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.partner_status")}
-                            </label>
-                            <select
-                                className="wdr-admin-users__input"
-                                value={editForm.partnerStatus}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        partnerStatus: e.target
-                                            .value as PartnerStatus,
-                                    }))
-                                }
-                            >
-                                {partnerStatusOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.contract_status")}
-                            </label>
-                            <select
-                                className="wdr-admin-users__input"
-                                value={editForm.mandateContractStatus}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        mandateContractStatus: e.target
-                                            .value as MandateContractStatus,
-                                    }))
-                                }
-                            >
-                                {contractStatusOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.stripe_account")}
-                            </label>
-                            <Input
-                                value={editForm.stripeConnectedAccountId}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        stripeConnectedAccountId:
-                                            e.target.value,
-                                    }))
-                                }
-                                placeholder={t(
-                                    "admin.users.field.stripe_placeholder",
-                                )}
-                            />
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.business_address")}
-                            </label>
-                            <Input
-                                value={editForm.businessAddress}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        businessAddress: e.target.value,
-                                    }))
-                                }
-                            />
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.contract")}
-                            </label>
-                            <Input
-                                value={editForm.mandateContractFilePath}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        mandateContractFilePath: e.target.value,
-                                    }))
-                                }
-                                placeholder={t(
-                                    "admin.users.field.contract_placeholder",
-                                )}
-                            />
-                            {editForm.mandateContractFilePath && (
-                                <a
-                                    className="wdr-admin-users__contract-link"
-                                    href={editForm.mandateContractFilePath}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    {t(
-                                        "admin.users.field.open_current_contract",
-                                    )}
-                                </a>
-                            )}
-                            {editingPartner && (
-                                <p className="wdr-admin-users__edit-hint">
-                                    {t("admin.users.field.contract_hint")
-                                        .replace(
-                                            "{validated}",
-                                            formatDate(
-                                                editingPartner.partnerValidatedAt,
-                                                intlLocale,
-                                                t("admin.users.not_provided"),
-                                            ),
-                                        )
-                                        .replace(
-                                            "{signed}",
-                                            formatDate(
-                                                editingPartner.mandateSignedAt,
-                                                intlLocale,
-                                                t("admin.users.not_provided"),
-                                            ),
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.commission")}
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        min={20}
+                                        max={30}
+                                        step={1}
+                                        value={editForm.commissionRate}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                commissionRate: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.partner_status")}
+                                    </label>
+                                    <select
+                                        className="wdr-admin-users__input"
+                                        value={editForm.partnerStatus}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                partnerStatus: e.target
+                                                    .value as PartnerStatus,
+                                            }))
+                                        }
+                                    >
+                                        {partnerStatusOptions.map((option) => (
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.contract_status")}
+                                    </label>
+                                    <select
+                                        className="wdr-admin-users__input"
+                                        value={editForm.mandateContractStatus}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                mandateContractStatus: e.target
+                                                    .value as MandateContractStatus,
+                                            }))
+                                        }
+                                    >
+                                        {contractStatusOptions.map((option) => (
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.stripe_account")}
+                                    </label>
+                                    <Input
+                                        value={
+                                            editForm.stripeConnectedAccountId
+                                        }
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                stripeConnectedAccountId:
+                                                    e.target.value,
+                                            }))
+                                        }
+                                        placeholder={t(
+                                            "admin.users.field.stripe_placeholder",
                                         )}
-                                </p>
-                            )}
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.upload_contract_pdf")}
-                            </label>
-                            <input
-                                className="wdr-admin-users__input"
-                                type="file"
-                                accept="application/pdf"
-                                onChange={(e) =>
-                                    setContractFile(e.target.files?.[0] ?? null)
-                                }
-                            />
-                            <div className="wdr-admin-users__edit-actions">
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setContractFile(null)}
-                                    disabled={uploadContractMutation.isPending}
-                                >
-                                    {t("admin.users.field.reset")}
-                                </Button>
-                                <Button
-                                    variant="primary"
-                                    onClick={() => void uploadContract()}
-                                    disabled={
-                                        uploadContractMutation.isPending ||
-                                        !contractFile
-                                    }
-                                >
-                                    {uploadContractMutation.isPending
-                                        ? t("admin.users.field.uploading")
-                                        : t("admin.users.field.upload_pdf")}
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="wdr-admin-users__edit-field">
-                            <label className="wdr-admin-users__edit-label">
-                                {t("admin.users.field.reason")}
-                            </label>
-                            <textarea
-                                className="wdr-admin-users__input"
-                                value={editForm.partnerRejectionReason}
-                                onChange={(e) =>
-                                    setEditForm((form) => ({
-                                        ...form,
-                                        partnerRejectionReason: e.target.value,
-                                    }))
-                                }
-                                rows={3}
-                            />
-                        </div>
-                        <div className="wdr-admin-users__edit-actions">
-                            <Button
-                                variant="ghost"
-                                onClick={() => setEditingPartnerId(null)}
-                            >
-                                {t("admin.users.cancel")}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={() => void savePartner()}
-                            >
-                                {updateUserMutation.isPending
-                                    ? t("admin.users.saving")
-                                    : t("admin.users.save")}
-                            </Button>
-                        </div>
+                                    />
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t(
+                                            "admin.users.field.business_address",
+                                        )}
+                                    </label>
+                                    <Input
+                                        value={editForm.businessAddress}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                businessAddress: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.contract")}
+                                    </label>
+                                    <Input
+                                        value={editForm.mandateContractFilePath}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                mandateContractFilePath:
+                                                    e.target.value,
+                                            }))
+                                        }
+                                        placeholder={t(
+                                            "admin.users.field.contract_placeholder",
+                                        )}
+                                    />
+                                    {editForm.mandateContractFilePath && (
+                                        <a
+                                            className="wdr-admin-users__contract-link"
+                                            href={
+                                                editForm.mandateContractFilePath
+                                            }
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {t(
+                                                "admin.users.field.open_current_contract",
+                                            )}
+                                        </a>
+                                    )}
+                                    {editingPartner && (
+                                        <p className="wdr-admin-users__edit-hint">
+                                            {t(
+                                                "admin.users.field.contract_hint",
+                                            )
+                                                .replace(
+                                                    "{validated}",
+                                                    formatDate(
+                                                        editingPartner.partnerValidatedAt,
+                                                        intlLocale,
+                                                        t(
+                                                            "admin.users.not_provided",
+                                                        ),
+                                                    ),
+                                                )
+                                                .replace(
+                                                    "{signed}",
+                                                    formatDate(
+                                                        editingPartner.mandateSignedAt,
+                                                        intlLocale,
+                                                        t(
+                                                            "admin.users.not_provided",
+                                                        ),
+                                                    ),
+                                                )}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t(
+                                            "admin.users.field.upload_contract_pdf",
+                                        )}
+                                    </label>
+                                    <input
+                                        className="wdr-admin-users__input"
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={(e) =>
+                                            setContractFile(
+                                                e.target.files?.[0] ?? null,
+                                            )
+                                        }
+                                    />
+                                    <div className="wdr-admin-users__edit-actions">
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() =>
+                                                setContractFile(null)
+                                            }
+                                            disabled={
+                                                uploadContractMutation.isPending
+                                            }
+                                        >
+                                            {t("admin.users.field.reset")}
+                                        </Button>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                                void uploadContract()
+                                            }
+                                            disabled={
+                                                uploadContractMutation.isPending ||
+                                                !contractFile
+                                            }
+                                        >
+                                            {uploadContractMutation.isPending
+                                                ? t(
+                                                      "admin.users.field.uploading",
+                                                  )
+                                                : t(
+                                                      "admin.users.field.upload_pdf",
+                                                  )}
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.reason")}
+                                    </label>
+                                    <textarea
+                                        className="wdr-admin-users__input"
+                                        value={editForm.partnerRejectionReason}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                partnerRejectionReason:
+                                                    e.target.value,
+                                            }))
+                                        }
+                                        rows={3}
+                                    />
+                                </div>
+                                <div className="wdr-admin-users__edit-actions">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setEditingPartnerId(null)
+                                        }
+                                    >
+                                        {t("admin.users.cancel")}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => void savePartner()}
+                                    >
+                                        {updateUserMutation.isPending
+                                            ? t("admin.users.saving")
+                                            : t("admin.users.save")}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1380,89 +1872,100 @@ export const AdminUsersPage: React.FC = () => {
 
                         <div className="wdr-admin-users__create-body">
                             <div className="wdr-admin-users__edit-form">
-                        <Input
-                            placeholder={t(
-                                "admin.users.placeholder.first_name",
-                            )}
-                            value={generalEditForm.firstName}
-                            onChange={(e) =>
-                                setGeneralEditForm((form) => ({
-                                    ...form,
-                                    firstName: e.target.value,
-                                }))
-                            }
-                        />
-                        <Input
-                            placeholder={t("admin.users.placeholder.last_name")}
-                            value={generalEditForm.lastName}
-                            onChange={(e) =>
-                                setGeneralEditForm((form) => ({
-                                    ...form,
-                                    lastName: e.target.value,
-                                }))
-                            }
-                        />
-                        <Input
-                            type="email"
-                            placeholder={t("admin.users.placeholder.email")}
-                            value={generalEditForm.email}
-                            onChange={(e) =>
-                                setGeneralEditForm((form) => ({
-                                    ...form,
-                                    email: e.target.value,
-                                }))
-                            }
-                        />
-                        <Input
-                            placeholder={t("admin.users.placeholder.phone")}
-                            value={generalEditForm.phoneNumber}
-                            onChange={(e) =>
-                                setGeneralEditForm((form) => ({
-                                    ...form,
-                                    phoneNumber: e.target.value,
-                                }))
-                            }
-                        />
-                        <Input
-                            placeholder={t("admin.users.placeholder.language")}
-                            value={generalEditForm.language}
-                            onChange={(e) =>
-                                setGeneralEditForm((form) => ({
-                                    ...form,
-                                    language: e.target.value,
-                                }))
-                            }
-                        />
-                        {editingUser.role === "CLIENT" && (
-                            <Input
-                                placeholder={t(
-                                    "admin.users.placeholder.preferred_currency",
+                                <Input
+                                    placeholder={t(
+                                        "admin.users.placeholder.first_name",
+                                    )}
+                                    value={generalEditForm.firstName}
+                                    onChange={(e) =>
+                                        setGeneralEditForm((form) => ({
+                                            ...form,
+                                            firstName: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Input
+                                    placeholder={t(
+                                        "admin.users.placeholder.last_name",
+                                    )}
+                                    value={generalEditForm.lastName}
+                                    onChange={(e) =>
+                                        setGeneralEditForm((form) => ({
+                                            ...form,
+                                            lastName: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Input
+                                    type="email"
+                                    placeholder={t(
+                                        "admin.users.placeholder.email",
+                                    )}
+                                    value={generalEditForm.email}
+                                    onChange={(e) =>
+                                        setGeneralEditForm((form) => ({
+                                            ...form,
+                                            email: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Input
+                                    placeholder={t(
+                                        "admin.users.placeholder.phone",
+                                    )}
+                                    value={generalEditForm.phoneNumber}
+                                    onChange={(e) =>
+                                        setGeneralEditForm((form) => ({
+                                            ...form,
+                                            phoneNumber: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Input
+                                    placeholder={t(
+                                        "admin.users.placeholder.language",
+                                    )}
+                                    value={generalEditForm.language}
+                                    onChange={(e) =>
+                                        setGeneralEditForm((form) => ({
+                                            ...form,
+                                            language: e.target.value,
+                                        }))
+                                    }
+                                />
+                                {editingUser.role === "CLIENT" && (
+                                    <Input
+                                        placeholder={t(
+                                            "admin.users.placeholder.preferred_currency",
+                                        )}
+                                        value={
+                                            generalEditForm.preferredCurrency
+                                        }
+                                        onChange={(e) =>
+                                            setGeneralEditForm((form) => ({
+                                                ...form,
+                                                preferredCurrency:
+                                                    e.target.value,
+                                            }))
+                                        }
+                                    />
                                 )}
-                                value={generalEditForm.preferredCurrency}
-                                onChange={(e) =>
-                                    setGeneralEditForm((form) => ({
-                                        ...form,
-                                        preferredCurrency: e.target.value,
-                                    }))
-                                }
-                            />
-                        )}
-                        <div className="wdr-admin-users__edit-actions">
-                            <Button
-                                variant="ghost"
-                                onClick={() => setEditingUserId(null)}
-                            >
-                                {t("admin.users.cancel")}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={() => void saveGeneralUser()}
-                            >
-                                {updateUserMutation.isPending
-                                    ? t("admin.users.saving")
-                                    : t("admin.users.save")}
-                            </Button>
-                        </div>
+                                <div className="wdr-admin-users__edit-actions">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => setEditingUserId(null)}
+                                    >
+                                        {t("admin.users.cancel")}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => void saveGeneralUser()}
+                                    >
+                                        {updateUserMutation.isPending
+                                            ? t("admin.users.saving")
+                                            : t("admin.users.save")}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1512,18 +2015,23 @@ export const AdminUsersPage: React.FC = () => {
                                 <div className="wdr-admin-users__form-section">
                                     <div className="wdr-admin-users__form-section-head">
                                         <h3 className="wdr-admin-users__form-section-title">
-                                            {t("admin.users.section.account_type")}
+                                            {t(
+                                                "admin.users.section.account_type",
+                                            )}
                                         </h3>
                                         <span className="wdr-admin-users__role-pill">
                                             {roleOptions.find(
                                                 (option) =>
-                                                    option.value === createForm.role,
+                                                    option.value ===
+                                                    createForm.role,
                                             )?.label ?? createForm.role}
                                         </span>
                                     </div>
                                     <label className="wdr-admin-users__select-field">
                                         <span className="wdr-admin-users__select-label">
-                                            {t("admin.users.section.account_type")}
+                                            {t(
+                                                "admin.users.section.account_type",
+                                            )}
                                         </span>
                                         <select
                                             className="wdr-admin-users__input"
@@ -1531,7 +2039,8 @@ export const AdminUsersPage: React.FC = () => {
                                             onChange={(e) =>
                                                 setCreateForm((form) => ({
                                                     ...form,
-                                                    role: e.target.value as UserRole,
+                                                    role: e.target
+                                                        .value as UserRole,
                                                 }))
                                             }
                                         >
@@ -1554,7 +2063,9 @@ export const AdminUsersPage: React.FC = () => {
                                     <div className="wdr-admin-users__form-grid">
                                         <label className="wdr-admin-users__select-field">
                                             <span className="wdr-admin-users__select-label">
-                                                {t("admin.users.placeholder.first_name")}
+                                                {t(
+                                                    "admin.users.placeholder.first_name",
+                                                )}
                                             </span>
                                             <Input
                                                 placeholder={t(
@@ -1564,14 +2075,17 @@ export const AdminUsersPage: React.FC = () => {
                                                 onChange={(e) =>
                                                     setCreateForm((form) => ({
                                                         ...form,
-                                                        firstName: e.target.value,
+                                                        firstName:
+                                                            e.target.value,
                                                     }))
                                                 }
                                             />
                                         </label>
                                         <label className="wdr-admin-users__select-field">
                                             <span className="wdr-admin-users__select-label">
-                                                {t("admin.users.placeholder.last_name")}
+                                                {t(
+                                                    "admin.users.placeholder.last_name",
+                                                )}
                                             </span>
                                             <Input
                                                 placeholder={t(
@@ -1581,7 +2095,8 @@ export const AdminUsersPage: React.FC = () => {
                                                 onChange={(e) =>
                                                     setCreateForm((form) => ({
                                                         ...form,
-                                                        lastName: e.target.value,
+                                                        lastName:
+                                                            e.target.value,
                                                     }))
                                                 }
                                             />
@@ -1596,7 +2111,9 @@ export const AdminUsersPage: React.FC = () => {
                                     <div className="wdr-admin-users__form-grid">
                                         <label className="wdr-admin-users__select-field">
                                             <span className="wdr-admin-users__select-label">
-                                                {t("admin.users.placeholder.email")}
+                                                {t(
+                                                    "admin.users.placeholder.email",
+                                                )}
                                             </span>
                                             <Input
                                                 type="email"
@@ -1627,7 +2144,8 @@ export const AdminUsersPage: React.FC = () => {
                                                 onChange={(e) =>
                                                     setCreateForm((form) => ({
                                                         ...form,
-                                                        password: e.target.value,
+                                                        password:
+                                                            e.target.value,
                                                     }))
                                                 }
                                             />
@@ -1642,7 +2160,9 @@ export const AdminUsersPage: React.FC = () => {
                                     <div className="wdr-admin-users__form-grid">
                                         <label className="wdr-admin-users__select-field">
                                             <span className="wdr-admin-users__select-label">
-                                                {t("admin.users.placeholder.language")}
+                                                {t(
+                                                    "admin.users.placeholder.language",
+                                                )}
                                             </span>
                                             <select
                                                 className="wdr-admin-users__input"
@@ -1650,18 +2170,21 @@ export const AdminUsersPage: React.FC = () => {
                                                 onChange={(e) =>
                                                     setCreateForm((form) => ({
                                                         ...form,
-                                                        language: e.target.value,
+                                                        language:
+                                                            e.target.value,
                                                     }))
                                                 }
                                             >
-                                                {LANGUAGE_OPTIONS.map((language) => (
-                                                    <option
-                                                        key={language}
-                                                        value={language}
-                                                    >
-                                                        {language.toUpperCase()}
-                                                    </option>
-                                                ))}
+                                                {LANGUAGE_OPTIONS.map(
+                                                    (language) => (
+                                                        <option
+                                                            key={language}
+                                                            value={language}
+                                                        >
+                                                            {language.toUpperCase()}
+                                                        </option>
+                                                    ),
+                                                )}
                                             </select>
                                         </label>
                                         {isClientCreation && (
@@ -1673,13 +2196,18 @@ export const AdminUsersPage: React.FC = () => {
                                                 </span>
                                                 <select
                                                     className="wdr-admin-users__input"
-                                                    value={createForm.preferredCurrency}
+                                                    value={
+                                                        createForm.preferredCurrency
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            preferredCurrency:
-                                                                e.target.value,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                preferredCurrency:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
                                                     }
                                                 >
                                                     {CURRENCY_OPTIONS.map(
@@ -1723,13 +2251,18 @@ export const AdminUsersPage: React.FC = () => {
                                                     placeholder={t(
                                                         "admin.users.placeholder.company",
                                                     )}
-                                                    value={createForm.companyName}
+                                                    value={
+                                                        createForm.companyName
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            companyName:
-                                                                e.target.value,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                companyName:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
                                                     }
                                                 />
                                             </label>
@@ -1743,13 +2276,18 @@ export const AdminUsersPage: React.FC = () => {
                                                     placeholder={t(
                                                         "admin.users.placeholder.phone",
                                                     )}
-                                                    value={createForm.phoneNumber}
+                                                    value={
+                                                        createForm.phoneNumber
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            phoneNumber:
-                                                                e.target.value,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                phoneNumber:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
                                                     }
                                                 />
                                             </label>
@@ -1763,13 +2301,18 @@ export const AdminUsersPage: React.FC = () => {
                                                     placeholder={t(
                                                         "admin.users.field.business_address",
                                                     )}
-                                                    value={createForm.businessAddress}
+                                                    value={
+                                                        createForm.businessAddress
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            businessAddress:
-                                                                e.target.value,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                businessAddress:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
                                                     }
                                                 />
                                             </label>
@@ -1787,13 +2330,18 @@ export const AdminUsersPage: React.FC = () => {
                                                     placeholder={t(
                                                         "admin.users.placeholder.commission",
                                                     )}
-                                                    value={createForm.commissionRate}
+                                                    value={
+                                                        createForm.commissionRate
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            commissionRate:
-                                                                e.target.value,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                commissionRate:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
                                                     }
                                                 />
                                             </label>
@@ -1805,20 +2353,29 @@ export const AdminUsersPage: React.FC = () => {
                                                 </span>
                                                 <select
                                                     className="wdr-admin-users__input"
-                                                    value={createForm.partnerStatus}
+                                                    value={
+                                                        createForm.partnerStatus
+                                                    }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            partnerStatus: e.target
-                                                                .value as PartnerStatus,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                partnerStatus: e
+                                                                    .target
+                                                                    .value as PartnerStatus,
+                                                            }),
+                                                        )
                                                     }
                                                 >
                                                     {partnerStatusOptions.map(
                                                         (option) => (
                                                             <option
-                                                                key={option.value}
-                                                                value={option.value}
+                                                                key={
+                                                                    option.value
+                                                                }
+                                                                value={
+                                                                    option.value
+                                                                }
                                                             >
                                                                 {option.label}
                                                             </option>
@@ -1838,19 +2395,25 @@ export const AdminUsersPage: React.FC = () => {
                                                         createForm.mandateContractStatus
                                                     }
                                                     onChange={(e) =>
-                                                        setCreateForm((form) => ({
-                                                            ...form,
-                                                            mandateContractStatus:
-                                                                e.target
-                                                                    .value as MandateContractStatus,
-                                                        }))
+                                                        setCreateForm(
+                                                            (form) => ({
+                                                                ...form,
+                                                                mandateContractStatus:
+                                                                    e.target
+                                                                        .value as MandateContractStatus,
+                                                            }),
+                                                        )
                                                     }
                                                 >
                                                     {contractStatusOptions.map(
                                                         (option) => (
                                                             <option
-                                                                key={option.value}
-                                                                value={option.value}
+                                                                key={
+                                                                    option.value
+                                                                }
+                                                                value={
+                                                                    option.value
+                                                                }
                                                             >
                                                                 {option.label}
                                                             </option>

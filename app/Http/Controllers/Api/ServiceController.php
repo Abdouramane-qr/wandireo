@@ -3,21 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Service;
+use App\Models\ServiceAttribute;
 use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
-use App\Models\ServiceAttribute;
-use App\Models\Service;
+use App\Models\User;
+use App\Services\Analytics\ProductAnalyticsTracker;
 use App\Services\PartnerContent\PartnerContentProviderRegistry;
 use App\Support\Locale;
-use App\Services\Analytics\ProductAnalyticsTracker;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class ServiceController extends Controller
@@ -27,8 +28,7 @@ class ServiceController extends Controller
     public function __construct(
         private readonly ProductAnalyticsTracker $analyticsTracker,
         private readonly PartnerContentProviderRegistry $partnerContentProviders,
-    ) {
-    }
+    ) {}
 
     /** GET /api/services */
     public function index(Request $request): JsonResponse
@@ -96,7 +96,9 @@ class ServiceController extends Controller
         $query = Service::with(['partner', 'serviceCategory', 'serviceSubcategory']);
         $operator = $this->likeOperator();
         $canSeeHiddenPartnerCatalog = $this->canSeeHiddenPartnerCatalog($request);
-        $shouldRestrictToPublicCatalog = ! $request->boolean('adminAll')
+        $canUseAdminAll = $request->boolean('adminAll')
+            && $request->user()?->role === 'ADMIN';
+        $shouldRestrictToPublicCatalog = ! $canUseAdminAll
             && ! $canSeeHiddenPartnerCatalog;
 
         if ($shouldRestrictToPublicCatalog) {
@@ -125,7 +127,7 @@ class ServiceController extends Controller
         }
 
         if ($request->q) {
-            $search = '%' . $request->string('q')->toString() . '%';
+            $search = '%'.$request->string('q')->toString().'%';
             $translatedTitle = $this->translatedColumnExpression('title');
             $translatedDescription = $this->translatedColumnExpression('description');
 
@@ -203,6 +205,7 @@ class ServiceController extends Controller
             'booking_mode' => 'nullable|in:INSTANT,REQUEST,EXTERNAL_REDIRECT',
             'featured' => 'nullable|boolean',
             'video_url' => 'nullable|url',
+            'is_available' => 'nullable|boolean',
             'location_city' => 'required|string',
             'location_country' => 'required|string',
             'location_region' => 'nullable|string',
@@ -234,15 +237,18 @@ class ServiceController extends Controller
         }
 
         if ($request->user()->role === 'ADMIN' && ! empty($data['partner_id']) && $data['partner_id'] !== $request->user()->id) {
-            $owner = \App\Models\User::find($data['partner_id']);
+            $owner = User::find($data['partner_id']);
             $ownerCommissionRate = $owner?->commission_rate ?? $ownerCommissionRate;
         }
 
         $data['commission_rate'] = $data['commission_rate'] ?? $ownerCommissionRate;
         $data['source_type'] = 'LOCAL';
+        $data['moderation_status'] = $this->initialModerationStatus($request);
+        $data['is_available'] = $data['moderation_status'] === Service::MODERATION_PUBLISHED;
 
         $service = Service::create($data);
         $service->refresh();
+        $this->recordModerationEvent($service, $request->user(), 'CREATED', null, $service->moderation_status);
         $this->flushServicesCache();
 
         return response()->json($service->load(['partner', 'serviceCategory', 'serviceSubcategory']), 201);
@@ -288,6 +294,7 @@ class ServiceController extends Controller
         $this->normalizeStructureReferences($payload, $service);
         $this->validateConfiguredAttributes($payload, $service);
         $this->prepareServiceUpdatePayload($request, $service, $payload);
+        $this->ensureAvailabilityChangeAllowed($service, $payload);
 
         $service->update($payload);
         $service->refresh();
@@ -318,10 +325,158 @@ class ServiceController extends Controller
             ? $request->boolean('isAvailable')
             : ! $service->is_available;
 
+        $this->ensureAvailabilityChangeAllowed($service, ['is_available' => $value]);
+
         $service->update(['is_available' => $value]);
         $this->flushServicesCache();
 
         return response()->json(['isAvailable' => $service->is_available]);
+    }
+
+    public function moderationQueue(Request $request): JsonResponse
+    {
+        $query = Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])
+            ->with(['moderationEvents' => fn ($events) => $events->latest()->limit(1)])
+            ->latest('updated_at');
+
+        if ($request->filled('status')) {
+            $query->where('moderation_status', $request->string('status')->toString());
+        } else {
+            $query->whereIn('moderation_status', [
+                Service::MODERATION_PENDING_REVIEW,
+                Service::MODERATION_REJECTED,
+                Service::MODERATION_SUSPENDED,
+            ]);
+        }
+
+        return response()->json($query->paginate($request->integer('limit', 50)));
+    }
+
+    public function submitReview(Request $request, string $id): JsonResponse
+    {
+        $service = Service::findOrFail($id);
+        $this->ensureCanManageService($request, $service);
+
+        $data = $request->validate([
+            'reason' => 'nullable|string|max:5000',
+        ]);
+
+        $this->ensureModerationTransitionAllowed($service, [
+            Service::MODERATION_DRAFT,
+            Service::MODERATION_REJECTED,
+        ]);
+
+        $this->transitionServiceModeration(
+            $service,
+            $request->user(),
+            'SUBMITTED',
+            Service::MODERATION_PENDING_REVIEW,
+            $data['reason'] ?? null,
+            [
+                'is_available' => false,
+                'submitted_for_review_at' => now(),
+            ],
+        );
+
+        return response()->json($this->serviceModerationResponse($service));
+    }
+
+    public function approve(Request $request, string $id): JsonResponse
+    {
+        $service = Service::findOrFail($id);
+
+        $data = $request->validate([
+            'reason' => 'nullable|string|max:5000',
+        ]);
+
+        $this->ensureModerationTransitionAllowed($service, [
+            Service::MODERATION_PENDING_REVIEW,
+        ]);
+
+        $this->transitionServiceModeration(
+            $service,
+            $request->user(),
+            'APPROVED',
+            Service::MODERATION_APPROVED,
+            $data['reason'] ?? null,
+            ['is_available' => false],
+        );
+
+        return response()->json($this->serviceModerationResponse($service));
+    }
+
+    public function publish(Request $request, string $id): JsonResponse
+    {
+        $service = Service::findOrFail($id);
+
+        $data = $request->validate([
+            'reason' => 'nullable|string|max:5000',
+        ]);
+
+        $this->ensureModerationTransitionAllowed($service, [
+            Service::MODERATION_APPROVED,
+            Service::MODERATION_PENDING_REVIEW,
+        ]);
+
+        $this->transitionServiceModeration(
+            $service,
+            $request->user(),
+            'PUBLISHED',
+            Service::MODERATION_PUBLISHED,
+            $data['reason'] ?? null,
+            ['is_available' => true],
+        );
+
+        return response()->json($this->serviceModerationResponse($service));
+    }
+
+    public function reject(Request $request, string $id): JsonResponse
+    {
+        $service = Service::findOrFail($id);
+
+        $data = $request->validate([
+            'reason' => 'required|string|max:5000',
+        ]);
+
+        $this->ensureModerationTransitionAllowed($service, [
+            Service::MODERATION_PENDING_REVIEW,
+        ]);
+
+        $this->transitionServiceModeration(
+            $service,
+            $request->user(),
+            'REJECTED',
+            Service::MODERATION_REJECTED,
+            $data['reason'],
+            ['is_available' => false],
+        );
+
+        return response()->json($this->serviceModerationResponse($service));
+    }
+
+    public function suspend(Request $request, string $id): JsonResponse
+    {
+        $service = Service::findOrFail($id);
+
+        $data = $request->validate([
+            'reason' => 'required|string|max:5000',
+        ]);
+
+        $this->ensureModerationTransitionAllowed($service, [
+            Service::MODERATION_APPROVED,
+            Service::MODERATION_PUBLISHED,
+        ]);
+
+        $this->transitionServiceModeration(
+            $service,
+            $request->user(),
+            'SUSPENDED',
+            Service::MODERATION_SUSPENDED,
+            $data['reason'],
+            ['is_available' => false],
+        );
+
+        return response()->json($this->serviceModerationResponse($service));
     }
 
     private function likeOperator(): string
@@ -358,10 +513,122 @@ class ServiceController extends Controller
         Cache::flush();
     }
 
+    private function initialModerationStatus(Request $request): string
+    {
+        if ($request->user()->role !== 'ADMIN') {
+            return Service::MODERATION_DRAFT;
+        }
+
+        return $request->boolean('is_available')
+            ? Service::MODERATION_PUBLISHED
+            : Service::MODERATION_DRAFT;
+    }
+
+    /**
+     * @param  array<int, string>  $allowedFromStatuses
+     */
+    private function ensureModerationTransitionAllowed(Service $service, array $allowedFromStatuses): void
+    {
+        if (! in_array($service->moderation_status, $allowedFromStatuses, true)) {
+            throw new HttpResponseException(
+                response()->json([
+                    'message' => 'This moderation action is not allowed from the current service status.',
+                    'errors' => [
+                        'moderation_status' => [
+                            "Current status {$service->moderation_status} cannot use this action.",
+                        ],
+                    ],
+                ], 422)
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function ensureAvailabilityChangeAllowed(Service $service, array $payload): void
+    {
+        if (! array_key_exists('is_available', $payload) || ! filter_var($payload['is_available'], FILTER_VALIDATE_BOOL)) {
+            return;
+        }
+
+        if ($service->moderation_status === Service::MODERATION_PUBLISHED) {
+            return;
+        }
+
+        throw new HttpResponseException(
+            response()->json([
+                'message' => 'A service must be published through moderation before it can be made public.',
+                'errors' => [
+                    'is_available' => [
+                        'A service must be published through moderation before it can be made public.',
+                    ],
+                ],
+            ], 422)
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $extraUpdates
+     */
+    private function transitionServiceModeration(
+        Service $service,
+        ?User $actor,
+        string $action,
+        string $toStatus,
+        ?string $reason = null,
+        array $extraUpdates = [],
+    ): void {
+        $fromStatus = $service->moderation_status;
+
+        $service->forceFill(array_merge([
+            'moderation_status' => $toStatus,
+            'moderation_reason' => $reason,
+            'moderated_at' => now(),
+            'moderated_by' => $actor?->id,
+        ], $extraUpdates))->save();
+
+        $this->recordModerationEvent($service, $actor, $action, $fromStatus, $toStatus, $reason);
+        $service->refresh();
+        $this->flushServicesCache();
+    }
+
+    private function recordModerationEvent(
+        Service $service,
+        ?User $actor,
+        string $action,
+        ?string $fromStatus,
+        string $toStatus,
+        ?string $reason = null,
+    ): void {
+        $service->moderationEvents()->create([
+            'actor_id' => $actor?->id,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+            'action' => $action,
+            'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serviceModerationResponse(Service $service): array
+    {
+        $service->load(['partner', 'serviceCategory', 'serviceSubcategory']);
+
+        $payload = $service->toArray();
+        $payload['latestModerationEvent'] = $service->moderationEvents()
+            ->latest()
+            ->first()?->toArray();
+
+        return $payload;
+    }
+
     private function applyRelevanceSort($query, string $search, string $destination): void
     {
-        $searchPattern = '%' . trim($search) . '%';
-        $destinationPattern = '%' . trim($destination) . '%';
+        $searchPattern = '%'.trim($search).'%';
+        $destinationPattern = '%'.trim($destination).'%';
         $translatedTitle = $this->translatedColumnExpression('title');
         $translatedDescription = $this->translatedColumnExpression('description');
 
@@ -613,6 +880,7 @@ class ServiceController extends Controller
                 $errors["extra_data.attributes.{$attribute->key}"] = [
                     "Le champ {$attribute->label} est obligatoire.",
                 ];
+
                 continue;
             }
 
@@ -769,7 +1037,7 @@ class ServiceController extends Controller
             if ($newOverrides !== [] && is_string($overrideRootPath)) {
                 data_set(
                     $payload,
-                    'extra_data.' . $overrideRootPath,
+                    'extra_data.'.$overrideRootPath,
                     array_replace($existingOverrides, $newOverrides),
                 );
             }

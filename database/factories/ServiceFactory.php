@@ -35,6 +35,11 @@ class ServiceFactory extends Factory
             'rating' => null,
             'review_count' => 0,
             'is_available' => true,
+            'moderation_status' => Service::MODERATION_PUBLISHED,
+            'moderation_reason' => null,
+            'submitted_for_review_at' => null,
+            'moderated_at' => null,
+            'moderated_by' => null,
             'tags' => [],
             'extra_data' => [],
         ];

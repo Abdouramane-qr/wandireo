@@ -60,6 +60,53 @@ class PublicServiceVisibilityTest extends TestCase
             ->assertJsonPath('data.0.id', (string) $available->id);
     }
 
+    public function test_public_admin_all_parameter_does_not_expose_hidden_services(): void
+    {
+        $available = Service::factory()->create([
+            'title' => ['fr' => 'Service visible'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => true,
+        ]);
+
+        Service::factory()->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $response = $this->getJson('/api/services?adminAll=true');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', (string) $available->id);
+    }
+
+    public function test_admin_all_parameter_can_include_hidden_services_for_admin(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'ADMIN',
+        ]);
+
+        Service::factory()->create([
+            'title' => ['fr' => 'Service visible'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => true,
+        ]);
+
+        Service::factory()->create([
+            'title' => ['fr' => 'Service masque'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->getJson('/api/services?adminAll=true');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+    }
+
     public function test_partner_owner_listing_can_include_unavailable_services_when_filtered_by_partner(): void
     {
         $partner = User::factory()->create([

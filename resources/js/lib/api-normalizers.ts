@@ -17,6 +17,7 @@ import type {
     ServiceCategory,
     ServiceCategoryDefinition,
     ServiceExtraDefinition,
+    ServiceModerationStatus,
     ServicePricingUnit,
     ServiceSubcategoryDefinition,
 } from "@/types/service";
@@ -78,6 +79,23 @@ function asStringArray(value: unknown): string[] {
     return Array.isArray(value)
         ? value.map((item) => asString(item)).filter(Boolean)
         : [];
+}
+
+function asServiceModerationStatus(
+    value: unknown,
+): ServiceModerationStatus | undefined {
+    const status = asString(value);
+
+    return [
+        "DRAFT",
+        "PENDING_REVIEW",
+        "APPROVED",
+        "PUBLISHED",
+        "REJECTED",
+        "SUSPENDED",
+    ].includes(status)
+        ? (status as ServiceModerationStatus)
+        : undefined;
 }
 
 function asLocalizedTextMap(
@@ -209,6 +227,11 @@ function baseService(rawInput: unknown): {
     rating?: number;
     reviewCount: number;
     isAvailable: boolean;
+    moderationStatus?: ServiceModerationStatus;
+    moderationReason?: string;
+    submittedForReviewAt?: Date;
+    moderatedAt?: Date;
+    moderatedBy?: string;
     tags: string[];
     images: string[];
     createdAt: Date;
@@ -299,6 +322,23 @@ function baseService(rawInput: unknown): {
         rating: raw.rating == null ? undefined : asNumber(raw.rating),
         reviewCount: asNumber(raw.review_count ?? raw.reviewCount),
         isAvailable: asBoolean(raw.is_available ?? raw.isAvailable, true),
+        moderationStatus: asServiceModerationStatus(
+            raw.moderation_status ?? raw.moderationStatus,
+        ),
+        moderationReason:
+            asString(raw.moderation_reason ?? raw.moderationReason) ||
+            undefined,
+        submittedForReviewAt:
+            raw.submitted_for_review_at || raw.submittedForReviewAt
+                ? asDate(
+                      raw.submitted_for_review_at ?? raw.submittedForReviewAt,
+                  )
+                : undefined,
+        moderatedAt:
+            raw.moderated_at || raw.moderatedAt
+                ? asDate(raw.moderated_at ?? raw.moderatedAt)
+                : undefined,
+        moderatedBy: asString(raw.moderated_by ?? raw.moderatedBy) || undefined,
         tags: asStringArray(raw.tags),
         images: asStringArray(raw.images),
         createdAt: asDate(raw.created_at ?? raw.createdAt),
@@ -427,9 +467,8 @@ export function normalizeServiceSubcategory(
         ),
         name: asString(raw.name),
         nameTranslations:
-            asLocalizedTextMap(
-                raw.name_translations ?? raw.nameTranslations,
-            ) || undefined,
+            asLocalizedTextMap(raw.name_translations ?? raw.nameTranslations) ||
+            undefined,
         slug: asString(raw.slug),
         description: asString(raw.description) || undefined,
         descriptionTranslations:
@@ -454,9 +493,8 @@ export function normalizeServiceCategory(
         ) as ServiceCategory,
         name: asString(raw.name),
         nameTranslations:
-            asLocalizedTextMap(
-                raw.name_translations ?? raw.nameTranslations,
-            ) || undefined,
+            asLocalizedTextMap(raw.name_translations ?? raw.nameTranslations) ||
+            undefined,
         slug: asString(raw.slug),
         description: asString(raw.description) || undefined,
         descriptionTranslations:
@@ -880,17 +918,15 @@ export function normalizeBooking(rawInput: unknown): Booking {
         updatedAt: asDate(raw.updated_at ?? raw.updatedAt),
         externalBookingReference:
             asString(
-                raw.external_booking_reference ??
-                    raw.externalBookingReference,
+                raw.external_booking_reference ?? raw.externalBookingReference,
             ) || undefined,
         externalBookingStatus:
             asString(
                 raw.external_booking_status ?? raw.externalBookingStatus,
             ) || undefined,
         externalErrorMessage:
-            asString(
-                raw.external_error_message ?? raw.externalErrorMessage,
-            ) || undefined,
+            asString(raw.external_error_message ?? raw.externalErrorMessage) ||
+            undefined,
     };
 }
 
