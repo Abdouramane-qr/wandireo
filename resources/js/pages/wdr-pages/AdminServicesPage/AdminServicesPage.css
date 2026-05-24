@@ -110,6 +110,8 @@
 }
 
 .wdr-admin-svc__filter-select {
+    display: block;
+    width: 100%;
     height: 38px;
     padding: 0 0.875rem;
     border: 1px solid var(--border-light);
@@ -120,6 +122,9 @@
     cursor: pointer;
     transition: border-color var(--transition-base);
     min-width: 11rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .wdr-admin-svc__filter-select:focus {
@@ -199,6 +204,8 @@
             rgba(247, 250, 252, 0.98)
         );
     box-shadow: 0 10px 30px -12px rgba(13, 59, 82, 0.12);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .wdr-admin-svc__fareharbor-header {
@@ -206,6 +213,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-eyebrow {
@@ -229,6 +237,7 @@
     max-width: 65ch;
     color: var(--text-muted);
     line-height: 1.6;
+    overflow-wrap: break-word;
 }
 
 .wdr-admin-svc__fareharbor-summary {
@@ -310,27 +319,117 @@
     line-height: 1.5;
 }
 
-.wdr-admin-svc__fareharbor-create {
+.wdr-admin-svc__fareharbor-failures {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid rgba(221, 92, 75, 0.18);
+    border-radius: 18px;
+    background: rgba(253, 232, 232, 0.72);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.wdr-admin-svc__fareharbor-failures-head {
     display: flex;
-    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.wdr-admin-svc__fareharbor-failures-head strong {
+    color: var(--danger-dark);
+    overflow-wrap: break-word;
+}
+
+.wdr-admin-svc__fareharbor-failures-head span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    overflow-wrap: break-word;
+}
+
+.wdr-admin-svc__fareharbor-failures-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.wdr-admin-svc__fareharbor-failure {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(221, 92, 75, 0.14);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.wdr-admin-svc__fareharbor-failure div {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.wdr-admin-svc__fareharbor-failure strong,
+.wdr-admin-svc__fareharbor-failure span,
+.wdr-admin-svc__fareharbor-failure p,
+.wdr-admin-svc__fareharbor-failure small {
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.wdr-admin-svc__fareharbor-failure span,
+.wdr-admin-svc__fareharbor-failure small {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.wdr-admin-svc__fareharbor-failure p {
+    margin: 0;
+    max-height: 4.5rem;
+    overflow: auto;
+    color: var(--danger-dark);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.wdr-admin-svc__fareharbor-create {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
     gap: 0.75rem;
     padding: 1.25rem;
     border-radius: 20px;
     border: 1px solid rgba(15, 23, 42, 0.08);
     background: rgba(255, 255, 255, 0.82);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .wdr-admin-svc__fareharbor-create > * {
-    flex: 1 1 180px;
-    min-width: 0; /* Empêche le débordement des inputs flex */
+    min-width: 0;
+    max-width: 100%;
 }
 
 .wdr-admin-svc__fareharbor-create > .wdr-admin-svc__checkbox {
-    flex: 0 1 auto;
-    min-width: 150px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     padding: 0.5rem 0.85rem;
     height: auto;
     min-height: 42px;
+    overflow: hidden;
+}
+
+.wdr-admin-svc__fareharbor-create > .wdr-admin-svc__checkbox span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
 }
 
 :is(.dark) .wdr-admin-svc__filter-input::placeholder {
@@ -342,26 +441,21 @@
 }
 
 .wdr-admin-svc__fareharbor-create > button {
-    flex: 0 0 auto;
     min-width: 120px;
 }
 
 @media (max-width: 768px) {
-    .wdr-admin-svc__fareharbor-create > * {
-        flex: 1 1 100%;
+    .wdr-admin-svc__fareharbor-create {
+        grid-template-columns: 1fr;
     }
 }
 
 .wdr-admin-svc__fareharbor-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
     gap: 1.25rem;
-}
-
-@media (max-width: 480px) {
-    .wdr-admin-svc__fareharbor-grid {
-        grid-template-columns: 1fr;
-    }
+    align-items: stretch;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-card {
@@ -375,6 +469,8 @@
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
     transition: box-shadow var(--transition-base);
     min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .wdr-admin-svc__fareharbor-card:hover {
@@ -386,6 +482,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-card-title {
@@ -394,7 +491,11 @@
     font-weight: 700;
     color: var(--text-main);
     line-height: 1.2;
-    overflow-wrap: anywhere;
+    display: -webkit-box;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .wdr-admin-svc__fareharbor-card-slug {
@@ -402,10 +503,13 @@
     font-size: 0.875rem;
     color: var(--text-muted);
     font-family: monospace;
-    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .wdr-admin-svc__fareharbor-status {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -440,11 +544,14 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-meta span {
     display: inline-flex;
     align-items: center;
+    max-width: 100%;
+    min-width: 0;
     min-height: 28px;
     padding: 0.25rem 0.75rem;
     border-radius: 8px;
@@ -452,7 +559,8 @@
     color: var(--text-muted);
     font-size: 0.8rem;
     font-weight: 500;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .wdr-admin-svc__fareharbor-email {
@@ -460,7 +568,9 @@
     font-size: 0.875rem;
     color: var(--primary);
     font-weight: 500;
-    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .wdr-admin-svc__fareharbor-error {
@@ -472,15 +582,22 @@
     font-size: 0.875rem;
     line-height: 1.5;
     border-left: 3px solid var(--danger);
+    max-height: 9rem;
+    max-width: 100%;
+    overflow: auto;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .wdr-admin-svc__fareharbor-toggles {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
     gap: 0.75rem;
     padding: 1rem;
     background: var(--bg-subtle);
     border-radius: 16px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .wdr-admin-svc__fareharbor-toggles .wdr-admin-svc__checkbox {
@@ -488,17 +605,35 @@
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .wdr-admin-svc__fareharbor-toggles .wdr-admin-svc__checkbox span {
     font-size: 0.875rem;
     color: var(--text-main);
     font-weight: 500;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
+}
+
+.wdr-admin-svc__fareharbor-toggles .wdr-admin-svc__checkbox--select {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.4rem;
 }
 
 .wdr-admin-svc__fareharbor-toggles .wdr-admin-svc__filter-select {
     width: 100%;
-    margin-top: 0.25rem;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 0;
 }
 
 .wdr-admin-svc__fareharbor-actions {
@@ -506,10 +641,12 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     padding-top: 0.5rem;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-actions > button {
-    flex: 1 1 auto;
+    flex: 1 1 10rem;
+    min-width: 0;
 }
 
 .wdr-admin-svc__fareharbor-empty {
@@ -1044,4 +1181,37 @@
     .wdr-admin-svc__table-empty {
         text-align: center;
     }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-admin-svc,
+.wdr-admin-svc__body,
+.wdr-admin-svc__toolbar,
+.wdr-admin-svc__table-wrapper,
+.wdr-admin-svc__fareharbor,
+.wdr-admin-svc__fareharbor-card,
+.wdr-admin-svc__fareharbor-create {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-svc__fareharbor-create {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.wdr-admin-svc__service-title,
+.wdr-admin-svc__fareharbor-note,
+.wdr-admin-svc__stripe-id,
+.wdr-admin-svc__table td {
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.wdr-admin-svc__source-badge,
+.wdr-admin-svc__availability,
+.wdr-admin-svc__table-actions .wdr-btn {
+    white-space: normal;
 }

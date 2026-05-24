@@ -17,6 +17,17 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.dashboard.empty": "No data to display at the moment.",
         "partner.dashboard.up_to_date": "Everything is up to date.",
         "partner.dashboard.member_since": "Partner since {date}",
+        "partner.dashboard.finance_title": "Financial tracking",
+        "partner.dashboard.finance_loading": "Refreshing...",
+        "partner.dashboard.finance_net": "Partner net",
+        "partner.dashboard.finance_receivable": "Receivable",
+        "partner.dashboard.finance_on_hold": "On hold",
+        "partner.dashboard.finance_paid": "Paid",
+        "partner.dashboard.finance_confirmed_bookings":
+            "{count} confirmed booking(s)",
+        "partner.dashboard.finance_receivable_sub": "Pending or scheduled",
+        "partner.dashboard.finance_on_hold_sub": "Held by Wandireo",
+        "partner.dashboard.finance_paid_sub": "Already marked as paid",
 
         // Profile & Status
         "partner.profile.title": "Partner Profile",
@@ -27,32 +38,87 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.profile.catalog_title": "Service Catalog",
         "partner.profile.catalog_manage": "Manage catalog",
         "partner.profile.add_service": "Add a service",
-        "partner.profile.first_service": "Create your first service to get started.",
+        "partner.profile.first_service":
+            "Create your first service to get started.",
         "partner.profile.empty": "No active services at the moment.",
         "partner.profile.account_title": "Partner contact details",
-        "partner.profile.account_subtitle": "Update the real email used for partner communication, along with the contact details used by the Wandireo team.",
+        "partner.profile.account_subtitle":
+            "Update the real email used for partner communication, along with the contact details used by the Wandireo team.",
+        "partner.profile.tax_title": "Tax profile",
+        "partner.profile.tax_subtitle":
+            "These details prepare accounting exports and partner invoicing.",
         "partner.profile.field.company_name": "Company",
         "partner.profile.field.email": "Partner email",
         "partner.profile.field.phone": "Phone",
         "partner.profile.field.business_address": "Business address",
+        "partner.profile.field.legal_company_name": "Legal company name",
+        "partner.profile.field.tax_country": "Tax country (ISO)",
+        "partner.profile.field.vat_number": "VAT number",
+        "partner.profile.field.business_registration_number":
+            "Business registration number",
+        "partner.profile.field.billing_email": "Billing email",
         "partner.profile.save": "Save details",
         "partner.profile.save_loading": "Saving...",
         "partner.profile.save_success_title": "Profile updated",
-        "partner.profile.save_success_desc": "Partner details were saved successfully.",
+        "partner.profile.save_success_desc":
+            "Partner details were saved successfully.",
         "partner.profile.save_error_title": "Update failed",
-        "partner.profile.save_error_desc": "Unable to update partner details right now.",
+        "partner.profile.save_error_desc":
+            "Unable to update partner details right now.",
+        "partner.documents.title": "Compliance documents",
+        "partner.documents.subtitle":
+            "Add the documents needed for administrative review of your partner account.",
+        "partner.documents.field.type": "Document type",
+        "partner.documents.field.expires_at": "Expiration date",
+        "partner.documents.field.file": "PDF or image file",
+        "partner.documents.upload": "Upload",
+        "partner.documents.uploading": "Uploading...",
+        "partner.documents.upload_missing": "Please select a file.",
+        "partner.documents.upload_success": "Document uploaded.",
+        "partner.documents.upload_error": "Unable to upload this document.",
+        "partner.documents.loading": "Loading documents...",
+        "partner.documents.empty": "No document uploaded yet.",
+        "partner.documents.file": "Document",
+        "partner.documents.type.business_registration": "Business registration",
+        "partner.documents.type.tax_certificate": "Tax certificate",
+        "partner.documents.type.insurance": "Insurance",
+        "partner.documents.type.identity": "Identity document",
+        "partner.documents.type.other": "Other document",
+        "partner.documents.status.uploaded": "Uploaded",
+        "partner.documents.status.under_review": "Under review",
+        "partner.documents.status.validated": "Validated",
+        "partner.documents.status.rejected": "Rejected",
+        "partner.documents.status.expired": "Expired",
+        "partner.compliance.title": "Compliance summary",
+        "partner.compliance.progress": "{completed}/{total} steps",
+        "partner.compliance.ready":
+            "Your dossier is ready for commercial operations.",
+        "partner.compliance.in_progress":
+            "Complete the remaining points to secure your dossier.",
+        "partner.compliance.account_approved": "Account approved",
+        "partner.compliance.contract_signed": "Contract signed",
+        "partner.compliance.tax_profile_complete": "Tax profile complete",
+        "partner.compliance.documents_validated": "Documents validated",
+        "partner.compliance.document_counts":
+            "{validated} validated · {pending} in review · {blocked} blocking",
 
         // Pending & Validation
         "partner.pending.title.pending": "Application under review",
         "partner.pending.title.approved": "Account activated!",
         "partner.pending.title.rejected": "Application rejected",
         "partner.pending.title.suspended": "Account suspended",
-        "partner.pending.message.pending": "Your application is currently being reviewed by our team. We will contact you very shortly.",
-        "partner.pending.message.approved": "Your account has been validated. You can now access your dashboard.",
-        "partner.pending.message.approved_unsigned": "Your account has been approved. Sign the contract to unlock your partner dashboard.",
-        "partner.pending.message.rejected": "Unfortunately, your application was not accepted.",
-        "partner.pending.message.rejected_with_reason": "Your application was rejected for the following reason: {reason}",
-        "partner.pending.message.suspended": "Your account has been temporarily suspended. Please contact support.",
+        "partner.pending.message.pending":
+            "Your application is currently being reviewed by our team. We will contact you very shortly.",
+        "partner.pending.message.approved":
+            "Your account has been validated. You can now access your dashboard.",
+        "partner.pending.message.approved_unsigned":
+            "Your account has been approved. Sign the contract to unlock your partner dashboard.",
+        "partner.pending.message.rejected":
+            "Unfortunately, your application was not accepted.",
+        "partner.pending.message.rejected_with_reason":
+            "Your application was rejected for the following reason: {reason}",
+        "partner.pending.message.suspended":
+            "Your account has been temporarily suspended. Please contact support.",
         "partner.pending.admin_validation": "Admin validation",
         "partner.pending.contract_status": "Contract status",
         "partner.pending.account_status": "Account status",
@@ -104,14 +170,16 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.bookings.status.cancelled": "Cancelled",
         "partner.bookings.accept": "Confirm",
         "partner.bookings.reject": "Reject",
-        "partner.bookings.toast.confirm_success": "Booking successfully confirmed.",
+        "partner.bookings.toast.confirm_success":
+            "Booking successfully confirmed.",
         "partner.bookings.toast.confirm_error": "Error during confirmation.",
         "partner.bookings.toast.reject_success": "Booking rejected.",
         "partner.bookings.toast.reject_error": "Error during rejection.",
 
         // Reject Modal
         "partner.bookings.reject_modal.title": "Reject booking",
-        "partner.bookings.reject_modal.description": "Please indicate the reason for rejection (unavailability, technical issue, etc.). The customer will be informed.",
+        "partner.bookings.reject_modal.description":
+            "Please indicate the reason for rejection (unavailability, technical issue, etc.). The customer will be informed.",
         "partner.bookings.reject_modal.submit": "Confirm rejection",
         "partner.bookings.reject_modal.cancel": "Cancel",
         "partner.bookings.reject_modal.submitting": "Processing...",
@@ -119,7 +187,8 @@ export function buildPartnerEnTranslations(): Record<string, string> {
 
         // Catalog Management
         "partner.catalog.page_title": "My Catalog",
-        "partner.catalog.page_subtitle": "Manage your offers, prices and availability in real time.",
+        "partner.catalog.page_subtitle":
+            "Manage your offers, prices and availability in real time.",
         "partner.catalog.back_dashboard": "Back to dashboard",
         "partner.catalog.action.add_service": "Add an offer",
         "partner.catalog.action.edit": "Edit",
@@ -129,7 +198,8 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.catalog.action.save": "Save changes",
         "partner.catalog.action.cancel": "Cancel",
         "partner.catalog.empty.title": "Your catalog is empty",
-        "partner.catalog.empty.subtitle": "Start by adding your first activity, boat or accommodation to receive your first bookings.",
+        "partner.catalog.empty.subtitle":
+            "Start by adding your first activity, boat or accommodation to receive your first bookings.",
 
         // Categories
         "partner.catalog.category.activity": "Activity",
@@ -212,9 +282,11 @@ export function buildPartnerEnTranslations(): Record<string, string> {
 
         // Payment Modes
         "partner.catalog.payment_mode.full_online": "100% Online payment",
-        "partner.catalog.payment_mode.commission_online": "Online commission, balance on site",
+        "partner.catalog.payment_mode.commission_online":
+            "Online commission, balance on site",
         "partner.catalog.payment_mode.on_site": "Full payment on site",
-        "partner.catalog.payment_mode.connected_account": "Connected Stripe account",
+        "partner.catalog.payment_mode.connected_account":
+            "Connected Stripe account",
 
         // Boat Types
         "partner.catalog.boat_type.catamaran": "Catamaran",
@@ -283,7 +355,8 @@ export function buildPartnerEnTranslations(): Record<string, string> {
         "partner.catalog.meta.minimum_nights": "min nights",
 
         // Preview
-        "partner.catalog.preview.client_price": "Client display price (incl. tax)",
+        "partner.catalog.preview.client_price":
+            "Client display price (incl. tax)",
         "partner.catalog.preview.commission": "Wandireo commission",
 
         // Toasts & Errors
@@ -298,7 +371,8 @@ export function buildPartnerEnTranslations(): Record<string, string> {
 
         "partner.catalog.error.title_required": "Title is required.",
         "service.form.url_placeholder": "https://...",
-        "partner.catalog.error.description_required": "Description is required.",
+        "partner.catalog.error.description_required":
+            "Description is required.",
         "partner.catalog.error.price_positive": "Price must be positive.",
         "partner.catalog.error.city_required": "City is required.",
         "partner.catalog.error.country_required": "Country is required.",

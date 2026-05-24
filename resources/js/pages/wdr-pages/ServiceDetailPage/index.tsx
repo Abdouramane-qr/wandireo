@@ -830,21 +830,21 @@ const BookingPanel: React.FC<BookingPanelProps> = ({
             </div>
 
             {showDepositOnlyPrice && (
-                    <div className="wdr-detail__booking-external-meta">
-                        <div className="wdr-detail__booking-external-row">
-                            <span className="wdr-detail__booking-external-label">
-                                {t("service.deposit")}
-                            </span>
+                <div className="wdr-detail__booking-external-meta">
+                    <div className="wdr-detail__booking-external-row">
+                        <span className="wdr-detail__booking-external-label">
+                            {t("service.deposit")}
+                        </span>
                         <strong className="wdr-detail__booking-external-value">
                             {depositDisplay}
                         </strong>
-                        </div>
-                        <p className="wdr-detail__booking-external-note">
-                            {depositOnlySummary}
-                        </p>
-                        <p className="wdr-detail__booking-external-note">
-                            {t("service.external_price_not_provided")}
-                        </p>
+                    </div>
+                    <p className="wdr-detail__booking-external-note">
+                        {depositOnlySummary}
+                    </p>
+                    <p className="wdr-detail__booking-external-note">
+                        {t("service.external_price_not_provided")}
+                    </p>
                 </div>
             )}
 
@@ -1160,8 +1160,12 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
     const queryClient = useQueryClient();
     const { t, intlLocale, locale } = useTranslation();
 
-    const { service: apiService, isLoading, isFetched, isNotFound } =
-        useServiceData(id);
+    const {
+        service: apiService,
+        isLoading,
+        isFetched,
+        isNotFound,
+    } = useServiceData(id);
     const service = apiService ?? null;
     const { services } = useServicesData(
         service ? { category: service.category } : undefined,
@@ -1217,7 +1221,9 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
         Boolean(id) &&
         (isLoading || (!service && !isFetched && serviceExists !== false));
     const shouldShowNotFound =
-        !shouldShowLoading && !service && (serviceExists === false || isNotFound);
+        !shouldShowLoading &&
+        !service &&
+        (serviceExists === false || isNotFound);
 
     if (shouldShowLoading) {
         return (
@@ -1347,6 +1353,22 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
                                 <span className="wdr-detail__category-badge">
                                     {categoryLabel}
                                 </span>
+                                {service.partnerTrust?.partnerApproved && (
+                                    <span className="wdr-detail__trust-badge">
+                                        {t("service.trust.partner_approved")}
+                                    </span>
+                                )}
+                                {service.partnerTrust?.contractSigned && (
+                                    <span className="wdr-detail__trust-badge">
+                                        {t("service.trust.contract_signed")}
+                                    </span>
+                                )}
+                                {(service.partnerTrust
+                                    ?.validatedDocumentsCount ?? 0) > 0 && (
+                                    <span className="wdr-detail__trust-badge">
+                                        {t("service.trust.documents_validated")}
+                                    </span>
+                                )}
                             </div>
                             <button
                                 type="button"

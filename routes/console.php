@@ -1,8 +1,9 @@
 <?php
 
-use App\Models\FareHarborCompany;
 use App\Models\BlogPost;
+use App\Models\FareHarborCompany;
 use App\Models\Service;
+use App\Models\User;
 use App\Services\BlogContentTranslationService;
 use App\Services\FareHarbor\FareHarborPartnerProvisioner;
 use App\Services\FareHarbor\FareHarborSyncService;
@@ -12,6 +13,10 @@ use App\Services\Payments\PaymentService;
 use App\Support\FareHarborDefaultCompanies;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -56,6 +61,45 @@ Artisan::command('fareharbor:sync-all', function (
     return self::SUCCESS;
 })->purpose('Synchronize all enabled FareHarbor companies.');
 
+Artisan::command('catalog:restore-archived-services {--dry-run}', function () {
+    $query = Service::onlyTrashed()
+        ->where('moderation_status', Service::MODERATION_SUSPENDED)
+        ->whereDoesntHave('moderationEvents');
+
+    $services = $query->get();
+    $count = $services->count();
+
+    $this->info(sprintf(
+        '%s %d archived service(s) eligible for restoration.',
+        $this->option('dry-run') ? 'Found' : 'Restoring',
+        $count,
+    ));
+
+    if ($count === 0 || $this->option('dry-run')) {
+        return self::SUCCESS;
+    }
+
+    DB::transaction(function () use ($services): void {
+        foreach ($services as $service) {
+            $service->restore();
+            $service->update([
+                'is_available' => true,
+                'moderation_status' => Service::MODERATION_PUBLISHED,
+                'moderation_reason' => null,
+                'submitted_for_review_at' => null,
+                'moderated_at' => now(),
+                'moderated_by' => null,
+            ]);
+        }
+    });
+
+    Cache::flush();
+
+    $this->info(sprintf('Restored %d archived service(s).', $count));
+
+    return self::SUCCESS;
+})->purpose('Restore soft-deleted catalog services that have no moderation history.');
+
 Artisan::command('fareharbor:bootstrap-companies {--sync} {--create-partners}', function (
     FareHarborPartnerProvisioner $partnerProvisioner,
     FareHarborSyncService $syncService,
@@ -89,6 +133,152 @@ Artisan::command('fareharbor:bootstrap-companies {--sync} {--create-partners}', 
 
     return self::SUCCESS;
 })->purpose('Bootstrap the default FareHarbor V1 company list, optionally creating partner accounts and syncing it.');
+
+Artisan::command('marketplace:finalize-partners {--execute}', function (
+    FareHarborPartnerProvisioner $partnerProvisioner,
+    FareHarborSyncService $syncService,
+) {
+    $execute = (bool) $this->option('execute');
+    $targetNames = [
+        'QUOREICH-FONDATION',
+        'QUOREICH-GROUP',
+        'Partner Demo 2',
+        'Partner Demo Experiences',
+    ];
+    $desiredCompanies = [
+        ['display_name' => 'Albufeira Surf & SUP', 'company_slug' => 'albufeirasurfsup'],
+        ['display_name' => 'Algarve Lusitano Horses', 'company_slug' => 'algarvelusitanohorses'],
+        ['display_name' => 'Capitão Nemo Algarve', 'company_slug' => 'capitaonemoalgarve'],
+        ['display_name' => 'Dolphin Seafaris', 'company_slug' => 'dolphinseafaris'],
+        ['display_name' => 'Golden Buggy Adventure Algarve', 'company_slug' => 'goldenbuggyadventurealgarve'],
+        ['display_name' => 'Momentos Dinâmicos, Lda.', 'company_slug' => 'momentosdinamicos'],
+        ['display_name' => 'Moments Watersports', 'company_slug' => 'momentswatersports'],
+        ['display_name' => 'Ocean4Fun', 'company_slug' => 'ocean4fun'],
+        ['display_name' => 'Ophelia Catamaran', 'company_slug' => 'opheliacatamaran'],
+        ['display_name' => 'Ponta da Piedade Tours', 'company_slug' => 'pontadapiedadetours'],
+        ['display_name' => 'Portitours', 'company_slug' => 'portitours'],
+        ['display_name' => 'Tridente Boat Trips', 'company_slug' => 'tridenteboattrips'],
+        ['display_name' => 'Welcome Boat Trips', 'company_slug' => 'welcomeboattrips'],
+        ['display_name' => 'Xplore Benagil', 'company_slug' => 'xplorebenagil'],
+    ];
+
+    $targets = User::query()
+        ->where(function ($query) use ($targetNames): void {
+            foreach ($targetNames as $name) {
+                $query
+                    ->orWhere('company_name', $name)
+                    ->orWhere('name', $name);
+            }
+        })
+        ->get();
+
+    $this->info($execute ? 'Executing marketplace partner cleanup.' : 'Dry run only. Add --execute to apply changes.');
+    $this->table(
+        ['id', 'name', 'email', 'company', 'services', 'bookings'],
+        $targets->map(fn (User $user): array => [
+            $user->id,
+            $user->name,
+            $user->email,
+            $user->company_name,
+            Service::withTrashed()->where('partner_id', $user->id)->count(),
+            DB::table('bookings')->where('partner_id', $user->id)->count(),
+        ])->all(),
+    );
+
+    if (! $execute) {
+        $this->info(sprintf('Would ensure %d FareHarbor partner accounts.', count($desiredCompanies)));
+
+        return self::SUCCESS;
+    }
+
+    DB::transaction(function () use ($desiredCompanies, $partnerProvisioner, $syncService, $targets): void {
+        $archive = User::query()->firstOrCreate(
+            ['email' => 'deleted-partner-archive@wandireo.local'],
+            [
+                'name' => 'Archive partenaires supprimés',
+                'password' => Hash::make(Str::password(20)),
+                'role' => 'PARTNER',
+                'partner_status' => 'SUSPENDED',
+                'company_name' => 'Archive partenaires supprimés',
+                'commission_rate' => 0.20,
+                'mandate_contract_status' => 'NOT_SENT',
+            ],
+        );
+
+        foreach ($targets as $target) {
+            DB::table('bookings')
+                ->where('partner_id', $target->id)
+                ->update(['partner_id' => $archive->id]);
+
+            Service::withTrashed()
+                ->where('partner_id', $target->id)
+                ->update([
+                    'partner_id' => $archive->id,
+                    'is_available' => false,
+                    'moderation_status' => Service::MODERATION_SUSPENDED,
+                    'deleted_at' => now(),
+                ]);
+
+            DB::table('partner_documents')
+                ->where('partner_id', $target->id)
+                ->delete();
+
+            DB::table('support_tickets')
+                ->where('partner_id', $target->id)
+                ->update(['partner_id' => null]);
+
+            DB::table('fareharbor_companies')
+                ->where('partner_id', $target->id)
+                ->update(['partner_id' => null]);
+
+            DB::table('audit_log_entries')
+                ->where('subject_type', User::class)
+                ->where('subject_id', $target->id)
+                ->update([
+                    'subject_id' => null,
+                    'summary' => DB::raw("COALESCE(summary, 'Deleted partner account')"),
+                ]);
+
+            $target->delete();
+        }
+
+        foreach ($desiredCompanies as $company) {
+            $record = FareHarborCompany::query()->updateOrCreate(
+                ['company_slug' => $company['company_slug']],
+                [
+                    'display_name' => $company['display_name'],
+                    'is_enabled' => true,
+                    'sync_items_enabled' => true,
+                    'sync_details_enabled' => true,
+                ],
+            );
+
+            if (! $record->partner_id) {
+                $partnerProvisioner->createForCompany($record);
+            }
+
+            $syncService->assignCompanyPartner($record->fresh());
+        }
+    });
+
+    $failedCompanies = FareHarborCompany::query()
+        ->where('last_status', 'FAILED')
+        ->orderBy('display_name')
+        ->get(['display_name', 'company_slug', 'last_synced_at', 'last_error']);
+
+    $this->info('Marketplace partner cleanup completed.');
+    $this->table(
+        ['partner', 'slug', 'last sync', 'cause'],
+        $failedCompanies->map(fn (FareHarborCompany $company): array => [
+            $company->display_name,
+            $company->company_slug,
+            optional($company->last_synced_at)->toDateTimeString(),
+            Str::limit((string) $company->last_error, 180),
+        ])->all(),
+    );
+
+    return self::SUCCESS;
+})->purpose('Clean removed partner accounts and ensure the production FareHarbor partner account list.');
 
 Artisan::command('partner-content:translate-backfill {--provider=FAREHARBOR} {--force}', function (
     PartnerContentTranslationService $translator,

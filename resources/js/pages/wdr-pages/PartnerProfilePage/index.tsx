@@ -51,6 +51,11 @@ interface PartnerProfileFormState {
     email: string;
     phoneNumber: string;
     businessAddress: string;
+    legalCompanyName: string;
+    taxCountry: string;
+    vatNumber: string;
+    businessRegistrationNumber: string;
+    billingEmail: string;
 }
 
 interface PartnerDocumentUploadFormState {
@@ -61,6 +66,25 @@ interface PartnerDocumentUploadFormState {
 type PartnerProfileFormErrors = Partial<
     Record<keyof PartnerProfileFormState, string>
 >;
+
+function apiErrorMessage(error: unknown): string | undefined {
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof error.response === "object" &&
+        error.response !== null &&
+        "data" in error.response &&
+        typeof error.response.data === "object" &&
+        error.response.data !== null &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+    ) {
+        return error.response.data.message;
+    }
+
+    return undefined;
+}
 
 interface PartnerProfileFieldProps {
     id: string;
@@ -103,8 +127,12 @@ export const PartnerProfilePage: React.FC = () => {
     const { isBlocked } = usePartnerApprovalGuard();
     const toast = useToast();
     const { t, intlLocale } = useTranslation();
-    const partner =
+    const contextPartner =
         currentUser?.role === "PARTNER" ? (currentUser as PartnerUser) : null;
+    const [profileOverride, setProfileOverride] = useState<PartnerUser | null>(
+        null,
+    );
+    const partner = profileOverride ?? contextPartner;
     const { services } = useServicesData({
         partnerId: partner?.id ?? "__missing_partner__",
         limit: 200,
@@ -119,6 +147,11 @@ export const PartnerProfilePage: React.FC = () => {
         email: partner?.email ?? "",
         phoneNumber: partner?.phoneNumber ?? "",
         businessAddress: partner?.businessAddress ?? "",
+        legalCompanyName: partner?.legalCompanyName ?? "",
+        taxCountry: partner?.taxCountry ?? "",
+        vatNumber: partner?.vatNumber ?? "",
+        businessRegistrationNumber: partner?.businessRegistrationNumber ?? "",
+        billingEmail: partner?.billingEmail ?? "",
     });
     const [isSaving, setIsSaving] = useState(false);
     const [formErrors, setFormErrors] = useState<PartnerProfileFormErrors>({});
@@ -131,19 +164,32 @@ export const PartnerProfilePage: React.FC = () => {
     const [documentFile, setDocumentFile] = useState<File | null>(null);
 
     useEffect(() => {
+        setProfileOverride(null);
         setForm({
-            companyName: partner?.companyName ?? "",
-            email: partner?.email ?? "",
-            phoneNumber: partner?.phoneNumber ?? "",
-            businessAddress: partner?.businessAddress ?? "",
+            companyName: contextPartner?.companyName ?? "",
+            email: contextPartner?.email ?? "",
+            phoneNumber: contextPartner?.phoneNumber ?? "",
+            businessAddress: contextPartner?.businessAddress ?? "",
+            legalCompanyName: contextPartner?.legalCompanyName ?? "",
+            taxCountry: contextPartner?.taxCountry ?? "",
+            vatNumber: contextPartner?.vatNumber ?? "",
+            businessRegistrationNumber:
+                contextPartner?.businessRegistrationNumber ?? "",
+            billingEmail: contextPartner?.billingEmail ?? "",
         });
         setFormErrors({});
         setSubmitError("");
     }, [
-        partner?.businessAddress,
-        partner?.companyName,
-        partner?.email,
-        partner?.phoneNumber,
+        contextPartner?.businessAddress,
+        contextPartner?.billingEmail,
+        contextPartner?.companyName,
+        contextPartner?.email,
+        contextPartner?.businessRegistrationNumber,
+        contextPartner?.id,
+        contextPartner?.legalCompanyName,
+        contextPartner?.phoneNumber,
+        contextPartner?.taxCountry,
+        contextPartner?.vatNumber,
     ]);
 
     const handleChange = useCallback(
@@ -161,12 +207,21 @@ export const PartnerProfilePage: React.FC = () => {
         setSubmitError("");
 
         try {
-            await usersApi.updateMe({
+            const updatedUser = await usersApi.updateMe({
                 email: form.email.trim(),
                 phoneNumber: form.phoneNumber.trim() || undefined,
                 companyName: form.companyName.trim() || undefined,
                 businessAddress: form.businessAddress.trim() || undefined,
+                legalCompanyName: form.legalCompanyName.trim() || undefined,
+                taxCountry: form.taxCountry.trim() || undefined,
+                vatNumber: form.vatNumber.trim() || undefined,
+                businessRegistrationNumber:
+                    form.businessRegistrationNumber.trim() || undefined,
+                billingEmail: form.billingEmail.trim() || undefined,
             });
+            if (updatedUser.role === "PARTNER") {
+                setProfileOverride(updatedUser);
+            }
             router.reload({ only: ["auth"] });
             toast.success(t("partner.profile.save_success_desc"), {
                 title: t("partner.profile.save_success_title"),
@@ -220,6 +275,46 @@ export const PartnerProfilePage: React.FC = () => {
                     : validationErrors.business_address;
             }
 
+            if (validationErrors.legal_company_name) {
+                nextErrors.legalCompanyName = Array.isArray(
+                    validationErrors.legal_company_name,
+                )
+                    ? validationErrors.legal_company_name[0]
+                    : validationErrors.legal_company_name;
+            }
+
+            if (validationErrors.tax_country) {
+                nextErrors.taxCountry = Array.isArray(
+                    validationErrors.tax_country,
+                )
+                    ? validationErrors.tax_country[0]
+                    : validationErrors.tax_country;
+            }
+
+            if (validationErrors.vat_number) {
+                nextErrors.vatNumber = Array.isArray(
+                    validationErrors.vat_number,
+                )
+                    ? validationErrors.vat_number[0]
+                    : validationErrors.vat_number;
+            }
+
+            if (validationErrors.business_registration_number) {
+                nextErrors.businessRegistrationNumber = Array.isArray(
+                    validationErrors.business_registration_number,
+                )
+                    ? validationErrors.business_registration_number[0]
+                    : validationErrors.business_registration_number;
+            }
+
+            if (validationErrors.billing_email) {
+                nextErrors.billingEmail = Array.isArray(
+                    validationErrors.billing_email,
+                )
+                    ? validationErrors.billing_email[0]
+                    : validationErrors.billing_email;
+            }
+
             setFormErrors(nextErrors);
             setSubmitError(
                 payload?.message ?? t("partner.profile.save_error_desc"),
@@ -264,6 +359,65 @@ export const PartnerProfilePage: React.FC = () => {
             rated.length
         );
     }, [partnerServices]);
+    const complianceSummary = useMemo(() => {
+        const validatedDocuments = documents.filter(
+            (document) => document.status === "VALIDATED",
+        ).length;
+        const pendingDocuments = documents.filter((document) =>
+            ["UPLOADED", "UNDER_REVIEW"].includes(document.status),
+        ).length;
+        const blockingDocuments = documents.filter((document) =>
+            ["REJECTED", "EXPIRED"].includes(document.status),
+        ).length;
+        const fiscalProfileComplete = [
+            partner?.legalCompanyName,
+            partner?.taxCountry,
+            partner?.businessRegistrationNumber,
+            partner?.billingEmail,
+        ].every((value) => Boolean(value?.trim()));
+        const steps = [
+            {
+                key: "account",
+                label: t("partner.compliance.account_approved"),
+                complete: partner?.partnerStatus === "APPROVED",
+            },
+            {
+                key: "contract",
+                label: t("partner.compliance.contract_signed"),
+                complete: partner?.mandateContractStatus === "SIGNED",
+            },
+            {
+                key: "tax",
+                label: t("partner.compliance.tax_profile_complete"),
+                complete: fiscalProfileComplete,
+            },
+            {
+                key: "documents",
+                label: t("partner.compliance.documents_validated"),
+                complete: validatedDocuments > 0 && blockingDocuments === 0,
+            },
+        ];
+        const completedSteps = steps.filter((step) => step.complete).length;
+
+        return {
+            steps,
+            completedSteps,
+            totalSteps: steps.length,
+            isReady: completedSteps === steps.length && pendingDocuments === 0,
+            validatedDocuments,
+            pendingDocuments,
+            blockingDocuments,
+        };
+    }, [
+        documents,
+        partner?.billingEmail,
+        partner?.businessRegistrationNumber,
+        partner?.legalCompanyName,
+        partner?.mandateContractStatus,
+        partner?.partnerStatus,
+        partner?.taxCountry,
+        t,
+    ]);
 
     const handleDocumentUpload = useCallback(async () => {
         if (!documentFile) {
@@ -283,8 +437,11 @@ export const PartnerProfilePage: React.FC = () => {
                 expiresAt: "",
             });
             toast.success(t("partner.documents.upload_success"));
-        } catch {
-            toast.error(t("partner.documents.upload_error"));
+        } catch (caughtError) {
+            toast.error(
+                apiErrorMessage(caughtError) ??
+                    t("partner.documents.upload_error"),
+            );
         }
     }, [documentFile, documentForm, t, toast, uploadDocumentMutation]);
 
@@ -498,6 +655,67 @@ export const PartnerProfilePage: React.FC = () => {
                         />
                     </div>
 
+                    <div className="wdr-pprofile__account-header wdr-pprofile__account-header--subsection">
+                        <div>
+                            <h3 className="wdr-pprofile__account-subtitle-title">
+                                {t("partner.profile.tax_title")}
+                            </h3>
+                            <p className="wdr-pprofile__account-subtitle">
+                                {t("partner.profile.tax_subtitle")}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="wdr-pprofile__form-grid">
+                        <PartnerProfileField
+                            id="partner-legal-company-name"
+                            label={t(
+                                "partner.profile.field.legal_company_name",
+                            )}
+                            value={form.legalCompanyName}
+                            onChange={handleChange("legalCompanyName")}
+                            autoComplete="organization"
+                            error={formErrors.legalCompanyName}
+                        />
+                        <PartnerProfileField
+                            id="partner-tax-country"
+                            label={t("partner.profile.field.tax_country")}
+                            value={form.taxCountry}
+                            onChange={handleChange("taxCountry")}
+                            autoComplete="country"
+                            error={formErrors.taxCountry}
+                        />
+                        <PartnerProfileField
+                            id="partner-vat-number"
+                            label={t("partner.profile.field.vat_number")}
+                            value={form.vatNumber}
+                            onChange={handleChange("vatNumber")}
+                            autoComplete="off"
+                            error={formErrors.vatNumber}
+                        />
+                        <PartnerProfileField
+                            id="partner-business-registration-number"
+                            label={t(
+                                "partner.profile.field.business_registration_number",
+                            )}
+                            value={form.businessRegistrationNumber}
+                            onChange={handleChange(
+                                "businessRegistrationNumber",
+                            )}
+                            autoComplete="off"
+                            error={formErrors.businessRegistrationNumber}
+                        />
+                        <PartnerProfileField
+                            id="partner-billing-email"
+                            label={t("partner.profile.field.billing_email")}
+                            value={form.billingEmail}
+                            onChange={handleChange("billingEmail")}
+                            type="email"
+                            autoComplete="email"
+                            error={formErrors.billingEmail}
+                        />
+                    </div>
+
                     {submitError && (
                         <p className="wdr-pprofile__submit-error">
                             {submitError}
@@ -532,6 +750,79 @@ export const PartnerProfilePage: React.FC = () => {
                     </div>
 
                     <div className="wdr-pprofile__documents-panel">
+                        <div
+                            className={[
+                                "wdr-pprofile__compliance-summary",
+                                complianceSummary.isReady
+                                    ? "wdr-pprofile__compliance-summary--ready"
+                                    : "wdr-pprofile__compliance-summary--attention",
+                            ].join(" ")}
+                        >
+                            <div className="wdr-pprofile__compliance-main">
+                                <span className="wdr-pprofile__compliance-kicker">
+                                    {t("partner.compliance.title")}
+                                </span>
+                                <strong className="wdr-pprofile__compliance-score">
+                                    {t("partner.compliance.progress")
+                                        .replace(
+                                            "{completed}",
+                                            String(
+                                                complianceSummary.completedSteps,
+                                            ),
+                                        )
+                                        .replace(
+                                            "{total}",
+                                            String(
+                                                complianceSummary.totalSteps,
+                                            ),
+                                        )}
+                                </strong>
+                                <p>
+                                    {complianceSummary.isReady
+                                        ? t("partner.compliance.ready")
+                                        : t("partner.compliance.in_progress")}
+                                </p>
+                            </div>
+                            <div className="wdr-pprofile__compliance-steps">
+                                {complianceSummary.steps.map((step) => (
+                                    <span
+                                        key={step.key}
+                                        className={[
+                                            "wdr-pprofile__compliance-step",
+                                            step.complete
+                                                ? "wdr-pprofile__compliance-step--done"
+                                                : "wdr-pprofile__compliance-step--todo",
+                                        ].join(" ")}
+                                    >
+                                        {step.label}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="wdr-pprofile__compliance-docs">
+                                <span>
+                                    {t("partner.compliance.document_counts")
+                                        .replace(
+                                            "{validated}",
+                                            String(
+                                                complianceSummary.validatedDocuments,
+                                            ),
+                                        )
+                                        .replace(
+                                            "{pending}",
+                                            String(
+                                                complianceSummary.pendingDocuments,
+                                            ),
+                                        )
+                                        .replace(
+                                            "{blocked}",
+                                            String(
+                                                complianceSummary.blockingDocuments,
+                                            ),
+                                        )}
+                                </span>
+                            </div>
+                        </div>
+
                         <div className="wdr-pprofile__document-upload">
                             <label className="wdr-pprofile__document-field">
                                 <span>{t("partner.documents.field.type")}</span>

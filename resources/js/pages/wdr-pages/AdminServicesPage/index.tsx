@@ -305,6 +305,15 @@ export const AdminServicesPage: React.FC = () => {
             Boolean(company.lastError) ||
             company.lastStatus.toLowerCase() === "failed",
     ).length;
+    const failingFareHarborCompanies = useMemo(
+        () =>
+            fareHarborCompanies.filter(
+                (company) =>
+                    Boolean(company.lastError) ||
+                    company.lastStatus.toLowerCase() === "failed",
+            ),
+        [fareHarborCompanies],
+    );
     const servicesByCompanySlug = useMemo(() => {
         const counters = new Map<
             string,
@@ -567,8 +576,11 @@ export const AdminServicesPage: React.FC = () => {
             success(
                 `${t("admin.services.fareharbor.toast.partner_created").replace("{name}", result.company.displayName)} ${result.partnerCredentials.email} / ${result.partnerCredentials.temporaryPassword}`,
             );
-        } catch {
-            error(t("admin.services.fareharbor.toast.partner_error"));
+        } catch (caughtError) {
+            error(
+                extractApiErrorMessage(caughtError) ??
+                    t("admin.services.fareharbor.toast.partner_error"),
+            );
         } finally {
             setFareHarborBusyId(null);
         }
@@ -932,6 +944,58 @@ export const AdminServicesPage: React.FC = () => {
                         )}
                     </p>
 
+                    {failingFareHarborCompanies.length > 0 && (
+                        <div className="wdr-admin-svc__fareharbor-failures">
+                            <div className="wdr-admin-svc__fareharbor-failures-head">
+                                <strong>
+                                    {t(
+                                        "admin.services.fareharbor.failures.title",
+                                    ).replace(
+                                        "{count}",
+                                        String(
+                                            failingFareHarborCompanies.length,
+                                        ),
+                                    )}
+                                </strong>
+                                <span>
+                                    {t(
+                                        "admin.services.fareharbor.failures.subtitle",
+                                    )}
+                                </span>
+                            </div>
+                            <div className="wdr-admin-svc__fareharbor-failures-list">
+                                {failingFareHarborCompanies.map((company) => (
+                                    <article
+                                        key={company.id}
+                                        className="wdr-admin-svc__fareharbor-failure"
+                                    >
+                                        <div>
+                                            <strong>
+                                                {company.displayName}
+                                            </strong>
+                                            <span>{company.companySlug}</span>
+                                        </div>
+                                        <p>
+                                            {company.lastError ||
+                                                t(
+                                                    "admin.services.fareharbor.failures.no_error",
+                                                )}
+                                        </p>
+                                        <small>
+                                            {company.lastSyncedAt
+                                                ? company.lastSyncedAt.toLocaleString(
+                                                      intlLocale,
+                                                  )
+                                                : t(
+                                                      "admin.services.fareharbor.never_synced",
+                                                  )}
+                                        </small>
+                                    </article>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="wdr-admin-svc__fareharbor-create">
                         <input
                             className="wdr-admin-svc__filter-select wdr-admin-svc__filter-input"
@@ -1172,7 +1236,7 @@ export const AdminServicesPage: React.FC = () => {
                                         ) : null}
 
                                         <div className="wdr-admin-svc__fareharbor-toggles">
-                                            <label className="wdr-admin-svc__checkbox">
+                                            <label className="wdr-admin-svc__checkbox wdr-admin-svc__checkbox--select">
                                                 <span>
                                                     {t(
                                                         "admin.services.fareharbor.partner_label",

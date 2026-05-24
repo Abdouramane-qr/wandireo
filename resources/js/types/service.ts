@@ -165,6 +165,15 @@ export interface ServiceLocation {
     };
 }
 
+export interface ServicePartnerTrust {
+    partnerApproved: boolean;
+    contractSigned: boolean;
+    validatedDocumentsCount: number;
+    hasBusinessRegistration: boolean;
+    hasTaxCertificate: boolean;
+    hasInsurance: boolean;
+}
+
 /**
  * Interface de base commune à tous les services de la plateforme.
  * Ne pas instancier directement : utiliser les sous-types spécialisés.
@@ -196,6 +205,7 @@ export interface BaseService {
     rating?: number;
     reviewCount: number;
     isAvailable: boolean;
+    partnerTrust?: ServicePartnerTrust;
     moderationStatus?: ServiceModerationStatus;
     moderationReason?: string;
     submittedForReviewAt?: Date;

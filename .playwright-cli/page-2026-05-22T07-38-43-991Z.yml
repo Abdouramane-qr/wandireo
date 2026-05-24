@@ -1,0 +1,227 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e142]:
+    - banner [ref=e143]:
+      - generic [ref=e144]:
+        - link "Wandireo - Retour à l'accueil" [ref=e145] [cursor=pointer]:
+          - /url: /fr
+          - img [ref=e146]
+        - navigation "Navigation principale" [ref=e147]:
+          - link "Tableau de bord" [ref=e148] [cursor=pointer]:
+            - /url: /fr/partenaire
+          - link "Catalogue" [ref=e149] [cursor=pointer]:
+            - /url: /fr/partenaire/catalogue
+          - link "Gestion des réservations" [ref=e150] [cursor=pointer]:
+            - /url: /fr/partenaire/reservations
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - button "Changer de thème" [ref=e154] [cursor=pointer]:
+              - img [ref=e155]
+            - button "FR" [ref=e158] [cursor=pointer]:
+              - img [ref=e159]
+              - generic [ref=e162]: FR
+          - button "Espace partenaire" [ref=e164] [cursor=pointer]:
+            - generic [ref=e165]: Espace partenaire
+          - generic [ref=e166]:
+            - generic [ref=e167]:
+              - generic [ref=e168]: P
+              - generic [ref=e169]: Partner
+            - button "Déconnexion" [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]: Déconnexion
+    - main [ref=e172]:
+      - generic [ref=e173]:
+        - region "Tableau de bord partenaire" [ref=e174]:
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - paragraph [ref=e177]: Tableau de bord partenaire
+              - heading "Partner Demo Experiences" [level=1] [ref=e178]
+              - paragraph [ref=e179]: Partenaire depuis le 12 avril 2026
+            - generic [ref=e180]:
+              - generic "Avatar de Partner Demo Experiences" [ref=e181]: PD
+              - button "Déconnexion" [ref=e182] [cursor=pointer]:
+                - generic [ref=e183]: Déconnexion
+        - generic [ref=e184]:
+          - region "Statistiques générales" [ref=e185]:
+            - generic [ref=e186]:
+              - img [ref=e188]
+              - generic [ref=e191]:
+                - generic [ref=e192]: 0 €
+                - generic [ref=e193]: Revenu total
+            - generic [ref=e194]:
+              - img [ref=e196]
+              - generic [ref=e199]:
+                - generic [ref=e200]: 0 €
+                - generic [ref=e201]: Revenu du mois
+            - generic [ref=e202]:
+              - img [ref=e204]
+              - generic [ref=e206]:
+                - generic [ref=e207]: "0"
+                - generic [ref=e208]: Réservations ce mois
+            - generic [ref=e209]:
+              - img [ref=e211]
+              - generic [ref=e214]:
+                - generic [ref=e215]: "0"
+                - generic [ref=e216]: réservations en attente
+          - region "Suivi financier" [ref=e217]:
+            - heading "Suivi financier" [level=2] [ref=e219]
+            - generic [ref=e220]:
+              - article [ref=e221]:
+                - generic [ref=e222]: Net partenaire
+                - strong [ref=e223]: 77 800 €
+                - generic [ref=e224]: 2 réservation(s) confirmée(s)
+              - article [ref=e225]:
+                - generic [ref=e226]: À recevoir
+                - strong [ref=e227]: 77 800 €
+                - generic [ref=e228]: En attente ou planifié
+              - article [ref=e229]:
+                - generic [ref=e230]: Bloqué
+                - strong [ref=e231]: 0 €
+                - generic [ref=e232]: Mis en attente par Wandireo
+              - article [ref=e233]:
+                - generic [ref=e234]: Réglé
+                - strong [ref=e235]: 0 €
+                - generic [ref=e236]: Déjà marqué comme réglé
+          - region "Vue d'ensemble du catalogue" [ref=e237]:
+            - heading "Vue d'ensemble du catalogue" [level=2] [ref=e239]
+            - generic [ref=e240]:
+              - article [ref=e241]:
+                - generic [ref=e242]: Offres actives
+                - strong [ref=e243]: "3"
+              - article [ref=e244]:
+                - generic [ref=e245]: Offres masquées
+                - strong [ref=e246]: "0"
+              - article [ref=e247]:
+                - generic [ref=e248]: Offres synchronisées
+                - strong [ref=e249]: "0"
+              - article [ref=e250]:
+                - button "Ajouter une offre" [ref=e251] [cursor=pointer]:
+                  - generic [ref=e252]: Ajouter une offre
+                - button "Voir le profil" [ref=e253] [cursor=pointer]:
+                  - generic [ref=e254]: Voir le profil
+          - region "Raccourcis" [ref=e255]:
+            - heading "Gestion" [level=2] [ref=e256]
+            - generic [ref=e257]:
+              - button "Ouvrir le catalogue partenaire" [ref=e258] [cursor=pointer]:
+                - img [ref=e260]
+                - generic [ref=e261]:
+                  - generic [ref=e262]: Mon catalogue
+                  - generic [ref=e263]: 3 offres actives
+                - img [ref=e264]
+              - button "Ouvrir les réservations partenaire" [ref=e266] [cursor=pointer]:
+                - img [ref=e268]
+                - generic [ref=e271]:
+                  - generic [ref=e272]: Mes réservations
+                  - generic [ref=e273]: Tout est à jour.
+                - img [ref=e274]
+          - region "Activités récentes" [ref=e276]:
+            - generic [ref=e277]:
+              - heading "Activités récentes" [level=2] [ref=e278]
+              - button "Tout voir" [ref=e279] [cursor=pointer]:
+                - text: Tout voir
+                - img [ref=e280]
+            - list [ref=e282]:
+              - listitem [ref=e283]:
+                - generic [ref=e284]:
+                  - generic [ref=e285]: 3/ Ferrari
+                  - generic [ref=e286]: 30 avr. 2026
+                - generic [ref=e287]:
+                  - generic [ref=e288]: 6 000 €
+                  - generic [ref=e289]: Confirmée
+              - listitem [ref=e290]:
+                - generic [ref=e291]:
+                  - generic [ref=e292]: Yacht charter in Tivat · Saxdor Brand New — 320 Gto (2026)
+                  - generic [ref=e293]: 30 avr. 2026
+                - generic [ref=e294]:
+                  - generic [ref=e295]: 87 360 €
+                  - generic [ref=e296]: Confirmée
+    - contentinfo [ref=e297]:
+      - generic [ref=e298]:
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - link "Wandireo - Retour à l'accueil" [ref=e301] [cursor=pointer]:
+              - /url: /fr
+              - img [ref=e302]
+            - paragraph [ref=e303]: Les meilleures expériences en Algarve.
+            - navigation "Réseaux sociaux" [ref=e304]:
+              - link "WhatsApp" [ref=e305] [cursor=pointer]:
+                - /url: https://wa.me/351928282231
+                - img [ref=e306]
+              - link "Instagram" [ref=e309] [cursor=pointer]:
+                - /url: https://www.instagram.com/experiences.algarve?igsh=aWVndGNpanA4cGVh&utm_source=qr
+                - img [ref=e310]
+              - link "TikTok" [ref=e313] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@experiences.algarve?_r=1&_t=ZN-94paV1xX9B0
+                - img [ref=e314]
+          - navigation "Explorer" [ref=e316]:
+            - heading "Explorer" [level=3] [ref=e317]
+            - list [ref=e318]:
+              - listitem [ref=e319]:
+                - link "Toutes les destinations" [ref=e320] [cursor=pointer]:
+                  - /url: /fr/recherche
+              - listitem [ref=e321]:
+                - link "Activités" [ref=e322] [cursor=pointer]:
+                  - /url: /fr/recherche?category=ACTIVITE
+              - listitem [ref=e323]:
+                - link "Bateaux & Nautisme" [ref=e324] [cursor=pointer]:
+                  - /url: /fr/recherche?category=BATEAU
+              - listitem [ref=e325]:
+                - link "Hébergements" [ref=e326] [cursor=pointer]:
+                  - /url: /fr/recherche?category=HEBERGEMENT
+              - listitem [ref=e327]:
+                - link "Location de voitures" [ref=e328] [cursor=pointer]:
+                  - /url: /fr/recherche?category=VOITURE
+              - listitem [ref=e329]:
+                - link "Le Blog Wandireo" [ref=e330] [cursor=pointer]:
+                  - /url: /fr/blog
+          - navigation "Services" [ref=e331]:
+            - heading "Services" [level=3] [ref=e332]
+            - list [ref=e333]:
+              - listitem [ref=e334]:
+                - link "Comment ça marche" [ref=e335] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e336]:
+                - link "Devenir partenaire" [ref=e337] [cursor=pointer]:
+                  - /url: /fr/partenaire/inscription
+              - listitem [ref=e338]:
+                - link "Connexion" [ref=e339] [cursor=pointer]:
+                  - /url: /fr/connexion
+              - listitem [ref=e340]:
+                - link "Inscription" [ref=e341] [cursor=pointer]:
+                  - /url: /fr/inscription
+          - navigation "Assistance" [ref=e342]:
+            - heading "Assistance" [level=3] [ref=e343]
+            - list [ref=e344]:
+              - listitem [ref=e345]:
+                - link "Centre d'aide" [ref=e346] [cursor=pointer]:
+                  - /url: /fr/guide
+              - listitem [ref=e347]:
+                - link "WhatsApp" [ref=e348] [cursor=pointer]:
+                  - /url: https://wa.me/351928282231
+              - listitem [ref=e349]:
+                - link "FAQ" [ref=e350] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e351]:
+                - link "booking@wandireo.com" [ref=e352] [cursor=pointer]:
+                  - /url: mailto:wandireo.bookings@gmail.com
+          - navigation "Légal" [ref=e353]:
+            - heading "Légal" [level=3] [ref=e354]
+            - list [ref=e355]:
+              - listitem [ref=e356]:
+                - link "Conditions d'utilisation" [ref=e357] [cursor=pointer]:
+                  - /url: /fr/conditions-utilisation
+              - listitem [ref=e358]:
+                - link "Politique de confidentialité" [ref=e359] [cursor=pointer]:
+                  - /url: /fr/politique-de-confidentialite
+              - listitem [ref=e360]:
+                - link "Mentions légales" [ref=e361] [cursor=pointer]:
+                  - /url: /fr/mentions-legales
+        - separator [ref=e362]
+        - generic [ref=e363]:
+          - paragraph [ref=e364]: 2026 Wandireo. Tous droits réservés.
+          - navigation "Légal" [ref=e365]:
+            - link "Conditions d'utilisation" [ref=e366] [cursor=pointer]:
+              - /url: /fr/conditions-utilisation
+            - link "Politique de confidentialité" [ref=e367] [cursor=pointer]:
+              - /url: /fr/politique-de-confidentialite
+            - link "Mentions légales" [ref=e368] [cursor=pointer]:
+              - /url: /fr/mentions-legales
+  - generic "Notifications"

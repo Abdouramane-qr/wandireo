@@ -120,7 +120,10 @@ export const PartnerPendingPage: React.FC = () => {
         currentUser.partnerStatus !== "REJECTED" &&
         currentUser.partnerStatus !== "SUSPENDED" &&
         currentUser.mandateContractStatus !== "SIGNED" &&
-        Boolean(currentUser.mandateContractFilePath);
+        Boolean(
+            currentUser.mandateContractText ||
+            currentUser.mandateContractFilePath,
+        );
 
     const handleSignContract = async (): Promise<void> => {
         if (!acceptedContract) {
@@ -133,11 +136,14 @@ export const PartnerPendingPage: React.FC = () => {
             success(t("partner.pending.contract_sign_success"));
 
             if (currentUser.partnerStatus === "APPROVED") {
-                navigate({ name: "partner-dashboard" });
+                router.reload({
+                    only: ["auth"],
+                    onSuccess: () => navigate({ name: "partner-dashboard" }),
+                });
                 return;
             }
 
-            router.reload();
+            router.reload({ only: ["auth"] });
         } catch {
             error(t("partner.pending.contract_sign_error"));
         }
@@ -222,20 +228,28 @@ export const PartnerPendingPage: React.FC = () => {
                         <p className="wdr-partner-pending__sign-message">
                             {t("partner.pending.contract_sign_message")}
                         </p>
+                        {currentUser.mandateContractText && (
+                            <div
+                                className="wdr-partner-pending__contract-text"
+                                tabIndex={0}
+                            >
+                                {currentUser.mandateContractText
+                                    .split(/\n{2,}/)
+                                    .map((paragraph, index) => (
+                                        <p key={index}>{paragraph}</p>
+                                    ))}
+                            </div>
+                        )}
                         <label className="wdr-partner-pending__checkbox">
                             <input
                                 type="checkbox"
                                 checked={acceptedContract}
                                 onChange={(event) =>
-                                    setAcceptedContract(
-                                        event.target.checked,
-                                    )
+                                    setAcceptedContract(event.target.checked)
                                 }
                             />
                             <span>
-                                {t(
-                                    "partner.pending.contract_sign_acknowledge",
-                                )}
+                                {t("partner.pending.contract_sign_acknowledge")}
                             </span>
                         </label>
                     </div>
@@ -272,15 +286,15 @@ export const PartnerPendingPage: React.FC = () => {
                     )}
                     {currentUser.partnerStatus === "APPROVED" &&
                         currentUser.mandateContractStatus === "SIGNED" && (
-                        <Button
-                            variant="primary"
-                            onClick={() =>
-                                navigate({ name: "partner-dashboard" })
-                            }
-                        >
-                            {t("partner.pending.open_dashboard")}
-                        </Button>
-                    )}
+                            <Button
+                                variant="primary"
+                                onClick={() =>
+                                    navigate({ name: "partner-dashboard" })
+                                }
+                            >
+                                {t("partner.pending.open_dashboard")}
+                            </Button>
+                        )}
                     <Button
                         variant="ghost"
                         onClick={() => navigate({ name: "home" })}

@@ -205,11 +205,17 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.field.open_current_contract": "Ouvrir le contrat actuel",
         "admin.users.field.contract_hint":
             "Validation admin : {validated} · Signature : {signed}",
+        "admin.users.field.contract_text": "Contrat à lire et signer",
+        "admin.users.field.contract_text_placeholder":
+            "Collez ici le texte du contrat partenaire...",
+        "admin.users.field.contract_text_hint":
+            "Dès qu'un texte est renseigné, le partenaire pourra le lire sur sa page de signature.",
         "admin.users.field.upload_contract_pdf": "Téléverser un contrat PDF",
         "admin.users.field.upload_pdf": "Téléverser le PDF",
         "admin.users.field.uploading": "Téléversement...",
         "admin.users.field.reset": "Réinitialiser",
         "admin.users.field.reason": "Motif",
+        "admin.users.field.permissions": "Permissions",
         "admin.users.placeholder.first_name": "Prénom",
         "admin.users.placeholder.last_name": "Nom",
         "admin.users.placeholder.email": "Email",
@@ -248,6 +254,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.toast.account_created": "Compte créé.",
         "admin.users.toast.account_create_error":
             "Erreur lors de la création du compte.",
+        "admin.users.toast.password_reset": "Mot de passe réinitialisé.",
+        "admin.users.toast.password_reset_error":
+            "Erreur lors de la réinitialisation du mot de passe.",
         "admin.users.toast.quick_action_error":
             "Erreur lors de l'action rapide.",
         "admin.users.error.commission_range":
@@ -256,12 +265,41 @@ export function buildAdminFrTranslations(): Record<string, string> {
             "L'identifiant Stripe doit commencer par acct_.",
         "admin.users.error.general_required":
             "Prénom, nom et email sont obligatoires.",
+        "admin.users.error.password_length":
+            "Le mot de passe doit contenir au moins 8 caractères.",
         "admin.users.error.pdf_required":
             "Veuillez sélectionner un fichier PDF.",
         "admin.users.error.create_required":
             "Prénom, nom, email et mot de passe sont obligatoires.",
         "admin.users.error.company_required":
             "Le nom de la société est obligatoire pour un partenaire.",
+        "admin.users.password_reset.action": "Mot de passe",
+        "admin.users.password_reset.badge": "Sécurité",
+        "admin.users.password_reset.title":
+            "Réinitialiser le mot de passe de {name}",
+        "admin.users.password_reset.subtitle":
+            "Laissez le champ vide pour générer automatiquement un mot de passe temporaire.",
+        "admin.users.password_reset.placeholder":
+            "Nouveau mot de passe temporaire",
+        "admin.users.password_reset.generated": "Mot de passe temporaire",
+        "admin.users.password_reset.confirm": "Réinitialiser",
+        "admin.users.contract_template.title": "Contrat partenaire global",
+        "admin.users.contract_template.subtitle":
+            "Modifiez le contrat une seule fois. La sauvegarde applique le texte à tous les comptes partenaires et redemande leur signature.",
+        "admin.users.contract_template.import_md": "Importer un fichier .md",
+        "admin.users.contract_template.placeholder":
+            "Collez ici le contrat partenaire au format Markdown...",
+        "admin.users.contract_template.apply_hint":
+            "La sauvegarde remplace le contrat de tous les partenaires.",
+        "admin.users.contract_template.save": "Appliquer à tous",
+        "admin.users.contract_template.saved":
+            "Contrat appliqué à {count} partenaires.",
+        "admin.users.contract_template.save_error":
+            "Erreur lors de la mise à jour du contrat global.",
+        "admin.users.contract_template.required":
+            "Le contrat global ne peut pas être vide.",
+        "admin.users.contract_template.md_required":
+            "Veuillez sélectionner un fichier Markdown .md.",
         "admin.users.csv.company": "société",
         "admin.users.csv.first_name": "prénom",
         "admin.users.documents.title": "{count} documents partenaires",
@@ -283,6 +321,15 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.users.documents.review_success": "Document mis à jour.",
         "admin.users.documents.review_error":
             "Erreur lors de la mise à jour du document.",
+        "admin.users.compliance.title": "Synthèse conformité partenaire",
+        "admin.users.compliance.complete": "Dossiers complets",
+        "admin.users.compliance.attention": "À surveiller",
+        "admin.users.compliance.pending_documents": "Documents à revoir",
+        "admin.users.compliance.blocking_documents": "Documents bloquants",
+        "admin.users.compliance.card_complete": "Conformité prête",
+        "admin.users.compliance.card_attention": "Conformité à compléter",
+        "admin.users.compliance.card_counts":
+            "{validated} validé(s) · {pending} en revue · {blocked} bloquant(s)",
         "admin.users.audit.title": "{count} événements audit",
         "admin.users.audit.subtitle":
             "Suivez les actions sensibles sur les partenaires, documents et services.",
@@ -401,6 +448,12 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.services.fareharbor.last_error": "Dernière erreur :",
         "admin.services.fareharbor.toast.sync_all_partial":
             "{failed} synchronisations sur {total} ont échoué.",
+        "admin.services.fareharbor.failures.title":
+            "Synchronisations échouées ({count})",
+        "admin.services.fareharbor.failures.subtitle":
+            "Causes retournées par le connecteur",
+        "admin.services.fareharbor.failures.no_error":
+            "Aucune cause détaillée enregistrée.",
 
         "admin.services.toast.activated": "Service activé.",
         "admin.services.toast.deactivated": "Service désactivé.",
@@ -608,6 +661,9 @@ export function buildAdminFrTranslations(): Record<string, string> {
             "Filtrer par statut de réservation",
         "admin.transactions.filter.payment_status":
             "Filtrer par statut de paiement",
+        "admin.transactions.filter.payout_status":
+            "Filtrer par statut de règlement",
+        "admin.transactions.filter.payout_all": "Tous les statuts de règlement",
         "admin.transactions.filter.provider_status":
             "Filtrer par statut prestataire",
         "admin.transactions.filter.provider_all":
@@ -617,6 +673,11 @@ export function buildAdminFrTranslations(): Record<string, string> {
             "Réf., client, service, partenaire, erreur externe",
         "admin.transactions.no_match":
             "Aucune transaction ne correspond aux critères.",
+        "admin.transactions.official_totals":
+            "Totaux de règlement calculés côté serveur sur les réservations confirmées non remboursées.",
+        "admin.transactions.export_csv": "Exporter CSV",
+        "admin.transactions.export_error":
+            "Impossible de générer l'export financier.",
 
         "admin.transactions.col.id": "Réf.",
         "admin.transactions.col.date": "Date",
@@ -627,13 +688,29 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.col.rate": "Taux",
         "admin.transactions.col.commission": "Commission",
         "admin.transactions.col.provider": "Prestataire",
+        "admin.transactions.col.billing": "Facturation",
         "admin.transactions.col.bookings": "Réservations",
         "admin.transactions.col.stripe_id": "ID Stripe",
+        "admin.transactions.col.payout_status": "Règlement",
+        "admin.transactions.col.actions": "Actions",
 
         "admin.transactions.total.volume": "Volume total d'affaires",
         "admin.transactions.total.commissions": "Total commissions",
         "admin.transactions.total.partner_net": "Net partenaires",
         "admin.transactions.total.online_collected": "Collecté en ligne",
+        "admin.transactions.risk.title": "Réservations à risque",
+        "admin.transactions.risk.subtitle":
+            "Isolez les réservations qui demandent une action support, finance ou prestataire avant règlement.",
+        "admin.transactions.risk.total": "{count} point(s) à traiter",
+        "admin.transactions.risk.attention": "Actions requises",
+        "admin.transactions.risk.attention_sub":
+            "Erreurs externes ou payouts bloqués",
+        "admin.transactions.risk.external": "Erreurs prestataire",
+        "admin.transactions.risk.external_sub":
+            "Création ou confirmation externe en échec",
+        "admin.transactions.risk.payout": "Payouts bloqués",
+        "admin.transactions.risk.payout_sub":
+            "{pending} payout(s) confirmé(s) encore à régler",
 
         "admin.transactions.booking.confirmed": "Confirmée",
         "admin.transactions.booking.pending": "En attente",
@@ -641,6 +718,21 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.transactions.payment.paid": "Payé",
         "admin.transactions.payment.pending": "En attente",
         "admin.transactions.payment.refunded": "Remboursé",
+        "admin.transactions.payout.pending": "À régler",
+        "admin.transactions.payout.on_hold": "Bloqué",
+        "admin.transactions.payout.scheduled": "Planifié",
+        "admin.transactions.payout.paid": "Réglé",
+        "admin.transactions.payout.failed": "Échec",
+        "admin.transactions.payout.mark_hold": "Bloquer",
+        "admin.transactions.payout.mark_paid": "Marquer réglé",
+        "admin.transactions.payout.update_success":
+            "Statut de règlement mis à jour.",
+        "admin.transactions.payout.update_error":
+            "Impossible de mettre à jour le règlement.",
+        "admin.transactions.payout.default_hold_note":
+            "Bloqué depuis l'admin finance.",
+        "admin.transactions.payout.default_paid_note":
+            "Marqué comme réglé depuis l'admin finance.",
         "admin.transactions.external.label": "Statut prestataire",
         "admin.transactions.external.confirmed": "Prestataire confirmé",
         "admin.transactions.external.failed": "Prestataire en échec",
@@ -675,6 +767,28 @@ export function buildAdminFrTranslations(): Record<string, string> {
         "admin.dashboard.metric.catalog": "Catalogue actif",
         "admin.dashboard.metric.catalog_sub":
             "{partners} partenaire(s) valides · {reviews} avis en attente",
+        "admin.dashboard.operations.title": "File d'actions opérationnelles",
+        "admin.dashboard.operations.subtitle":
+            "Priorisez les validations, documents, services, paiements et incidents qui demandent une intervention admin.",
+        "admin.dashboard.operations.total": "{count} point(s) à traiter",
+        "admin.dashboard.operations.partner_onboarding":
+            "Onboarding partenaire",
+        "admin.dashboard.operations.partner_onboarding_sub":
+            "{contracts} contrat(s) à signer",
+        "admin.dashboard.operations.documents": "Documents conformité",
+        "admin.dashboard.operations.documents_sub":
+            "{blocked} document(s) bloquant(s)",
+        "admin.dashboard.operations.services": "Services en revue",
+        "admin.dashboard.operations.services_sub":
+            "{blocked} service(s) rejeté(s) ou suspendu(s)",
+        "admin.dashboard.operations.finance": "Payouts à risque",
+        "admin.dashboard.operations.finance_sub":
+            "{pending} payout(s) confirmé(s) en attente",
+        "admin.dashboard.operations.reviews": "Avis clients",
+        "admin.dashboard.operations.reviews_sub": "Modération des avis",
+        "admin.dashboard.operations.external": "Réservations externes",
+        "admin.dashboard.operations.external_sub":
+            "Erreurs prestataire à vérifier",
 
         // Admin Dashboard Funnel
         "admin.dashboard.funnel.title": "Funnel produit",

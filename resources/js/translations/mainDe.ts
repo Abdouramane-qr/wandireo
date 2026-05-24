@@ -22,7 +22,8 @@ export function buildMainDeTranslations(): Record<string, string> {
         "common.back_home": "Zurück zur Startseite",
         "common.platform": "Plattform",
         "common.sidebar": "Seitenleiste",
-        "common.sidebar_mobile_description": "Zeigt die mobile Seitenleiste an.",
+        "common.sidebar_mobile_description":
+            "Zeigt die mobile Seitenleiste an.",
         "common.toggle_sidebar": "Seitenleiste umschalten",
         "common.previous_page": "Vorherige Seite",
         "common.next_page": "Nächste Seite",
@@ -72,10 +73,19 @@ export function buildMainDeTranslations(): Record<string, string> {
         "footer.services": "Services",
         "footer.how_it_works": "Wie es funktioniert",
         "footer.help": "Hilfebereich",
+        "footer.help_center": "Hilfebereich",
+        "footer.whatsapp": "WhatsApp",
+        "footer.faq": "FAQ",
         "footer.legal": "Rechtliches",
         "footer.contact": "Kontakt",
         "footer.booking_email": "booking@wandireo.com",
         "footer.rights": "Alle Rechte vorbehalten.",
+        "footer.terms": "Nutzungsbedingungen",
+        "footer.privacy": "Datenschutzerklärung",
+        "footer.legal_notice": "Impressum",
+        "footer.copyright": "Wandireo. Alle Rechte vorbehalten.",
+        "footer.logo_aria": "Wandireo - Zur Startseite",
+        "footer.socials": "Soziale Netzwerke",
         "footer.social.whatsapp": "WhatsApp",
         "footer.social.instagram": "Instagram",
         "footer.social.tiktok": "TikTok",
@@ -96,7 +106,8 @@ export function buildMainDeTranslations(): Record<string, string> {
         "checkout.steps.payment": "Zahlung",
         "checkout.steps.confirmation": "Bestätigung",
         "checkout.title": "Reisendeninformationen",
-        "checkout.subtitle": "Diese Angaben werden an den Anbieter übermittelt, um Ihre Buchung vorzubereiten.",
+        "checkout.subtitle":
+            "Diese Angaben werden an den Anbieter übermittelt, um Ihre Buchung vorzubereiten.",
         "checkout.identity": "Identität",
         "checkout.contact": "Kontaktdaten",
         "checkout.special_requests": "Besondere Wünsche",
@@ -104,15 +115,19 @@ export function buildMainDeTranslations(): Record<string, string> {
         "checkout.first_name": "Vorname",
         "checkout.last_name": "Nachname",
         "checkout.nationality": "Nationalität",
-        "checkout.nationality_placeholder": "z. B. Französisch, Belgisch, Schweizerisch...",
+        "checkout.nationality_placeholder":
+            "z. B. Französisch, Belgisch, Schweizerisch...",
         "checkout.email": "E-Mail-Adresse",
         "checkout.email_placeholder": "ihre@email.de",
-        "checkout.email_hint": "Die Buchungsbestätigung wird an diese Adresse gesendet.",
+        "checkout.email_hint":
+            "Die Buchungsbestätigung wird an diese Adresse gesendet.",
         "checkout.phone": "Telefon",
         "checkout.phone_placeholder": "+49 151 234 56789",
-        "checkout.phone_hint": "Hilfreich bei kurzfristigen Änderungen am Aktivitätstag.",
+        "checkout.phone_hint":
+            "Hilfreich bei kurzfristigen Änderungen am Aktivitätstag.",
         "checkout.message_label": "Nachricht an den Anbieter",
-        "checkout.message_placeholder": "Allergien, Barrierefreiheit, Geburtstag, besondere Wünsche...",
+        "checkout.message_placeholder":
+            "Allergien, Barrierefreiheit, Geburtstag, besondere Wünsche...",
         "checkout.back": "Zurück zum Warenkorb",
         "checkout.continue": "Weiter — Zahlung",
         "checkout.order": "Ihre Buchung",
@@ -122,8 +137,10 @@ export function buildMainDeTranslations(): Record<string, string> {
         "checkout.total_vat": "Gesamt inkl. MwSt.",
         "checkout.errors.first_name": "Der Vorname ist erforderlich.",
         "checkout.errors.last_name": "Der Nachname ist erforderlich.",
-        "checkout.errors.email_required": "Die E-Mail-Adresse ist erforderlich.",
-        "checkout.errors.email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+        "checkout.errors.email_required":
+            "Die E-Mail-Adresse ist erforderlich.",
+        "checkout.errors.email_invalid":
+            "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
         "checkout.errors.phone": "Die Telefonnummer ist erforderlich.",
         "checkout.errors.nationality": "Die Nationalität ist erforderlich.",
 
@@ -131,7 +148,8 @@ export function buildMainDeTranslations(): Record<string, string> {
         "payment.steps.information": "Informationen",
         "payment.steps.confirmation": "Bestätigung",
         "payment.title": "Buchung abschließen",
-        "payment.subtitle": "Dieser Schritt bestätigt die Buchung und speichert den vom Server validierten Betrag.",
+        "payment.subtitle":
+            "Dieser Schritt bestätigt die Buchung und speichert den vom Server validierten Betrag.",
         "payment.summary_title": "Bestätigungsübersicht",
         "payment.traveler": "Reisender",
         "payment.email": "E-Mail",
@@ -141,8 +159,10 @@ export function buildMainDeTranslations(): Record<string, string> {
         "payment.pay_later": "Später zu zahlen",
         "payment.pay_now": "Jetzt zu zahlen",
         "payment.syncing": "Betrag wird mit dem Server geprüft...",
-        "payment.sync_error": "Der Betrag konnte nicht erneut mit dem Server geprüft werden.",
-        "payment.submit_error": "Die Buchung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+        "payment.sync_error":
+            "Der Betrag konnte nicht erneut mit dem Server geprüft werden.",
+        "payment.submit_error":
+            "Die Buchung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
         "payment.back": "Zurück",
         "payment.confirming": "Speichern...",
         "payment.verifying": "Prüfung...",
@@ -156,7 +176,8 @@ export function buildMainDeTranslations(): Record<string, string> {
         "confirmation.empty": "Keine Bestätigung für die Referenz gefunden",
         "confirmation.back_home": "Zurück zur Startseite",
         "confirmation.title": "Buchung bestätigt!",
-        "confirmation.subtitle": "Ihre Buchung wurde erfolgreich registriert. Eine Zusammenfassung wird gesendet an",
+        "confirmation.subtitle":
+            "Ihre Buchung wurde erfolgreich registriert. Eine Zusammenfassung wird gesendet an",
         "confirmation.reference": "Referenz",
         "confirmation.stay": "Ihr Aufenthalt",
         "confirmation.start_date": "Startdatum",
@@ -184,11 +205,14 @@ export function buildMainDeTranslations(): Record<string, string> {
         "confirmation.payment_received": "Zahlung erhalten",
         "confirmation.next_steps": "Nächste Schritte",
         "confirmation.next1_title": "E-Mail-Bestätigung",
-        "confirmation.next1_desc": "Eine vollständige Zusammenfassung wird innerhalb weniger Minuten an Ihre E-Mail-Adresse gesendet.",
+        "confirmation.next1_desc":
+            "Eine vollständige Zusammenfassung wird innerhalb weniger Minuten an Ihre E-Mail-Adresse gesendet.",
         "confirmation.next2_title": "Kontakt durch den Anbieter",
-        "confirmation.next2_desc": "Der Anbieter wird Sie innerhalb von 24 Stunden kontaktieren, um die Details abzustimmen.",
+        "confirmation.next2_desc":
+            "Der Anbieter wird Sie innerhalb von 24 Stunden kontaktieren, um die Details abzustimmen.",
         "confirmation.next3_title": "Genießen Sie Ihr Erlebnis",
-        "confirmation.next3_desc": "Jetzt müssen Sie nur noch Ihre Koffer packen.",
+        "confirmation.next3_desc":
+            "Jetzt müssen Sie nur noch Ihre Koffer packen.",
         "confirmation.discover_more": "Weitere Aktivitäten entdecken",
     };
 }

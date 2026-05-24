@@ -6,13 +6,13 @@
  * du meme domaine. Aucun token n'est stocke dans le navigateur.
  */
 
-import axios from 'axios';
-import { getBrowserLocale } from '@/lib/locale';
+import axios from "axios";
+import { getBrowserLocale } from "@/lib/locale";
 
-const SESSION_KEY = 'wandireo-session-id';
+const SESSION_KEY = "wandireo-session-id";
 
 function getBrowserSessionId(): string | null {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
         return null;
     }
 
@@ -23,7 +23,7 @@ function getBrowserSessionId(): string | null {
     }
 
     const next =
-        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
             ? crypto.randomUUID()
             : `wandireo-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
@@ -33,23 +33,27 @@ function getBrowserSessionId(): string | null {
 }
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
     timeout: 15_000,
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
     },
 });
 
 api.interceptors.request.use((config) => {
     const sessionId = getBrowserSessionId();
 
-    if (sessionId) {
-        config.headers['X-Wandireo-Session'] = sessionId;
+    if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
     }
 
-    config.headers['Accept-Language'] = getBrowserLocale();
+    if (sessionId) {
+        config.headers["X-Wandireo-Session"] = sessionId;
+    }
+
+    config.headers["Accept-Language"] = getBrowserLocale();
 
     return config;
 });

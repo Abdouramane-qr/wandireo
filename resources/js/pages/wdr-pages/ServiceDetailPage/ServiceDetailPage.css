@@ -215,6 +215,19 @@
     margin-bottom: 0.75rem;
 }
 
+.wdr-detail__trust-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.65rem;
+    border: 1px solid color-mix(in srgb, var(--success) 35%, #cfe8d8);
+    background: color-mix(in srgb, var(--success) 10%, #ffffff);
+    color: var(--success-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 99px;
+}
+
 .wdr-detail__title {
     font-size: clamp(1.5rem, 3vw, 2.25rem);
     font-weight: 700;

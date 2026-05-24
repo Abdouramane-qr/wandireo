@@ -231,6 +231,56 @@
     margin: 0;
 }
 
+.wdr-partner-dash__section-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   Finance partenaire
+   ============================================================ */
+
+.wdr-partner-dash__finance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.wdr-partner-dash__finance-card {
+    background: var(--bg-elevated);
+    border: var(--card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: 1rem 1.1rem;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.wdr-partner-dash__finance-card--net {
+    border-color: color-mix(in srgb, var(--success) 30%, var(--border-light));
+    background: color-mix(in srgb, var(--success) 7%, var(--bg-elevated));
+}
+
+.wdr-partner-dash__finance-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.wdr-partner-dash__finance-value {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    color: var(--text-main);
+    overflow-wrap: anywhere;
+}
+
+.wdr-partner-dash__finance-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
 /* ============================================================
    Acces rapides
    ============================================================ */
@@ -513,6 +563,10 @@
     .wdr-partner-dash__overview-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    .wdr-partner-dash__finance-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 @media (max-width: 400px) {
@@ -522,5 +576,55 @@
 
     .wdr-partner-dash__overview-grid {
         grid-template-columns: 1fr;
+    }
+
+    .wdr-partner-dash__finance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-partner-dash__stats,
+.wdr-partner-dash__finance-grid,
+.wdr-partner-dash__overview-grid,
+.wdr-partner-dash__shortcut-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.wdr-partner-dash__stat-card,
+.wdr-partner-dash__finance-card,
+.wdr-partner-dash__overview-card,
+.wdr-partner-dash__shortcut-card,
+.wdr-partner-dash__activity-item,
+.wdr-partner-dash__activity-meta,
+.wdr-partner-dash__activity-footer {
+    min-width: 0;
+}
+
+.wdr-partner-dash__stat-value,
+.wdr-partner-dash__stat-label,
+.wdr-partner-dash__activity-service,
+.wdr-partner-dash__activity-date,
+.wdr-partner-dash__shortcut-title,
+.wdr-partner-dash__shortcut-sub {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+@media (max-width: 480px) {
+    .wdr-partner-dash__hero-right,
+    .wdr-partner-dash__shortcut-card,
+    .wdr-partner-dash__activity-meta,
+    .wdr-partner-dash__activity-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .wdr-partner-dash__shortcut-badge,
+    .wdr-partner-dash__activity-status {
+        align-self: flex-start;
     }
 }

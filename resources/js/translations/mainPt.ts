@@ -79,10 +79,19 @@ export function buildMainPtTranslations(): Record<string, string> {
         "footer.services": "Serviços",
         "footer.how_it_works": "Como funciona",
         "footer.help": "Centro de Ajuda",
+        "footer.help_center": "Centro de ajuda",
+        "footer.whatsapp": "WhatsApp",
+        "footer.faq": "FAQ",
         "footer.legal": "Legal",
         "footer.contact": "Contacto",
         "footer.booking_email": "booking@wandireo.com",
         "footer.rights": "Todos os direitos reservados.",
+        "footer.terms": "Termos de utilização",
+        "footer.privacy": "Política de privacidade",
+        "footer.legal_notice": "Aviso legal",
+        "footer.copyright": "Wandireo. Todos os direitos reservados.",
+        "footer.logo_aria": "Wandireo - Voltar ao início",
+        "footer.socials": "Redes sociais",
         "footer.social.whatsapp": "WhatsApp",
         "footer.social.instagram": "Instagram",
         "footer.social.tiktok": "TikTok",
@@ -96,8 +105,7 @@ export function buildMainPtTranslations(): Record<string, string> {
         "welcome.description":
             "O Laravel tem um ecossistema extremamente rico. Sugerimos começar pelos seguintes recursos.",
         "welcome.read_docs_prefix": "Ler a",
-        "welcome.watch_tutorials_prefix":
-            "Ver tutoriais em vídeo no",
+        "welcome.watch_tutorials_prefix": "Ver tutoriais em vídeo no",
         "welcome.deploy_now": "Fazer deploy agora",
         "password.show": "Mostrar palavra-passe",
         "password.hide": "Ocultar palavra-passe",
@@ -131,25 +139,18 @@ export function buildMainPtTranslations(): Record<string, string> {
             "Foi enviado um novo link de verificação para o seu endereço de email.",
         "settings.profile.save_button": "Guardar",
         "settings.security.page_title": "Definições de segurança",
-        "settings.security.password_title":
-            "Atualizar a palavra-passe",
+        "settings.security.password_title": "Atualizar a palavra-passe",
         "settings.security.password_description":
             "Utilize uma palavra-passe longa e difícil de adivinhar para proteger a sua conta",
-        "settings.security.current_password_label":
-            "Palavra-passe atual",
-        "settings.security.current_password_placeholder":
-            "Palavra-passe atual",
+        "settings.security.current_password_label": "Palavra-passe atual",
+        "settings.security.current_password_placeholder": "Palavra-passe atual",
         "settings.security.new_password_label": "Nova palavra-passe",
-        "settings.security.new_password_placeholder":
-            "Nova palavra-passe",
-        "settings.security.confirm_password_label":
-            "Confirmar a palavra-passe",
+        "settings.security.new_password_placeholder": "Nova palavra-passe",
+        "settings.security.confirm_password_label": "Confirmar a palavra-passe",
         "settings.security.confirm_password_placeholder":
             "Confirmar a palavra-passe",
-        "settings.security.save_password_button":
-            "Guardar a palavra-passe",
-        "settings.security.two_factor_title":
-            "Autenticação de dois fatores",
+        "settings.security.save_password_button": "Guardar a palavra-passe",
+        "settings.security.two_factor_title": "Autenticação de dois fatores",
         "settings.security.two_factor_description":
             "Gira as definições da sua autenticação de dois fatores",
         "settings.security.two_factor_enabled_message":
@@ -160,8 +161,7 @@ export function buildMainPtTranslations(): Record<string, string> {
         "settings.security.continue_setup": "Continuar configuração",
         "settings.security.enable_two_factor": "Ativar 2FA",
         "settings.appearance.page_title": "Definições de aparência",
-        "settings.appearance.heading_title":
-            "Definições de aparência",
+        "settings.appearance.heading_title": "Definições de aparência",
         "settings.appearance.heading_description":
             "Atualize as definições visuais da sua conta",
         "auth.two_factor.setup.enabled_title":
@@ -176,24 +176,18 @@ export function buildMainPtTranslations(): Record<string, string> {
             "Ativar a autenticação de dois fatores",
         "auth.two_factor.setup.enable_description":
             "Para concluir a ativação da autenticação de dois fatores, digitalize o código QR ou introduza a chave de configuração na sua aplicação autenticadora",
-        "auth.two_factor.setup.manual_or":
-            "ou introduza o código manualmente",
+        "auth.two_factor.setup.manual_or": "ou introduza o código manualmente",
         "auth.two_factor.setup.close_button": "Fechar",
         "auth.two_factor.setup.continue_button": "Continuar",
-        "auth.two_factor.recovery_codes.title":
-            "Códigos de recuperação 2FA",
+        "auth.two_factor.recovery_codes.title": "Códigos de recuperação 2FA",
         "auth.two_factor.recovery_codes.description":
             "Os códigos de recuperação permitem-lhe recuperar o acesso se perder o seu dispositivo 2FA. Guarde-os num gestor de palavras-passe seguro.",
-        "auth.two_factor.recovery_codes.view":
-            "Ver códigos de recuperação",
-        "auth.two_factor.recovery_codes.hide":
-            "Ocultar códigos de recuperação",
-        "auth.two_factor.recovery_codes.regenerate":
-            "Regenerar códigos",
+        "auth.two_factor.recovery_codes.view": "Ver códigos de recuperação",
+        "auth.two_factor.recovery_codes.hide": "Ocultar códigos de recuperação",
+        "auth.two_factor.recovery_codes.regenerate": "Regenerar códigos",
         "auth.two_factor.recovery_codes.regenerate_help":
             "Cada código de recuperação pode ser utilizado uma vez para aceder à sua conta e será removido após a utilização. Se precisar de mais, clique em Regenerar códigos acima.",
-        "auth.two_factor.recovery_codes.list_aria":
-            "Códigos de recuperação",
+        "auth.two_factor.recovery_codes.list_aria": "Códigos de recuperação",
         "auth.two_factor.recovery_codes.loading_aria":
             "A carregar códigos de recuperação",
     };

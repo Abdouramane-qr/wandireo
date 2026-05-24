@@ -77,8 +77,9 @@ function buildInitialCategories(
         VOITURE: false,
     };
 
-    if (urlCategory && urlCategory in initial) {
-        initial[urlCategory as ServiceCategory] = true;
+    const upperCategory = urlCategory?.toUpperCase();
+    if (upperCategory && upperCategory in initial) {
+        initial[upperCategory as ServiceCategory] = true;
     }
 
     return initial;
@@ -91,8 +92,9 @@ function hasActiveCategory(
 }
 
 function buildInitialVertical(urlCategory: string): SearchVertical {
-    return ALL_CATEGORIES.includes(urlCategory as ServiceCategory)
-        ? (urlCategory as ServiceCategory)
+    const upperCategory = urlCategory?.toUpperCase();
+    return ALL_CATEGORIES.includes(upperCategory as ServiceCategory)
+        ? (upperCategory as ServiceCategory)
         : "ALL";
 }
 
@@ -449,11 +451,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
     const destinationOptions = useMemo(() => {
         return buildPublicDestinationOptions(allServices).sort((a, b) => {
-            if (a.country === "Algarve") {
+            if (a.country === "Portugal" && a.region === "Algarve") {
                 return -1;
             }
 
-            if (b.country === "Algarve") {
+            if (b.country === "Portugal" && b.region === "Algarve") {
                 return 1;
             }
 
@@ -1006,15 +1008,24 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                             <option value="">
                                 {t("search.all_destinations")}
                             </option>
-                            {destinationOptions.map(({ country, cities }) => (
-                                <optgroup key={country} label={country}>
-                                    {cities.map((city) => (
-                                        <option key={city} value={city}>
-                                            {city}
-                                        </option>
-                                    ))}
-                                </optgroup>
-                            ))}
+                            {destinationOptions.map(
+                                ({ country, region, cities }) => (
+                                    <optgroup
+                                        key={`${country}-${region ?? ""}`}
+                                        label={
+                                            region
+                                                ? `${country} - ${region}`
+                                                : country
+                                        }
+                                    >
+                                        {cities.map((city) => (
+                                            <option key={city} value={city}>
+                                                {city}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                ),
+                            )}
                         </select>
                     </div>
 

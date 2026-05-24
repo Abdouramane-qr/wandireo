@@ -3,6 +3,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 interface DestinationOption {
     country: string;
+    region?: string;
     cities: string[];
 }
 
@@ -134,15 +135,24 @@ export function SearchBar({
                         aria-label={t("home.destination")}
                     >
                         <option value="">{t("search.all_destinations")}</option>
-                        {destinationOptions.map(({ country, cities }) => (
-                            <optgroup key={country} label={country}>
-                                {cities.map((city) => (
-                                    <option key={city} value={city}>
-                                        {city}
-                                    </option>
-                                ))}
-                            </optgroup>
-                        ))}
+                        {destinationOptions.map(
+                            ({ country, region, cities }) => (
+                                <optgroup
+                                    key={`${country}-${region ?? ""}`}
+                                    label={
+                                        region
+                                            ? `${country} - ${region}`
+                                            : country
+                                    }
+                                >
+                                    {cities.map((city) => (
+                                        <option key={city} value={city}>
+                                            {city}
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            ),
+                        )}
                     </select>
                 </div>
             </div>
@@ -224,7 +234,9 @@ export function SearchBar({
                     <select
                         className="wdr-home__sfield-input wdr-home__sfield-select"
                         value={category}
-                        onChange={(event) => onCategoryChange(event.target.value)}
+                        onChange={(event) =>
+                            onCategoryChange(event.target.value)
+                        }
                         aria-label={t("home.category")}
                     >
                         {categoryOptions.map((option) => (

@@ -1,0 +1,184 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e148]:
+    - banner [ref=e149]:
+      - generic [ref=e150]:
+        - link "Wandireo - Retour à l'accueil" [ref=e151] [cursor=pointer]:
+          - /url: /fr
+          - img [ref=e152]
+        - navigation "Navigation principale" [ref=e153]:
+          - link "Recherche" [ref=e154] [cursor=pointer]:
+            - /url: /fr/recherche
+          - link "Activités" [ref=e155] [cursor=pointer]:
+            - /url: /fr/recherche?category=ACTIVITE
+          - link "Bateaux" [ref=e156] [cursor=pointer]:
+            - /url: /fr/recherche?category=BATEAU
+          - link "Hébergements" [ref=e157] [cursor=pointer]:
+            - /url: /fr/recherche?category=HEBERGEMENT
+          - link "Voitures" [ref=e158] [cursor=pointer]:
+            - /url: /fr/recherche?category=VOITURE
+          - link "Blog" [ref=e159] [cursor=pointer]:
+            - /url: /fr/blog
+        - generic [ref=e160]:
+          - button "Recherche" [ref=e162] [cursor=pointer]:
+            - img [ref=e163]
+          - generic [ref=e166]:
+            - button "Changer de thème" [ref=e168] [cursor=pointer]:
+              - img [ref=e169]
+            - button "FR" [ref=e172] [cursor=pointer]:
+              - img [ref=e173]
+              - generic [ref=e176]: FR
+          - button "Devenir partenaire" [ref=e178] [cursor=pointer]:
+            - generic [ref=e179]: Devenir partenaire
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - generic [ref=e182]: C
+              - generic [ref=e183]: Client
+            - button "Déconnexion" [ref=e184] [cursor=pointer]:
+              - generic [ref=e185]: Déconnexion
+    - main [ref=e186]:
+      - generic [ref=e187]:
+        - region "Espace voyageur" [ref=e188]:
+          - generic [ref=e189]:
+            - generic [ref=e190]:
+              - paragraph [ref=e191]: Votre espace voyageur
+              - heading "Client" [level=1] [ref=e192]
+              - paragraph [ref=e193]: Compte créé le 12 avril 2026
+            - generic "Profil de Client Demo" [ref=e194]: CD
+        - generic [ref=e195]:
+          - region "Résumé de votre activité" [ref=e196]:
+            - generic [ref=e197]:
+              - img [ref=e199]
+              - generic [ref=e201]:
+                - generic [ref=e202]: "0"
+                - generic [ref=e203]: réservations à venir
+            - generic [ref=e204]:
+              - img [ref=e206]
+              - generic [ref=e208]:
+                - generic [ref=e209]: "2"
+                - generic [ref=e210]: réservations effectuées
+            - generic [ref=e211]:
+              - img [ref=e213]
+              - generic [ref=e216]:
+                - generic [ref=e217]: 93 360 €
+                - generic [ref=e218]: Réglé en ligne
+          - region "Vos prochaines réservations" [ref=e219]:
+            - generic [ref=e220]:
+              - heading "Vos prochaines réservations" [level=2] [ref=e221]
+              - button "Tout voir" [ref=e222] [cursor=pointer]:
+                - text: Tout voir
+                - img [ref=e223]
+            - generic [ref=e225]:
+              - img [ref=e227]
+              - paragraph [ref=e230]: Aucune réservation à venir
+              - paragraph [ref=e231]: Explorez le catalogue pour préparer votre prochaine expérience.
+              - button "Explorer les activités" [ref=e232] [cursor=pointer]:
+                - generic [ref=e233]: Explorer les activités
+          - region "Accès rapides" [ref=e234]:
+            - heading "Accès rapides" [level=2] [ref=e235]
+            - generic [ref=e236]:
+              - button "Historique des réservations Retrouvez vos confirmations, vos statuts et vos détails de réservation." [ref=e237] [cursor=pointer]:
+                - img [ref=e239]
+                - generic [ref=e240]:
+                  - generic [ref=e241]: Historique des réservations
+                  - generic [ref=e242]: Retrouvez vos confirmations, vos statuts et vos détails de réservation.
+                - img [ref=e243]
+              - button "Profil voyageur Mettez à jour vos informations et vos préférences de voyage." [ref=e245] [cursor=pointer]:
+                - img [ref=e247]
+                - generic [ref=e250]:
+                  - generic [ref=e251]: Profil voyageur
+                  - generic [ref=e252]: Mettez à jour vos informations et vos préférences de voyage.
+                - img [ref=e253]
+          - button "Déconnexion" [ref=e256] [cursor=pointer]:
+            - generic [ref=e257]: Déconnexion
+    - contentinfo [ref=e258]:
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e261]:
+            - link "footer.logo_aria" [ref=e262] [cursor=pointer]:
+              - /url: /fr
+              - img [ref=e263]
+            - paragraph [ref=e264]: Les meilleures expériences en Algarve.
+            - navigation "footer.socials" [ref=e265]:
+              - link "WhatsApp" [ref=e266] [cursor=pointer]:
+                - /url: https://wa.me/351928282231
+                - img [ref=e267]
+              - link "Instagram" [ref=e270] [cursor=pointer]:
+                - /url: https://www.instagram.com/experiences.algarve?igsh=aWVndGNpanA4cGVh&utm_source=qr
+                - img [ref=e271]
+              - link "TikTok" [ref=e274] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@experiences.algarve?_r=1&_t=ZN-94paV1xX9B0
+                - img [ref=e275]
+          - navigation "Explorer" [ref=e277]:
+            - heading "Explorer" [level=3] [ref=e278]
+            - list [ref=e279]:
+              - listitem [ref=e280]:
+                - link "Toutes les destinations" [ref=e281] [cursor=pointer]:
+                  - /url: /fr/recherche
+              - listitem [ref=e282]:
+                - link "Activités" [ref=e283] [cursor=pointer]:
+                  - /url: /fr/recherche?category=ACTIVITE
+              - listitem [ref=e284]:
+                - link "Bateaux & Nautisme" [ref=e285] [cursor=pointer]:
+                  - /url: /fr/recherche?category=BATEAU
+              - listitem [ref=e286]:
+                - link "Hébergements" [ref=e287] [cursor=pointer]:
+                  - /url: /fr/recherche?category=HEBERGEMENT
+              - listitem [ref=e288]:
+                - link "Location de voitures" [ref=e289] [cursor=pointer]:
+                  - /url: /fr/recherche?category=VOITURE
+              - listitem [ref=e290]:
+                - link "Le Blog Wandireo" [ref=e291] [cursor=pointer]:
+                  - /url: /fr/blog
+          - navigation "Services" [ref=e292]:
+            - heading "Services" [level=3] [ref=e293]
+            - list [ref=e294]:
+              - listitem [ref=e295]:
+                - link "Comment ça marche" [ref=e296] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e297]:
+                - link "Devenir partenaire" [ref=e298] [cursor=pointer]:
+                  - /url: /fr/partenaire/inscription
+              - listitem [ref=e299]:
+                - link "Connexion" [ref=e300] [cursor=pointer]:
+                  - /url: /fr/connexion
+              - listitem [ref=e301]:
+                - link "Inscription" [ref=e302] [cursor=pointer]:
+                  - /url: /fr/inscription
+          - navigation "Assistance" [ref=e303]:
+            - heading "Assistance" [level=3] [ref=e304]
+            - list [ref=e305]:
+              - listitem [ref=e306]:
+                - link "Centre d'aide" [ref=e307] [cursor=pointer]:
+                  - /url: /fr/guide
+              - listitem [ref=e308]:
+                - link "WhatsApp" [ref=e309] [cursor=pointer]:
+                  - /url: https://wa.me/351928282231
+              - listitem [ref=e310]:
+                - link "FAQ" [ref=e311] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e312]:
+                - link "booking@wandireo.com" [ref=e313] [cursor=pointer]:
+                  - /url: mailto:wandireo.bookings@gmail.com
+          - navigation "Légal" [ref=e314]:
+            - heading "Légal" [level=3] [ref=e315]
+            - list [ref=e316]:
+              - listitem [ref=e317]:
+                - link "Conditions d'utilisation" [ref=e318] [cursor=pointer]:
+                  - /url: /fr/conditions-utilisation
+              - listitem [ref=e319]:
+                - link "Politique de confidentialité" [ref=e320] [cursor=pointer]:
+                  - /url: /fr/politique-de-confidentialite
+              - listitem [ref=e321]:
+                - link "Mentions légales" [ref=e322] [cursor=pointer]:
+                  - /url: /fr/mentions-legales
+        - separator [ref=e323]
+        - generic [ref=e324]:
+          - paragraph [ref=e325]: 2026 Wandireo. Tous droits réservés.
+          - navigation "Légal" [ref=e326]:
+            - link "Conditions d'utilisation" [ref=e327] [cursor=pointer]:
+              - /url: /fr/conditions-utilisation
+            - link "Politique de confidentialité" [ref=e328] [cursor=pointer]:
+              - /url: /fr/politique-de-confidentialite
+            - link "Mentions légales" [ref=e329] [cursor=pointer]:
+              - /url: /fr/mentions-legales
+  - generic "Notifications"

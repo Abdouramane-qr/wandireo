@@ -28,7 +28,8 @@ export function buildMainFrTranslations(): Record<string, string> {
         "common.back_home": "Retour à l'accueil",
         "common.platform": "Plateforme",
         "common.sidebar": "Barre latérale",
-        "common.sidebar_mobile_description": "Affiche la barre latérale mobile.",
+        "common.sidebar_mobile_description":
+            "Affiche la barre latérale mobile.",
         "common.toggle_sidebar": "Basculer la barre latérale",
         "common.previous_page": "Page précédente",
         "common.next_page": "Page suivante",
@@ -90,6 +91,8 @@ export function buildMainFrTranslations(): Record<string, string> {
         "footer.privacy": "Politique de confidentialité",
         "footer.legal_notice": "Mentions légales",
         "footer.copyright": "Wandireo. Tous droits réservés.",
+        "footer.logo_aria": "Wandireo - Retour à l'accueil",
+        "footer.socials": "Réseaux sociaux",
         "footer.social.whatsapp": "WhatsApp",
         "footer.social.instagram": "Instagram",
         "footer.social.tiktok": "TikTok",
@@ -141,17 +144,13 @@ export function buildMainFrTranslations(): Record<string, string> {
         "settings.security.password_description":
             "Utilisez un mot de passe long et difficile à deviner pour sécuriser votre compte",
         "settings.security.current_password_label": "Mot de passe actuel",
-        "settings.security.current_password_placeholder":
-            "Mot de passe actuel",
+        "settings.security.current_password_placeholder": "Mot de passe actuel",
         "settings.security.new_password_label": "Nouveau mot de passe",
-        "settings.security.new_password_placeholder":
-            "Nouveau mot de passe",
-        "settings.security.confirm_password_label":
-            "Confirmer le mot de passe",
+        "settings.security.new_password_placeholder": "Nouveau mot de passe",
+        "settings.security.confirm_password_label": "Confirmer le mot de passe",
         "settings.security.confirm_password_placeholder":
             "Confirmer le mot de passe",
-        "settings.security.save_password_button":
-            "Enregistrer le mot de passe",
+        "settings.security.save_password_button": "Enregistrer le mot de passe",
         "settings.security.two_factor_title": "Double authentification",
         "settings.security.two_factor_description":
             "Gérez les réglages de votre double authentification",
@@ -178,8 +177,7 @@ export function buildMainFrTranslations(): Record<string, string> {
             "Activer la double authentification",
         "auth.two_factor.setup.enable_description":
             "Pour finaliser l'activation de la double authentification, scannez le QR code ou saisissez la clé de configuration dans votre application d'authentification",
-        "auth.two_factor.setup.manual_or":
-            "ou saisissez le code manuellement",
+        "auth.two_factor.setup.manual_or": "ou saisissez le code manuellement",
         "auth.two_factor.setup.close_button": "Fermer",
         "auth.two_factor.setup.continue_button": "Continuer",
         "auth.two_factor.recovery_codes.title": "Codes de récupération 2FA",
@@ -189,12 +187,10 @@ export function buildMainFrTranslations(): Record<string, string> {
             "Afficher les codes de récupération",
         "auth.two_factor.recovery_codes.hide":
             "Masquer les codes de récupération",
-        "auth.two_factor.recovery_codes.regenerate":
-            "Régénérer les codes",
+        "auth.two_factor.recovery_codes.regenerate": "Régénérer les codes",
         "auth.two_factor.recovery_codes.regenerate_help":
             "Chaque code de récupération peut être utilisé une seule fois pour accéder à votre compte puis est supprimé. Si vous en avez besoin de nouveaux, cliquez sur Régénérer les codes ci-dessus.",
-        "auth.two_factor.recovery_codes.list_aria":
-            "Codes de récupération",
+        "auth.two_factor.recovery_codes.list_aria": "Codes de récupération",
         "auth.two_factor.recovery_codes.loading_aria":
             "Chargement des codes de récupération",
     };

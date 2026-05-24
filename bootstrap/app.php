@@ -1,17 +1,19 @@
 <?php
 
-use App\Support\Locale;
+use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
-use App\Http\Middleware\SetSecurityHeaders;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetSecurityHeaders;
+use App\Support\Locale;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Sentry\Laravel\Integration;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -54,7 +56,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'locale']);
         $middleware->statefulApi();
 
-        $middleware->alias(['role' => EnsureRole::class]);
+        $middleware->alias([
+            'permission' => EnsurePermission::class,
+            'role' => EnsureRole::class,
+        ]);
 
         $middleware->throttleApi();
 
@@ -73,7 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Rapport Sentry (uniquement si le SDK est installé et le DSN configuré)
-        if (class_exists(\Sentry\Laravel\Integration::class)) {
-            \Sentry\Laravel\Integration::handles($exceptions);
+        if (class_exists(Integration::class)) {
+            Integration::handles($exceptions);
         }
     })->create();

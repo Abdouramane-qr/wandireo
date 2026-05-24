@@ -137,6 +137,52 @@
     max-width: 48rem;
 }
 
+.wdr-admin-users__contract-template {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-sm);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.wdr-admin-users__contract-file {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.wdr-admin-users__contract-file input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.wdr-admin-users__contract-template-textarea {
+    min-height: 18rem;
+    resize: vertical;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
 /* ============================================================
    Documents partenaires
    ============================================================ */
@@ -308,6 +354,51 @@
     gap: 1.5rem;
 }
 
+.wdr-admin-users__compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.wdr-admin-users__compliance-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    display: grid;
+    gap: 0.25rem;
+}
+
+.wdr-admin-users__compliance-card--ok {
+    border-color: color-mix(in srgb, var(--success) 35%, var(--border-light));
+    background: color-mix(in srgb, var(--success) 8%, var(--bg-elevated));
+}
+
+.wdr-admin-users__compliance-card--attention {
+    border-color: color-mix(in srgb, var(--warning) 35%, var(--border-light));
+    background: color-mix(in srgb, var(--warning) 8%, var(--bg-elevated));
+}
+
+.wdr-admin-users__compliance-card--blocked {
+    border-color: color-mix(in srgb, var(--danger) 30%, var(--border-light));
+    background: color-mix(in srgb, var(--danger) 6%, var(--bg-elevated));
+}
+
+.wdr-admin-users__compliance-label {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.wdr-admin-users__compliance-value {
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+}
+
 /* ============================================================
    Carte partenaire
    ============================================================ */
@@ -412,6 +503,35 @@
 .wdr-admin-users__partner-status--suspended {
     background: #eef2ff;
     color: #4338ca;
+}
+
+.wdr-admin-users__compliance-strip {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.7rem 0.8rem;
+    display: grid;
+    gap: 0.2rem;
+}
+
+.wdr-admin-users__compliance-strip span {
+    color: var(--text-main);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.wdr-admin-users__compliance-strip small {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+}
+
+.wdr-admin-users__compliance-strip--ok {
+    border-color: color-mix(in srgb, var(--success) 35%, var(--border-light));
+    background: color-mix(in srgb, var(--success) 8%, var(--bg-elevated));
+}
+
+.wdr-admin-users__compliance-strip--attention {
+    border-color: color-mix(in srgb, var(--warning) 35%, var(--border-light));
+    background: color-mix(in srgb, var(--warning) 8%, var(--bg-elevated));
 }
 
 /* Métriques */
@@ -875,6 +995,10 @@
         grid-template-columns: 1fr;
     }
 
+    .wdr-admin-users__compliance-grid {
+        grid-template-columns: 1fr;
+    }
+
     .wdr-admin-users__form-grid {
         grid-template-columns: 1fr;
     }
@@ -1147,4 +1271,70 @@
         text-transform: uppercase;
         color: var(--text-muted);
     }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-admin-users,
+.wdr-admin-users__body,
+.wdr-admin-users__partner-card,
+.wdr-admin-users__document-card,
+.wdr-admin-users__audit-row,
+.wdr-admin-users__table-wrapper,
+.wdr-admin-users__form-section,
+.wdr-admin-users__create-modal {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-users__partners-grid,
+.wdr-admin-users__documents-list,
+.wdr-admin-users__compliance-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.wdr-admin-users__partner-company,
+.wdr-admin-users__partner-name,
+.wdr-admin-users__partner-email,
+.wdr-admin-users__partner-address,
+.wdr-admin-users__stripe-id,
+.wdr-admin-users__audit-summary,
+.wdr-admin-users__audit-meta,
+.wdr-admin-users__document-meta,
+.wdr-admin-users__document-reason,
+.wdr-admin-users__table td {
+    overflow-wrap: anywhere;
+}
+
+.wdr-admin-users__partner-status,
+.wdr-admin-users__document-status,
+.wdr-admin-users__audit-category,
+.wdr-admin-users__role-pill,
+.wdr-admin-users__table-actions .wdr-btn {
+    white-space: normal;
+}
+
+.wdr-admin-users__password-result {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(15, 139, 168, 0.22);
+    border-radius: 14px;
+    background: rgba(15, 139, 168, 0.08);
+    color: var(--text-main);
+    min-width: 0;
+}
+
+.wdr-admin-users__password-result span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.wdr-admin-users__password-result strong {
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    overflow-wrap: anywhere;
 }

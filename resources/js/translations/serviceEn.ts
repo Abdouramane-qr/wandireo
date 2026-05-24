@@ -8,7 +8,8 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.gallery_show_photo": "Show photo {index}",
         "service.gallery_prev": "Previous photo",
         "service.gallery_next": "Next photo",
-        "service.rating_label": "Rating: {rating} out of 5, based on {count} reviews",
+        "service.rating_label":
+            "Rating: {rating} out of 5, based on {count} reviews",
         "service.reviews_count": "({count} reviews)",
         "service.location": "Location",
         "service.description": "About this offer",
@@ -16,6 +17,9 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.category.boat": "Boat",
         "service.category.stay": "Stay",
         "service.category.car": "Car",
+        "service.trust.partner_approved": "Approved partner",
+        "service.trust.contract_signed": "Contract signed",
+        "service.trust.documents_validated": "Verified documents",
         "service.features": "Highlights",
         "service.detail_category": "Detailed category",
         "service.subcategory": "Subcategory",
@@ -33,8 +37,7 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.languages": "Languages",
         "service.group_type": "Group type",
         "service.medical_clearance": "Medical certificate",
-        "service.medical_clearance_required":
-            "Mandatory before participation",
+        "service.medical_clearance_required": "Mandatory before participation",
         "service.boats_amenities": "Onboard amenities",
         "service.specifications": "Specifications",
         "service.boat_type": "Boat type",
@@ -78,10 +81,8 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.booking.time_slot": "Time slot",
         "service.booking.choose_slot": "Choose a slot",
         "service.booking.participants": "Travelers ({min} - {max})",
-        "service.booking.decrease_participants":
-            "Decrease number of travelers",
-        "service.booking.increase_participants":
-            "Increase number of travelers",
+        "service.booking.decrease_participants": "Decrease number of travelers",
+        "service.booking.increase_participants": "Increase number of travelers",
         "service.booking.pickup": "Start",
         "service.booking.return": "Return",
         "service.booking.night_one": "night",
@@ -95,8 +96,7 @@ export function buildServiceEnTranslations(): Record<string, string> {
             "The amount and payment method are confirmed before final validation.",
         "service.booking.error.select_date":
             "Please select a date for the activity.",
-        "service.booking.error.select_slot":
-            "Please select a time slot.",
+        "service.booking.error.select_slot": "Please select a time slot.",
         "service.booking.error.select_dates":
             "Please provide both dates (check-in and check-out).",
         "service.booking.error.invalid_dates":
@@ -115,8 +115,7 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.external_cta": "Book now",
         "service.external_note":
             "Displayed availability is updated in real time.",
-        "service.external_realtime":
-            "Availability updated in real time.",
+        "service.external_realtime": "Availability updated in real time.",
         "service.external_price_label": "Price",
         "service.external_price_total_label": "Total amount shared",
         "service.external_price_total_unknown": "Total not provided",
@@ -165,8 +164,7 @@ export function buildServiceEnTranslations(): Record<string, string> {
         "service.form.structure.none_attributes":
             "No dynamic attribute configured.",
         "service.form.structure.extras": "Extras",
-        "service.form.structure.none_extras":
-            "No active extra configured.",
+        "service.form.structure.none_extras": "No active extra configured.",
         "service.form.section.guidance": "Writing guidance",
         "service.form.guidance.structure": "Active structure: {name}",
         "service.form.guidance.activity.title":
@@ -201,5 +199,9 @@ export function buildServiceEnTranslations(): Record<string, string> {
             "Add important limits: minimum age, deposit, mileage and insurance.",
         "service.form.guidance.car.3":
             "Keep the copy simple and direct, without internal jargon or vague promises.",
+        "service.form.locale_editor": "Editing language",
+        "service.form.locale_hint":
+            "French is the catalog baseline and remains required.",
+        "service.form.actions.add_images": "Add images",
     };
 }

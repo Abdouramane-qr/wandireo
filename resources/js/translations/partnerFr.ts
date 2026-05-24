@@ -17,6 +17,17 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.dashboard.empty": "Aucune donnée à afficher pour le moment.",
         "partner.dashboard.up_to_date": "Tout est à jour.",
         "partner.dashboard.member_since": "Partenaire depuis le {date}",
+        "partner.dashboard.finance_title": "Suivi financier",
+        "partner.dashboard.finance_loading": "Actualisation...",
+        "partner.dashboard.finance_net": "Net partenaire",
+        "partner.dashboard.finance_receivable": "À recevoir",
+        "partner.dashboard.finance_on_hold": "Bloqué",
+        "partner.dashboard.finance_paid": "Réglé",
+        "partner.dashboard.finance_confirmed_bookings":
+            "{count} réservation(s) confirmée(s)",
+        "partner.dashboard.finance_receivable_sub": "En attente ou planifié",
+        "partner.dashboard.finance_on_hold_sub": "Mis en attente par Wandireo",
+        "partner.dashboard.finance_paid_sub": "Déjà marqué comme réglé",
 
         // Profile & Status
         "partner.profile.title": "Profil Partenaire",
@@ -33,10 +44,19 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.profile.account_title": "Coordonnées du partenaire",
         "partner.profile.account_subtitle":
             "Mettez à jour l'email réel utilisé pour les échanges, ainsi que les informations de contact visibles par l'équipe Wandireo.",
+        "partner.profile.tax_title": "Profil fiscal",
+        "partner.profile.tax_subtitle":
+            "Ces informations préparent les exports comptables et la facturation partenaire.",
         "partner.profile.field.company_name": "Entreprise",
         "partner.profile.field.email": "Email partenaire",
         "partner.profile.field.phone": "Téléphone",
         "partner.profile.field.business_address": "Adresse professionnelle",
+        "partner.profile.field.legal_company_name": "Raison sociale",
+        "partner.profile.field.tax_country": "Pays fiscal (ISO)",
+        "partner.profile.field.vat_number": "Numéro de TVA",
+        "partner.profile.field.business_registration_number":
+            "Numéro d'immatriculation",
+        "partner.profile.field.billing_email": "Email de facturation",
         "partner.profile.save": "Enregistrer les informations",
         "partner.profile.save_loading": "Enregistrement...",
         "partner.profile.save_success_title": "Profil mis à jour",
@@ -71,6 +91,18 @@ export function buildPartnerFrTranslations(): Record<string, string> {
         "partner.documents.status.validated": "Validé",
         "partner.documents.status.rejected": "Rejeté",
         "partner.documents.status.expired": "Expiré",
+        "partner.compliance.title": "Synthèse conformité",
+        "partner.compliance.progress": "{completed}/{total} étapes",
+        "partner.compliance.ready":
+            "Votre dossier est prêt pour l'exploitation commerciale.",
+        "partner.compliance.in_progress":
+            "Complétez les points restants pour sécuriser votre dossier.",
+        "partner.compliance.account_approved": "Compte validé",
+        "partner.compliance.contract_signed": "Contrat signé",
+        "partner.compliance.tax_profile_complete": "Profil fiscal complet",
+        "partner.compliance.documents_validated": "Documents validés",
+        "partner.compliance.document_counts":
+            "{validated} validé(s) · {pending} en revue · {blocked} bloquant(s)",
 
         // Pending & Validation
         "partner.pending.title.pending": "Dossier en cours de validation",

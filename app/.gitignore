@@ -8,6 +8,16 @@
 !Services/BlogContentTranslationService.php
 !Services/PartnerContentTranslationService.php
 !Models/
+!Models/Booking.php
 !Models/Service.php
+!Models/User.php
 !Support/
+!Support/AdminPermission.php
 !Support/ServiceExtraDataLocalizer.php
+!Http/
+!Http/Controllers/
+!Http/Controllers/Api/
+!Http/Controllers/Api/BookingController.php
+!Http/Controllers/Api/HomeCatalogPreviewController.php
+!Http/Middleware/
+!Http/Middleware/EnsurePermission.php

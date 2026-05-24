@@ -502,3 +502,53 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-partner-bk,
+.wdr-partner-bk__body,
+.wdr-partner-bk__header-inner,
+.wdr-partner-bk__header-left,
+.wdr-partner-bk__card,
+.wdr-partner-bk__card-id-block,
+.wdr-partner-bk__modal {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-partner-bk__summary {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.wdr-partner-bk__title,
+.wdr-partner-bk__subtitle,
+.wdr-partner-bk__card-id,
+.wdr-partner-bk__card-service,
+.wdr-partner-bk__detail,
+.wdr-partner-bk__card-extras,
+.wdr-partner-bk__card-external,
+.wdr-partner-bk__card-notes,
+.wdr-partner-bk__card-cancel-reason {
+    overflow-wrap: anywhere;
+}
+
+.wdr-partner-bk__badge,
+.wdr-partner-bk__tab {
+    white-space: normal;
+}
+
+@media (max-width: 560px) {
+    .wdr-partner-bk__header-inner,
+    .wdr-partner-bk__card-actions,
+    .wdr-partner-bk__card-details {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .wdr-partner-bk__card-actions .wdr-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

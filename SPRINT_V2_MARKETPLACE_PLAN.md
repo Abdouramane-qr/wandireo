@@ -18,6 +18,29 @@ Ce sprint ne cherche pas a ajouter plus de fonctionnalites visibles. Il cherche 
 - synchro providers externes
 - administration quotidienne
 
+## Final Status - 2026-05-19
+
+Sprint V2 is finalized in the current working tree.
+
+Delivered scope:
+
+- service moderation lifecycle with review, approval, publication, rejection, suspension, and traceable events
+- partner compliance documents, contract state, fiscal profile, and partner-facing compliance summary
+- generic audit log for sensitive governance, moderation, document, and finance actions
+- action-level admin permission middleware with scoped permission keys and legacy admin compatibility
+- admin finance summary, finance CSV export, payout readiness fields, and payout status updates
+- partner finance visibility for gross volume, commission, net amount, and payout buckets
+- public client trust badges based on partner approval, signed contract, and validated documents
+- admin operational dashboard queue, compliance counters, transaction risk triage, and support button polish
+
+Final validation:
+
+- targeted PHPUnit coverage passed for moderation, public visibility, partner documents, audit log, admin permissions, admin booking operations, user profile, Stripe checkout, and external booking flows during the sprint
+- frontend validation passed with `npm run types:check`, targeted Prettier checks, and `npm run build`
+- Docker app image was rebuilt with `docker compose up -d --build app`
+- Laravel caches were cleared with `php artisan optimize:clear`
+- Docker `app` service is healthy after the final rebuild
+
 ## Guiding Principle
 
 La regle de fond est la suivante :
@@ -37,14 +60,14 @@ La regle de fond est la suivante :
 - admin has operational controls for users, services, support, reviews and analytics
 - service content is already translatable and structurally rich
 
-### Main gaps
+### Initial gaps addressed in this sprint
 
-- no explicit service moderation lifecycle
-- no formal partner compliance workspace
-- no audit trail for moderation and partner status changes
-- no fine-grained permission layer beyond role checks
-- no finance/payout/export layer
-- no partner-facing revenue/compliance center
+- explicit service moderation lifecycle has been introduced
+- partner compliance workspace and document review are in place
+- audit trail now covers moderation, documents, partner governance, and payout changes
+- action-level permission checks protect sensitive admin endpoints
+- finance, payout readiness, and export foundations are available
+- partner-facing revenue and compliance summaries are visible
 
 ### Main risks
 
@@ -558,7 +581,7 @@ composer test
     - service moderation columns and `service_moderation_events`
     - moderation constants and relations on `Service`
     - partner submit-review action
-    - admin moderation queue, approve, publish, reject, suspend actions
+- admin moderation queue, approve, publish, reject, suspend actions
     - availability guard so unpublished services cannot be made public through legacy update/toggle endpoints
     - public visibility tests updated so `adminAll=true` does not leak hidden services for guests
 - Partner compliance documents are implemented in the current working tree:
@@ -591,7 +614,7 @@ composer test
     - partner/client/admin dashboard guards were corrected to avoid `/partenaire` <-> `/mon-espace` redirects when an admin enters the partner area
     - current source does not contain a `fonts.googleapis.com` import; the CSP warning seen in the browser is likely from stale built assets, cache, or an injected extension/script, while the redirect loop was caused by role routing
     - `npm run types:check`, targeted Prettier check, and `npm run build` passed after the dashboard guard fix
-- Audit log foundation is in progress:
+- Audit log foundation implemented:
     - `audit_log_entries` table added for generic sensitive-action traceability
     - admin read endpoint added at `GET /api/admin/audit-log`
     - partner document upload/review actions write audit entries
@@ -600,23 +623,104 @@ composer test
     - targeted feature coverage added in `AuditLogTest`
     - validation passed: `AuditLogTest`, `PartnerDocumentTest`, `ServiceModerationTest`, `PartnerContractSigningTest`, `AdminUserManagementTest`, and targeted Pint check
     - Docker app image was rebuilt, app container was recreated, migration `2026_05_17_000004` was applied, `optimize:clear` was run, and `GET /api/admin/audit-log` is visible in route list
-- Audit log admin UI is in progress:
+- Audit log admin UI implemented:
     - admin users page now includes a compact audit feed with category filtering
     - frontend audit API, type, and React Query hook were added
     - document/user/service mutations invalidate the audit log query so admin can see recent governance actions
     - validation passed: `npm run types:check`, targeted Prettier check, and `npm run build`
     - Docker app image was rebuilt and app container recreated after the UI audit feed, with `optimize:clear` run and no pending audit migration
+- Permission model refinement implemented:
+    - `permission` middleware added for action-level admin checks
+    - admins with no `permissions` array keep full legacy access; admins with a permissions array are scoped to `all` or explicit permission keys
+    - sensitive endpoints now require dedicated permission keys for audit log, partner governance, partner document review, service moderation, service structure, content, support, reviews, FareHarbor, bookings, and analytics
+    - admin user edit can update scoped admin permissions
+- Finance visibility foundation implemented:
+    - admin finance summary endpoint added at `GET /api/admin/finance/summary`
+    - admin finance CSV export endpoint added at `GET /api/admin/finance/export`
+    - settlement totals are computed server-side from confirmed, non-refunded bookings
+    - commission totals use the booking pricing snapshot when available, with a service/partner commission-rate fallback
+    - admin transactions page now consumes backend finance totals and exposes the CSV export action
+    - `finance.view` permission key added for finance endpoints
+    - validation passed: `AdminBookingOperationsTest`, `AdminPermissionTest`, targeted Pint check, `npm run types:check`, and targeted Prettier check
+- Payout readiness foundation implemented:
+    - bookings now expose payout workflow fields: `payout_status`, `payout_marked_at`, `payout_marked_by`, and `payout_notes`
+    - supported payout statuses are `PENDING`, `ON_HOLD`, `SCHEDULED`, `PAID`, and `FAILED`
+    - admin finance summary and CSV export include payout status data
+    - admin transactions page can filter by payout status and mark eligible confirmed bookings as blocked or paid
+    - payout status changes are audited through `audit_log_entries` with category `finance` and action `PAYOUT_STATUS_UPDATED`
+    - validation passed: `AdminBookingOperationsTest`, targeted Pint check, `npm run types:check`, and targeted Prettier check
+- Partner finance visibility foundation implemented:
+    - partner finance summary endpoint added at `GET /api/partner/finance/summary`
+    - partner summary only includes the authenticated partner's confirmed, non-refunded bookings
+    - partner totals expose gross volume, commission total, net partner amount, and payout buckets for pending, on-hold, scheduled, paid, and failed payouts
+    - partner dashboard now shows read-only finance tracking cards for net partner, receivable, blocked, and paid amounts
+    - validation passed: `AdminBookingOperationsTest`, targeted Pint check, `npm run types:check`, and targeted Prettier check
+- Partner tax profile foundation implemented:
+    - partner accounts now expose fiscal fields for legal company name, tax country, VAT number, business registration number, and billing email
+    - partners can maintain these fields from their own profile page
+    - non-partner accounts cannot persist partner fiscal fields through `/api/users/me`
+    - admin create/update flows can store the same fiscal fields for partner accounts
+    - validation passed: `UserProfileApiTest`, targeted Pint check, `npm run types:check`, and targeted Prettier check
+- Finance export invoice-readiness implemented:
+    - admin finance summary partner rows now include partner fiscal identity fields
+    - admin finance CSV export now includes legal company name, tax country, VAT number, business registration number, and billing email
+    - admin transactions partner performance table displays the fiscal/billing identity used for settlement preparation
+    - validation passed: `AdminBookingOperationsTest`, targeted Pint check, `npm run types:check`, and targeted Prettier check
+- Client trust visibility foundation implemented:
+    - public service detail API now exposes a computed `partner_trust` summary for the owning partner
+    - trust summary includes approved partner state, signed contract state, validated document count, and validated business/tax/insurance document flags
+    - public API does not expose partner document records or file paths
+    - service detail page now displays simple trust badges for approved partner, signed contract, and verified documents
+    - validation passed: `PublicServiceVisibilityTest`, targeted Pint check, `npm run types:check`, targeted Prettier check, and `npm run build`
+- Admin compliance visibility implemented:
+    - admin users page now shows global partner compliance counters for complete dossiers, partners needing attention, pending documents, and blocking documents
+    - each partner card now displays a compact compliance strip derived from partner approval, signed contract state, and reviewed partner documents
+    - compliance visibility reuses the existing partner document review API and does not expose new public document data
+    - validation passed: `npm run types:check` and targeted Prettier check
+- Partner compliance summary implemented:
+    - partner profile now shows a compliance score covering account approval, signed contract, fiscal profile completion, and validated documents
+    - partner document counts now surface validated, in-review, and blocking documents before the upload form
+    - English partner document translations were completed for the existing partner document area
+    - validation passed: `npm run types:check` and targeted Prettier check
+- Admin operational dashboard improvements implemented:
+    - admin dashboard now includes an operational action queue for partner onboarding, unsigned contracts, compliance documents, service moderation, payout attention, pending reviews, and external booking errors
+    - each action card routes to the existing admin area responsible for resolving the item
+    - queue counts reuse existing admin users, partner documents, services, bookings, and reviews data
+    - validation passed: `npm run types:check` and targeted Prettier check
+- Admin transaction risk triage implemented:
+    - admin transactions page now highlights bookings requiring support or finance action
+    - quick risk filters isolate all action-required rows, external provider errors, and blocked/failed payouts
+    - risk summary keeps confirmed pending payouts visible while separating them from blocking payout states
+    - validation passed: `npm run types:check` and targeted Prettier check
+- Admin support button polish implemented:
+    - support page actions now use clearer icon+label buttons for creating, viewing, closing, and cancelling tickets
+    - support table and modal actions now have dedicated hover/focus styling consistent with the admin surfaces
+    - legacy support variant action controls were also polished to avoid inconsistent button treatment if still reached
+    - validation passed: `npm run types:check`, targeted Prettier check, and `npm run build`
+    - Docker app image was rebuilt, app container was recreated, `optimize:clear` was run, and the `app` service is healthy after the final rebuild
+- Post-review partner onboarding fixes implemented:
+    - admin can store a written mandate contract on partner accounts; approved partners without signature stay on the pending page, read the scrollable contract text, accept it, and then unlock the partner dashboard
+    - compliance profile updates refresh the partner profile state immediately, so the 4-step compliance summary follows saved fiscal/company changes without waiting for a full navigation
+    - partner document uploads now let Axios set the multipart boundary instead of forcing JSON headers, and upload failures surface backend messages when available
+    - partner service form translations were completed for the locale editor text, a direct media upload shortcut was added, and validation scrolls to the first visible form error
+    - FareHarbor partner account provisioning now requires a real email from the partner directory, reuses an existing real partner account when present, and stops generating `@partners.wandireo.local` accounts for unknown companies
+    - FareHarbor sync failures now persist a readable 404/invalid-slug explanation for admin triage
+    - cleanup migrations added for known FareHarbor real emails, safe detachment/removal of unused synthetic accounts, and consolidation of remaining synthetic duplicates that still have historical references
+    - default partner mandate contract text now auto-generates when an approved partner has no admin-provided contract text, including existing approved unsigned partners through backfill
+    - updating the contract text from admin resets the partner contract to pending signature so the partner must scroll, accept, and sign again before dashboard access
+    - validation passed: `PartnerContractSigningTest`, `PartnerDocumentTest`, `FareHarborIntegrationTest`, `UserProfileApiTest`, targeted Pint check, `npm run types:check`, `npm run lint:check`, targeted Prettier check, and `npm run build`
 
 ### Non-goals for slice 1
 
-- no payout/export implementation yet
-- no client trust badges yet
+- no automated payout execution yet
+- no invoice generation yet
+- no advanced reputation or trust scoring yet
 - no full RBAC engine yet
 - no standalone moderation dashboard beyond the current admin services review controls
 
-### Open decisions after slice 1
+### Open decisions after Sprint V2
 
 - whether `APPROVED` should exist separately from `PUBLISHED` long term
 - whether external imports should default to `PENDING_REVIEW` or continue auto-publication
 - whether partner status names should be migrated from `APPROVED` to `ACTIVE`
-- whether moderation event tables become a generic audit log or stay service-specific
+- whether service moderation event tables stay service-specific alongside the generic audit log long term

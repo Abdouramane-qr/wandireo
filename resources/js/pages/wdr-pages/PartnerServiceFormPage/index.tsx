@@ -199,8 +199,10 @@ function hasLocaleTranslation(
     translations: LocalizedTextMap,
     locale: Locale,
 ): boolean {
-    return typeof translations[locale] === "string"
-        && translations[locale]!.trim() !== "";
+    return (
+        typeof translations[locale] === "string" &&
+        translations[locale]!.trim() !== ""
+    );
 }
 
 function getLocalizedStructureValue(
@@ -778,6 +780,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
         if (!validate()) {
             error(t("service.form.error.fix_before_continue"));
+            window.setTimeout(() => {
+                document
+                    .querySelector<HTMLElement>(".wdr-sform__error")
+                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 0);
 
             return;
         }
@@ -991,16 +998,32 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
 
             <div className="wdr-sform__header">
                 <div className="wdr-sform__header-inner">
-                    <h1 className="wdr-sform__title">
-                        {isEditing
-                            ? t("service.form.title.edit")
-                            : t("service.form.title.create")}
-                    </h1>
-                    <p className="wdr-sform__subtitle">
-                        {isEditing
-                            ? t("service.form.subtitle.edit")
-                            : t("service.form.subtitle.create")}
-                    </p>
+                    <div>
+                        <h1 className="wdr-sform__title">
+                            {isEditing
+                                ? t("service.form.title.edit")
+                                : t("service.form.title.create")}
+                        </h1>
+                        <p className="wdr-sform__subtitle">
+                            {isEditing
+                                ? t("service.form.subtitle.edit")
+                                : t("service.form.subtitle.create")}
+                        </p>
+                    </div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() =>
+                            document
+                                .getElementById("sf-image-upload")
+                                ?.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "center",
+                                })
+                        }
+                    >
+                        {t("service.form.actions.add_images")}
+                    </Button>
                 </div>
             </div>
 
@@ -1079,7 +1102,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                         <div className="wdr-sform__field">
                             <div className="wdr-sform__locale-bar">
                                 <span className="wdr-sform__locale-label">
-                                    Locale d'edition
+                                    {t("service.form.locale_editor")}
                                 </span>
                                 <div className="wdr-sform__locale-tabs">
                                     {SUPPORTED_LOCALES.map((locale) => (
@@ -1097,8 +1120,7 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 </div>
                             </div>
                             <p className="wdr-sform__locale-hint">
-                                La locale FR sert de base pour le catalogue et
-                                reste obligatoire.
+                                {t("service.form.locale_hint")}
                             </p>
                         </div>
 
@@ -1890,313 +1912,339 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                 )}
 
                                 {isEditing && (
-                                <>
-                                    <div className="wdr-sform__row">
-                                        <div className="wdr-sform__field">
-                                            <label className="wdr-sform__label">
-                                                {t("service.form.rule.name")}
-                                            </label>
-                                            <Input
-                                                value={pricingRuleForm.name}
-                                                onChange={(e) =>
-                                                    setPricingRuleForm(
-                                                        (previous) => ({
-                                                            ...previous,
-                                                            name: e.target
-                                                                .value,
-                                                        }),
-                                                    )
-                                                }
-                                                placeholder={t(
-                                                    "service.form.rule.name_placeholder",
-                                                )}
-                                            />
-                                        </div>
-
-                                        <div className="wdr-sform__field">
-                                            <label className="wdr-sform__label">
-                                                {t("service.form.rule.type")}
-                                            </label>
-                                            <Select
-                                                options={pricingRuleTypeOptions}
-                                                value={pricingRuleForm.ruleType}
-                                                onChange={(e) =>
-                                                    setPricingRuleForm(
-                                                        (previous) => ({
-                                                            ...previous,
-                                                            ruleType: e.target
-                                                                .value as PricingRuleType,
-                                                        }),
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="wdr-sform__row">
-                                        <div className="wdr-sform__field">
-                                            <label className="wdr-sform__label">
-                                                {t(
-                                                    "service.form.rule.adjustment",
-                                                )}
-                                            </label>
-                                            <Select
-                                                options={
-                                                    pricingAdjustmentOptions
-                                                }
-                                                value={
-                                                    pricingRuleForm.adjustmentType
-                                                }
-                                                onChange={(e) =>
-                                                    setPricingRuleForm(
-                                                        (previous) => ({
-                                                            ...previous,
-                                                            adjustmentType: e
-                                                                .target
-                                                                .value as PricingAdjustmentType,
-                                                        }),
-                                                    )
-                                                }
-                                            />
-                                        </div>
-
-                                        <div className="wdr-sform__field">
-                                            <label className="wdr-sform__label">
-                                                {t("service.form.rule.value")}
-                                            </label>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                value={
-                                                    pricingRuleForm.adjustmentValue
-                                                }
-                                                onChange={(e) =>
-                                                    setPricingRuleForm(
-                                                        (previous) => ({
-                                                            ...previous,
-                                                            adjustmentValue:
-                                                                e.target.value,
-                                                        }),
-                                                    )
-                                                }
-                                                placeholder={t(
-                                                    "service.form.rule.value_placeholder",
-                                                )}
-                                            />
-                                        </div>
-
-                                        <div className="wdr-sform__field">
-                                            <label className="wdr-sform__label">
-                                                {t(
-                                                    "service.form.rule.priority",
-                                                )}
-                                            </label>
-                                            <Input
-                                                type="number"
-                                                min={1}
-                                                value={pricingRuleForm.priority}
-                                                onChange={(e) =>
-                                                    setPricingRuleForm(
-                                                        (previous) => ({
-                                                            ...previous,
-                                                            priority:
-                                                                e.target.value,
-                                                        }),
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {pricingRuleForm.ruleType ===
-                                        "SEASONAL" && (
+                                    <>
                                         <div className="wdr-sform__row">
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
                                                     {t(
-                                                        "service.form.rule.start",
+                                                        "service.form.rule.name",
                                                     )}
                                                 </label>
                                                 <Input
-                                                    type="date"
-                                                    value={
-                                                        pricingRuleForm.startDate
-                                                    }
+                                                    value={pricingRuleForm.name}
                                                     onChange={(e) =>
                                                         setPricingRuleForm(
                                                             (previous) => ({
                                                                 ...previous,
-                                                                startDate:
-                                                                    e.target
-                                                                        .value,
+                                                                name: e.target
+                                                                    .value,
                                                             }),
                                                         )
                                                     }
+                                                    placeholder={t(
+                                                        "service.form.rule.name_placeholder",
+                                                    )}
                                                 />
                                             </div>
+
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
-                                                    {t("service.form.rule.end")}
+                                                    {t(
+                                                        "service.form.rule.type",
+                                                    )}
                                                 </label>
-                                                <Input
-                                                    type="date"
+                                                <Select
+                                                    options={
+                                                        pricingRuleTypeOptions
+                                                    }
                                                     value={
-                                                        pricingRuleForm.endDate
+                                                        pricingRuleForm.ruleType
                                                     }
                                                     onChange={(e) =>
                                                         setPricingRuleForm(
                                                             (previous) => ({
                                                                 ...previous,
-                                                                endDate:
-                                                                    e.target
-                                                                        .value,
+                                                                ruleType: e
+                                                                    .target
+                                                                    .value as PricingRuleType,
                                                             }),
                                                         )
                                                     }
                                                 />
                                             </div>
                                         </div>
-                                    )}
 
-                                    {pricingRuleForm.ruleType ===
-                                        "DURATION" && (
                                         <div className="wdr-sform__row">
                                             <div className="wdr-sform__field">
                                                 <label className="wdr-sform__label">
                                                     {t(
-                                                        "service.form.rule.min_units",
+                                                        "service.form.rule.adjustment",
+                                                    )}
+                                                </label>
+                                                <Select
+                                                    options={
+                                                        pricingAdjustmentOptions
+                                                    }
+                                                    value={
+                                                        pricingRuleForm.adjustmentType
+                                                    }
+                                                    onChange={(e) =>
+                                                        setPricingRuleForm(
+                                                            (previous) => ({
+                                                                ...previous,
+                                                                adjustmentType:
+                                                                    e.target
+                                                                        .value as PricingAdjustmentType,
+                                                            }),
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="wdr-sform__field">
+                                                <label className="wdr-sform__label">
+                                                    {t(
+                                                        "service.form.rule.value",
                                                     )}
                                                 </label>
                                                 <Input
                                                     type="number"
-                                                    min={1}
+                                                    step="0.01"
                                                     value={
-                                                        pricingRuleForm.minUnits
+                                                        pricingRuleForm.adjustmentValue
                                                     }
                                                     onChange={(e) =>
                                                         setPricingRuleForm(
                                                             (previous) => ({
                                                                 ...previous,
-                                                                minUnits:
+                                                                adjustmentValue:
                                                                     e.target
                                                                         .value,
                                                             }),
                                                         )
                                                     }
                                                     placeholder={t(
-                                                        "service.form.rule.min_units_placeholder",
+                                                        "service.form.rule.value_placeholder",
                                                     )}
                                                 />
                                             </div>
+
+                                            <div className="wdr-sform__field">
+                                                <label className="wdr-sform__label">
+                                                    {t(
+                                                        "service.form.rule.priority",
+                                                    )}
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    value={
+                                                        pricingRuleForm.priority
+                                                    }
+                                                    onChange={(e) =>
+                                                        setPricingRuleForm(
+                                                            (previous) => ({
+                                                                ...previous,
+                                                                priority:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
+                                                    }
+                                                />
+                                            </div>
                                         </div>
-                                    )}
 
-                                    <p className="wdr-sform__hint">
-                                        {t("service.form.rule.backend_hint")}
-                                    </p>
+                                        {pricingRuleForm.ruleType ===
+                                            "SEASONAL" && (
+                                            <div className="wdr-sform__row">
+                                                <div className="wdr-sform__field">
+                                                    <label className="wdr-sform__label">
+                                                        {t(
+                                                            "service.form.rule.start",
+                                                        )}
+                                                    </label>
+                                                    <Input
+                                                        type="date"
+                                                        value={
+                                                            pricingRuleForm.startDate
+                                                        }
+                                                        onChange={(e) =>
+                                                            setPricingRuleForm(
+                                                                (previous) => ({
+                                                                    ...previous,
+                                                                    startDate:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="wdr-sform__field">
+                                                    <label className="wdr-sform__label">
+                                                        {t(
+                                                            "service.form.rule.end",
+                                                        )}
+                                                    </label>
+                                                    <Input
+                                                        type="date"
+                                                        value={
+                                                            pricingRuleForm.endDate
+                                                        }
+                                                        onChange={(e) =>
+                                                            setPricingRuleForm(
+                                                                (previous) => ({
+                                                                    ...previous,
+                                                                    endDate:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
 
-                                    <div className="wdr-sform__calendar-sync-actions">
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            onClick={() =>
-                                                void handleCreatePricingRule()
-                                            }
-                                            disabled={
-                                                createPricingRule.isPending
-                                            }
-                                        >
-                                            {createPricingRule.isPending
-                                                ? t("service.form.rule.adding")
-                                                : t("service.form.rule.add")}
-                                        </Button>
-                                    </div>
+                                        {pricingRuleForm.ruleType ===
+                                            "DURATION" && (
+                                            <div className="wdr-sform__row">
+                                                <div className="wdr-sform__field">
+                                                    <label className="wdr-sform__label">
+                                                        {t(
+                                                            "service.form.rule.min_units",
+                                                        )}
+                                                    </label>
+                                                    <Input
+                                                        type="number"
+                                                        min={1}
+                                                        value={
+                                                            pricingRuleForm.minUnits
+                                                        }
+                                                        onChange={(e) =>
+                                                            setPricingRuleForm(
+                                                                (previous) => ({
+                                                                    ...previous,
+                                                                    minUnits:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            )
+                                                        }
+                                                        placeholder={t(
+                                                            "service.form.rule.min_units_placeholder",
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
 
-                                    {pricingRulesQuery.data &&
-                                        pricingRulesQuery.data.length > 0 && (
-                                            <div className="wdr-sform__image-grid">
-                                                {pricingRulesQuery.data.map(
-                                                    (rule) => (
-                                                        <div
-                                                            key={rule.id}
-                                                            className="wdr-sform__image-card"
-                                                        >
-                                                            <div className="wdr-sform__image-card-meta">
-                                                                <span>
-                                                                    {rule.name}
-                                                                </span>
-                                                                <span>
-                                                                    {
-                                                                        rule.ruleType
-                                                                    }{" "}
-                                                                    ·{" "}
-                                                                    {rule.adjustmentType ===
-                                                                    "PERCENTAGE"
-                                                                        ? `${rule.adjustmentValue}%`
-                                                                        : formatPrice(
-                                                                              rule.adjustmentValue,
-                                                                              "EUR",
-                                                                          )}
-                                                                </span>
-                                                                {rule.startDate &&
-                                                                    rule.endDate && (
+                                        <p className="wdr-sform__hint">
+                                            {t(
+                                                "service.form.rule.backend_hint",
+                                            )}
+                                        </p>
+
+                                        <div className="wdr-sform__calendar-sync-actions">
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                onClick={() =>
+                                                    void handleCreatePricingRule()
+                                                }
+                                                disabled={
+                                                    createPricingRule.isPending
+                                                }
+                                            >
+                                                {createPricingRule.isPending
+                                                    ? t(
+                                                          "service.form.rule.adding",
+                                                      )
+                                                    : t(
+                                                          "service.form.rule.add",
+                                                      )}
+                                            </Button>
+                                        </div>
+
+                                        {pricingRulesQuery.data &&
+                                            pricingRulesQuery.data.length >
+                                                0 && (
+                                                <div className="wdr-sform__image-grid">
+                                                    {pricingRulesQuery.data.map(
+                                                        (rule) => (
+                                                            <div
+                                                                key={rule.id}
+                                                                className="wdr-sform__image-card"
+                                                            >
+                                                                <div className="wdr-sform__image-card-meta">
+                                                                    <span>
+                                                                        {
+                                                                            rule.name
+                                                                        }
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            rule.ruleType
+                                                                        }{" "}
+                                                                        ·{" "}
+                                                                        {rule.adjustmentType ===
+                                                                        "PERCENTAGE"
+                                                                            ? `${rule.adjustmentValue}%`
+                                                                            : formatPrice(
+                                                                                  rule.adjustmentValue,
+                                                                                  "EUR",
+                                                                              )}
+                                                                    </span>
+                                                                    {rule.startDate &&
+                                                                        rule.endDate && (
+                                                                            <span>
+                                                                                {rule.startDate.toLocaleDateString(
+                                                                                    intlLocale,
+                                                                                )}{" "}
+                                                                                →{" "}
+                                                                                {rule.endDate.toLocaleDateString(
+                                                                                    intlLocale,
+                                                                                )}
+                                                                            </span>
+                                                                        )}
+                                                                    {rule.minUnits && (
                                                                         <span>
-                                                                            {rule.startDate.toLocaleDateString(
-                                                                                intlLocale,
-                                                                            )}{" "}
-                                                                            →{" "}
-                                                                            {rule.endDate.toLocaleDateString(
-                                                                                intlLocale,
+                                                                            {t(
+                                                                                "service.form.rule.min_units_display",
+                                                                            ).replace(
+                                                                                "{count}",
+                                                                                String(
+                                                                                    rule.minUnits,
+                                                                                ),
                                                                             )}
                                                                         </span>
                                                                     )}
-                                                                {rule.minUnits && (
                                                                     <span>
                                                                         {t(
-                                                                            "service.form.rule.min_units_display",
+                                                                            "service.form.rule.priority_display",
                                                                         ).replace(
-                                                                            "{count}",
+                                                                            "{priority}",
                                                                             String(
-                                                                                rule.minUnits,
+                                                                                rule.priority,
                                                                             ),
                                                                         )}
                                                                     </span>
-                                                                )}
-                                                                <span>
-                                                                    {t(
-                                                                        "service.form.rule.priority_display",
-                                                                    ).replace(
-                                                                        "{priority}",
-                                                                        String(
-                                                                            rule.priority,
-                                                                        ),
-                                                                    )}
-                                                                </span>
-                                                                <div className="wdr-sform__image-actions">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="wdr-sform__image-remove"
-                                                                        onClick={() =>
-                                                                            void handleDeletePricingRule(
-                                                                                rule.id,
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            deletePricingRule.isPending
-                                                                        }
-                                                                    >
-                                                                        {t(
-                                                                            "service.form.delete",
-                                                                        )}
-                                                                    </button>
+                                                                    <div className="wdr-sform__image-actions">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="wdr-sform__image-remove"
+                                                                            onClick={() =>
+                                                                                void handleDeletePricingRule(
+                                                                                    rule.id,
+                                                                                )
+                                                                            }
+                                                                            disabled={
+                                                                                deletePricingRule.isPending
+                                                                            }
+                                                                        >
+                                                                            {t(
+                                                                                "service.form.delete",
+                                                                            )}
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ),
-                                                )}
-                                            </div>
-                                        )}
-                                </>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                    </>
                                 )}
                             </div>
                         )}
@@ -2222,9 +2270,11 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                                         }
                                     />
                                     <p className="wdr-sform__hint">
-                                        {PaymentModeDescriptions[
-                                            form.paymentMode
-                                        ]}
+                                        {
+                                            PaymentModeDescriptions[
+                                                form.paymentMode
+                                            ]
+                                        }
                                     </p>
                                 </div>
 
@@ -2469,157 +2519,168 @@ const PartnerServiceFormContent: React.FC<PartnerServiceFormContentProps> = ({
                     </fieldset>
 
                     {!isExternalService && (
-                    <fieldset className="wdr-sform__fieldset">
-                        <legend className="wdr-sform__legend">
-                            {t("service.form.section.ical")}
-                        </legend>
+                        <fieldset className="wdr-sform__fieldset">
+                            <legend className="wdr-sform__legend">
+                                {t("service.form.section.ical")}
+                            </legend>
 
-                        {!isEditing && (
-                            <p className="wdr-sform__hint">
-                                {t("service.form.ical.create_hint")}
-                            </p>
-                        )}
+                            {!isEditing && (
+                                <p className="wdr-sform__hint">
+                                    {t("service.form.ical.create_hint")}
+                                </p>
+                            )}
 
-                        {isEditing && !canUseIcalSync && (
-                            <p className="wdr-sform__hint">
-                                {t("service.form.ical.unavailable_hint")}
-                            </p>
-                        )}
+                            {isEditing && !canUseIcalSync && (
+                                <p className="wdr-sform__hint">
+                                    {t("service.form.ical.unavailable_hint")}
+                                </p>
+                            )}
 
-                        {canUseIcalSync && (
-                            <div className="wdr-sform__calendar-sync">
-                                <div className="wdr-sform__field">
-                                    <label
-                                        htmlFor="sf-ical-import"
-                                        className="wdr-sform__label"
-                                    >
-                                        {t("service.form.ical.import_url")}
-                                    </label>
-                                    <Input
-                                        id="sf-ical-import"
-                                        type="url"
-                                        value={calendarImportUrl}
-                                        onChange={(e) =>
-                                            setCalendarImportUrl(e.target.value)
-                                        }
-                                        placeholder={t(
-                                            "service.form.url_placeholder",
-                                        )}
-                                    />
-                                    <p className="wdr-sform__hint">
-                                        {t("service.form.ical.import_hint")}
-                                    </p>
-                                </div>
-
-                                <div className="wdr-sform__field">
-                                    <label
-                                        htmlFor="sf-ical-export"
-                                        className="wdr-sform__label"
-                                    >
-                                        {t("service.form.ical.export_url")}
-                                    </label>
-                                    <Input
-                                        id="sf-ical-export"
-                                        value={
-                                            calendarSyncQuery.data?.exportUrl ??
-                                            ""
-                                        }
-                                        readOnly
-                                        placeholder={t(
-                                            "service.form.ical.export_placeholder",
-                                        )}
-                                    />
-                                    <p className="wdr-sform__hint">
-                                        {t("service.form.ical.export_hint")}
-                                    </p>
-                                </div>
-
-                                <div className="wdr-sform__calendar-sync-meta">
-                                    <span>
-                                        {t("service.form.ical.status")}{" "}
-                                        <strong>
-                                            {getCalendarSyncStatusLabel(
-                                                calendarSyncQuery.data
-                                                    ?.lastStatus,
-                                                t,
+                            {canUseIcalSync && (
+                                <div className="wdr-sform__calendar-sync">
+                                    <div className="wdr-sform__field">
+                                        <label
+                                            htmlFor="sf-ical-import"
+                                            className="wdr-sform__label"
+                                        >
+                                            {t("service.form.ical.import_url")}
+                                        </label>
+                                        <Input
+                                            id="sf-ical-import"
+                                            type="url"
+                                            value={calendarImportUrl}
+                                            onChange={(e) =>
+                                                setCalendarImportUrl(
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder={t(
+                                                "service.form.url_placeholder",
                                             )}
-                                        </strong>
-                                    </span>
-                                    <span>
-                                        {t("service.form.ical.last_sync")}{" "}
-                                        <strong>
-                                            {calendarSyncQuery.data
-                                                ?.lastSyncedAt
-                                                ? calendarSyncQuery.data.lastSyncedAt.toLocaleString(
-                                                      intlLocale,
-                                                  )
-                                                : t("service.form.ical.never")}
-                                        </strong>
-                                    </span>
-                                    <span>
-                                        {t("service.form.ical.imported_events")}{" "}
-                                        <strong>
-                                            {calendarSyncQuery.data
-                                                ?.importedEventsCount ?? 0}
-                                        </strong>
-                                    </span>
-                                </div>
+                                        />
+                                        <p className="wdr-sform__hint">
+                                            {t("service.form.ical.import_hint")}
+                                        </p>
+                                    </div>
 
-                                {calendarSyncQuery.data?.lastError && (
-                                    <p className="wdr-sform__error">
-                                        {calendarSyncQuery.data.lastError}
-                                    </p>
-                                )}
+                                    <div className="wdr-sform__field">
+                                        <label
+                                            htmlFor="sf-ical-export"
+                                            className="wdr-sform__label"
+                                        >
+                                            {t("service.form.ical.export_url")}
+                                        </label>
+                                        <Input
+                                            id="sf-ical-export"
+                                            value={
+                                                calendarSyncQuery.data
+                                                    ?.exportUrl ?? ""
+                                            }
+                                            readOnly
+                                            placeholder={t(
+                                                "service.form.ical.export_placeholder",
+                                            )}
+                                        />
+                                        <p className="wdr-sform__hint">
+                                            {t("service.form.ical.export_hint")}
+                                        </p>
+                                    </div>
 
-                                <div className="wdr-sform__calendar-sync-actions">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onClick={() =>
-                                            void handleSaveCalendarSync()
-                                        }
-                                        disabled={
-                                            saveCalendarSync.isPending ||
-                                            runCalendarSync.isPending ||
-                                            saving
-                                        }
-                                    >
-                                        {saveCalendarSync.isPending
-                                            ? t("service.form.ical.saving")
-                                            : t("service.form.ical.save_url")}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={() =>
-                                            void handleRunCalendarSync()
-                                        }
-                                        disabled={
-                                            runCalendarSync.isPending ||
-                                            saveCalendarSync.isPending ||
-                                            !calendarImportUrl.trim()
-                                        }
-                                    >
-                                        {runCalendarSync.isPending
-                                            ? t("service.form.ical.syncing")
-                                            : t("service.form.ical.sync_now")}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={() =>
-                                            void handleCopyExportUrl()
-                                        }
-                                        disabled={
-                                            !calendarSyncQuery.data?.exportUrl
-                                        }
-                                    >
-                                        {t("service.form.ical.copy_export")}
-                                    </Button>
+                                    <div className="wdr-sform__calendar-sync-meta">
+                                        <span>
+                                            {t("service.form.ical.status")}{" "}
+                                            <strong>
+                                                {getCalendarSyncStatusLabel(
+                                                    calendarSyncQuery.data
+                                                        ?.lastStatus,
+                                                    t,
+                                                )}
+                                            </strong>
+                                        </span>
+                                        <span>
+                                            {t("service.form.ical.last_sync")}{" "}
+                                            <strong>
+                                                {calendarSyncQuery.data
+                                                    ?.lastSyncedAt
+                                                    ? calendarSyncQuery.data.lastSyncedAt.toLocaleString(
+                                                          intlLocale,
+                                                      )
+                                                    : t(
+                                                          "service.form.ical.never",
+                                                      )}
+                                            </strong>
+                                        </span>
+                                        <span>
+                                            {t(
+                                                "service.form.ical.imported_events",
+                                            )}{" "}
+                                            <strong>
+                                                {calendarSyncQuery.data
+                                                    ?.importedEventsCount ?? 0}
+                                            </strong>
+                                        </span>
+                                    </div>
+
+                                    {calendarSyncQuery.data?.lastError && (
+                                        <p className="wdr-sform__error">
+                                            {calendarSyncQuery.data.lastError}
+                                        </p>
+                                    )}
+
+                                    <div className="wdr-sform__calendar-sync-actions">
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={() =>
+                                                void handleSaveCalendarSync()
+                                            }
+                                            disabled={
+                                                saveCalendarSync.isPending ||
+                                                runCalendarSync.isPending ||
+                                                saving
+                                            }
+                                        >
+                                            {saveCalendarSync.isPending
+                                                ? t("service.form.ical.saving")
+                                                : t(
+                                                      "service.form.ical.save_url",
+                                                  )}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={() =>
+                                                void handleRunCalendarSync()
+                                            }
+                                            disabled={
+                                                runCalendarSync.isPending ||
+                                                saveCalendarSync.isPending ||
+                                                !calendarImportUrl.trim()
+                                            }
+                                        >
+                                            {runCalendarSync.isPending
+                                                ? t("service.form.ical.syncing")
+                                                : t(
+                                                      "service.form.ical.sync_now",
+                                                  )}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={() =>
+                                                void handleCopyExportUrl()
+                                            }
+                                            disabled={
+                                                !calendarSyncQuery.data
+                                                    ?.exportUrl
+                                            }
+                                        >
+                                            {t("service.form.ical.copy_export")}
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </fieldset>
+                            )}
+                        </fieldset>
                     )}
 
                     <div className="wdr-sform__actions">

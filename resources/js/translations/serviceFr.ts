@@ -16,6 +16,9 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.category.boat": "Bateau",
         "service.category.stay": "Hébergement",
         "service.category.car": "Voiture",
+        "service.trust.partner_approved": "Partenaire validé",
+        "service.trust.contract_signed": "Contrat signé",
+        "service.trust.documents_validated": "Documents vérifiés",
         "service.features": "À retenir",
         "service.detail_category": "Catégorie détaillée",
         "service.subcategory": "Sous-catégorie",
@@ -69,8 +72,7 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.places": "places",
         "service.customer_reviews": "Avis voyageurs ({count})",
         "service.no_reviews_title": "Pas encore d’avis",
-        "service.no_reviews_desc":
-            "Cette offre n’a pas encore reçu d’avis.",
+        "service.no_reviews_desc": "Cette offre n’a pas encore reçu d’avis.",
         "service.similar": "Vous pourriez aussi aimer",
         "service.favorite_add": "Ajouter aux favoris",
         "service.favorite_remove": "Retirer des favoris",
@@ -115,8 +117,7 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.external_cta": "Réserver",
         "service.external_note":
             "La disponibilité affichée est mise à jour en temps réel.",
-        "service.external_realtime":
-            "Disponibilité mise à jour en temps réel.",
+        "service.external_realtime": "Disponibilité mise à jour en temps réel.",
         "service.external_price_label": "Prix",
         "service.external_price_total_label": "Montant total communiqué",
         "service.external_price_total_unknown": "Total non communiqué",
@@ -165,8 +166,7 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.form.structure.none_attributes":
             "Aucun attribut dynamique configuré.",
         "service.form.structure.extras": "Extras",
-        "service.form.structure.none_extras":
-            "Aucun extra actif configuré.",
+        "service.form.structure.none_extras": "Aucun extra actif configuré.",
         "service.form.section.guidance": "Conseils de saisie",
         "service.form.guidance.structure": "Structure active : {name}",
         "service.form.guidance.activity.title":
@@ -227,6 +227,9 @@ export function buildServiceFrTranslations(): Record<string, string> {
             "Sélectionnez un partenaire avant de créer ce service.",
         "service.form.partner.hint_optional":
             "Si aucun partenaire n'est choisi, le premier partenaire disponible sera utilisé.",
+        "service.form.locale_editor": "Langue d'édition",
+        "service.form.locale_hint":
+            "Le français sert de base pour le catalogue et reste obligatoire.",
         "service.form.label.title": "Titre",
         "service.form.label.description": "Description",
         "service.form.label.category": "Type de service",
@@ -331,6 +334,7 @@ export function buildServiceFrTranslations(): Record<string, string> {
         "service.form.ical.syncing": "Synchronisation...",
         "service.form.ical.copy_export": "Copier l'URL d'export",
         "service.form.actions.cancel": "Annuler",
+        "service.form.actions.add_images": "Ajouter des images",
         "service.form.actions.create": "Créer le service",
         "service.form.actions.save_changes": "Enregistrer les modifications",
         "service.form.actions.saving": "Enregistrement...",
@@ -362,8 +366,7 @@ export function buildServiceFrTranslations(): Record<string, string> {
             "Renseignez un nombre d'unités minimum pour cette règle.",
         "service.form.toast.save_create": "Service créé.",
         "service.form.toast.save_update": "Service mis à jour.",
-        "service.form.toast.save_error":
-            "Impossible d'enregistrer le service.",
+        "service.form.toast.save_error": "Impossible d'enregistrer le service.",
         "service.form.toast.images_uploaded_one": "Image téléversée.",
         "service.form.toast.images_uploaded_other":
             "{count} images téléversées.",

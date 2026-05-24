@@ -362,3 +362,35 @@
         justify-content: stretch;
     }
 }
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-profile,
+.wdr-profile__inner,
+.wdr-profile__section,
+.wdr-profile__field,
+.wdr-profile__identity {
+    min-width: 0;
+    overflow-x: clip;
+}
+
+.wdr-profile__fields-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.wdr-profile__input,
+.wdr-profile__select,
+.wdr-profile__info-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 460px) {
+    .wdr-profile__header,
+    .wdr-profile__section-header {
+        align-items: flex-start;
+        text-align: left;
+    }
+}

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -48,5 +49,26 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($partner)->get(route('partner.pending'));
 
         $response->assertOk();
+    }
+
+    public function test_partner_pending_page_receives_contract_text_for_signature()
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'PENDING_SIGNATURE',
+            'mandate_contract_text' => 'Contract terms visible to partner.',
+            'mandate_signed_at' => null,
+            'onboarding_completed_at' => null,
+        ]);
+
+        $response = $this->actingAs($partner)->get(route('partner.pending'));
+
+        $response
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('auth.user.mandateContractText', 'Contract terms visible to partner.')
+                ->where('auth.user.mandateContractStatus', 'PENDING_SIGNATURE')
+            );
     }
 }

@@ -6,7 +6,7 @@ import { favoritesApi } from "@/api/favorites";
 import { useFavoritesData } from "@/hooks/useFavoritesData";
 import { useBlogPostsData } from "@/hooks/useBlogData";
 import { useGeoContext } from "@/hooks/useGeoContext";
-import { useServicesDataWithOptions } from "@/hooks/useServicesData";
+import { useHomeCatalogPreviewData } from "@/hooks/useHomeCatalogPreviewData";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useWdrRouter";
 import { useUser } from "@/context/UserContext";
@@ -15,11 +15,17 @@ import {
     buildPublicDestinationOptions,
     PUBLIC_ALGARVE_DESTINATIONS,
 } from "@/lib/publicDestinations";
-import { toServiceCardData } from "@/lib/serviceAdapter";
 import { BlogStatusNames } from "@/types/blog";
+import type { ServiceCategory } from "@/types/service";
 import "./HomePage.css";
 
-const DESTINATION_CARDS = PUBLIC_ALGARVE_DESTINATIONS;
+const DESTINATION_GROUPS = [
+    {
+        country: "Portugal",
+        region: "Algarve",
+        cities: PUBLIC_ALGARVE_DESTINATIONS,
+    },
+];
 
 const WhatsAppIcon: React.FC = () => (
     <svg
@@ -46,10 +52,7 @@ export const HomePage: React.FC = () => {
     const [category, setCategory] = useState("");
 
     const today = todayISO();
-    const { services } = useServicesDataWithOptions(
-        { limit: 100 },
-        { fetchAll: true },
-    );
+    const { preview } = useHomeCatalogPreviewData();
     const { favorites } = useFavoritesData(currentUser?.id ?? "");
     const { posts: allPosts } = useBlogPostsData({
         status: BlogStatusNames.PUBLISHED,
@@ -96,12 +99,16 @@ export const HomePage: React.FC = () => {
     );
 
     const destinationOptions = useMemo(() => {
-        return buildPublicDestinationOptions(services).sort((a, b) => {
-            if (a.country === "Algarve") {
+        return [
+            ...(preview?.destinations?.length
+                ? preview.destinations
+                : buildPublicDestinationOptions([])),
+        ].sort((a, b) => {
+            if (a.country === "Portugal" && a.region === "Algarve") {
                 return -1;
             }
 
-            if (b.country === "Algarve") {
+            if (b.country === "Portugal" && b.region === "Algarve") {
                 return 1;
             }
 
@@ -121,18 +128,23 @@ export const HomePage: React.FC = () => {
 
             return a.country.localeCompare(b.country, "fr");
         });
-    }, [geoContext.countryName, services]);
+    }, [geoContext.countryName, preview?.destinations]);
 
     const latestPosts = useMemo(() => allPosts.slice(0, 3), [allPosts]);
 
     const featuredServices = useMemo(
-        () =>
-            [...services]
-                .filter((service) => service.isAvailable)
-                .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-                .slice(0, 4)
-                .map((service) => toServiceCardData(service)),
-        [services],
+        () => preview?.featuredServices ?? [],
+        [preview?.featuredServices],
+    );
+
+    const categoryCounts = useMemo<Record<ServiceCategory, number>>(
+        () => ({
+            ACTIVITE: preview?.categoryCounts.ACTIVITE ?? 0,
+            BATEAU: preview?.categoryCounts.BATEAU ?? 0,
+            HEBERGEMENT: preview?.categoryCounts.HEBERGEMENT ?? 0,
+            VOITURE: preview?.categoryCounts.VOITURE ?? 0,
+        }),
+        [preview?.categoryCounts],
     );
 
     const categoryTiles = useMemo(
@@ -164,13 +176,9 @@ export const HomePage: React.FC = () => {
                 },
             ].map((tile) => ({
                 ...tile,
-                count: services.filter(
-                    (service) =>
-                        service.isAvailable &&
-                        service.category === tile.value,
-                ).length,
+                count: categoryCounts[tile.value as ServiceCategory],
             })),
-        [services, t],
+        [categoryCounts, t],
     );
 
     const handleSearch = (event: React.FormEvent) => {
@@ -463,32 +471,46 @@ export const HomePage: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="wdr-home__destination-grid">
-                        {DESTINATION_CARDS.map((city) => (
-                            <button
-                                key={city}
-                                type="button"
-                                className="wdr-home__destination-card"
-                                onClick={() =>
-                                    navigate({
-                                        name: "search",
-                                        query: city,
-                                        category: "",
-                                        dateFrom: "",
-                                        dateTo: "",
-                                    })
-                                }
+                    <div className="wdr-home__destination-groups">
+                        {DESTINATION_GROUPS.map((group) => (
+                            <article
+                                key={`${group.country}-${group.region}`}
+                                className="wdr-home__destination-region"
                             >
-                                <span className="wdr-home__destination-kicker">
-                                    Algarve
-                                </span>
-                                <h3 className="wdr-home__destination-name">
-                                    {city}
-                                </h3>
-                                <p className="wdr-home__destination-copy">
-                                    {t("home.destination_copy")} {city}.
-                                </p>
-                            </button>
+                                <div className="wdr-home__destination-region-head">
+                                    <span>{group.country}</span>
+                                    <strong>{group.region}</strong>
+                                </div>
+                                <div className="wdr-home__destination-grid">
+                                    {group.cities.map((city) => (
+                                        <button
+                                            key={city}
+                                            type="button"
+                                            className="wdr-home__destination-card"
+                                            onClick={() =>
+                                                navigate({
+                                                    name: "search",
+                                                    query: city,
+                                                    category: "",
+                                                    dateFrom: "",
+                                                    dateTo: "",
+                                                })
+                                            }
+                                        >
+                                            <span className="wdr-home__destination-kicker">
+                                                {group.region}
+                                            </span>
+                                            <h3 className="wdr-home__destination-name">
+                                                {city}
+                                            </h3>
+                                            <p className="wdr-home__destination-copy">
+                                                {t("home.destination_copy")}{" "}
+                                                {city}.
+                                            </p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </article>
                         ))}
                     </div>
                 </div>

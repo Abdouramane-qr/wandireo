@@ -342,9 +342,24 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+    min-height: 2rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.25rem 0.65rem;
+    background: #ffffff;
     color: var(--primary);
     font-size: 0.78rem;
     font-weight: 700;
+    transition:
+        background-color var(--transition-base),
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+}
+
+.wdr-admin-support__ticket-row:hover .wdr-admin-support__ticket-action {
+    border-color: color-mix(in srgb, var(--primary) 32%, var(--border-light));
+    background: color-mix(in srgb, var(--primary) 7%, #ffffff);
+    box-shadow: 0 10px 22px -16px rgba(15, 139, 168, 0.65);
 }
 
 .wdr-admin-support__empty {
@@ -498,7 +513,7 @@
 .wdr-admin-support__detail-option {
     min-height: 2.5rem;
     padding: 0.55rem 0.75rem;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border-light);
     background: var(--bg-elevated);
     color: var(--text-muted);
@@ -515,6 +530,7 @@
 
 .wdr-admin-support__detail-option:hover {
     border-color: rgba(51, 184, 213, 0.22);
+    box-shadow: 0 10px 22px -16px rgba(15, 139, 168, 0.55);
 }
 
 .wdr-admin-support__detail-option--active {
@@ -638,6 +654,12 @@
     justify-content: flex-end;
     gap: 0.75rem;
     padding-top: 0.25rem;
+}
+
+.wdr-admin-support__cta,
+.wdr-admin-support__detail-actions .wdr-btn,
+.wdr-admin-support__form-actions .wdr-btn {
+    border-radius: var(--radius-md);
 }
 
 @media (max-width: 900px) {
@@ -770,4 +792,43 @@
 
 :is(.dark) .wdr-admin-support__detail-message-body {
     background: rgba(8, 24, 34, 0.95);
+}
+
+/* ============================================================
+   Support button and overflow hardening
+   ============================================================ */
+
+.wdr-admin-support,
+.wdr-admin-support__body,
+.wdr-admin-support__toolbar,
+.wdr-admin-support__panel,
+.wdr-admin-support__detail-card,
+.wdr-admin-support__form-grid {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-support__cta,
+.wdr-admin-support__hero-actions .wdr-btn,
+.wdr-admin-support__detail-actions .wdr-btn,
+.wdr-admin-support__form-actions .wdr-btn {
+    justify-content: center;
+    min-height: 2.5rem;
+    max-width: 100%;
+    white-space: normal;
+}
+
+.wdr-admin-support__ticket-subject,
+.wdr-admin-support__message-preview,
+.wdr-admin-support__detail-message-body,
+.wdr-admin-support__form-error {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+    .wdr-admin-support__detail-actions .wdr-btn,
+    .wdr-admin-support__form-actions .wdr-btn,
+    .wdr-admin-support__hero-actions .wdr-btn {
+        width: 100%;
+    }
 }

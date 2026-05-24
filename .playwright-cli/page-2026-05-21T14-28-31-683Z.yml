@@ -1,0 +1,317 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e142]:
+    - banner [ref=e143]:
+      - generic [ref=e144]:
+        - link "Wandireo - Retour à l'accueil" [ref=e145] [cursor=pointer]:
+          - /url: /fr
+          - img [ref=e146]
+        - navigation "Navigation principale" [ref=e147]:
+          - link "Administration" [ref=e148] [cursor=pointer]:
+            - /url: /fr/admin
+          - link "Utilisateurs" [ref=e149] [cursor=pointer]:
+            - /url: /fr/admin/utilisateurs
+          - link "Catalogue" [ref=e150] [cursor=pointer]:
+            - /url: /fr/admin/services
+          - link "Blog" [ref=e151] [cursor=pointer]:
+            - /url: /fr/admin/blog
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - button "Changer de thème" [ref=e155] [cursor=pointer]:
+              - img [ref=e156]
+            - button "FR" [ref=e159] [cursor=pointer]:
+              - img [ref=e160]
+              - generic [ref=e163]: FR
+          - button "Administration" [ref=e165] [cursor=pointer]:
+            - generic [ref=e166]: Administration
+          - generic [ref=e167]:
+            - generic [ref=e168]:
+              - generic [ref=e169]: V
+              - generic [ref=e170]: Visual
+            - button "Déconnexion" [ref=e171] [cursor=pointer]:
+              - generic [ref=e172]: Déconnexion
+    - main [ref=e173]:
+      - generic [ref=e174]:
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - paragraph [ref=e178]: Pilotage
+            - heading "Administration Wandireo" [level=1] [ref=e179]
+            - paragraph [ref=e180]: Suivez les indicateurs clés, les réservations récentes et l'état opérationnel de la plateforme. jeudi 21 mai 2026
+          - generic [ref=e181]:
+            - generic "Avatar administrateur" [ref=e182]: VA
+            - generic [ref=e183]: Visual Admin
+            - button "Déconnexion" [ref=e184] [cursor=pointer]:
+              - generic [ref=e185]: Déconnexion
+        - navigation "Navigation administration" [ref=e186]:
+          - generic [ref=e187]:
+            - generic [ref=e188]:
+              - paragraph [ref=e189]: Administration
+              - paragraph [ref=e190]: Pilotage Wandireo
+            - button "Tableau de bord" [ref=e191] [cursor=pointer]:
+              - img [ref=e193]
+              - generic [ref=e195]: Tableau de bord
+            - button "Utilisateurs" [ref=e196] [cursor=pointer]:
+              - img [ref=e198]
+              - generic [ref=e203]: Utilisateurs
+            - button "Catalogue" [ref=e204] [cursor=pointer]:
+              - img [ref=e206]
+              - generic [ref=e211]: Catalogue
+            - button "Structure" [ref=e212] [cursor=pointer]:
+              - img [ref=e214]
+              - generic [ref=e218]: Structure
+            - button "Avis" [ref=e219] [cursor=pointer]:
+              - img [ref=e221]
+              - generic [ref=e223]: Avis
+            - button "Transactions" [ref=e224] [cursor=pointer]:
+              - img [ref=e226]
+              - generic [ref=e228]: Transactions
+            - button "Support" [ref=e229] [cursor=pointer]:
+              - img [ref=e231]
+              - generic [ref=e233]: Support
+        - generic [ref=e234]:
+          - region "Indicateurs de performance" [ref=e235]:
+            - generic [ref=e236]:
+              - img [ref=e238]
+              - generic [ref=e241]:
+                - generic [ref=e242]: Volume d'affaires
+                - generic [ref=e243]: 93 360 €
+                - generic [ref=e244]: Réservations confirmées
+            - generic [ref=e245]:
+              - img [ref=e247]
+              - generic [ref=e249]:
+                - generic [ref=e250]: Commissions perçues
+                - generic [ref=e251]: 15 560 €
+                - generic [ref=e252]: Sur 2 réservation(s) confirmée(s)
+            - generic [ref=e253]:
+              - img [ref=e255]
+              - generic [ref=e259]:
+                - generic [ref=e260]: En attente
+                - generic [ref=e261]: "0"
+                - generic [ref=e262]: Réservation(s) en cours de traitement
+            - generic [ref=e263]:
+              - img [ref=e265]
+              - generic [ref=e270]:
+                - generic [ref=e271]: Comptes actifs
+                - generic [ref=e272]: "12"
+                - generic [ref=e273]: 3 client(s) · 9 partenaire(s)
+            - generic [ref=e274]:
+              - img [ref=e276]
+              - generic [ref=e281]:
+                - generic [ref=e282]: Catalogue actif
+                - generic [ref=e283]: "209"
+                - generic [ref=e284]: 9 partenaire(s) valides · 0 avis en attente
+          - generic [ref=e285]:
+            - generic [ref=e286]:
+              - generic [ref=e287]:
+                - heading "File d'actions opérationnelles" [level=2] [ref=e288]
+                - paragraph [ref=e289]: Priorisez les validations, documents, services, paiements et incidents qui demandent une intervention admin.
+              - generic [ref=e290]: 6 point(s) à traiter
+            - generic [ref=e291]:
+              - button "Onboarding partenaire 0 5 contrat(s) à signer" [ref=e292] [cursor=pointer]:
+                - generic [ref=e293]: Onboarding partenaire
+                - strong [ref=e294]: "0"
+                - generic [ref=e295]: 5 contrat(s) à signer
+              - button "Documents conformité 1 0 document(s) bloquant(s)" [ref=e296] [cursor=pointer]:
+                - generic [ref=e297]: Documents conformité
+                - strong [ref=e298]: "1"
+                - generic [ref=e299]: 0 document(s) bloquant(s)
+              - button "Services en revue 0 0 service(s) rejeté(s) ou suspendu(s)" [ref=e300] [cursor=pointer]:
+                - generic [ref=e301]: Services en revue
+                - strong [ref=e302]: "0"
+                - generic [ref=e303]: 0 service(s) rejeté(s) ou suspendu(s)
+              - button "Payouts à risque 0 2 payout(s) confirmé(s) en attente" [ref=e304] [cursor=pointer]:
+                - generic [ref=e305]: Payouts à risque
+                - strong [ref=e306]: "0"
+                - generic [ref=e307]: 2 payout(s) confirmé(s) en attente
+              - button "Avis clients 0 Modération des avis" [ref=e308] [cursor=pointer]:
+                - generic [ref=e309]: Avis clients
+                - strong [ref=e310]: "0"
+                - generic [ref=e311]: Modération des avis
+              - button "Réservations externes 0 Erreurs prestataire à vérifier" [ref=e312] [cursor=pointer]:
+                - generic [ref=e313]: Réservations externes
+                - strong [ref=e314]: "0"
+                - generic [ref=e315]: Erreurs prestataire à vérifier
+          - generic [ref=e316]:
+            - heading "Funnel produit" [level=2] [ref=e318]
+            - generic [ref=e319]:
+              - generic [ref=e321]:
+                - generic [ref=e322]: Recherches
+                - generic [ref=e323]: "56"
+                - generic [ref=e324]: 30 derniers jours
+              - generic [ref=e326]:
+                - generic [ref=e327]: Vues fiche
+                - generic [ref=e328]: "70"
+                - generic [ref=e329]: 125% depuis la recherche
+              - generic [ref=e331]:
+                - generic [ref=e332]: Débuts de réservation
+                - generic [ref=e333]: "355"
+                - generic [ref=e334]: 507.1% depuis la fiche
+              - generic [ref=e336]:
+                - generic [ref=e337]: Réservations confirmées
+                - generic [ref=e338]: "0"
+                - generic [ref=e339]: 0% depuis le checkout
+          - generic [ref=e340]:
+            - heading "Accès rapides" [level=2] [ref=e341]
+            - generic [ref=e342]:
+              - button "Partenaires Modération comptes" [ref=e343] [cursor=pointer]:
+                - img [ref=e344]
+                - generic [ref=e349]: Partenaires
+                - generic [ref=e350]: Modération comptes
+              - button "Catalogue Gérer les services" [ref=e351] [cursor=pointer]:
+                - img [ref=e352]
+                - generic [ref=e357]: Catalogue
+                - generic [ref=e358]: Gérer les services
+              - button "Finances admin.dashboard.shortcuts.transactions_sub" [ref=e359] [cursor=pointer]:
+                - img [ref=e360]
+                - generic [ref=e362]: Finances
+                - generic [ref=e363]: admin.dashboard.shortcuts.transactions_sub
+              - button "Avis Modération avis" [ref=e364] [cursor=pointer]:
+                - img [ref=e365]
+                - generic [ref=e367]: Avis
+                - generic [ref=e368]: Modération avis
+          - generic [ref=e369]:
+            - generic [ref=e370]:
+              - heading "Dernières réservations" [level=2] [ref=e371]
+              - button "Tout voir" [ref=e372] [cursor=pointer]:
+                - generic [ref=e373]: Tout voir
+            - table "Liste des transactions récentes" [ref=e375]:
+              - rowgroup [ref=e376]:
+                - row "ID Client Partenaire Total Commission Statut" [ref=e377]:
+                  - columnheader "ID" [ref=e378]
+                  - columnheader "Client" [ref=e379]
+                  - columnheader "Partenaire" [ref=e380]
+                  - columnheader "Total" [ref=e381]
+                  - columnheader "Commission" [ref=e382]
+                  - columnheader "Statut" [ref=e383]
+              - rowgroup [ref=e384]:
+                - row "019e3266-ed95-71bd-970c-eb30d6c53b79 Client Demo Seafaris 160 680 € — Annulée" [ref=e385]:
+                  - cell "019e3266-ed95-71bd-970c-eb30d6c53b79" [ref=e386]
+                  - cell "Client Demo" [ref=e387]
+                  - cell "Seafaris" [ref=e388]
+                  - cell "160 680 €" [ref=e389]
+                  - cell "—" [ref=e390]
+                  - cell "Annulée" [ref=e391]:
+                    - generic [ref=e393]: Annulée
+                - row "019e3262-465d-722d-9900-dbec34ad3ea7 Client Demo Seafaris 214 240 € — Annulée" [ref=e394]:
+                  - cell "019e3262-465d-722d-9900-dbec34ad3ea7" [ref=e395]
+                  - cell "Client Demo" [ref=e396]
+                  - cell "Seafaris" [ref=e397]
+                  - cell "214 240 €" [ref=e398]
+                  - cell "—" [ref=e399]
+                  - cell "Annulée" [ref=e400]:
+                    - generic [ref=e402]: Annulée
+                - row "019e320b-8c1b-7397-ace8-57a5b2ae2a00 Client Demo Moments Watersports 6 000 € — Annulée" [ref=e403]:
+                  - cell "019e320b-8c1b-7397-ace8-57a5b2ae2a00" [ref=e404]
+                  - cell "Client Demo" [ref=e405]
+                  - cell "Moments Watersports" [ref=e406]
+                  - cell "6 000 €" [ref=e407]
+                  - cell "—" [ref=e408]
+                  - cell "Annulée" [ref=e409]:
+                    - generic [ref=e411]: Annulée
+                - row "019de0b2-5766-7330-9a54-9f2cdd9f3918 Client Demo Partner Demo Experiences 6 000 € 1 000 € Confirmée" [ref=e412]:
+                  - cell "019de0b2-5766-7330-9a54-9f2cdd9f3918" [ref=e413]
+                  - cell "Client Demo" [ref=e414]
+                  - cell "Partner Demo Experiences" [ref=e415]
+                  - cell "6 000 €" [ref=e416]
+                  - cell "1 000 €" [ref=e417]
+                  - cell "Confirmée" [ref=e418]:
+                    - generic [ref=e420]: Confirmée
+                - row "019de070-f6e3-729d-9e2c-45b33e2a1821 Client Demo Partner Demo Experiences 87 360 € 14 560 € Confirmée" [ref=e421]:
+                  - cell "019de070-f6e3-729d-9e2c-45b33e2a1821" [ref=e422]
+                  - cell "Client Demo" [ref=e423]
+                  - cell "Partner Demo Experiences" [ref=e424]
+                  - cell "87 360 €" [ref=e425]
+                  - cell "14 560 €" [ref=e426]
+                  - cell "Confirmée" [ref=e427]:
+                    - generic [ref=e429]: Confirmée
+    - contentinfo [ref=e430]:
+      - generic [ref=e431]:
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - link "footer.logo_aria" [ref=e434] [cursor=pointer]:
+              - /url: /fr
+              - img [ref=e435]
+            - paragraph [ref=e436]: Les meilleures expériences en Algarve.
+            - navigation "footer.socials" [ref=e437]:
+              - link "WhatsApp" [ref=e438] [cursor=pointer]:
+                - /url: https://wa.me/351928282231
+                - img [ref=e439]
+              - link "Instagram" [ref=e442] [cursor=pointer]:
+                - /url: https://www.instagram.com/experiences.algarve?igsh=aWVndGNpanA4cGVh&utm_source=qr
+                - img [ref=e443]
+              - link "TikTok" [ref=e446] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@experiences.algarve?_r=1&_t=ZN-94paV1xX9B0
+                - img [ref=e447]
+          - navigation "Explorer" [ref=e449]:
+            - heading "Explorer" [level=3] [ref=e450]
+            - list [ref=e451]:
+              - listitem [ref=e452]:
+                - link "Toutes les destinations" [ref=e453] [cursor=pointer]:
+                  - /url: /fr/recherche
+              - listitem [ref=e454]:
+                - link "Activités" [ref=e455] [cursor=pointer]:
+                  - /url: /fr/recherche?category=ACTIVITE
+              - listitem [ref=e456]:
+                - link "Bateaux & Nautisme" [ref=e457] [cursor=pointer]:
+                  - /url: /fr/recherche?category=BATEAU
+              - listitem [ref=e458]:
+                - link "Hébergements" [ref=e459] [cursor=pointer]:
+                  - /url: /fr/recherche?category=HEBERGEMENT
+              - listitem [ref=e460]:
+                - link "Location de voitures" [ref=e461] [cursor=pointer]:
+                  - /url: /fr/recherche?category=VOITURE
+              - listitem [ref=e462]:
+                - link "Le Blog Wandireo" [ref=e463] [cursor=pointer]:
+                  - /url: /fr/blog
+          - navigation "Services" [ref=e464]:
+            - heading "Services" [level=3] [ref=e465]
+            - list [ref=e466]:
+              - listitem [ref=e467]:
+                - link "Comment ça marche" [ref=e468] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e469]:
+                - link "Devenir partenaire" [ref=e470] [cursor=pointer]:
+                  - /url: /fr/partenaire/inscription
+              - listitem [ref=e471]:
+                - link "Connexion" [ref=e472] [cursor=pointer]:
+                  - /url: /fr/connexion
+              - listitem [ref=e473]:
+                - link "Inscription" [ref=e474] [cursor=pointer]:
+                  - /url: /fr/inscription
+          - navigation "Assistance" [ref=e475]:
+            - heading "Assistance" [level=3] [ref=e476]
+            - list [ref=e477]:
+              - listitem [ref=e478]:
+                - link "Centre d'aide" [ref=e479] [cursor=pointer]:
+                  - /url: /fr/guide
+              - listitem [ref=e480]:
+                - link "WhatsApp" [ref=e481] [cursor=pointer]:
+                  - /url: https://wa.me/351928282231
+              - listitem [ref=e482]:
+                - link "FAQ" [ref=e483] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e484]:
+                - link "booking@wandireo.com" [ref=e485] [cursor=pointer]:
+                  - /url: mailto:wandireo.bookings@gmail.com
+          - navigation "Légal" [ref=e486]:
+            - heading "Légal" [level=3] [ref=e487]
+            - list [ref=e488]:
+              - listitem [ref=e489]:
+                - link "Conditions d'utilisation" [ref=e490] [cursor=pointer]:
+                  - /url: /fr/conditions-utilisation
+              - listitem [ref=e491]:
+                - link "Politique de confidentialité" [ref=e492] [cursor=pointer]:
+                  - /url: /fr/politique-de-confidentialite
+              - listitem [ref=e493]:
+                - link "Mentions légales" [ref=e494] [cursor=pointer]:
+                  - /url: /fr/mentions-legales
+        - separator [ref=e495]
+        - generic [ref=e496]:
+          - paragraph [ref=e497]: 2026 Wandireo. Tous droits réservés.
+          - navigation "Légal" [ref=e498]:
+            - link "Conditions d'utilisation" [ref=e499] [cursor=pointer]:
+              - /url: /fr/conditions-utilisation
+            - link "Politique de confidentialité" [ref=e500] [cursor=pointer]:
+              - /url: /fr/politique-de-confidentialite
+            - link "Mentions légales" [ref=e501] [cursor=pointer]:
+              - /url: /fr/mentions-legales
+  - generic "Notifications"

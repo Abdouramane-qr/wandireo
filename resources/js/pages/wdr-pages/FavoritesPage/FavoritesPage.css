@@ -97,3 +97,30 @@
     border-color: #e5334b;
     background: #fff0f2;
 }
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-favs,
+.wdr-favs__inner,
+.wdr-favs__item {
+    min-width: 0;
+    overflow-x: clip;
+}
+
+.wdr-favs__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.wdr-favs__remove-btn {
+    max-width: 100%;
+    white-space: normal;
+}
+
+@media (max-width: 480px) {
+    .wdr-favs__header-inner,
+    .wdr-favs__inner {
+        padding-inline: 1rem;
+    }
+}

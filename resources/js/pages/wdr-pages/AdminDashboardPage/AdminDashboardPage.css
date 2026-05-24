@@ -90,7 +90,6 @@
     padding: 2.5rem 1.5rem;
 }
 
-
 .wdr-admin-dash__hero-content {
     max-width: 1440px;
     margin: 0 auto;
@@ -248,7 +247,6 @@
     transform: translateY(-2px);
 }
 
-
 .wdr-admin-dash__metric-icon {
     width: 40px;
     height: 40px;
@@ -327,6 +325,97 @@
 
 .wdr-admin-dash__section-header .wdr-admin-dash__section-title {
     margin: 0;
+}
+
+.wdr-admin-dash__section-copy {
+    margin: 0.35rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   File d'actions opérationnelles
+   ============================================================ */
+
+.wdr-admin-dash__operations {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border: var(--card-border);
+    color: var(--text-main);
+}
+
+.wdr-admin-dash__operations-total {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.wdr-admin-dash__operations-total--attention {
+    background: #fff3d6;
+    color: #9a6700;
+}
+
+.wdr-admin-dash__operations-total--clear {
+    background: #e6f9ef;
+    color: var(--success-dark);
+}
+
+.wdr-admin-dash__operations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.wdr-admin-dash__operation-card {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-main);
+    padding: 1rem;
+    color: var(--text-main);
+    text-align: left;
+    cursor: pointer;
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base),
+        transform var(--transition-base);
+}
+
+.wdr-admin-dash__operation-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.wdr-admin-dash__operation-label {
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.wdr-admin-dash__operation-value {
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    font-size: 1.55rem;
+    line-height: 1.1;
+}
+
+.wdr-admin-dash__operation-card small {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.4;
 }
 
 /* ============================================================
@@ -457,6 +546,10 @@
 }
 
 @media (max-width: 768px) {
+    .wdr-admin-dash__operations-grid {
+        grid-template-columns: 1fr;
+    }
+
     .wdr-admin-dash__table {
         min-width: 0;
     }
@@ -686,4 +779,38 @@
         text-transform: uppercase;
         color: var(--text-muted);
     }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-admin-dash,
+.wdr-admin-dash__body,
+.wdr-admin-dash__recent,
+.wdr-admin-dash__table-wrapper,
+.wdr-admin-dash__metric-card,
+.wdr-admin-dash__quick-link,
+.wdr-admin-dash__table-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-dash__metrics,
+.wdr-admin-dash__quick-grid,
+.wdr-admin-dash__table-cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.wdr-admin-dash__metric-value,
+.wdr-admin-dash__metric-label,
+.wdr-admin-dash__metric-sub,
+.wdr-admin-dash__table-meta,
+.wdr-admin-dash__table-partner,
+.wdr-admin-dash__table td {
+    overflow-wrap: anywhere;
+}
+
+.wdr-admin-dash__status {
+    white-space: normal;
 }

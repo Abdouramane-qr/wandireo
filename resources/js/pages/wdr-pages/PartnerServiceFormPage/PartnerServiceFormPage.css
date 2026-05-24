@@ -15,8 +15,11 @@
 
 /* ---- En-tete ---- */
 .wdr-sform__header {
-    background:
-        linear-gradient(180deg, rgba(242, 250, 251, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(242, 250, 251, 0.96) 0%,
+        rgba(255, 255, 255, 0.92) 100%
+    );
     border-bottom: 1px solid var(--border-light);
     padding: 1.5rem 0 2rem;
     margin-top: 1rem;
@@ -27,6 +30,10 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 .wdr-sform__title {
@@ -65,8 +72,11 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f9fcfe 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f9fcfe 100%
+    );
     box-shadow: var(--shadow-sm);
 }
 
@@ -103,7 +113,11 @@
     padding: 0.875rem 1rem;
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
-    background: linear-gradient(180deg, rgba(248, 252, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(248, 252, 255, 0.98) 0%,
+        rgba(255, 255, 255, 0.94) 100%
+    );
 }
 
 .wdr-sform__locale-label {
@@ -164,7 +178,11 @@
 
 .wdr-sform__structure-summary {
     border: 1px solid rgba(0, 132, 255, 0.16);
-    background: linear-gradient(180deg, rgba(0, 132, 255, 0.04), rgba(255, 255, 255, 0.92));
+    background: linear-gradient(
+        180deg,
+        rgba(0, 132, 255, 0.04),
+        rgba(255, 255, 255, 0.92)
+    );
     border-radius: var(--radius-lg);
     padding: 1rem;
     display: flex;
@@ -332,8 +350,11 @@
     font-family: var(--font-family);
     font-size: 0.9rem;
     color: var(--text-main);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, var(--bg-main) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--bg-main) 100%
+    );
     transition: border-color var(--transition-base);
     box-sizing: border-box;
     min-height: 100px;
@@ -352,8 +373,11 @@
     padding: 0.875rem;
     font-size: 0.9rem;
     color: var(--text-main);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, var(--bg-main) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--bg-main) 100%
+    );
     box-sizing: border-box;
 }
 
@@ -382,8 +406,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 249, 255, 0.96) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(240, 249, 255, 0.96) 100%
+    );
     border: 1px solid rgba(0, 132, 255, 0.2);
     border-radius: var(--radius-md);
     padding: 0.625rem 1rem;
@@ -418,8 +445,11 @@
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
     overflow: hidden;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, #f7fbfd 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.99) 0%,
+        #f7fbfd 100%
+    );
     box-shadow: 0 18px 34px rgba(5, 31, 40, 0.08);
 }
 
@@ -452,8 +482,11 @@
 .wdr-sform__image-remove {
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f5fbfd 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f5fbfd 100%
+    );
     color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 600;
@@ -485,8 +518,11 @@
     padding: 0.875rem 1rem;
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f5fbfd 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        #f5fbfd 100%
+    );
     color: var(--text-muted);
     font-size: 0.82rem;
 }
@@ -510,8 +546,11 @@
 }
 
 :is(.dark) .wdr-sform__header {
-    background:
-        linear-gradient(180deg, rgba(7, 24, 32, 0.96) 0%, rgba(8, 28, 38, 0.94) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(7, 24, 32, 0.96) 0%,
+        rgba(8, 28, 38, 0.94) 100%
+    );
     border-bottom-color: rgba(117, 217, 226, 0.12);
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
 }
@@ -531,23 +570,29 @@
 }
 
 :is(.dark) .wdr-sform__fieldset {
-    background:
-        linear-gradient(180deg, rgba(17, 43, 57, 0.98) 0%, rgba(13, 34, 48, 0.98) 100%) !important;
+    background: linear-gradient(
+        180deg,
+        rgba(17, 43, 57, 0.98) 0%,
+        rgba(13, 34, 48, 0.98) 100%
+    ) !important;
     box-shadow: var(--shadow-md);
 }
 
 :is(.dark) .wdr-sform__structure-summary {
     border-color: rgba(51, 184, 213, 0.24);
-    background:
-        linear-gradient(
-            180deg,
-            rgba(51, 184, 213, 0.1),
-            rgba(17, 43, 57, 0.96)
-        );
+    background: linear-gradient(
+        180deg,
+        rgba(51, 184, 213, 0.1),
+        rgba(17, 43, 57, 0.96)
+    );
 }
 
 :is(.dark) .wdr-sform__guidance-card {
-    background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg-elevated) 100%) !important;
+    background: linear-gradient(
+        180deg,
+        var(--bg-soft) 0%,
+        var(--bg-elevated) 100%
+    ) !important;
 }
 
 :is(.dark) .wdr-sform__guidance-chip,
@@ -558,12 +603,11 @@
 
 :is(.dark) .wdr-sform__textarea,
 :is(.dark) .wdr-sform__file-input {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(21, 50, 67, 0.96) 0%,
-            rgba(13, 34, 48, 0.96) 100%
-        ) !important;
+    background: linear-gradient(
+        180deg,
+        rgba(21, 50, 67, 0.96) 0%,
+        rgba(13, 34, 48, 0.96) 100%
+    ) !important;
 }
 
 :is(.dark) .wdr-sform__image-action,
@@ -576,9 +620,71 @@
 }
 
 @media (max-width: 500px) {
+    .wdr-sform__header-inner {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
     .wdr-sform__structure-summary-header,
     .wdr-sform__guidance-header,
     .wdr-sform__actions {
         flex-direction: column-reverse;
+    }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-sform,
+.wdr-sform__inner,
+.wdr-sform__fieldset,
+.wdr-sform__field,
+.wdr-sform__structure-summary,
+.wdr-sform__structure-card,
+.wdr-sform__image-card,
+.wdr-sform__calendar-sync-meta {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-sform__row,
+.wdr-sform__structure-grid,
+.wdr-sform__image-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.wdr-sform__title,
+.wdr-sform__subtitle,
+.wdr-sform__label,
+.wdr-sform__locale-hint,
+.wdr-sform__structure-summary-subtitle,
+.wdr-sform__structure-copy,
+.wdr-sform__structure-meta,
+.wdr-sform__calendar-sync-meta {
+    overflow-wrap: anywhere;
+}
+
+.wdr-sform__locale-bar,
+.wdr-sform__calendar-sync-actions,
+.wdr-sform__actions {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+    .wdr-sform__fieldset {
+        padding: 1rem;
+    }
+
+    .wdr-sform__locale-bar,
+    .wdr-sform__calendar-sync-actions,
+    .wdr-sform__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .wdr-sform__actions .wdr-btn,
+    .wdr-sform__calendar-sync-actions .wdr-btn {
+        width: 100%;
     }
 }

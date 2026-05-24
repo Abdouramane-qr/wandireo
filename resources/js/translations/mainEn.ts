@@ -79,10 +79,19 @@ export function buildMainEnTranslations(): Record<string, string> {
         "footer.services": "Services",
         "footer.how_it_works": "How it works",
         "footer.help": "Help Center",
+        "footer.help_center": "Help Center",
+        "footer.whatsapp": "WhatsApp",
+        "footer.faq": "FAQ",
         "footer.legal": "Legal",
         "footer.contact": "Contact",
         "footer.booking_email": "booking@wandireo.com",
         "footer.rights": "All rights reserved.",
+        "footer.terms": "Terms of use",
+        "footer.privacy": "Privacy policy",
+        "footer.legal_notice": "Legal notice",
+        "footer.copyright": "Wandireo. All rights reserved.",
+        "footer.logo_aria": "Wandireo - Back to home",
+        "footer.socials": "Social networks",
         "footer.social.whatsapp": "WhatsApp",
         "footer.social.instagram": "Instagram",
         "footer.social.tiktok": "TikTok",
@@ -147,8 +156,7 @@ export function buildMainEnTranslations(): Record<string, string> {
             "When you sign in, you will be asked for a temporary code. You can retrieve it from a TOTP app on your phone.",
         "settings.security.two_factor_disabled_message":
             "When you enable two-factor authentication, you will be asked for a temporary code at sign-in. This code can be retrieved from a TOTP app on your phone.",
-        "settings.security.disable_two_factor":
-            "Disable 2FA",
+        "settings.security.disable_two_factor": "Disable 2FA",
         "settings.security.continue_setup": "Continue setup",
         "settings.security.enable_two_factor": "Enable 2FA",
         "settings.appearance.page_title": "Appearance settings",
@@ -159,8 +167,7 @@ export function buildMainEnTranslations(): Record<string, string> {
             "Two-factor authentication enabled",
         "auth.two_factor.setup.enabled_description":
             "Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.",
-        "auth.two_factor.setup.verify_title":
-            "Verify the authentication code",
+        "auth.two_factor.setup.verify_title": "Verify the authentication code",
         "auth.two_factor.setup.verify_description":
             "Enter the 6-digit code shown in your authenticator app",
         "auth.two_factor.setup.enable_title":
@@ -179,7 +186,6 @@ export function buildMainEnTranslations(): Record<string, string> {
         "auth.two_factor.recovery_codes.regenerate_help":
             "Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate codes above.",
         "auth.two_factor.recovery_codes.list_aria": "Recovery codes",
-        "auth.two_factor.recovery_codes.loading_aria":
-            "Loading recovery codes",
+        "auth.two_factor.recovery_codes.loading_aria": "Loading recovery codes",
     };
 }

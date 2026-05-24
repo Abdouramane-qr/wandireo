@@ -730,3 +730,48 @@
 [2026-05-12 13:55:00] testing.INFO: stripe.webhook.checkout_completed {"payment_id":1,"booking_id":"019e1c78-346d-7125-a1d5-03fa3cd3fb24","session_id":"cs_test_external_idempotent"} 
 [2026-05-12 13:55:00] testing.INFO: stripe.webhook.payment_already_paid {"payment_id":1,"session_id":"cs_test_external_idempotent","status":"paid"} 
 [2026-05-12 13:55:00] testing.WARNING: stripe.webhook.invalid_signature  
+[2026-05-24 11:34:52] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e59c4-3ac3-7231-ada0-b4a2a819c630","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-24 11:35:01] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59c4-5b5f-7356-b0a0-9da46885fff3","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:35:08] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59c4-7922-71b8-8ffb-e985f7d185b6","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:35:24] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-24 11:35:27] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59c4-c39e-728a-9ef8-72bf4e1da111","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:35:32] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59c4-d3f0-70d8-9ada-98cc9f54b71e","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:35:32] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59c4-d3f0-70d8-9ada-98cc9f54b71e","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:57:17] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e59d8-c026-73d2-91d7-feb79a3ec966","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-24 11:57:20] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59d8-cc82-73ed-9139-0f685a9b4e18","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:57:23] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59d8-d639-73ff-aeb5-b24811b40bea","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:57:29] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-24 11:57:33] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59d8-fc33-73c4-9c1e-9aa36bcbdd7c","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:57:36] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59d9-09fc-7150-a6c1-71b8d582abc3","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 11:57:36] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59d9-09fc-7150-a6c1-71b8d582abc3","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:18:19] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e59ec-0275-711b-acfe-4a422ebc4171","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-24 12:18:22] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-0e96-707f-b4fe-dbe7c1c49edc","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:18:26] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-1be7-70f4-97ce-bb094b49e656","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:18:31] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-24 12:18:34] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-3be6-700e-a522-5584bd4462df","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:18:37] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-4717-73c9-ba54-8fa146a77a18","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:18:37] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-4717-73c9-ba54-8fa146a77a18","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:19:05] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e59ec-b45c-72ed-8f99-1c08b45b4939","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-24 12:19:08] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-c028-703f-bf84-4e83ab6b68f2","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:19:11] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-cb16-700f-8258-161471ebe252","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:19:17] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-24 12:19:21] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-f337-733a-bbdb-197002535c4a","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:19:24] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-fea3-72ce-93e4-f5509a16575b","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:19:24] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e59ec-fea3-72ce-93e4-f5509a16575b","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:59:46] testing.WARNING: FareHarbor availability lookup failed. {"service_id":"019e5a11-f408-717f-abf2-27de3f0e62f8","source_external_id":"fh-item-3","message":"provider down"} 
+[2026-05-24 12:59:52] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e5a12-09ec-72be-9d94-a5ac68bd4b48","provider":"FAREHARBOR","source_external_id":"seafaris:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 12:59:56] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e5a12-19f1-7321-ae2c-f83d994042b3","provider":"FAREHARBOR","source_external_id":"buggy-adventure:shared-item","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 13:00:02] testing.WARNING: Partner content translation failed and reused the previous translation. {"field":"title","target_locale":"es","message":"HTTP request returned status code 422:
+{\"detail\":\"Translation not found.\"}
+"} 
+[2026-05-24 13:00:06] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e5a12-42d3-71f7-8713-7cc56889398b","provider":"FAREHARBOR","source_external_id":"seafaris:fh-assign","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 13:00:09] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e5a12-4ef3-721b-a6ed-6b48232819da","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 
+[2026-05-24 13:00:09] testing.WARNING: Imported partner service remains translation-incomplete after sync. {"service_id":"019e5a12-4ef3-721b-a6ed-6b48232819da","provider":"FAREHARBOR","source_external_id":"seafaris:fh-override","issues":["missing_fr_title","missing_fr_description"]} 

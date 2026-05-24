@@ -1,0 +1,164 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Wandireo - Retour à l'accueil" [ref=e6] [cursor=pointer]:
+          - /url: /fr
+          - img [ref=e7]
+        - navigation "Navigation principale" [ref=e8]:
+          - link "Recherche" [ref=e9] [cursor=pointer]:
+            - /url: /fr/recherche
+          - link "Activités" [ref=e10] [cursor=pointer]:
+            - /url: /fr/recherche?category=ACTIVITE
+          - link "Bateaux" [ref=e11] [cursor=pointer]:
+            - /url: /fr/recherche?category=BATEAU
+          - link "Hébergements" [ref=e12] [cursor=pointer]:
+            - /url: /fr/recherche?category=HEBERGEMENT
+          - link "Voitures" [ref=e13] [cursor=pointer]:
+            - /url: /fr/recherche?category=VOITURE
+          - link "Blog" [ref=e14] [cursor=pointer]:
+            - /url: /fr/blog
+        - generic [ref=e15]:
+          - button "Recherche" [ref=e17] [cursor=pointer]:
+            - img [ref=e18]
+          - generic [ref=e21]:
+            - button "Changer de thème" [ref=e23] [cursor=pointer]:
+              - img [ref=e24]
+            - button "FR" [ref=e27] [cursor=pointer]:
+              - img [ref=e28]
+              - generic [ref=e31]: FR
+          - button "Devenir partenaire" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: Devenir partenaire
+          - generic [ref=e35]:
+            - button "Connexion" [ref=e36] [cursor=pointer]:
+              - generic [ref=e37]: Connexion
+            - button "Inscription" [ref=e38] [cursor=pointer]:
+              - generic [ref=e39]: Inscription
+    - main [ref=e40]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - heading "Connexion" [level=1] [ref=e44]
+          - paragraph [ref=e45]: Connectez-vous pour retrouver vos réservations, vos favoris et votre espace voyageur.
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - text: Adresse e-mail
+              - generic [ref=e49]: "*"
+            - textbox "Adresse e-mail" [ref=e51]:
+              - /placeholder: vous@exemple.com
+              - text: admin@wandireo.com
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - text: Mot de passe
+              - generic [ref=e54]: "*"
+            - generic [ref=e55]:
+              - textbox "Mot de passe" [ref=e56]:
+                - /placeholder: Votre mot de passe
+                - text: password123
+              - button [ref=e58] [cursor=pointer]:
+                - img [ref=e59]
+            - alert [ref=e145]:
+              - img [ref=e146]
+              - text: Adresse e-mail ou mot de passe incorrect.
+          - button "Mot de passe oublié ?" [ref=e62] [cursor=pointer]
+          - button "Se connecter" [ref=e63] [cursor=pointer]:
+            - generic [ref=e64]: Se connecter
+        - generic [ref=e65]:
+          - paragraph [ref=e66]:
+            - text: Pas encore de compte ?
+            - button "Créer un compte" [ref=e67] [cursor=pointer]
+          - paragraph [ref=e68]:
+            - text: Vous gérez des offres touristiques ?
+            - button "Devenir partenaire" [ref=e69] [cursor=pointer]
+    - contentinfo [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - link "footer.logo_aria" [ref=e74] [cursor=pointer]:
+              - /url: /fr
+              - img [ref=e75]
+            - paragraph [ref=e76]: Les meilleures expériences en Algarve.
+            - navigation "footer.socials" [ref=e77]:
+              - link "WhatsApp" [ref=e78] [cursor=pointer]:
+                - /url: https://wa.me/351928282231
+                - img [ref=e79]
+              - link "Instagram" [ref=e82] [cursor=pointer]:
+                - /url: https://www.instagram.com/experiences.algarve?igsh=aWVndGNpanA4cGVh&utm_source=qr
+                - img [ref=e83]
+              - link "TikTok" [ref=e86] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@experiences.algarve?_r=1&_t=ZN-94paV1xX9B0
+                - img [ref=e87]
+          - navigation "Explorer" [ref=e89]:
+            - heading "Explorer" [level=3] [ref=e90]
+            - list [ref=e91]:
+              - listitem [ref=e92]:
+                - link "Toutes les destinations" [ref=e93] [cursor=pointer]:
+                  - /url: /fr/recherche
+              - listitem [ref=e94]:
+                - link "Activités" [ref=e95] [cursor=pointer]:
+                  - /url: /fr/recherche?category=ACTIVITE
+              - listitem [ref=e96]:
+                - link "Bateaux & Nautisme" [ref=e97] [cursor=pointer]:
+                  - /url: /fr/recherche?category=BATEAU
+              - listitem [ref=e98]:
+                - link "Hébergements" [ref=e99] [cursor=pointer]:
+                  - /url: /fr/recherche?category=HEBERGEMENT
+              - listitem [ref=e100]:
+                - link "Location de voitures" [ref=e101] [cursor=pointer]:
+                  - /url: /fr/recherche?category=VOITURE
+              - listitem [ref=e102]:
+                - link "Le Blog Wandireo" [ref=e103] [cursor=pointer]:
+                  - /url: /fr/blog
+          - navigation "Services" [ref=e104]:
+            - heading "Services" [level=3] [ref=e105]
+            - list [ref=e106]:
+              - listitem [ref=e107]:
+                - link "Comment ça marche" [ref=e108] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e109]:
+                - link "Devenir partenaire" [ref=e110] [cursor=pointer]:
+                  - /url: /fr/partenaire/inscription
+              - listitem [ref=e111]:
+                - link "Connexion" [ref=e112] [cursor=pointer]:
+                  - /url: /fr/connexion
+              - listitem [ref=e113]:
+                - link "Inscription" [ref=e114] [cursor=pointer]:
+                  - /url: /fr/inscription
+          - navigation "Assistance" [ref=e115]:
+            - heading "Assistance" [level=3] [ref=e116]
+            - list [ref=e117]:
+              - listitem [ref=e118]:
+                - link "Centre d'aide" [ref=e119] [cursor=pointer]:
+                  - /url: /fr/guide
+              - listitem [ref=e120]:
+                - link "WhatsApp" [ref=e121] [cursor=pointer]:
+                  - /url: https://wa.me/351928282231
+              - listitem [ref=e122]:
+                - link "FAQ" [ref=e123] [cursor=pointer]:
+                  - /url: /fr/#faq
+              - listitem [ref=e124]:
+                - link "booking@wandireo.com" [ref=e125] [cursor=pointer]:
+                  - /url: mailto:wandireo.bookings@gmail.com
+          - navigation "Légal" [ref=e126]:
+            - heading "Légal" [level=3] [ref=e127]
+            - list [ref=e128]:
+              - listitem [ref=e129]:
+                - link "Conditions d'utilisation" [ref=e130] [cursor=pointer]:
+                  - /url: /fr/conditions-utilisation
+              - listitem [ref=e131]:
+                - link "Politique de confidentialité" [ref=e132] [cursor=pointer]:
+                  - /url: /fr/politique-de-confidentialite
+              - listitem [ref=e133]:
+                - link "Mentions légales" [ref=e134] [cursor=pointer]:
+                  - /url: /fr/mentions-legales
+        - separator [ref=e135]
+        - generic [ref=e136]:
+          - paragraph [ref=e137]: 2026 Wandireo. Tous droits réservés.
+          - navigation "Légal" [ref=e138]:
+            - link "Conditions d'utilisation" [ref=e139] [cursor=pointer]:
+              - /url: /fr/conditions-utilisation
+            - link "Politique de confidentialité" [ref=e140] [cursor=pointer]:
+              - /url: /fr/politique-de-confidentialite
+            - link "Mentions légales" [ref=e141] [cursor=pointer]:
+              - /url: /fr/mentions-legales
+  - generic "Notifications"

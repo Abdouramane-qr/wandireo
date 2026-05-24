@@ -82,6 +82,27 @@
     line-height: 1.65;
 }
 
+.wdr-partner-pending__contract-text {
+    max-height: min(46vh, 28rem);
+    margin-top: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    border: 1px solid rgba(16, 40, 63, 0.14);
+    border-radius: 14px;
+    background: #fff;
+    color: #10283f;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.wdr-partner-pending__contract-text p {
+    margin: 0 0 0.8rem;
+}
+
+.wdr-partner-pending__contract-text p:last-child {
+    margin-bottom: 0;
+}
+
 .wdr-partner-pending__checkbox {
     display: flex;
     align-items: flex-start;
@@ -107,5 +128,40 @@
 
     .wdr-partner-pending__actions > * {
         width: 100%;
+    }
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-partner-pending,
+.wdr-partner-pending__card,
+.wdr-partner-pending__sign-box,
+.wdr-partner-pending__contract-text {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-partner-pending__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.wdr-partner-pending__title,
+.wdr-partner-pending__message,
+.wdr-partner-pending__item,
+.wdr-partner-pending__sign-message,
+.wdr-partner-pending__contract-text,
+.wdr-partner-pending__checkbox {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+    .wdr-partner-pending {
+        padding-inline: 1rem;
+    }
+
+    .wdr-partner-pending__card {
+        padding: 1rem;
     }
 }

@@ -15,8 +15,10 @@
  *         et vers l'espace client si l'utilisateur n'est pas un PARTNER.
  */
 
+import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/wdr";
+import { bookingsApi } from "@/api/bookings";
 import { useUser } from "@/context/UserContext";
 import { usePartnerBookingsData } from "@/hooks/useBookingsData";
 import { usePartnerApprovalGuard } from "@/hooks/usePartnerApprovalGuard";
@@ -211,6 +213,11 @@ export const PartnerDashboardPage: React.FC = () => {
         partnerId: partnerUser?.id,
         limit: 200,
     });
+    const financeSummaryQuery = useQuery({
+        queryKey: ["partner-finance-summary", partnerUser?.id],
+        queryFn: bookingsApi.partnerFinanceSummary,
+        enabled: currentUser?.role === "PARTNER",
+    });
 
     useEffect(() => {
         if (!currentUser) {
@@ -302,6 +309,11 @@ export const PartnerDashboardPage: React.FC = () => {
         () => Object.fromEntries(services.map((s) => [s.id, s.title])),
         [services],
     );
+    const financeTotals = financeSummaryQuery.data?.totals;
+    const receivableTotal = financeTotals
+        ? financeTotals.pending_payout_total +
+          financeTotals.scheduled_payout_total
+        : 0;
 
     /* Guard : attend la redirection si non authentifie ou mauvais role */
     if (isBlocked || !currentUser || currentUser.role !== "PARTNER") {
@@ -437,6 +449,82 @@ export const PartnerDashboardPage: React.FC = () => {
                                 {pendingCount}
                             </span>
                         )}
+                    </div>
+                </section>
+
+                <section
+                    className="wdr-partner-dash__section"
+                    aria-label={t("partner.dashboard.finance_title")}
+                >
+                    <div className="wdr-partner-dash__section-header">
+                        <h2 className="wdr-partner-dash__section-title">
+                            {t("partner.dashboard.finance_title")}
+                        </h2>
+                        {financeSummaryQuery.isFetching && (
+                            <span className="wdr-partner-dash__section-note">
+                                {t("partner.dashboard.finance_loading")}
+                            </span>
+                        )}
+                    </div>
+                    <div className="wdr-partner-dash__finance-grid">
+                        <article className="wdr-partner-dash__finance-card wdr-partner-dash__finance-card--net">
+                            <span className="wdr-partner-dash__finance-label">
+                                {t("partner.dashboard.finance_net")}
+                            </span>
+                            <strong className="wdr-partner-dash__finance-value">
+                                {formatPrice(
+                                    financeTotals?.partner_net_total ?? 0,
+                                    "EUR",
+                                )}
+                            </strong>
+                            <span className="wdr-partner-dash__finance-sub">
+                                {t(
+                                    "partner.dashboard.finance_confirmed_bookings",
+                                ).replace(
+                                    "{count}",
+                                    String(financeTotals?.bookings_count ?? 0),
+                                )}
+                            </span>
+                        </article>
+                        <article className="wdr-partner-dash__finance-card">
+                            <span className="wdr-partner-dash__finance-label">
+                                {t("partner.dashboard.finance_receivable")}
+                            </span>
+                            <strong className="wdr-partner-dash__finance-value">
+                                {formatPrice(receivableTotal, "EUR")}
+                            </strong>
+                            <span className="wdr-partner-dash__finance-sub">
+                                {t("partner.dashboard.finance_receivable_sub")}
+                            </span>
+                        </article>
+                        <article className="wdr-partner-dash__finance-card">
+                            <span className="wdr-partner-dash__finance-label">
+                                {t("partner.dashboard.finance_on_hold")}
+                            </span>
+                            <strong className="wdr-partner-dash__finance-value">
+                                {formatPrice(
+                                    financeTotals?.on_hold_payout_total ?? 0,
+                                    "EUR",
+                                )}
+                            </strong>
+                            <span className="wdr-partner-dash__finance-sub">
+                                {t("partner.dashboard.finance_on_hold_sub")}
+                            </span>
+                        </article>
+                        <article className="wdr-partner-dash__finance-card">
+                            <span className="wdr-partner-dash__finance-label">
+                                {t("partner.dashboard.finance_paid")}
+                            </span>
+                            <strong className="wdr-partner-dash__finance-value">
+                                {formatPrice(
+                                    financeTotals?.paid_payout_total ?? 0,
+                                    "EUR",
+                                )}
+                            </strong>
+                            <span className="wdr-partner-dash__finance-sub">
+                                {t("partner.dashboard.finance_paid_sub")}
+                            </span>
+                        </article>
                     </div>
                 </section>
 

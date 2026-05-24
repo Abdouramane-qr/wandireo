@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PartnerDocument;
 use App\Models\Service;
 use App\Models\ServiceAttribute;
 use App\Models\ServiceCategory;
@@ -81,7 +82,7 @@ class ServiceController extends Controller
                 ])),
             ];
 
-            match ($service->category) {
+            match (strtoupper((string) $service->category)) {
                 'ACTIVITE' => $results['activities'][] = $item,
                 'BATEAU' => $results['boats'][] = $item,
                 'HEBERGEMENT' => $results['accommodations'][] = $item,
@@ -104,11 +105,12 @@ class ServiceController extends Controller
             && ! $canSeeHiddenPartnerCatalog;
 
         if ($shouldRestrictToPublicCatalog) {
-            $query->where('is_available', true);
+            $query->where('is_available', true)
+                ->where('moderation_status', Service::MODERATION_PUBLISHED);
         }
 
         if ($request->category) {
-            $query->where('category', $request->category);
+            $query->whereRaw('UPPER(category) = ?', [strtoupper($request->category)]);
         }
 
         if ($request->partnerId) {
@@ -173,11 +175,15 @@ class ServiceController extends Controller
         $serviceModel = Service::with(['partner', 'serviceCategory', 'serviceSubcategory'])
             ->findOrFail($id);
 
-        if (! $serviceModel->is_available && ! $this->canAccessHiddenService(request(), $serviceModel)) {
+        $isPubliclyAvailable = $serviceModel->is_available
+            && $serviceModel->moderation_status === Service::MODERATION_PUBLISHED;
+
+        if (! $isPubliclyAvailable && ! $this->canAccessHiddenService(request(), $serviceModel)) {
             abort(404);
         }
 
         $service = $serviceModel->toArray();
+        $service['partner_trust'] = $this->partnerTrustPayload($serviceModel->partner);
 
         if (! in_array(request()->user()?->role, ['ADMIN', 'PARTNER'], true)) {
             $this->analyticsTracker->track(request(), 'service_viewed', [
@@ -187,6 +193,37 @@ class ServiceController extends Controller
         }
 
         return response()->json($service);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function partnerTrustPayload(?User $partner): array
+    {
+        if (! $partner || ! $partner->isPartner()) {
+            return [
+                'partner_approved' => false,
+                'contract_signed' => false,
+                'validated_documents_count' => 0,
+                'has_business_registration' => false,
+                'has_tax_certificate' => false,
+                'has_insurance' => false,
+            ];
+        }
+
+        $validatedDocuments = PartnerDocument::query()
+            ->where('partner_id', $partner->id)
+            ->where('status', PartnerDocument::STATUS_VALIDATED)
+            ->pluck('document_type');
+
+        return [
+            'partner_approved' => $partner->partner_status === 'APPROVED',
+            'contract_signed' => $partner->mandate_contract_status === 'SIGNED',
+            'validated_documents_count' => $validatedDocuments->count(),
+            'has_business_registration' => $validatedDocuments->contains(PartnerDocument::TYPE_BUSINESS_REGISTRATION),
+            'has_tax_certificate' => $validatedDocuments->contains(PartnerDocument::TYPE_TAX_CERTIFICATE),
+            'has_insurance' => $validatedDocuments->contains(PartnerDocument::TYPE_INSURANCE),
+        ];
     }
 
     /** POST /api/services */

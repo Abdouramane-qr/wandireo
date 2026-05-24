@@ -2,7 +2,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
     return {
         // Admin Dashboard
         "admin.dashboard.title": "Administration",
-        "admin.dashboard.subtitle": "Global platform overview and key indicators.",
+        "admin.dashboard.subtitle":
+            "Global platform overview and key indicators.",
         "admin.dashboard.logout": "Logout",
         "admin.dashboard.badge": "Admin",
         "admin.dashboard.avatar_label": "Admin avatar",
@@ -62,7 +63,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.blog.editor.cover_error": "Upload error",
         "admin.blog.editor.cover_hint": "Recommended format: 1200x630px",
         "admin.blog.editor.cover_remove": "Remove image",
-        "admin.blog.editor.placeholder.preview": "The preview will appear here...",
+        "admin.blog.editor.placeholder.preview":
+            "The preview will appear here...",
         "admin.blog.editor.actions.save": "Save",
         "admin.blog.editor.actions.save_draft": "Save as draft",
         "admin.blog.editor.actions.publish": "Publish article",
@@ -100,7 +102,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
 
         // Admin Reviews
         "admin.reviews.title": "Review Moderation",
-        "admin.reviews.subtitle": "Manage customer feedback and review visibility on the platform.",
+        "admin.reviews.subtitle":
+            "Manage customer feedback and review visibility on the platform.",
         "admin.reviews.search": "Search a review...",
         "admin.reviews.empty": "No reviews to moderate.",
         "admin.reviews.rating": "Rating",
@@ -168,8 +171,7 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.users.partner_status.rejected": "Rejected",
         "admin.users.partner_status.suspended": "Suspended",
         "admin.users.contract_status.not_sent": "Not sent",
-        "admin.users.contract_status.pending_signature":
-            "Pending signature",
+        "admin.users.contract_status.pending_signature": "Pending signature",
         "admin.users.contract_status.signed": "Signed",
         "admin.users.contract_status.rejected": "Rejected",
         "admin.users.table.name": "Name",
@@ -192,6 +194,11 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.users.field.open_current_contract": "Open current contract",
         "admin.users.field.contract_hint":
             "Admin validation: {validated} · Signature: {signed}",
+        "admin.users.field.contract_text": "Contract to read and sign",
+        "admin.users.field.contract_text_placeholder":
+            "Paste the partner contract text here...",
+        "admin.users.field.contract_text_hint":
+            "When text is provided, the partner can read it on the signature page.",
         "admin.users.field.upload_contract_pdf": "Upload a contract PDF",
         "admin.users.field.upload_pdf": "Upload PDF",
         "admin.users.field.uploading": "Uploading...",
@@ -202,8 +209,7 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.users.placeholder.email": "Email",
         "admin.users.placeholder.initial_password": "Initial password",
         "admin.users.placeholder.language": "Language",
-        "admin.users.placeholder.preferred_currency":
-            "Preferred currency",
+        "admin.users.placeholder.preferred_currency": "Preferred currency",
         "admin.users.placeholder.company": "Company",
         "admin.users.placeholder.phone": "Phone",
         "admin.users.placeholder.commission": "Commission (%)",
@@ -225,31 +231,54 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.users.save": "Save",
         "admin.users.saving": "Saving...",
         "admin.users.toast.partner_updated": "Partner updated.",
-        "admin.users.toast.partner_update_error":
-            "Error updating partner.",
+        "admin.users.toast.partner_update_error": "Error updating partner.",
         "admin.users.toast.account_updated": "Account updated.",
-        "admin.users.toast.account_update_error":
-            "Error updating account.",
+        "admin.users.toast.account_update_error": "Error updating account.",
         "admin.users.toast.contract_uploaded": "Contract uploaded.",
-        "admin.users.toast.contract_upload_error":
-            "Error uploading contract.",
+        "admin.users.toast.contract_upload_error": "Error uploading contract.",
         "admin.users.toast.account_created": "Account created.",
-        "admin.users.toast.account_create_error":
-            "Error creating account.",
-        "admin.users.toast.quick_action_error":
-            "Error during quick action.",
+        "admin.users.toast.account_create_error": "Error creating account.",
+        "admin.users.toast.password_reset": "Password reset.",
+        "admin.users.toast.password_reset_error": "Error resetting password.",
+        "admin.users.toast.quick_action_error": "Error during quick action.",
         "admin.users.error.commission_range":
             "Commission must stay between 20 and 30%.",
         "admin.users.error.stripe_prefix":
             "Stripe identifier must start with acct_.",
         "admin.users.error.general_required":
             "First name, last name and email are required.",
-        "admin.users.error.pdf_required":
-            "Please select a PDF file.",
+        "admin.users.error.password_length":
+            "Password must contain at least 8 characters.",
+        "admin.users.error.pdf_required": "Please select a PDF file.",
         "admin.users.error.create_required":
             "First name, last name, email and password are required.",
         "admin.users.error.company_required":
             "Company name is required for a partner account.",
+        "admin.users.password_reset.action": "Password",
+        "admin.users.password_reset.badge": "Security",
+        "admin.users.password_reset.title": "Reset {name}'s password",
+        "admin.users.password_reset.subtitle":
+            "Leave the field empty to automatically generate a temporary password.",
+        "admin.users.password_reset.placeholder": "New temporary password",
+        "admin.users.password_reset.generated": "Temporary password",
+        "admin.users.password_reset.confirm": "Reset password",
+        "admin.users.contract_template.title": "Global partner contract",
+        "admin.users.contract_template.subtitle":
+            "Edit the contract once. Saving applies the text to all partner accounts and requires a new signature.",
+        "admin.users.contract_template.import_md": "Import .md file",
+        "admin.users.contract_template.placeholder":
+            "Paste the partner contract in Markdown format...",
+        "admin.users.contract_template.apply_hint":
+            "Saving replaces the contract for every partner.",
+        "admin.users.contract_template.save": "Apply to all",
+        "admin.users.contract_template.saved":
+            "Contract applied to {count} partners.",
+        "admin.users.contract_template.save_error":
+            "Error updating the global contract.",
+        "admin.users.contract_template.required":
+            "The global contract cannot be empty.",
+        "admin.users.contract_template.md_required":
+            "Please select a Markdown .md file.",
         "admin.users.csv.company": "company",
         "admin.users.csv.first_name": "first_name",
 
@@ -296,7 +325,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.services.category.stay": "Accommodation",
         "admin.services.csv.category": "Category",
 
-        "admin.services.fareharbor.catalog_note": "Service synced via FareHarbor",
+        "admin.services.fareharbor.catalog_note":
+            "Service synced via FareHarbor",
         "admin.services.fareharbor.catalog_summary": "Real-time integration",
         "admin.services.fareharbor.stats.companies": "Companies",
         "admin.services.fareharbor.stats.imported": "Imported",
@@ -306,6 +336,12 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.services.fareharbor.last_error": "Last error:",
         "admin.services.fareharbor.toast.sync_all_partial":
             "{failed} synchronizations out of {total} failed.",
+        "admin.services.fareharbor.failures.title":
+            "Failed synchronizations ({count})",
+        "admin.services.fareharbor.failures.subtitle":
+            "Causes returned by the connector",
+        "admin.services.fareharbor.failures.no_error":
+            "No detailed cause recorded.",
 
         "admin.services.toast.activated": "Service activated.",
         "admin.services.toast.deactivated": "Service deactivated.",
@@ -313,14 +349,16 @@ export function buildAdminEnTranslations(): Record<string, string> {
 
         // Admin Structure (Dynamic Fields)
         "admin.structure.title": "Catalog Structure",
-        "admin.structure.subtitle": "Define categories, subcategories, attributes and available options.",
+        "admin.structure.subtitle":
+            "Define categories, subcategories, attributes and available options.",
         "admin.structure.eyebrow": "System configuration",
         "admin.structure.back_catalog": "Back to catalog",
         "admin.structure.categories": "Categories",
         "admin.structure.extras": "Options (Extras)",
         "admin.structure.preset_attributes": "Preset Attributes",
         "admin.structure.preset_extras": "Preset Extras",
-        "admin.structure.select_category_manage": "Select a category to manage its structure.",
+        "admin.structure.select_category_manage":
+            "Select a category to manage its structure.",
         "admin.structure.empty_categories": "No categories configured.",
         "admin.structure.new_category": "New Category",
         "admin.structure.edit_category": "Edit Category",
@@ -348,20 +386,25 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.structure.cancel": "Cancel",
         "admin.structure.create_service": "Create service",
 
-        "admin.structure.confirm.delete_category": "Delete this category? This will affect linked services.",
-        "admin.structure.confirm.delete_subcategory": "Delete this subcategory?",
+        "admin.structure.confirm.delete_category":
+            "Delete this category? This will affect linked services.",
+        "admin.structure.confirm.delete_subcategory":
+            "Delete this subcategory?",
         "admin.structure.confirm.delete_attribute": "Delete this attribute?",
         "admin.structure.confirm.delete_extra": "Delete this option?",
 
         "admin.structure.toast.category_created": "Category created.",
         "admin.structure.toast.category_updated": "Category updated.",
         "admin.structure.toast.category_deleted": "Category deleted.",
-        "admin.structure.toast.category_save_error": "Error during category save.",
+        "admin.structure.toast.category_save_error":
+            "Error during category save.",
         "admin.structure.toast.attribute_created": "Attribute created.",
         "admin.structure.toast.attribute_updated": "Attribute updated.",
         "admin.structure.toast.attribute_deleted": "Attribute deleted.",
-        "admin.structure.toast.attributes_added": "Attributes successfully added.",
-        "admin.structure.toast.attribute_save_error": "Error during attribute save.",
+        "admin.structure.toast.attributes_added":
+            "Attributes successfully added.",
+        "admin.structure.toast.attribute_save_error":
+            "Error during attribute save.",
         "admin.structure.toast.extra_created": "Option created.",
         "admin.structure.toast.extra_updated": "Option updated.",
         "admin.structure.toast.extra_deleted": "Option deleted.",
@@ -369,13 +412,18 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.structure.toast.delete_error": "Error during deletion.",
 
         "admin.structure.error.select_category": "Please select a category.",
-        "admin.structure.error.attributes_exist": "Some attributes already exist.",
-        "admin.structure.error.attributes_add": "Error during attributes addition.",
+        "admin.structure.error.attributes_exist":
+            "Some attributes already exist.",
+        "admin.structure.error.attributes_add":
+            "Error during attributes addition.",
         "admin.structure.error.extras_exist": "Some options already exist.",
         "admin.structure.error.extras_add": "Error during options addition.",
-        "admin.structure.error.preset_apply": "Error during preset application.",
-        "admin.structure.error.preset_exists": "Preset has already been applied.",
-        "admin.structure.error.no_attribute_preset": "No attribute preset available.",
+        "admin.structure.error.preset_apply":
+            "Error during preset application.",
+        "admin.structure.error.preset_exists":
+            "Preset has already been applied.",
+        "admin.structure.error.no_attribute_preset":
+            "No attribute preset available.",
         "admin.structure.error.no_extra_preset": "No option preset available.",
 
         // Presets Specifics
@@ -387,20 +435,23 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.structure.preset.stays_created": "Stay structure initialized.",
 
         "admin.structure.preset.boat_category.name": "Boats",
-        "admin.structure.preset.boat_category.description": "Boat rentals, sea trips and jet-skis.",
+        "admin.structure.preset.boat_category.description":
+            "Boat rentals, sea trips and jet-skis.",
         "admin.structure.preset.boat_subcategory.yacht": "Yacht",
         "admin.structure.preset.boat_subcategory.catamaran": "Catamaran",
         "admin.structure.preset.boat_subcategory.jet_ski": "Jet Ski",
 
         "admin.structure.preset.car_category.name": "Cars",
-        "admin.structure.preset.car_category.description": "Vehicle rental and local mobility.",
+        "admin.structure.preset.car_category.description":
+            "Vehicle rental and local mobility.",
         "admin.structure.preset.car_subcategory.city_car": "City car",
         "admin.structure.preset.car_subcategory.suv": "SUV",
         "admin.structure.preset.car_subcategory.luxury": "Luxury",
         "admin.structure.preset.car_subcategory.electric": "Electric",
 
         "admin.structure.preset.stay_category.name": "Accommodations",
-        "admin.structure.preset.stay_category.description": "Villas, apartments and premium stays.",
+        "admin.structure.preset.stay_category.description":
+            "Villas, apartments and premium stays.",
         "admin.structure.preset.stay_subcategory.villa": "Villa",
         "admin.structure.preset.stay_subcategory.apartment": "Apartment",
         "admin.structure.preset.stay_subcategory.house": "House",
@@ -424,7 +475,8 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.structure.preset.extra.car.driver.name": "Driver",
         "admin.structure.preset.extra.car.delivery.name": "Hotel delivery",
         "admin.structure.preset.extra.stay.breakfast.name": "Breakfast",
-        "admin.structure.preset.extra.stay.late_checkout.name": "Late check-out",
+        "admin.structure.preset.extra.stay.late_checkout.name":
+            "Late check-out",
 
         "admin.structure.preset.fuel_option.diesel": "Diesel",
         "admin.structure.preset.fuel_option.gasoline": "Gasoline",
@@ -439,13 +491,37 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.dashboard.metric.volume": "Business Volume",
         "admin.dashboard.metric.volume_sub": "Confirmed bookings",
         "admin.dashboard.metric.commissions": "Collected Commissions",
-        "admin.dashboard.metric.commissions_sub": "On {count} confirmed booking(s)",
+        "admin.dashboard.metric.commissions_sub":
+            "On {count} confirmed booking(s)",
         "admin.dashboard.metric.pending": "Pending",
         "admin.dashboard.metric.pending_sub": "Booking(s) being processed",
         "admin.dashboard.metric.accounts": "Active Accounts",
-        "admin.dashboard.metric.accounts_sub": "{clients} client(s) · {partners} partner(s)",
+        "admin.dashboard.metric.accounts_sub":
+            "{clients} client(s) · {partners} partner(s)",
         "admin.dashboard.metric.catalog": "Active Catalog",
-        "admin.dashboard.metric.catalog_sub": "{partners} valid partner(s) · {reviews} reviews pending",
+        "admin.dashboard.metric.catalog_sub":
+            "{partners} valid partner(s) · {reviews} reviews pending",
+        "admin.dashboard.operations.title": "Operational action queue",
+        "admin.dashboard.operations.subtitle":
+            "Prioritize validations, documents, services, payouts and incidents that need admin intervention.",
+        "admin.dashboard.operations.total": "{count} point(s) to handle",
+        "admin.dashboard.operations.partner_onboarding": "Partner onboarding",
+        "admin.dashboard.operations.partner_onboarding_sub":
+            "{contracts} contract(s) to sign",
+        "admin.dashboard.operations.documents": "Compliance documents",
+        "admin.dashboard.operations.documents_sub":
+            "{blocked} blocking document(s)",
+        "admin.dashboard.operations.services": "Services in review",
+        "admin.dashboard.operations.services_sub":
+            "{blocked} rejected or suspended service(s)",
+        "admin.dashboard.operations.finance": "Payouts at risk",
+        "admin.dashboard.operations.finance_sub":
+            "{pending} confirmed payout(s) pending",
+        "admin.dashboard.operations.reviews": "Customer reviews",
+        "admin.dashboard.operations.reviews_sub": "Review moderation",
+        "admin.dashboard.operations.external": "External bookings",
+        "admin.dashboard.operations.external_sub":
+            "Provider errors to investigate",
 
         // Admin Dashboard Funnel
         "admin.dashboard.funnel.title": "Product Funnel",
@@ -457,10 +533,24 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.dashboard.funnel.starts_sub": "{rate}% from details",
         "admin.dashboard.funnel.confirmed": "Confirmed Bookings",
         "admin.dashboard.funnel.confirmed_sub": "{rate}% from checkout",
+        "admin.transactions.risk.title": "Bookings at risk",
+        "admin.transactions.risk.subtitle":
+            "Isolate bookings that need support, finance or provider action before payout.",
+        "admin.transactions.risk.total": "{count} point(s) to handle",
+        "admin.transactions.risk.attention": "Actions required",
+        "admin.transactions.risk.attention_sub":
+            "External errors or blocked payouts",
+        "admin.transactions.risk.external": "Provider errors",
+        "admin.transactions.risk.external_sub":
+            "External creation or confirmation failed",
+        "admin.transactions.risk.payout": "Blocked payouts",
+        "admin.transactions.risk.payout_sub":
+            "{pending} confirmed payout(s) still pending",
 
         // Admin Support
         "support.title": "Support Center",
-        "support.subtitle": "Monitor user assistance and track Wandireo incidents.",
+        "support.subtitle":
+            "Monitor user assistance and track Wandireo incidents.",
         "support.new_ticket": "Create a ticket",
         "support.ticket_subject": "Subject",
         "support.ticket_message": "Message",
@@ -493,9 +583,12 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "support.ticket_detail_title": "Ticket: {subject}",
         "support.empty": "No tickets found.",
         "support.form.title": "How can we help ?",
-        "support.form.subtitle": "Fill in the details below to create a support request.",
-        "support.form.subject_placeholder": "Ex: Access problem or technical error",
-        "support.form.message_placeholder": "Describe your request in a few lines...",
+        "support.form.subtitle":
+            "Fill in the details below to create a support request.",
+        "support.form.subject_placeholder":
+            "Ex: Access problem or technical error",
+        "support.form.message_placeholder":
+            "Describe your request in a few lines...",
         "support.form.media_placeholder": "Optional link (Loom, Screenshot...)",
         "support.form.submit": "Create ticket",
         "support.toast.create_success": "The ticket was created successfully.",
@@ -510,6 +603,7 @@ export function buildAdminEnTranslations(): Record<string, string> {
         "admin.structure.toast.subcategory_created": "Subcategory created.",
         "admin.structure.toast.subcategory_updated": "Subcategory updated.",
         "admin.structure.toast.subcategory_deleted": "Subcategory deleted.",
-        "admin.structure.toast.subcategory_save_error": "Error saving subcategory.",
+        "admin.structure.toast.subcategory_save_error":
+            "Error saving subcategory.",
     };
 }

@@ -483,3 +483,56 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-dashboard__stats,
+.wdr-dashboard__quick-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.wdr-dashboard__trip-card,
+.wdr-dashboard__quick-card,
+.wdr-dashboard__stat-card {
+    min-width: 0;
+}
+
+.wdr-dashboard__trip-title,
+.wdr-dashboard__trip-meta,
+.wdr-dashboard__quick-label,
+.wdr-dashboard__quick-desc,
+.wdr-dashboard__stat-label,
+.wdr-dashboard__stat-value {
+    overflow-wrap: anywhere;
+}
+
+.wdr-dashboard__trip-status {
+    white-space: normal;
+    text-align: center;
+}
+
+@media (max-width: 460px) {
+    .wdr-dashboard__hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wdr-dashboard__trip-card {
+        grid-template-columns: 1fr;
+    }
+
+    .wdr-dashboard__trip-title,
+    .wdr-dashboard__trip-meta,
+    .wdr-dashboard__trip-status {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .wdr-dashboard__trip-meta,
+    .wdr-dashboard__quick-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

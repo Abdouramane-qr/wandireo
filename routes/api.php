@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\FareHarborCompanyController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\HomeCatalogPreviewController;
 use App\Http\Controllers\Api\PartnerDocumentController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
+use App\Support\AdminPermission;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================
@@ -48,6 +50,7 @@ Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
 
 Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/search', [ServiceController::class, 'search']);
+Route::get('/home/catalog-preview', HomeCatalogPreviewController::class);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/services/{id}/calendar.ics', [ServiceCalendarSyncController::class, 'export']);
 
@@ -85,6 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/partner/documents', [PartnerDocumentController::class, 'partnerIndex'])
         ->middleware('role:PARTNER');
     Route::post('/partner/documents', [PartnerDocumentController::class, 'partnerStore'])
+        ->middleware('role:PARTNER');
+    Route::get('/partner/finance/summary', [BookingController::class, 'partnerFinanceSummary'])
         ->middleware('role:PARTNER');
 
     // ── Reservations (client) ─────────────────────────────────────────────
@@ -124,50 +129,56 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Blog + Admin (ecriture admin uniquement) ──────────────────────────
     Route::middleware('role:ADMIN')->group(function () {
         Route::get('/support/tickets', [SupportController::class, 'index']);
-        Route::post('/support/tickets', [SupportController::class, 'store']);
-        Route::patch('/support/tickets/{id}', [SupportController::class, 'update']);
-        Route::delete('/support/tickets/{id}', [SupportController::class, 'destroy']);
+        Route::post('/support/tickets', [SupportController::class, 'store'])->middleware('permission:'.AdminPermission::SUPPORT_MANAGE);
+        Route::patch('/support/tickets/{id}', [SupportController::class, 'update'])->middleware('permission:'.AdminPermission::SUPPORT_MANAGE);
+        Route::delete('/support/tickets/{id}', [SupportController::class, 'destroy'])->middleware('permission:'.AdminPermission::SUPPORT_MANAGE);
         Route::get('/blog/posts/by-id/{id}', [BlogController::class, 'showById']);
-        Route::post('/blog/posts', [BlogController::class, 'store']);
-        Route::patch('/blog/posts/{id}', [BlogController::class, 'update']);
-        Route::delete('/blog/posts/{id}', [BlogController::class, 'destroy']);
-        Route::post('/service-structure/categories', [AdminServiceStructureController::class, 'storeCategory']);
-        Route::patch('/service-structure/categories/{id}', [AdminServiceStructureController::class, 'updateCategory']);
-        Route::delete('/service-structure/categories/{id}', [AdminServiceStructureController::class, 'destroyCategory']);
-        Route::post('/service-structure/subcategories', [AdminServiceStructureController::class, 'storeSubcategory']);
-        Route::patch('/service-structure/subcategories/{id}', [AdminServiceStructureController::class, 'updateSubcategory']);
-        Route::delete('/service-structure/subcategories/{id}', [AdminServiceStructureController::class, 'destroySubcategory']);
-        Route::post('/service-structure/attributes', [AdminServiceStructureController::class, 'storeAttribute']);
-        Route::patch('/service-structure/attributes/{id}', [AdminServiceStructureController::class, 'updateAttribute']);
-        Route::delete('/service-structure/attributes/{id}', [AdminServiceStructureController::class, 'destroyAttribute']);
-        Route::post('/service-structure/extras', [AdminServiceStructureController::class, 'storeExtra']);
-        Route::patch('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'updateExtra']);
-        Route::delete('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'destroyExtra']);
-        Route::get('/admin/audit-log', [AuditLogController::class, 'index']);
-        Route::get('/admin/services/moderation', [ServiceController::class, 'moderationQueue']);
-        Route::post('/services/{id}/approve', [ServiceController::class, 'approve']);
-        Route::post('/services/{id}/publish', [ServiceController::class, 'publish']);
-        Route::post('/services/{id}/reject', [ServiceController::class, 'reject']);
-        Route::post('/services/{id}/suspend', [ServiceController::class, 'suspend']);
-        Route::get('/partner-documents', [PartnerDocumentController::class, 'adminIndex']);
-        Route::patch('/partner-documents/{id}', [PartnerDocumentController::class, 'adminUpdate']);
+        Route::post('/blog/posts', [BlogController::class, 'store'])->middleware('permission:'.AdminPermission::CONTENT_MANAGE);
+        Route::patch('/blog/posts/{id}', [BlogController::class, 'update'])->middleware('permission:'.AdminPermission::CONTENT_MANAGE);
+        Route::delete('/blog/posts/{id}', [BlogController::class, 'destroy'])->middleware('permission:'.AdminPermission::CONTENT_MANAGE);
+        Route::post('/service-structure/categories', [AdminServiceStructureController::class, 'storeCategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::patch('/service-structure/categories/{id}', [AdminServiceStructureController::class, 'updateCategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::delete('/service-structure/categories/{id}', [AdminServiceStructureController::class, 'destroyCategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::post('/service-structure/subcategories', [AdminServiceStructureController::class, 'storeSubcategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::patch('/service-structure/subcategories/{id}', [AdminServiceStructureController::class, 'updateSubcategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::delete('/service-structure/subcategories/{id}', [AdminServiceStructureController::class, 'destroySubcategory'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::post('/service-structure/attributes', [AdminServiceStructureController::class, 'storeAttribute'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::patch('/service-structure/attributes/{id}', [AdminServiceStructureController::class, 'updateAttribute'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::delete('/service-structure/attributes/{id}', [AdminServiceStructureController::class, 'destroyAttribute'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::post('/service-structure/extras', [AdminServiceStructureController::class, 'storeExtra'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::patch('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'updateExtra'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::delete('/service-structure/extras/{id}', [AdminServiceStructureController::class, 'destroyExtra'])->middleware('permission:'.AdminPermission::SERVICE_STRUCTURE_MANAGE);
+        Route::get('/admin/audit-log', [AuditLogController::class, 'index'])->middleware('permission:'.AdminPermission::AUDIT_LOG_VIEW);
+        Route::get('/admin/services/moderation', [ServiceController::class, 'moderationQueue'])->middleware('permission:'.AdminPermission::SERVICE_MODERATION_MANAGE);
+        Route::post('/services/{id}/approve', [ServiceController::class, 'approve'])->middleware('permission:'.AdminPermission::SERVICE_MODERATION_MANAGE);
+        Route::post('/services/{id}/publish', [ServiceController::class, 'publish'])->middleware('permission:'.AdminPermission::SERVICE_MODERATION_MANAGE);
+        Route::post('/services/{id}/reject', [ServiceController::class, 'reject'])->middleware('permission:'.AdminPermission::SERVICE_MODERATION_MANAGE);
+        Route::post('/services/{id}/suspend', [ServiceController::class, 'suspend'])->middleware('permission:'.AdminPermission::SERVICE_MODERATION_MANAGE);
+        Route::get('/partner-documents', [PartnerDocumentController::class, 'adminIndex'])->middleware('permission:'.AdminPermission::PARTNER_DOCUMENT_REVIEW);
+        Route::patch('/partner-documents/{id}', [PartnerDocumentController::class, 'adminUpdate'])->middleware('permission:'.AdminPermission::PARTNER_DOCUMENT_REVIEW);
+        Route::get('/users/contract-template', [UserController::class, 'adminContractTemplate'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::patch('/users/contract-template', [UserController::class, 'adminUpdateContractTemplate'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
         Route::get('/users', [UserController::class, 'adminIndex']);
-        Route::post('/users', [UserController::class, 'adminCreate']);
-        Route::post('/users/partners', [UserController::class, 'adminCreatePartner']);
-        Route::post('/users/{id}/contract', [UserController::class, 'adminUploadContract']);
-        Route::post('/users/{id}/contract/mark-signed', [UserController::class, 'adminMarkContractSigned']);
-        Route::patch('/users/{id}', [UserController::class, 'adminUpdate']);
-        Route::get('/bookings', [BookingController::class, 'adminList']);
-        Route::get('/analytics/funnel', [AnalyticsController::class, 'funnel']);
+        Route::post('/users', [UserController::class, 'adminCreate'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::post('/users/partners', [UserController::class, 'adminCreatePartner'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::post('/users/{id}/contract', [UserController::class, 'adminUploadContract'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::post('/users/{id}/contract/mark-signed', [UserController::class, 'adminMarkContractSigned'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::post('/users/{id}/password', [UserController::class, 'adminResetPassword'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::patch('/users/{id}', [UserController::class, 'adminUpdate'])->middleware('permission:'.AdminPermission::PARTNER_GOVERNANCE_MANAGE);
+        Route::get('/bookings', [BookingController::class, 'adminList'])->middleware('permission:'.AdminPermission::BOOKINGS_VIEW);
+        Route::get('/admin/finance/summary', [BookingController::class, 'adminFinanceSummary'])->middleware('permission:'.AdminPermission::FINANCE_VIEW);
+        Route::get('/admin/finance/export', [BookingController::class, 'adminFinanceExport'])->middleware('permission:'.AdminPermission::FINANCE_VIEW);
+        Route::patch('/admin/finance/bookings/{id}/payout-status', [BookingController::class, 'adminUpdatePayoutStatus'])->middleware('permission:'.AdminPermission::FINANCE_VIEW);
+        Route::get('/analytics/funnel', [AnalyticsController::class, 'funnel'])->middleware('permission:'.AdminPermission::ANALYTICS_VIEW);
         Route::get('/admin-reviews', [ReviewController::class, 'adminList']);
-        Route::patch('/admin-reviews/{id}', [ReviewController::class, 'adminUpdate']);
-        Route::delete('/admin-reviews/{id}', [ReviewController::class, 'adminDestroy']);
-        Route::get('/fareharbor/companies', [FareHarborCompanyController::class, 'index']);
-        Route::post('/fareharbor/companies', [FareHarborCompanyController::class, 'store']);
-        Route::patch('/fareharbor/companies/{id}', [FareHarborCompanyController::class, 'update']);
-        Route::post('/fareharbor/companies/{id}/partner-account', [FareHarborCompanyController::class, 'createPartnerAccount']);
-        Route::post('/fareharbor/companies/{id}/sync', [FareHarborCompanyController::class, 'sync']);
-        Route::post('/fareharbor/companies/sync-all', [FareHarborCompanyController::class, 'syncAll']);
+        Route::patch('/admin-reviews/{id}', [ReviewController::class, 'adminUpdate'])->middleware('permission:'.AdminPermission::REVIEWS_MANAGE);
+        Route::delete('/admin-reviews/{id}', [ReviewController::class, 'adminDestroy'])->middleware('permission:'.AdminPermission::REVIEWS_MANAGE);
+        Route::get('/fareharbor/companies', [FareHarborCompanyController::class, 'index'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
+        Route::post('/fareharbor/companies', [FareHarborCompanyController::class, 'store'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
+        Route::patch('/fareharbor/companies/{id}', [FareHarborCompanyController::class, 'update'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
+        Route::post('/fareharbor/companies/{id}/partner-account', [FareHarborCompanyController::class, 'createPartnerAccount'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
+        Route::post('/fareharbor/companies/{id}/sync', [FareHarborCompanyController::class, 'sync'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
+        Route::post('/fareharbor/companies/sync-all', [FareHarborCompanyController::class, 'syncAll'])->middleware('permission:'.AdminPermission::FAREHARBOR_MANAGE);
     });
 
     // ── Upload (S3 pre-signe) — tout utilisateur authentifie ─────────────

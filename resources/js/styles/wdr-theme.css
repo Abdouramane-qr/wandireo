@@ -666,3 +666,363 @@
 :is(.dark) .wdr-pprofile__hero {
     box-shadow: var(--shadow-md);
 }
+
+/* ============================================================
+   Private workspace responsive hardening
+   ============================================================ */
+
+.wdr-theme {
+    --wdr-private-page-max: 1200px;
+    --wdr-private-card-radius: var(--radius-lg);
+    overflow-x: clip;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash,
+        .wdr-admin-users,
+        .wdr-admin-svc,
+        .wdr-admin-tx,
+        .wdr-admin-reviews,
+        .wdr-admin-structure,
+        .wdr-admin-support,
+        .wdr-ablog,
+        .wdr-editor,
+        .wdr-dashboard,
+        .wdr-profile,
+        .wdr-favorites,
+        .wdr-favs,
+        .wdr-history,
+        .wdr-partner-dash,
+        .wdr-partner-pending,
+        .wdr-pprofile,
+        .wdr-partner-bookings,
+        .wdr-partner-bk,
+        .wdr-partner-catalog,
+        .wdr-catalog,
+        .wdr-sform
+    ) {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash,
+        .wdr-admin-users,
+        .wdr-admin-svc,
+        .wdr-admin-tx,
+        .wdr-admin-reviews,
+        .wdr-admin-structure,
+        .wdr-admin-support,
+        .wdr-ablog,
+        .wdr-editor,
+        .wdr-dashboard,
+        .wdr-profile,
+        .wdr-favorites,
+        .wdr-favs,
+        .wdr-history,
+        .wdr-partner-dash,
+        .wdr-partner-pending,
+        .wdr-pprofile,
+        .wdr-partner-bookings,
+        .wdr-partner-bk,
+        .wdr-partner-catalog,
+        .wdr-catalog,
+        .wdr-sform
+    )
+    :is(
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        span,
+        small,
+        strong,
+        a,
+        label,
+        li,
+        td,
+        th,
+        code
+    ) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash,
+        .wdr-admin-users,
+        .wdr-admin-svc,
+        .wdr-admin-tx,
+        .wdr-admin-reviews,
+        .wdr-admin-structure,
+        .wdr-admin-support,
+        .wdr-ablog,
+        .wdr-editor,
+        .wdr-dashboard,
+        .wdr-profile,
+        .wdr-favorites,
+        .wdr-favs,
+        .wdr-history,
+        .wdr-partner-dash,
+        .wdr-partner-pending,
+        .wdr-pprofile,
+        .wdr-partner-bookings,
+        .wdr-partner-bk,
+        .wdr-partner-catalog,
+        .wdr-catalog,
+        .wdr-sform
+    )
+    :is(
+        button,
+        .wdr-btn,
+        [class*="__btn"],
+        [class*="__button"],
+        [class*="__action"],
+        [class*="__link"]
+    ) {
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal !important;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash,
+        .wdr-admin-users,
+        .wdr-admin-svc,
+        .wdr-admin-tx,
+        .wdr-admin-reviews,
+        .wdr-admin-structure,
+        .wdr-admin-support,
+        .wdr-ablog,
+        .wdr-editor,
+        .wdr-dashboard,
+        .wdr-profile,
+        .wdr-favorites,
+        .wdr-favs,
+        .wdr-history,
+        .wdr-partner-dash,
+        .wdr-partner-pending,
+        .wdr-pprofile,
+        .wdr-partner-bookings,
+        .wdr-partner-bk,
+        .wdr-partner-catalog,
+        .wdr-catalog,
+        .wdr-sform
+    )
+    :is(input, select, textarea) {
+    max-width: 100%;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash__hero-content,
+        .wdr-admin-users__hero-content,
+        .wdr-admin-svc__hero-content,
+        .wdr-admin-tx__hero-content,
+        .wdr-dashboard__hero-content,
+        .wdr-partner-dash__hero-content,
+        .wdr-pprofile__hero-inner,
+        .wdr-sform__header-inner
+    ) {
+    width: min(100%, var(--wdr-private-page-max));
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash__metric-card,
+        .wdr-admin-users__partner-card,
+        .wdr-admin-users__document-card,
+        .wdr-admin-users__audit-row,
+        .wdr-admin-svc__fareharbor-card,
+        .wdr-admin-svc__table-wrapper,
+        .wdr-admin-tx__card,
+        .wdr-admin-tx__table-wrapper,
+        .wdr-admin-reviews__card,
+        .wdr-admin-structure__panel,
+        .wdr-admin-support__table-wrapper,
+        .wdr-dashboard__stat-card,
+        .wdr-dashboard__trip-card,
+        .wdr-history__card,
+        .wdr-favorites__card,
+        .wdr-favs__item,
+        .wdr-profile__card,
+        .wdr-partner-dash__stat-card,
+        .wdr-partner-dash__shortcut-card,
+        .wdr-partner-dash__finance-card,
+        .wdr-partner-dash__overview-card,
+        .wdr-partner-bookings__card,
+        .wdr-partner-bk__card,
+        .wdr-partner-bk__summary-card,
+        .wdr-partner-catalog__card,
+        .wdr-catalog__item,
+        .wdr-catalog__summary-card,
+        .wdr-catalog__toolbar,
+        .wdr-partner-pending__card,
+        .wdr-pprofile__form-grid,
+        .wdr-sform__fieldset
+    ) {
+    border-radius: var(--wdr-private-card-radius);
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash__table-wrapper,
+        .wdr-admin-users__table-wrapper,
+        .wdr-admin-svc__table-wrapper,
+        .wdr-admin-tx__table-wrapper,
+        .wdr-admin-support__table-wrapper,
+        .wdr-ablog__table-wrapper,
+        .wdr-partner-bookings__table-wrapper,
+        .wdr-partner-bk__table-wrapper
+    ) {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wdr-theme
+    :is(
+        .wdr-admin-dash__table,
+        .wdr-admin-users__table,
+        .wdr-admin-svc__table,
+        .wdr-admin-tx__table,
+        .wdr-admin-support__table,
+        .wdr-ablog__table,
+        .wdr-partner-bookings__table,
+        .wdr-partner-bk__table
+    ) {
+    max-width: none;
+}
+
+@media (max-width: 760px) {
+    .wdr-theme
+        :is(
+            .wdr-admin-dash__body,
+            .wdr-admin-users__body,
+            .wdr-admin-svc__body,
+            .wdr-admin-tx__body,
+            .wdr-admin-reviews__body,
+            .wdr-admin-structure__body,
+            .wdr-admin-support__body,
+            .wdr-ablog__body,
+            .wdr-editor__body,
+            .wdr-dashboard__body,
+            .wdr-profile__body,
+            .wdr-favorites__body,
+            .wdr-favs__inner,
+            .wdr-history__body,
+            .wdr-history,
+            .wdr-partner-dash__body,
+            .wdr-partner-pending__inner,
+            .wdr-pprofile__account-inner,
+            .wdr-partner-bookings__body,
+            .wdr-partner-bk__body,
+            .wdr-partner-catalog__body,
+            .wdr-catalog__body,
+            .wdr-sform__inner
+        ) {
+        padding-inline: 1rem;
+    }
+
+    .wdr-theme
+        :is(
+            .wdr-admin-dash__hero,
+            .wdr-admin-users__hero,
+            .wdr-admin-svc__hero,
+            .wdr-admin-tx__hero,
+            .wdr-admin-reviews__hero,
+            .wdr-admin-structure__hero,
+            .wdr-admin-support__hero,
+            .wdr-dashboard__hero,
+            .wdr-partner-dash__hero,
+            .wdr-pprofile__hero,
+            .wdr-sform__header
+        ) {
+        padding-inline: 1rem;
+    }
+
+    .wdr-theme
+        :is(
+            .wdr-admin-users__documents-list,
+            .wdr-admin-users__partners-grid,
+            .wdr-admin-users__compliance-grid,
+            .wdr-admin-svc__fareharbor-grid,
+            .wdr-admin-tx__totals,
+            .wdr-dashboard__stats,
+            .wdr-dashboard__actions-grid,
+            .wdr-partner-dash__stats,
+            .wdr-partner-dash__finance-grid,
+            .wdr-partner-dash__overview-grid,
+            .wdr-partner-bk__summary,
+            .wdr-catalog__summary,
+            .wdr-catalog__toolbar-grid,
+            .wdr-partner-catalog__stats,
+            .wdr-pprofile__form-grid,
+            .wdr-sform__row,
+            .wdr-sform__structure-grid
+        ) {
+        grid-template-columns: 1fr !important;
+    }
+
+    .wdr-theme
+        :is(
+            .wdr-admin-users__document-card,
+            .wdr-admin-users__audit-row,
+            .wdr-admin-users__partner-header,
+            .wdr-admin-users__partner-actions,
+            .wdr-admin-svc__toolbar,
+            .wdr-admin-tx__toolbar,
+            .wdr-admin-reviews__toolbar,
+            .wdr-dashboard__section-header,
+            .wdr-partner-dash__section-header,
+            .wdr-partner-dash__activity-meta,
+            .wdr-partner-dash__activity-footer,
+            .wdr-pprofile__account-header,
+            .wdr-sform__header-inner,
+            .wdr-sform__locale-bar,
+            .wdr-sform__structure-summary-header
+        ) {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .wdr-theme
+        :is(
+            .wdr-admin-users__document-side,
+            .wdr-admin-users__document-actions,
+            .wdr-admin-users__partner-actions,
+            .wdr-admin-users__toolbar,
+            .wdr-admin-svc__toolbar,
+            .wdr-admin-tx__toolbar,
+            .wdr-admin-reviews__toolbar,
+            .wdr-partner-dash__hero-right,
+            .wdr-pprofile__hero-actions
+        ) {
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .wdr-theme
+        :is(
+            .wdr-admin-users__document-actions > *,
+            .wdr-admin-users__partner-actions > *,
+            .wdr-admin-users__toolbar > *,
+            .wdr-admin-svc__toolbar > *,
+            .wdr-admin-tx__toolbar > *,
+            .wdr-admin-reviews__toolbar > *,
+            .wdr-sform__header-actions > *
+        ) {
+        width: 100%;
+    }
+}

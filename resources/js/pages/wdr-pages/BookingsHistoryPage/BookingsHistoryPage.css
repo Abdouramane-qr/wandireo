@@ -451,3 +451,55 @@
     gap: 0.625rem;
     flex-wrap: wrap;
 }
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-history__inner,
+.wdr-history__card,
+.wdr-history__card-service,
+.wdr-history__review-zone,
+.wdr-history__review-form {
+    min-width: 0;
+}
+
+.wdr-history__tabs {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wdr-history__tab {
+    flex: 1 1 auto;
+    min-width: max-content;
+}
+
+.wdr-history__card-ref,
+.wdr-history__meta-item,
+.wdr-history__extras,
+.wdr-history__cancellation-note,
+.wdr-history__review-form-title {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+    .wdr-history__card,
+    .wdr-history__empty {
+        padding: 1rem;
+    }
+
+    .wdr-history__card-meta,
+    .wdr-history__card-prices,
+    .wdr-history__card-badges {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .wdr-history__badge,
+    .wdr-history__tab {
+        white-space: normal;
+    }
+}

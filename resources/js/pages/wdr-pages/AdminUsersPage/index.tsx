@@ -5,9 +5,12 @@ import { useUser } from "@/context/UserContext";
 import { useAdminAuditLogData } from "@/hooks/useAuditLogData";
 import { useAdminBookingsData } from "@/hooks/useBookingsData";
 import {
+    useAdminContractTemplateData,
     useAdminCreateUserData,
     useAdminMarkPartnerContractSignedData,
+    useAdminResetUserPasswordData,
     useAdminUploadPartnerContractData,
+    useAdminUpdateContractTemplateData,
     useAdminUpdateUserData,
     useAdminUsersData,
 } from "@/hooks/useUsersData";
@@ -48,6 +51,7 @@ type PartnerEditForm = {
     partnerRejectionReason: string;
     mandateContractStatus: MandateContractStatus;
     mandateContractFilePath: string;
+    mandateContractText: string;
 };
 
 type GeneralEditForm = {
@@ -57,6 +61,7 @@ type GeneralEditForm = {
     phoneNumber: string;
     language: string;
     preferredCurrency: string;
+    permissions: string;
 };
 
 type DocumentReviewForm = {
@@ -100,6 +105,21 @@ const DEFAULT_CREATE_FORM: PartnerCreateForm = {
 
 const LANGUAGE_OPTIONS = ["fr", "en", "es", "pt", "it", "de"] as const;
 const CURRENCY_OPTIONS = ["EUR", "USD", "GBP", "CHF", "CAD"] as const;
+const ADMIN_PERMISSION_OPTIONS = [
+    "all",
+    "audit_log.view",
+    "partner_governance.manage",
+    "partner_document.review",
+    "service_moderation.manage",
+    "service_structure.manage",
+    "support.manage",
+    "content.manage",
+    "reviews.manage",
+    "fareharbor.manage",
+    "bookings.view",
+    "finance.view",
+    "analytics.view",
+] as const;
 const AUDIT_LOG_CATEGORIES = [
     "partner_governance",
     "partner_document",
@@ -189,9 +209,11 @@ export const AdminUsersPage: React.FC = () => {
     });
     const { bookings } = useAdminBookingsData();
     const updateUserMutation = useAdminUpdateUserData();
+    const updateContractTemplateMutation = useAdminUpdateContractTemplateData();
     const createUserMutation = useAdminCreateUserData();
     const uploadContractMutation = useAdminUploadPartnerContractData();
     const markContractSignedMutation = useAdminMarkPartnerContractSignedData();
+    const resetPasswordMutation = useAdminResetUserPasswordData();
     const reviewDocumentMutation = useAdminPartnerDocumentReviewData();
     const { documents: partnerDocuments, total: partnerDocumentsTotal } =
         useAdminPartnerDocumentsData({
@@ -200,6 +222,12 @@ export const AdminUsersPage: React.FC = () => {
                 ? {}
                 : { status: documentStatusFilter }),
         });
+    const { documents: complianceDocuments } = useAdminPartnerDocumentsData({
+        limit: 500,
+    });
+    const contractTemplateQuery = useAdminContractTemplateData(
+        currentUser?.role === "ADMIN",
+    );
     const {
         entries: auditEntries,
         total: auditEntriesTotal,
@@ -234,11 +262,87 @@ export const AdminUsersPage: React.FC = () => {
                 : [],
         [allUsers, partnerStatusFilter],
     );
+    const partnerCompliance = useMemo(() => {
+        const summaries = new Map<
+            string,
+            {
+                validatedCount: number;
+                pendingCount: number;
+                rejectedCount: number;
+                expiredCount: number;
+                isComplete: boolean;
+                needsAttention: boolean;
+            }
+        >();
+
+        partners.forEach((partner) => {
+            const documents = complianceDocuments.filter(
+                (document) => String(document.partnerId) === partner.id,
+            );
+            const validatedCount = documents.filter(
+                (document) => document.status === "VALIDATED",
+            ).length;
+            const pendingCount = documents.filter((document) =>
+                ["UPLOADED", "UNDER_REVIEW"].includes(document.status),
+            ).length;
+            const rejectedCount = documents.filter(
+                (document) => document.status === "REJECTED",
+            ).length;
+            const expiredCount = documents.filter(
+                (document) => document.status === "EXPIRED",
+            ).length;
+            const hasBlockingDocument = rejectedCount > 0 || expiredCount > 0;
+            const isComplete =
+                partner.partnerStatus === "APPROVED" &&
+                partner.mandateContractStatus === "SIGNED" &&
+                validatedCount > 0 &&
+                pendingCount === 0 &&
+                !hasBlockingDocument;
+
+            summaries.set(partner.id, {
+                validatedCount,
+                pendingCount,
+                rejectedCount,
+                expiredCount,
+                isComplete,
+                needsAttention:
+                    !isComplete ||
+                    pendingCount > 0 ||
+                    hasBlockingDocument ||
+                    validatedCount === 0,
+            });
+        });
+
+        return summaries;
+    }, [complianceDocuments, partners]);
+    const complianceStats = useMemo(() => {
+        const summaries = Array.from(partnerCompliance.values());
+
+        return {
+            complete: summaries.filter((summary) => summary.isComplete).length,
+            attention: summaries.filter((summary) => summary.needsAttention)
+                .length,
+            pendingDocuments: summaries.reduce(
+                (total, summary) => total + summary.pendingCount,
+                0,
+            ),
+            blockingDocuments: summaries.reduce(
+                (total, summary) =>
+                    total + summary.rejectedCount + summary.expiredCount,
+                0,
+            ),
+        };
+    }, [partnerCompliance]);
 
     const [editingPartnerId, setEditingPartnerId] = useState<string | null>(
         null,
     );
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
+    const [resetPasswordUserId, setResetPasswordUserId] = useState<
+        string | null
+    >(null);
+    const [resetPasswordValue, setResetPasswordValue] = useState("");
+    const [resetPasswordResult, setResetPasswordResult] = useState("");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [documentReviewForm, setDocumentReviewForm] =
         useState<DocumentReviewForm | null>(null);
@@ -250,8 +354,10 @@ export const AdminUsersPage: React.FC = () => {
         partnerRejectionReason: "",
         mandateContractStatus: "NOT_SENT",
         mandateContractFilePath: "",
+        mandateContractText: "",
     });
     const [contractFile, setContractFile] = useState<File | null>(null);
+    const [globalContractText, setGlobalContractText] = useState("");
     const [generalEditForm, setGeneralEditForm] = useState<GeneralEditForm>({
         firstName: "",
         lastName: "",
@@ -259,6 +365,7 @@ export const AdminUsersPage: React.FC = () => {
         phoneNumber: "",
         language: "fr",
         preferredCurrency: "EUR",
+        permissions: "",
     });
     const [createForm, setCreateForm] =
         useState<PartnerCreateForm>(DEFAULT_CREATE_FORM);
@@ -341,11 +448,20 @@ export const AdminUsersPage: React.FC = () => {
         }
     }, [currentUser, navigate]);
 
+    useEffect(() => {
+        if (contractTemplateQuery.data?.contractText) {
+            setGlobalContractText(contractTemplateQuery.data.contractText);
+        }
+    }, [contractTemplateQuery.data?.contractText]);
+
     const editingPartner = editingPartnerId
         ? (partners.find((partner) => partner.id === editingPartnerId) ?? null)
         : null;
     const editingUser = editingUserId
         ? (allUsers.find((user) => user.id === editingUserId) ?? null)
+        : null;
+    const resetPasswordUser = resetPasswordUserId
+        ? (allUsers.find((user) => user.id === resetPasswordUserId) ?? null)
         : null;
 
     const partnerRevenue = useMemo(
@@ -389,6 +505,7 @@ export const AdminUsersPage: React.FC = () => {
             partnerRejectionReason: partner.partnerRejectionReason ?? "",
             mandateContractStatus: partner.mandateContractStatus,
             mandateContractFilePath: partner.mandateContractFilePath ?? "",
+            mandateContractText: partner.mandateContractText ?? "",
         });
         setContractFile(null);
     };
@@ -403,7 +520,17 @@ export const AdminUsersPage: React.FC = () => {
             language: user.language ?? "fr",
             preferredCurrency:
                 user.role === "CLIENT" ? (user.preferredCurrency ?? "EUR") : "",
+            permissions:
+                user.role === "ADMIN" ? user.permissions.join(", ") : "",
         });
+    };
+
+    const openPasswordResetModal = (
+        user: ClientUser | AdminUser | PartnerUser,
+    ): void => {
+        setResetPasswordUserId(user.id);
+        setResetPasswordValue("");
+        setResetPasswordResult("");
     };
 
     const savePartner = async (): Promise<void> => {
@@ -438,6 +565,8 @@ export const AdminUsersPage: React.FC = () => {
                     mandateContractStatus: editForm.mandateContractStatus,
                     mandateContractFilePath:
                         editForm.mandateContractFilePath.trim() || undefined,
+                    mandateContractText:
+                        editForm.mandateContractText.trim() || undefined,
                 },
             });
             success(t("admin.users.toast.partner_updated"));
@@ -476,6 +605,13 @@ export const AdminUsersPage: React.FC = () => {
                             ? generalEditForm.preferredCurrency.trim() ||
                               undefined
                             : undefined,
+                    permissions:
+                        editingUser.role === "ADMIN"
+                            ? generalEditForm.permissions
+                                  .split(/[\n,]+/)
+                                  .map((permission) => permission.trim())
+                                  .filter(Boolean)
+                            : undefined,
                 },
             });
             success(t("admin.users.toast.account_updated"));
@@ -512,6 +648,69 @@ export const AdminUsersPage: React.FC = () => {
             success(t("admin.users.toast.contract_uploaded"));
         } catch {
             error(t("admin.users.toast.contract_upload_error"));
+        }
+    };
+
+    const resetUserPassword = async (): Promise<void> => {
+        if (!resetPasswordUser) {
+            return;
+        }
+
+        const manualPassword = resetPasswordValue.trim();
+
+        if (manualPassword && manualPassword.length < 8) {
+            error(t("admin.users.error.password_length"));
+            return;
+        }
+
+        try {
+            const result = await resetPasswordMutation.mutateAsync({
+                id: resetPasswordUser.id,
+                password: manualPassword || undefined,
+            });
+
+            setResetPasswordResult(result.temporaryPassword);
+            success(t("admin.users.toast.password_reset"));
+        } catch {
+            error(t("admin.users.toast.password_reset_error"));
+        }
+    };
+
+    const importGlobalContractMarkdown = async (
+        file: File | undefined,
+    ): Promise<void> => {
+        if (!file) {
+            return;
+        }
+
+        if (!file.name.toLowerCase().endsWith(".md")) {
+            error(t("admin.users.contract_template.md_required"));
+            return;
+        }
+
+        setGlobalContractText(await file.text());
+    };
+
+    const saveGlobalContractTemplate = async (): Promise<void> => {
+        if (!globalContractText.trim()) {
+            error(t("admin.users.contract_template.required"));
+            return;
+        }
+
+        try {
+            const result = await updateContractTemplateMutation.mutateAsync({
+                contractText: globalContractText.trim(),
+                applyToPartners: true,
+            });
+
+            success(
+                t("admin.users.contract_template.saved").replace(
+                    "{count}",
+                    String(result.updatedPartners ?? 0),
+                ),
+            );
+        } catch {
+            error(t("admin.users.contract_template.save_error"));
         }
     };
 
@@ -633,10 +832,6 @@ export const AdminUsersPage: React.FC = () => {
             await updateUserMutation.mutateAsync({
                 id: partner.id,
                 data: {
-                    commissionRate: partner.commissionRate,
-                    stripeConnectedAccountId:
-                        partner.stripeConnectedAccountId ?? undefined,
-                    businessAddress: partner.businessAddress ?? undefined,
                     partnerStatus: data.partnerStatus ?? partner.partnerStatus,
                     mandateContractStatus:
                         data.mandateContractStatus ??
@@ -890,6 +1085,67 @@ export const AdminUsersPage: React.FC = () => {
                     )}
                 </section>
 
+                <section
+                    className="wdr-admin-users__contract-template"
+                    aria-labelledby="admin-contract-template-title"
+                >
+                    <div className="wdr-admin-users__section-head">
+                        <div>
+                            <h2
+                                id="admin-contract-template-title"
+                                className="wdr-admin-users__section-title"
+                            >
+                                {t("admin.users.contract_template.title")}
+                            </h2>
+                            <p className="wdr-admin-users__section-copy">
+                                {t("admin.users.contract_template.subtitle")}
+                            </p>
+                        </div>
+                        <label className="wdr-admin-users__contract-file">
+                            <span>
+                                {t("admin.users.contract_template.import_md")}
+                            </span>
+                            <input
+                                type="file"
+                                accept=".md,text/markdown,text/plain"
+                                onChange={(event) =>
+                                    void importGlobalContractMarkdown(
+                                        event.target.files?.[0],
+                                    )
+                                }
+                            />
+                        </label>
+                    </div>
+                    <textarea
+                        className="wdr-admin-users__input wdr-admin-users__contract-template-textarea"
+                        value={globalContractText}
+                        onChange={(event) =>
+                            setGlobalContractText(event.target.value)
+                        }
+                        rows={12}
+                        placeholder={t(
+                            "admin.users.contract_template.placeholder",
+                        )}
+                    />
+                    <div className="wdr-admin-users__edit-actions">
+                        <span className="wdr-admin-users__edit-hint">
+                            {t("admin.users.contract_template.apply_hint")}
+                        </span>
+                        <Button
+                            variant="primary"
+                            onClick={() => void saveGlobalContractTemplate()}
+                            disabled={
+                                updateContractTemplateMutation.isPending ||
+                                contractTemplateQuery.isLoading
+                            }
+                        >
+                            {updateContractTemplateMutation.isPending
+                                ? t("admin.users.saving")
+                                : t("admin.users.contract_template.save")}
+                        </Button>
+                    </div>
+                </section>
+
                 <section>
                     <div className="wdr-admin-users__section-head">
                         <div>
@@ -1023,6 +1279,44 @@ export const AdminUsersPage: React.FC = () => {
                         </div>
                     </div>
 
+                    <div
+                        className="wdr-admin-users__compliance-grid"
+                        aria-label={t("admin.users.compliance.title")}
+                    >
+                        <article className="wdr-admin-users__compliance-card wdr-admin-users__compliance-card--ok">
+                            <span className="wdr-admin-users__compliance-label">
+                                {t("admin.users.compliance.complete")}
+                            </span>
+                            <strong className="wdr-admin-users__compliance-value">
+                                {complianceStats.complete}
+                            </strong>
+                        </article>
+                        <article className="wdr-admin-users__compliance-card wdr-admin-users__compliance-card--attention">
+                            <span className="wdr-admin-users__compliance-label">
+                                {t("admin.users.compliance.attention")}
+                            </span>
+                            <strong className="wdr-admin-users__compliance-value">
+                                {complianceStats.attention}
+                            </strong>
+                        </article>
+                        <article className="wdr-admin-users__compliance-card">
+                            <span className="wdr-admin-users__compliance-label">
+                                {t("admin.users.compliance.pending_documents")}
+                            </span>
+                            <strong className="wdr-admin-users__compliance-value">
+                                {complianceStats.pendingDocuments}
+                            </strong>
+                        </article>
+                        <article className="wdr-admin-users__compliance-card wdr-admin-users__compliance-card--blocked">
+                            <span className="wdr-admin-users__compliance-label">
+                                {t("admin.users.compliance.blocking_documents")}
+                            </span>
+                            <strong className="wdr-admin-users__compliance-value">
+                                {complianceStats.blockingDocuments}
+                            </strong>
+                        </article>
+                    </div>
+
                     <div className="wdr-admin-users__partners-grid">
                         {partners.map((partner) => {
                             const revenue = partnerRevenue[partner.id] ?? {
@@ -1030,6 +1324,16 @@ export const AdminUsersPage: React.FC = () => {
                                 commission: 0,
                                 partnerNet: 0,
                                 bookingsCount: 0,
+                            };
+                            const compliance = partnerCompliance.get(
+                                partner.id,
+                            ) ?? {
+                                validatedCount: 0,
+                                pendingCount: 0,
+                                rejectedCount: 0,
+                                expiredCount: 0,
+                                isComplete: false,
+                                needsAttention: true,
                             };
 
                             return (
@@ -1137,6 +1441,49 @@ export const AdminUsersPage: React.FC = () => {
                                                 t,
                                             )}
                                         </code>
+                                    </div>
+
+                                    <div
+                                        className={[
+                                            "wdr-admin-users__compliance-strip",
+                                            compliance.isComplete
+                                                ? "wdr-admin-users__compliance-strip--ok"
+                                                : "wdr-admin-users__compliance-strip--attention",
+                                        ].join(" ")}
+                                    >
+                                        <span>
+                                            {compliance.isComplete
+                                                ? t(
+                                                      "admin.users.compliance.card_complete",
+                                                  )
+                                                : t(
+                                                      "admin.users.compliance.card_attention",
+                                                  )}
+                                        </span>
+                                        <small>
+                                            {t(
+                                                "admin.users.compliance.card_counts",
+                                            )
+                                                .replace(
+                                                    "{validated}",
+                                                    String(
+                                                        compliance.validatedCount,
+                                                    ),
+                                                )
+                                                .replace(
+                                                    "{pending}",
+                                                    String(
+                                                        compliance.pendingCount,
+                                                    ),
+                                                )
+                                                .replace(
+                                                    "{blocked}",
+                                                    String(
+                                                        compliance.rejectedCount +
+                                                            compliance.expiredCount,
+                                                    ),
+                                                )}
+                                        </small>
                                     </div>
 
                                     <div className="wdr-admin-users__stripe-row">
@@ -1304,6 +1651,17 @@ export const AdminUsersPage: React.FC = () => {
                                         >
                                             {t("admin.users.edit")}
                                         </Button>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() =>
+                                                openPasswordResetModal(partner)
+                                            }
+                                        >
+                                            {t(
+                                                "admin.users.password_reset.action",
+                                            )}
+                                        </Button>
                                     </div>
                                 </article>
                             );
@@ -1403,6 +1761,19 @@ export const AdminUsersPage: React.FC = () => {
                                                 >
                                                     {t("admin.users.edit")}
                                                 </Button>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openPasswordResetModal(
+                                                            client,
+                                                        )
+                                                    }
+                                                >
+                                                    {t(
+                                                        "admin.users.password_reset.action",
+                                                    )}
+                                                </Button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1487,6 +1858,19 @@ export const AdminUsersPage: React.FC = () => {
                                                     }
                                                 >
                                                     {t("admin.users.edit")}
+                                                </Button>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        openPasswordResetModal(
+                                                            admin,
+                                                        )
+                                                    }
+                                                >
+                                                    {t(
+                                                        "admin.users.password_reset.action",
+                                                    )}
                                                 </Button>
                                             </td>
                                         </tr>
@@ -1865,6 +2249,31 @@ export const AdminUsersPage: React.FC = () => {
                                 </div>
                                 <div className="wdr-admin-users__edit-field">
                                     <label className="wdr-admin-users__edit-label">
+                                        {t("admin.users.field.contract_text")}
+                                    </label>
+                                    <textarea
+                                        className="wdr-admin-users__input"
+                                        rows={10}
+                                        value={editForm.mandateContractText}
+                                        onChange={(e) =>
+                                            setEditForm((form) => ({
+                                                ...form,
+                                                mandateContractText:
+                                                    e.target.value,
+                                            }))
+                                        }
+                                        placeholder={t(
+                                            "admin.users.field.contract_text_placeholder",
+                                        )}
+                                    />
+                                    <p className="wdr-admin-users__edit-hint">
+                                        {t(
+                                            "admin.users.field.contract_text_hint",
+                                        )}
+                                    </p>
+                                </div>
+                                <div className="wdr-admin-users__edit-field">
+                                    <label className="wdr-admin-users__edit-label">
                                         {t(
                                             "admin.users.field.upload_contract_pdf",
                                         )}
@@ -2073,6 +2482,29 @@ export const AdminUsersPage: React.FC = () => {
                                         }
                                     />
                                 )}
+                                {editingUser.role === "ADMIN" && (
+                                    <label className="wdr-admin-users__edit-field">
+                                        <span className="wdr-admin-users__edit-label">
+                                            {t("admin.users.field.permissions")}
+                                        </span>
+                                        <textarea
+                                            className="wdr-admin-users__input"
+                                            rows={4}
+                                            value={generalEditForm.permissions}
+                                            onChange={(e) =>
+                                                setGeneralEditForm((form) => ({
+                                                    ...form,
+                                                    permissions: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <span className="wdr-admin-users__edit-hint">
+                                            {ADMIN_PERMISSION_OPTIONS.join(
+                                                ", ",
+                                            )}
+                                        </span>
+                                    </label>
+                                )}
                                 <div className="wdr-admin-users__edit-actions">
                                     <Button
                                         variant="ghost"
@@ -2087,6 +2519,100 @@ export const AdminUsersPage: React.FC = () => {
                                         {updateUserMutation.isPending
                                             ? t("admin.users.saving")
                                             : t("admin.users.save")}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {resetPasswordUser && (
+                <div
+                    className="wdr-admin-users__create-overlay"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setResetPasswordUserId(null);
+                        }
+                    }}
+                >
+                    <div
+                        className="wdr-admin-users__create-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="wdr-admin-users-reset-password-title"
+                    >
+                        <div className="wdr-admin-users__create-header">
+                            <div className="wdr-admin-users__create-badge">
+                                {t("admin.users.password_reset.badge")}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setResetPasswordUserId(null)}
+                                className="wdr-admin-users__create-close"
+                                aria-label={t("common.close")}
+                            >
+                                <X size={18} />
+                            </button>
+                            <h2
+                                id="wdr-admin-users-reset-password-title"
+                                className="wdr-admin-users__create-title"
+                            >
+                                {t("admin.users.password_reset.title").replace(
+                                    "{name}",
+                                    `${resetPasswordUser.firstName} ${resetPasswordUser.lastName}`,
+                                )}
+                            </h2>
+                            <p className="wdr-admin-users__create-subtitle">
+                                {t("admin.users.password_reset.subtitle")}
+                            </p>
+                        </div>
+
+                        <div className="wdr-admin-users__create-body">
+                            <div className="wdr-admin-users__edit-form">
+                                <Input
+                                    type="text"
+                                    placeholder={t(
+                                        "admin.users.password_reset.placeholder",
+                                    )}
+                                    value={resetPasswordValue}
+                                    onChange={(event) =>
+                                        setResetPasswordValue(
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                                {resetPasswordResult && (
+                                    <div className="wdr-admin-users__password-result">
+                                        <span>
+                                            {t(
+                                                "admin.users.password_reset.generated",
+                                            )}
+                                        </span>
+                                        <strong>{resetPasswordResult}</strong>
+                                    </div>
+                                )}
+                                <div className="wdr-admin-users__edit-actions">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setResetPasswordUserId(null)
+                                        }
+                                    >
+                                        {t("admin.users.cancel")}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => void resetUserPassword()}
+                                        disabled={
+                                            resetPasswordMutation.isPending
+                                        }
+                                    >
+                                        {resetPasswordMutation.isPending
+                                            ? t("admin.users.saving")
+                                            : t(
+                                                  "admin.users.password_reset.confirm",
+                                              )}
                                     </Button>
                                 </div>
                             </div>

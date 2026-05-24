@@ -17,8 +17,7 @@ class FareHarborSyncService
     public function __construct(
         private readonly FareHarborClient $client,
         private readonly PartnerContentTranslationService $partnerContentTranslator,
-    ) {
-    }
+    ) {}
 
     public function syncCompany(FareHarborCompany $company): array
     {
@@ -117,6 +116,9 @@ class FareHarborSyncService
                     $service->update([
                         'extra_data' => $extraData,
                         'last_synced_at' => now(),
+                        'source_sync_status' => 'MISSING',
+                        'source_missing_at' => now(),
+                        'source_sync_error_message' => null,
                     ]);
 
                     $this->touchCalendarSync($service, 'SUCCESS', null);
@@ -137,10 +139,12 @@ class FareHarborSyncService
                 'importedCount' => $importedCount,
             ];
         } catch (\Throwable $exception) {
+            $errorMessage = $this->syncErrorMessage($exception);
+
             $company->update([
                 'last_synced_at' => now(),
                 'last_status' => 'FAILED',
-                'last_error' => Str::limit($exception->getMessage(), 1500),
+                'last_error' => $errorMessage,
             ]);
 
             Service::query()
@@ -153,12 +157,10 @@ class FareHarborSyncService
                         );
                     }
                 })
-                ->get()
-                ->each(fn (Service $service) => $this->touchCalendarSync(
-                    $service,
-                    'FAILED',
-                    Str::limit($exception->getMessage(), 1500),
-                ));
+                ->update([
+                    'source_sync_status' => 'FAILED',
+                    'source_sync_error_message' => $errorMessage,
+                ]);
 
             throw $exception;
         }
@@ -184,7 +186,7 @@ class FareHarborSyncService
                         'companyId' => (string) $company->id,
                         'importedCount' => 0,
                         'status' => 'FAILED',
-                        'error' => Str::limit($exception->getMessage(), 1500),
+                        'error' => $this->syncErrorMessage($exception),
                     ];
                 }
             })
@@ -436,6 +438,10 @@ class FareHarborSyncService
             'source_provider' => 'FAREHARBOR',
             'source_external_id' => $providerExternalId,
             'last_synced_at' => now(),
+            'source_sync_status' => 'SYNCED',
+            'source_last_seen_at' => now(),
+            'source_missing_at' => null,
+            'source_sync_error_message' => null,
             'is_available' => (bool) $this->overrideValue(
                 $overrides,
                 'is_available',
@@ -542,6 +548,17 @@ class FareHarborSyncService
     private function providerExternalId(string $companySlug, string $itemId): string
     {
         return sprintf('%s:%s', $companySlug, $itemId);
+    }
+
+    private function syncErrorMessage(\Throwable $exception): string
+    {
+        $message = $exception->getMessage();
+
+        if (str_contains($message, 'status code 404')) {
+            return 'Société FareHarbor introuvable ou slug invalide (404). Vérifiez le slug, puis désactivez la société si elle ne doit plus être synchronisée.';
+        }
+
+        return Str::limit($message, 1500);
     }
 
     private function normalizeItemPayload(array $payload): array

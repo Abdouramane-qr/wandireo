@@ -27,6 +27,7 @@ import { AdminSectionNav, Button } from "@/components/wdr";
 import { useUser } from "@/context/UserContext";
 import { useAnalyticsFunnelData } from "@/hooks/useAnalyticsData";
 import { useAdminBookingsData } from "@/hooks/useBookingsData";
+import { useAdminPartnerDocumentsData } from "@/hooks/usePartnerDocumentsData";
 import { useAdminReviewsData } from "@/hooks/useReviewsData";
 import { useServicesData } from "@/hooks/useServicesData";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -191,11 +192,14 @@ function getStatusClass(status: string): string {
     return "cancelled";
 }
 
-function getExternalStatusSummary(booking: {
-    externalBookingStatus?: string;
-    externalBookingReference?: string;
-    externalErrorMessage?: string;
-}, t: (key: string) => string): string | null {
+function getExternalStatusSummary(
+    booking: {
+        externalBookingStatus?: string;
+        externalBookingReference?: string;
+        externalErrorMessage?: string;
+    },
+    t: (key: string) => string,
+): string | null {
     if (booking.externalErrorMessage) {
         return booking.externalErrorMessage;
     }
@@ -225,6 +229,9 @@ export const AdminDashboardPage: React.FC = () => {
     const { users } = useAdminUsersData();
     const { services } = useServicesData({ adminAll: true, limit: 300 });
     const { reviews } = useAdminReviewsData({ status: "PENDING" });
+    const { documents: partnerDocuments } = useAdminPartnerDocumentsData({
+        limit: 500,
+    });
     const { data: funnel } = useAnalyticsFunnelData(30);
 
     // Sources de données effectives (API prioritaire, fallback mock)
@@ -307,6 +314,67 @@ export const AdminDashboardPage: React.FC = () => {
                 .slice(0, 5),
         [bookings],
     );
+    const operationalQueue = useMemo(() => {
+        const partnersPendingApproval = allPartners.filter(
+            (partner) => partner.partnerStatus === "PENDING",
+        ).length;
+        const contractsMissing = allPartners.filter(
+            (partner) =>
+                partner.partnerStatus === "APPROVED" &&
+                partner.mandateContractStatus !== "SIGNED",
+        ).length;
+        const documentsInReview = partnerDocuments.filter(
+            (document) =>
+                document.status === "UPLOADED" ||
+                document.status === "UNDER_REVIEW",
+        ).length;
+        const documentsBlocking = partnerDocuments.filter(
+            (document) =>
+                document.status === "REJECTED" || document.status === "EXPIRED",
+        ).length;
+        const servicesPendingReview = services.filter(
+            (service) => service.moderationStatus === "PENDING_REVIEW",
+        ).length;
+        const servicesBlocked = services.filter((service) =>
+            ["REJECTED", "SUSPENDED"].includes(service.moderationStatus ?? ""),
+        ).length;
+        const payoutsAttention = bookings.filter(
+            (booking) =>
+                booking.status === BookingStatusNames.CONFIRMED &&
+                ["ON_HOLD", "FAILED"].includes(booking.payoutStatus),
+        ).length;
+        const payoutsPending = bookings.filter(
+            (booking) =>
+                booking.status === BookingStatusNames.CONFIRMED &&
+                booking.payoutStatus === "PENDING",
+        ).length;
+        const externalBookingErrors = bookings.filter((booking) =>
+            Boolean(booking.externalErrorMessage),
+        ).length;
+
+        return {
+            partnersPendingApproval,
+            contractsMissing,
+            documentsInReview,
+            documentsBlocking,
+            servicesPendingReview,
+            servicesBlocked,
+            payoutsAttention,
+            payoutsPending,
+            pendingReviews: reviews.length,
+            externalBookingErrors,
+            totalAttention:
+                partnersPendingApproval +
+                contractsMissing +
+                documentsInReview +
+                documentsBlocking +
+                servicesPendingReview +
+                servicesBlocked +
+                payoutsAttention +
+                reviews.length +
+                externalBookingErrors,
+        };
+    }, [allPartners, bookings, partnerDocuments, reviews.length, services]);
 
     const adminInitials =
         `${currentUser.firstName[0]}${currentUser.lastName[0]}`.toUpperCase();
@@ -472,6 +540,144 @@ export const AdminDashboardPage: React.FC = () => {
                                     )}
                             </span>
                         </div>
+                    </div>
+                </section>
+
+                <section className="wdr-admin-dash__operations">
+                    <div className="wdr-admin-dash__section-header">
+                        <div>
+                            <h2 className="wdr-admin-dash__section-title">
+                                {t("admin.dashboard.operations.title")}
+                            </h2>
+                            <p className="wdr-admin-dash__section-copy">
+                                {t("admin.dashboard.operations.subtitle")}
+                            </p>
+                        </div>
+                        <span
+                            className={[
+                                "wdr-admin-dash__operations-total",
+                                operationalQueue.totalAttention > 0
+                                    ? "wdr-admin-dash__operations-total--attention"
+                                    : "wdr-admin-dash__operations-total--clear",
+                            ].join(" ")}
+                        >
+                            {t("admin.dashboard.operations.total").replace(
+                                "{count}",
+                                String(operationalQueue.totalAttention),
+                            )}
+                        </span>
+                    </div>
+                    <div className="wdr-admin-dash__operations-grid">
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() => navigate({ name: "admin-users" })}
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t(
+                                    "admin.dashboard.operations.partner_onboarding",
+                                )}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.partnersPendingApproval}
+                            </strong>
+                            <small>
+                                {t(
+                                    "admin.dashboard.operations.partner_onboarding_sub",
+                                ).replace(
+                                    "{contracts}",
+                                    String(operationalQueue.contractsMissing),
+                                )}
+                            </small>
+                        </button>
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() => navigate({ name: "admin-users" })}
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t("admin.dashboard.operations.documents")}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.documentsInReview}
+                            </strong>
+                            <small>
+                                {t(
+                                    "admin.dashboard.operations.documents_sub",
+                                ).replace(
+                                    "{blocked}",
+                                    String(operationalQueue.documentsBlocking),
+                                )}
+                            </small>
+                        </button>
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() => navigate({ name: "admin-services" })}
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t("admin.dashboard.operations.services")}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.servicesPendingReview}
+                            </strong>
+                            <small>
+                                {t(
+                                    "admin.dashboard.operations.services_sub",
+                                ).replace(
+                                    "{blocked}",
+                                    String(operationalQueue.servicesBlocked),
+                                )}
+                            </small>
+                        </button>
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() =>
+                                navigate({ name: "admin-transactions" })
+                            }
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t("admin.dashboard.operations.finance")}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.payoutsAttention}
+                            </strong>
+                            <small>
+                                {t(
+                                    "admin.dashboard.operations.finance_sub",
+                                ).replace(
+                                    "{pending}",
+                                    String(operationalQueue.payoutsPending),
+                                )}
+                            </small>
+                        </button>
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() => navigate({ name: "admin-reviews" })}
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t("admin.dashboard.operations.reviews")}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.pendingReviews}
+                            </strong>
+                            <small>
+                                {t("admin.dashboard.operations.reviews_sub")}
+                            </small>
+                        </button>
+                        <button
+                            className="wdr-admin-dash__operation-card"
+                            onClick={() =>
+                                navigate({ name: "admin-transactions" })
+                            }
+                        >
+                            <span className="wdr-admin-dash__operation-label">
+                                {t("admin.dashboard.operations.external")}
+                            </span>
+                            <strong className="wdr-admin-dash__operation-value">
+                                {operationalQueue.externalBookingErrors}
+                            </strong>
+                            <small>
+                                {t("admin.dashboard.operations.external_sub")}
+                            </small>
+                        </button>
                     </div>
                 </section>
 
@@ -684,27 +890,47 @@ export const AdminDashboardPage: React.FC = () => {
                                         <tr key={booking.id}>
                                             <td
                                                 className="wdr-admin-dash__table-id"
-                                                data-label={t("admin.dashboard.table.id")}
+                                                data-label={t(
+                                                    "admin.dashboard.table.id",
+                                                )}
                                             >
                                                 {booking.id}
                                             </td>
-                                            <td data-label={t("admin.dashboard.table.client")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.dashboard.table.client",
+                                                )}
+                                            >
                                                 {client
                                                     ? `${client.firstName} ${client.lastName}`
                                                     : booking.clientId}
                                             </td>
-                                            <td data-label={t("admin.dashboard.table.partner")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.dashboard.table.partner",
+                                                )}
+                                            >
                                                 {partner
                                                     ? partner.companyName
                                                     : booking.partnerId}
                                             </td>
-                                            <td className="wdr-admin-dash__table-amount" data-label={t("admin.dashboard.table.amount")}>
+                                            <td
+                                                className="wdr-admin-dash__table-amount"
+                                                data-label={t(
+                                                    "admin.dashboard.table.amount",
+                                                )}
+                                            >
                                                 {formatPrice(
                                                     booking.totalPrice,
                                                     booking.currency,
                                                 )}
                                             </td>
-                                            <td className="wdr-admin-dash__table-commission" data-label={t("admin.dashboard.table.commission")}>
+                                            <td
+                                                className="wdr-admin-dash__table-commission"
+                                                data-label={t(
+                                                    "admin.dashboard.table.commission",
+                                                )}
+                                            >
                                                 {booking.status ===
                                                 BookingStatusNames.CONFIRMED
                                                     ? formatPrice(
@@ -713,7 +939,11 @@ export const AdminDashboardPage: React.FC = () => {
                                                       )
                                                     : "—"}
                                             </td>
-                                            <td data-label={t("admin.dashboard.table.status")}>
+                                            <td
+                                                data-label={t(
+                                                    "admin.dashboard.table.status",
+                                                )}
+                                            >
                                                 <div>
                                                     <span
                                                         className={`wdr-admin-dash__status wdr-admin-dash__status--${getStatusClass(booking.status)}`}

@@ -208,6 +208,29 @@ function normalizeBookingMode(value: unknown): BookingMode {
     return "REQUEST";
 }
 
+function normalizeServicePartnerTrust(value: unknown): Service["partnerTrust"] {
+    const raw = asRecord(value);
+
+    if (Object.keys(raw).length === 0) {
+        return undefined;
+    }
+
+    return {
+        partnerApproved: asBoolean(raw.partner_approved ?? raw.partnerApproved),
+        contractSigned: asBoolean(raw.contract_signed ?? raw.contractSigned),
+        validatedDocumentsCount: asNumber(
+            raw.validated_documents_count ?? raw.validatedDocumentsCount,
+        ),
+        hasBusinessRegistration: asBoolean(
+            raw.has_business_registration ?? raw.hasBusinessRegistration,
+        ),
+        hasTaxCertificate: asBoolean(
+            raw.has_tax_certificate ?? raw.hasTaxCertificate,
+        ),
+        hasInsurance: asBoolean(raw.has_insurance ?? raw.hasInsurance),
+    };
+}
+
 function baseService(rawInput: unknown): {
     raw: UnknownRecord;
     extra: UnknownRecord;
@@ -227,6 +250,7 @@ function baseService(rawInput: unknown): {
     rating?: number;
     reviewCount: number;
     isAvailable: boolean;
+    partnerTrust?: Service["partnerTrust"];
     moderationStatus?: ServiceModerationStatus;
     moderationReason?: string;
     submittedForReviewAt?: Date;
@@ -254,7 +278,7 @@ function baseService(rawInput: unknown): {
 } {
     const raw = asRecord(rawInput);
     const extra = serviceExtra(raw);
-    const category = asString(raw.category, "ACTIVITE") as ServiceCategory;
+    const category = asString(raw.category, "ACTIVITE").toUpperCase() as ServiceCategory;
     const wandireo = asRecord(extra.wandireo);
     const partnerPrice = asNumber(
         raw.partner_price ??
@@ -322,6 +346,9 @@ function baseService(rawInput: unknown): {
         rating: raw.rating == null ? undefined : asNumber(raw.rating),
         reviewCount: asNumber(raw.review_count ?? raw.reviewCount),
         isAvailable: asBoolean(raw.is_available ?? raw.isAvailable, true),
+        partnerTrust: normalizeServicePartnerTrust(
+            raw.partner_trust ?? raw.partnerTrust,
+        ),
         moderationStatus: asServiceModerationStatus(
             raw.moderation_status ?? raw.moderationStatus,
         ),
@@ -555,6 +582,19 @@ export function normalizeUser(rawInput: unknown): User {
             businessAddress:
                 asString(raw.business_address ?? raw.businessAddress) ||
                 undefined,
+            legalCompanyName:
+                asString(raw.legal_company_name ?? raw.legalCompanyName) ||
+                undefined,
+            taxCountry:
+                asString(raw.tax_country ?? raw.taxCountry) || undefined,
+            vatNumber: asString(raw.vat_number ?? raw.vatNumber) || undefined,
+            businessRegistrationNumber:
+                asString(
+                    raw.business_registration_number ??
+                        raw.businessRegistrationNumber,
+                ) || undefined,
+            billingEmail:
+                asString(raw.billing_email ?? raw.billingEmail) || undefined,
             partnerStatus: asString(
                 raw.partner_status ?? raw.partnerStatus,
                 "PENDING",
@@ -576,6 +616,18 @@ export function normalizeUser(rawInput: unknown): User {
                     raw.mandate_contract_file_path ??
                         raw.mandateContractFilePath,
                 ) || undefined,
+            mandateContractText:
+                asString(
+                    raw.mandate_contract_text ?? raw.mandateContractText,
+                ) || undefined,
+            mandateContractTextUpdatedAt:
+                raw.mandate_contract_text_updated_at ||
+                raw.mandateContractTextUpdatedAt
+                    ? asDate(
+                          raw.mandate_contract_text_updated_at ??
+                              raw.mandateContractTextUpdatedAt,
+                      )
+                    : undefined,
             mandateSignedAt:
                 raw.mandate_signed_at || raw.mandateSignedAt
                     ? asDate(raw.mandate_signed_at ?? raw.mandateSignedAt)
@@ -888,6 +940,15 @@ export function normalizeBooking(rawInput: unknown): Booking {
             raw.payment_status ?? raw.paymentStatus,
             "PENDING",
         ) as PaymentStatus,
+        payoutStatus: asString(
+            raw.payout_status ?? raw.payoutStatus,
+            "PENDING",
+        ) as Booking["payoutStatus"],
+        payoutMarkedAt:
+            raw.payout_marked_at || raw.payoutMarkedAt
+                ? asDate(raw.payout_marked_at ?? raw.payoutMarkedAt)
+                : undefined,
+        payoutNotes: asString(raw.payout_notes ?? raw.payoutNotes) || undefined,
         startDate: asDate(raw.start_date ?? raw.startDate),
         endDate:
             raw.end_date || raw.endDate

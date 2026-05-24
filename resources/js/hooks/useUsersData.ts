@@ -32,6 +32,16 @@ export function useAdminUsersData(
     return { users: query.data ?? [], isLoading: query.isLoading };
 }
 
+export function useAdminContractTemplateData(enabled = true) {
+    return useQuery({
+        queryKey: ["users", "contract-template"],
+        queryFn: () => usersApi.adminContractTemplate(),
+        staleTime: 60_000,
+        retry: 1,
+        enabled,
+    });
+}
+
 export function useAdminUpdateUserData() {
     const queryClient = useQueryClient();
 
@@ -46,6 +56,28 @@ export function useAdminUpdateUserData() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
             queryClient.invalidateQueries({ queryKey: ["services"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
+        },
+    });
+}
+
+export function useAdminUpdateContractTemplateData() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({
+            contractText,
+            applyToPartners,
+        }: {
+            contractText: string;
+            applyToPartners?: boolean;
+        }) =>
+            usersApi.adminUpdateContractTemplate(contractText, applyToPartners),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["users", "contract-template"],
+            });
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
             queryClient.invalidateQueries({ queryKey: ["audit-log"] });
         },
     });
@@ -96,6 +128,19 @@ export function useAdminMarkPartnerContractSignedData() {
     return useMutation({
         mutationFn: ({ id }: { id: string }) =>
             usersApi.adminMarkContractSigned(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
+            queryClient.invalidateQueries({ queryKey: ["audit-log"] });
+        },
+    });
+}
+
+export function useAdminResetUserPasswordData() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, password }: { id: string; password?: string }) =>
+            usersApi.adminResetPassword(id, password),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users", "admin"] });
             queryClient.invalidateQueries({ queryKey: ["audit-log"] });

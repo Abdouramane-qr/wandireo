@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\PartnerDocument;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -145,6 +146,40 @@ class PublicServiceVisibilityTest extends TestCase
 
         $this->getJson("/api/services/{$service->id}")
             ->assertNotFound();
+    }
+
+    public function test_public_service_detail_exposes_partner_trust_summary_without_documents(): void
+    {
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'SIGNED',
+        ]);
+        $service = Service::factory()->for($partner, 'partner')->create([
+            'title' => ['fr' => 'Service confiance'],
+            'description' => ['fr' => 'Description'],
+            'is_available' => true,
+        ]);
+
+        PartnerDocument::create([
+            'partner_id' => $partner->id,
+            'uploaded_by' => $partner->id,
+            'document_type' => PartnerDocument::TYPE_INSURANCE,
+            'status' => PartnerDocument::STATUS_VALIDATED,
+            'file_path' => 'partners/private/insurance.pdf',
+            'original_name' => 'insurance.pdf',
+            'mime_type' => 'application/pdf',
+            'size_bytes' => 1234,
+        ]);
+
+        $this->getJson("/api/services/{$service->id}")
+            ->assertOk()
+            ->assertJsonPath('partner_trust.partner_approved', true)
+            ->assertJsonPath('partner_trust.contract_signed', true)
+            ->assertJsonPath('partner_trust.validated_documents_count', 1)
+            ->assertJsonPath('partner_trust.has_insurance', true)
+            ->assertJsonMissingPath('partner_documents')
+            ->assertJsonMissingPath('partner.partner_documents');
     }
 
     public function test_public_service_page_returns_404_for_unavailable_services(): void

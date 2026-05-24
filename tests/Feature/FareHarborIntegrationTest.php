@@ -28,6 +28,60 @@ class FareHarborIntegrationTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_fareharbor_partner_account_uses_existing_real_partner_email(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'email' => 'info@momentswatersports.com',
+        ]);
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Moments Water Sports',
+            'company_slug' => 'momentswatersports',
+            'is_enabled' => true,
+            'sync_items_enabled' => false,
+            'sync_details_enabled' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->postJson("/api/fareharbor/companies/{$company->id}/partner-account");
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('partner_credentials.email', 'info@momentswatersports.com')
+            ->assertJsonPath('partner_credentials.temporary_password', '');
+
+        $this->assertSame($partner->id, $company->fresh()->partner_id);
+        $this->assertDatabaseMissing('users', [
+            'email' => 'fareharbor+momentswatersports@partners.wandireo.local',
+        ]);
+    }
+
+    public function test_fareharbor_partner_account_falls_back_to_technical_email(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Unknown Provider',
+            'company_slug' => 'unknown-provider',
+            'is_enabled' => true,
+            'sync_items_enabled' => false,
+            'sync_details_enabled' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->postJson("/api/fareharbor/companies/{$company->id}/partner-account");
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('partner_credentials.email', 'fareharbor+unknown-provider@partners.wandireo.local');
+
+        $this->assertNotNull($company->fresh()->partner_id);
+        $this->assertDatabaseHas('users', [
+            'email' => 'fareharbor+unknown-provider@partners.wandireo.local',
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'PENDING_SIGNATURE',
+        ]);
+    }
+
     public function test_external_fareharbor_service_can_use_the_local_booking_flow_when_price_is_known(): void
     {
         $client = User::factory()->create(['role' => 'CLIENT']);
@@ -250,6 +304,55 @@ class FareHarborIntegrationTest extends TestCase
             'provider' => 'FAREHARBOR',
             'last_status' => 'SUCCESS',
             'import_url' => null,
+        ]);
+    }
+
+    public function test_sync_marks_missing_external_items_without_deleting_them(): void
+    {
+        $company = FareHarborCompany::query()->create([
+            'display_name' => 'Seafaris',
+            'company_slug' => 'seafaris',
+            'is_enabled' => true,
+            'sync_items_enabled' => true,
+            'sync_details_enabled' => true,
+        ]);
+
+        $service = Service::factory()
+            ->category('ACTIVITE', 'PAR_PERSONNE')
+            ->create([
+                'partner_id' => null,
+                'source_type' => 'EXTERNAL',
+                'source_provider' => 'FAREHARBOR',
+                'source_external_id' => 'seafaris:fh-missing',
+                'is_available' => true,
+                'extra_data' => [
+                    'fareharbor' => [
+                        'company' => 'seafaris',
+                        'itemId' => 'fh-missing',
+                    ],
+                ],
+            ]);
+
+        $client = Mockery::mock(FareHarborClient::class);
+        $client->shouldReceive('listItems')
+            ->once()
+            ->with('seafaris')
+            ->andReturn([]);
+
+        $this->app->instance(FareHarborClient::class, $client);
+
+        $this->app->make(FareHarborSyncService::class)->syncCompany($company);
+
+        $service->refresh();
+
+        $this->assertNull($service->deleted_at);
+        $this->assertTrue($service->is_available);
+        $this->assertSame('MISSING', $service->source_sync_status);
+        $this->assertNotNull($service->source_missing_at);
+        $this->assertDatabaseHas('services', [
+            'id' => $service->id,
+            'deleted_at' => null,
+            'source_sync_status' => 'MISSING',
         ]);
     }
 
@@ -1013,6 +1116,34 @@ class FareHarborIntegrationTest extends TestCase
         $this->artisan('fareharbor:bootstrap-companies')->assertSuccessful();
 
         $this->assertSame(17, FareHarborCompany::query()->count());
+    }
+
+    public function test_catalog_restore_command_restores_soft_deleted_services_without_moderation_history(): void
+    {
+        $service = Service::factory()
+            ->category('BATEAU', 'PAR_JOUR')
+            ->create([
+                'title' => ['fr' => 'Sortie bateau'],
+                'description' => ['fr' => 'Description'],
+                'is_available' => false,
+                'moderation_status' => Service::MODERATION_SUSPENDED,
+            ]);
+
+        $service->delete();
+
+        $this->assertSoftDeleted('services', [
+            'id' => $service->id,
+        ]);
+
+        $this->artisan('catalog:restore-archived-services')
+            ->expectsOutputToContain('Restored 1 archived service(s).')
+            ->assertSuccessful();
+
+        $service->refresh();
+
+        $this->assertNull($service->deleted_at);
+        $this->assertTrue($service->is_available);
+        $this->assertSame(Service::MODERATION_PUBLISHED, $service->moderation_status);
     }
 
     /**

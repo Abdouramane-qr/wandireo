@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -99,5 +100,120 @@ class AdminUserManagementTest extends TestCase
             'partner_status' => 'PENDING',
             'mandate_contract_status' => 'NOT_SENT',
         ]);
+    }
+
+    public function test_admin_can_approve_partner_without_resubmitting_commission_rate(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'company_name' => 'Approved Partner SARL',
+            'partner_status' => 'PENDING',
+            'mandate_contract_status' => 'NOT_SENT',
+            'mandate_contract_text' => null,
+            'commission_rate' => 0.15,
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson("/api/users/{$partner->id}", [
+            'partner_status' => 'APPROVED',
+        ])
+            ->assertOk()
+            ->assertJsonPath('partnerStatus', 'APPROVED')
+            ->assertJsonPath('mandateContractStatus', 'PENDING_SIGNATURE');
+
+        $partner->refresh();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $partner->id,
+            'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'PENDING_SIGNATURE',
+            'commission_rate' => 0.15,
+        ]);
+        $this->assertStringContainsString('CONTRAT DE MANDAT', $partner->mandate_contract_text);
+    }
+
+    public function test_admin_can_update_partner_contract_text_and_require_new_signature(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'partner_status' => 'APPROVED',
+            'mandate_contract_status' => 'SIGNED',
+            'mandate_contract_text' => 'Old contract',
+            'mandate_signed_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson("/api/users/{$partner->id}", [
+            'mandate_contract_text' => 'Updated contract terms',
+        ])
+            ->assertOk()
+            ->assertJsonPath('mandateContractStatus', 'PENDING_SIGNATURE')
+            ->assertJsonPath('mandateContractText', 'Updated contract terms');
+
+        $partner->refresh();
+
+        $this->assertSame('PENDING_SIGNATURE', $partner->mandate_contract_status);
+        $this->assertSame('Updated contract terms', $partner->mandate_contract_text);
+        $this->assertNull($partner->mandate_signed_at);
+        $this->assertNull($partner->onboarding_completed_at);
+    }
+
+    public function test_admin_can_reset_a_user_password(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $partner = User::factory()->create([
+            'role' => 'PARTNER',
+            'password' => Hash::make('old-password'),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->postJson("/api/users/{$partner->id}/password", [
+            'password' => 'new-password-123',
+        ])
+            ->assertOk()
+            ->assertJsonPath('user.id', $partner->id);
+
+        $this->assertSame('new-password-123', $response->json('temporary_password'));
+        $this->assertTrue(Hash::check('new-password-123', $partner->fresh()->password));
+    }
+
+    public function test_admin_can_update_global_contract_template_for_all_partners(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+        $signedPartner = User::factory()->create([
+            'role' => 'PARTNER',
+            'mandate_contract_status' => 'SIGNED',
+            'mandate_contract_text' => 'Old contract',
+            'mandate_signed_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+        $pendingPartner = User::factory()->create([
+            'role' => 'PARTNER',
+            'mandate_contract_status' => 'PENDING_SIGNATURE',
+            'mandate_contract_text' => 'Old contract',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/users/contract-template', [
+            'contract_text' => "# New global contract\n\nUpdated terms.",
+            'apply_to_partners' => true,
+        ])
+            ->assertOk()
+            ->assertJsonPath('updated_partners', 2);
+
+        foreach ([$signedPartner, $pendingPartner] as $partner) {
+            $partner->refresh();
+            $this->assertSame("# New global contract\n\nUpdated terms.", $partner->mandate_contract_text);
+            $this->assertSame('PENDING_SIGNATURE', $partner->mandate_contract_status);
+            $this->assertNull($partner->mandate_signed_at);
+            $this->assertNull($partner->onboarding_completed_at);
+        }
     }
 }

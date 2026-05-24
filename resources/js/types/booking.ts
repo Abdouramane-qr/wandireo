@@ -6,8 +6,8 @@
  * un Partenaire et un Service (activité, hébergement, transport...).
  */
 
-import type { PaymentMode } from './service';
-import type { ServiceExtraInputType } from './service';
+import type { PaymentMode } from "./service";
+import type { ServiceExtraInputType } from "./service";
 
 // ---------------------------------------------------------------------------
 // Statut de la réservation
@@ -21,13 +21,13 @@ import type { ServiceExtraInputType } from './service';
  */
 export const BookingStatusNames = {
     /** Checkout initialise mais paiement non encore confirme. */
-    AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+    AWAITING_PAYMENT: "AWAITING_PAYMENT",
     /** En attente de confirmation par le partenaire ou de paiement du client. */
-    PENDING: 'PENDING',
+    PENDING: "PENDING",
     /** Réservation validée par le partenaire et paiement accepté. */
-    CONFIRMED: 'CONFIRMED',
+    CONFIRMED: "CONFIRMED",
     /** Réservation annulée (par le client ou le partenaire). */
-    CANCELLED: 'CANCELLED',
+    CANCELLED: "CANCELLED",
 } as const;
 
 export type BookingStatus =
@@ -45,13 +45,24 @@ export type BookingStatus =
  * REFUNDED : Remboursement émis à la suite d'une annulation éligible.
  */
 export const PaymentStatusNames = {
-    PENDING: 'PENDING',
-    PAID: 'PAID',
-    REFUNDED: 'REFUNDED',
+    PENDING: "PENDING",
+    PAID: "PAID",
+    REFUNDED: "REFUNDED",
 } as const;
 
 export type PaymentStatus =
     (typeof PaymentStatusNames)[keyof typeof PaymentStatusNames];
+
+export const PayoutStatusNames = {
+    PENDING: "PENDING",
+    ON_HOLD: "ON_HOLD",
+    SCHEDULED: "SCHEDULED",
+    PAID: "PAID",
+    FAILED: "FAILED",
+} as const;
+
+export type PayoutStatus =
+    (typeof PayoutStatusNames)[keyof typeof PayoutStatusNames];
 
 // ---------------------------------------------------------------------------
 // Interface principale : Booking
@@ -78,6 +89,13 @@ export interface Booking {
 
     /** Statut du paiement associé à cette réservation. */
     paymentStatus: PaymentStatus;
+
+    /** Statut du règlement partenaire associé à cette réservation. */
+    payoutStatus: PayoutStatus;
+
+    payoutMarkedAt?: Date;
+
+    payoutNotes?: string;
 
     /** Date de début de l'activité ou du séjour. */
     startDate: Date;

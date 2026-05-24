@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Eye, Plus, X } from "lucide-react";
 import { AdminSectionNav, Button, Modal, useToast } from "@/components/wdr";
 import {
     useCreateSupportTicketData,
@@ -341,6 +342,8 @@ export default function AdminSupportPage() {
 
                     <Button
                         variant="primary"
+                        className="wdr-admin-support__primary-action"
+                        leftIcon={<Plus size={16} />}
                         onClick={() => setIsCreateOpen(true)}
                     >
                         {t("support.new_ticket")}
@@ -358,10 +361,10 @@ export default function AdminSupportPage() {
                                 <tr>
                                     <th>{t("support.ticket_date")}</th>
                                     <th>{t("support.ticket_subject")}</th>
-                                <th>{t("support.ticket_user")}</th>
-                                <th>{t("support.status.all")}</th>
-                                <th>{t("support.ticket_priority")}</th>
-                                <th>{t("support.ticket_actions")}</th>
+                                    <th>{t("support.ticket_user")}</th>
+                                    <th>{t("support.status.all")}</th>
+                                    <th>{t("support.ticket_priority")}</th>
+                                    <th>{t("support.ticket_actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -428,6 +431,8 @@ export default function AdminSupportPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                className="wdr-admin-support__table-action"
+                                                leftIcon={<Eye size={14} />}
                                                 onClick={() =>
                                                     setSelectedTicket(ticket)
                                                 }
@@ -532,6 +537,8 @@ export default function AdminSupportPage() {
                         <Button
                             variant="ghost"
                             type="button"
+                            className="wdr-admin-support__modal-action"
+                            leftIcon={<X size={15} />}
                             onClick={() => setIsCreateOpen(false)}
                         >
                             {t("common.cancel")}
@@ -539,6 +546,7 @@ export default function AdminSupportPage() {
                         <Button
                             variant="primary"
                             type="submit"
+                            className="wdr-admin-support__primary-action"
                             loading={createMutation.isPending}
                         >
                             {t("support.form.submit")}
@@ -630,6 +638,8 @@ export default function AdminSupportPage() {
                         <div className="wdr-admin-support__detail-footer">
                             <Button
                                 variant="ghost"
+                                className="wdr-admin-support__modal-action"
+                                leftIcon={<X size={15} />}
                                 onClick={() => setSelectedTicket(null)}
                             >
                                 {t("common.close")}

@@ -176,9 +176,20 @@
     margin-bottom: 1.25rem;
 }
 
+.wdr-pprofile__account-header--subsection {
+    margin-top: 1.5rem;
+}
+
 .wdr-pprofile__account-title {
     margin: 0;
     font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.wdr-pprofile__account-subtitle-title {
+    margin: 0;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text-main);
 }
@@ -291,6 +302,82 @@
     padding: 1.25rem;
     display: grid;
     gap: 1.25rem;
+}
+
+.wdr-pprofile__compliance-summary {
+    display: grid;
+    grid-template-columns: minmax(14rem, 0.9fr) minmax(18rem, 1.2fr) auto;
+    gap: 1rem;
+    align-items: center;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background: var(--bg-subtle);
+}
+
+.wdr-pprofile__compliance-summary--ready {
+    border-color: color-mix(in srgb, var(--success-dark) 28%, transparent);
+    background: #f0fbf5;
+}
+
+.wdr-pprofile__compliance-summary--attention {
+    border-color: color-mix(in srgb, #b7791f 28%, transparent);
+    background: #fffaf0;
+}
+
+.wdr-pprofile__compliance-main {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.wdr-pprofile__compliance-kicker {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.wdr-pprofile__compliance-score {
+    color: var(--text-main);
+    font-size: 1.35rem;
+    line-height: 1.1;
+}
+
+.wdr-pprofile__compliance-main p,
+.wdr-pprofile__compliance-docs span {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.wdr-pprofile__compliance-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.wdr-pprofile__compliance-step {
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.wdr-pprofile__compliance-step--done {
+    background: #e6f9ef;
+    color: var(--success-dark);
+}
+
+.wdr-pprofile__compliance-step--todo {
+    background: #ffffff;
+    color: #9a6700;
+    border: 1px solid #f2d28c;
+}
+
+.wdr-pprofile__compliance-docs {
+    justify-self: end;
+    text-align: right;
 }
 
 .wdr-pprofile__document-upload {
@@ -550,6 +637,15 @@
     .wdr-pprofile__service-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .wdr-pprofile__compliance-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .wdr-pprofile__compliance-docs {
+        justify-self: start;
+        text-align: left;
+    }
 }
 
 @media (max-width: 640px) {
@@ -602,4 +698,56 @@
     padding: 3rem 1rem;
     text-align: center;
     color: var(--text-muted);
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-pprofile,
+.wdr-pprofile__hero-inner,
+.wdr-pprofile__hero-info,
+.wdr-pprofile__account-inner,
+.wdr-pprofile__documents-inner,
+.wdr-pprofile__catalog-inner,
+.wdr-pprofile__form-grid,
+.wdr-pprofile__document-row,
+.wdr-pprofile__service-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-pprofile__form-grid,
+.wdr-pprofile__service-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.wdr-pprofile__company-name,
+.wdr-pprofile__full-name,
+.wdr-pprofile__address,
+.wdr-pprofile__account-subtitle,
+.wdr-pprofile__service-location,
+.wdr-pprofile__service-description,
+.wdr-pprofile__service-price-value {
+    overflow-wrap: anywhere;
+}
+
+.wdr-pprofile__service-category,
+.wdr-pprofile__service-badge {
+    white-space: normal;
+}
+
+@media (max-width: 520px) {
+    .wdr-pprofile__hero-inner,
+    .wdr-pprofile__stats-inner,
+    .wdr-pprofile__account-header,
+    .wdr-pprofile__service-topline,
+    .wdr-pprofile__service-pricing {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .wdr-pprofile__stat {
+        width: 100%;
+    }
 }

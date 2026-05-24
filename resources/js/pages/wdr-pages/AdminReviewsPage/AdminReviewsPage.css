@@ -32,7 +32,6 @@
     }
 }
 
-
 .wdr-admin-reviews__card,
 .wdr-admin-reviews__empty {
     background: var(--bg-elevated);
@@ -40,7 +39,6 @@
     border-radius: 24px;
     box-shadow: 0 10px 30px -12px rgba(13, 59, 82, 0.12);
 }
-
 
 .wdr-admin-reviews__hero {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -277,4 +275,29 @@
 :is(.dark) .wdr-admin-reviews__status--rejected {
     background: rgba(221, 92, 75, 0.16);
     color: #ffb2a8;
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-admin-reviews,
+.wdr-admin-reviews__body,
+.wdr-admin-reviews__toolbar,
+.wdr-admin-reviews__card,
+.wdr-admin-reviews__card-head {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-reviews__comment,
+.wdr-admin-reviews__meta,
+.wdr-admin-reviews__search,
+.wdr-admin-reviews__status {
+    overflow-wrap: anywhere;
+}
+
+.wdr-admin-reviews__status,
+.wdr-admin-reviews__actions .wdr-btn {
+    white-space: normal;
 }

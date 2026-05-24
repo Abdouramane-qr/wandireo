@@ -80,6 +80,32 @@
     flex-wrap: wrap;
 }
 
+.wdr-admin-support__primary-action {
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 22px -14px rgba(15, 139, 168, 0.65);
+}
+
+.wdr-admin-support__primary-action:hover:not(:disabled) {
+    box-shadow: 0 16px 28px -16px rgba(15, 139, 168, 0.75);
+}
+
+.wdr-admin-support__table-action,
+.wdr-admin-support__modal-action {
+    border-radius: var(--radius-md);
+    background: #ffffff;
+}
+
+.wdr-admin-support__table-action {
+    min-width: 6.25rem;
+}
+
+.wdr-admin-support__table-action:hover:not(:disabled),
+.wdr-admin-support__modal-action:hover:not(:disabled) {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 32%, var(--border-light));
+    background: color-mix(in srgb, var(--primary) 7%, #ffffff);
+}
+
 .wdr-admin-support__filters {
     display: flex;
     gap: 0.75rem;
@@ -98,7 +124,9 @@
     color: var(--text-main);
     font-size: 0.875rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 .wdr-admin-support__select:focus {
@@ -358,6 +386,7 @@
 .wdr-admin-support__detail-footer {
     display: flex;
     justify-content: flex-end;
+    gap: 0.75rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border-light);
 }
@@ -424,9 +453,44 @@
         padding: 0.9rem;
     }
 
+    .wdr-admin-support__toolbar .wdr-btn,
+    .wdr-admin-support__detail-footer .wdr-btn {
+        width: 100%;
+    }
+
     .wdr-admin-support__paragraph,
     .wdr-admin-support__list li,
     .wdr-admin-support__blockquote {
         font-size: 0.92rem;
     }
+}
+
+/* ============================================================
+   Support button and overflow hardening
+   ============================================================ */
+
+.wdr-admin-support,
+.wdr-admin-support__body,
+.wdr-admin-support__toolbar,
+.wdr-admin-support__table-wrapper,
+.wdr-admin-support__ticket-detail,
+.wdr-admin-support__message-box {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-support__toolbar .wdr-btn,
+.wdr-admin-support__detail-footer .wdr-btn,
+.wdr-admin-support__select {
+    min-height: 2.5rem;
+    max-width: 100%;
+    white-space: normal;
+}
+
+.wdr-admin-support__paragraph,
+.wdr-admin-support__list li,
+.wdr-admin-support__blockquote,
+.wdr-admin-support__inline-code,
+.wdr-admin-support__message-box {
+    overflow-wrap: anywhere;
 }

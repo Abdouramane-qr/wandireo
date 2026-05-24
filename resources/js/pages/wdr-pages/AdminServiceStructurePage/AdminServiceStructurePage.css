@@ -36,7 +36,6 @@
     box-shadow: 0 10px 30px -12px rgba(13, 59, 82, 0.12);
 }
 
-
 .wdr-admin-structure__hero {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     color: var(--text-light);
@@ -280,4 +279,35 @@
 
 :is(.dark) .wdr-admin-structure__textarea::placeholder {
     color: #8ca8b6;
+}
+
+/* ============================================================
+   Responsive hardening
+   ============================================================ */
+
+.wdr-admin-structure,
+.wdr-admin-structure__layout,
+.wdr-admin-structure__panel,
+.wdr-admin-structure__category-card,
+.wdr-admin-structure__item,
+.wdr-admin-structure__textarea {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.wdr-admin-structure__grid,
+.wdr-admin-structure__translations,
+.wdr-admin-structure__stats {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.wdr-admin-structure__description,
+.wdr-admin-structure__item span,
+.wdr-admin-structure__item strong,
+.wdr-admin-structure__textarea {
+    overflow-wrap: anywhere;
+}
+
+.wdr-admin-structure__actions .wdr-btn {
+    white-space: normal;
 }

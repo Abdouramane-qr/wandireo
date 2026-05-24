@@ -4,28 +4,28 @@
  */
 
 export const UserRoleNames = {
-    CLIENT: 'CLIENT',
-    PARTNER: 'PARTNER',
-    ADMIN: 'ADMIN',
+    CLIENT: "CLIENT",
+    PARTNER: "PARTNER",
+    ADMIN: "ADMIN",
 } as const;
 
 export type UserRole = (typeof UserRoleNames)[keyof typeof UserRoleNames];
 
 export const PartnerStatusNames = {
-    PENDING: 'PENDING',
-    APPROVED: 'APPROVED',
-    REJECTED: 'REJECTED',
-    SUSPENDED: 'SUSPENDED',
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+    SUSPENDED: "SUSPENDED",
 } as const;
 
 export type PartnerStatus =
     (typeof PartnerStatusNames)[keyof typeof PartnerStatusNames];
 
 export const MandateContractStatusNames = {
-    NOT_SENT: 'NOT_SENT',
-    PENDING_SIGNATURE: 'PENDING_SIGNATURE',
-    SIGNED: 'SIGNED',
-    REJECTED: 'REJECTED',
+    NOT_SENT: "NOT_SENT",
+    PENDING_SIGNATURE: "PENDING_SIGNATURE",
+    SIGNED: "SIGNED",
+    REJECTED: "REJECTED",
 } as const;
 
 export type MandateContractStatus =
@@ -51,7 +51,7 @@ export interface BaseUser {
  * Peut réserver des activités et services, puis laisser des avis.
  */
 export interface ClientUser extends BaseUser {
-    role: 'CLIENT';
+    role: "CLIENT";
     bookings: string[]; // IDs des réservations
     reviews: string[]; // IDs des avis laissés
     preferredCurrency?: string;
@@ -62,15 +62,22 @@ export interface ClientUser extends BaseUser {
  * Gère ses activités, services, produits, ventes et disponibilités.
  */
 export interface PartnerUser extends BaseUser {
-    role: 'PARTNER';
+    role: "PARTNER";
     companyName: string;
     stripeConnectedAccountId?: string;
     businessAddress?: string;
+    legalCompanyName?: string;
+    taxCountry?: string;
+    vatNumber?: string;
+    businessRegistrationNumber?: string;
+    billingEmail?: string;
     partnerStatus: PartnerStatus;
     partnerValidatedAt?: Date;
     partnerRejectionReason?: string;
     mandateContractStatus: MandateContractStatus;
     mandateContractFilePath?: string;
+    mandateContractText?: string;
+    mandateContractTextUpdatedAt?: Date;
     mandateSignedAt?: Date;
     onboardingCompletedAt?: Date;
     activities: string[]; // IDs des activités/services proposés
@@ -84,7 +91,7 @@ export interface PartnerUser extends BaseUser {
  * gestion des commissions, langues et localisations.
  */
 export interface AdminUser extends BaseUser {
-    role: 'ADMIN';
+    role: "ADMIN";
     permissions: string[];
     managedLanguages: string[];
     managedLocations: string[];

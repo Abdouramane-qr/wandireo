@@ -79,10 +79,19 @@ export function buildMainEsTranslations(): Record<string, string> {
         "footer.services": "Servicios",
         "footer.how_it_works": "Cómo funciona",
         "footer.help": "Centro de Ayuda",
+        "footer.help_center": "Centro de ayuda",
+        "footer.whatsapp": "WhatsApp",
+        "footer.faq": "FAQ",
         "footer.legal": "Legal",
         "footer.contact": "Contacto",
         "footer.booking_email": "booking@wandireo.com",
         "footer.rights": "Todos los derechos reservados.",
+        "footer.terms": "Condiciones de uso",
+        "footer.privacy": "Política de privacidad",
+        "footer.legal_notice": "Aviso legal",
+        "footer.copyright": "Wandireo. Todos los derechos reservados.",
+        "footer.logo_aria": "Wandireo - Volver al inicio",
+        "footer.socials": "Redes sociales",
         "footer.social.whatsapp": "WhatsApp",
         "footer.social.instagram": "Instagram",
         "footer.social.tiktok": "TikTok",
@@ -96,8 +105,7 @@ export function buildMainEsTranslations(): Record<string, string> {
         "welcome.description":
             "Laravel cuenta con un ecosistema increíblemente rico. Le sugerimos comenzar con los siguientes recursos.",
         "welcome.read_docs_prefix": "Leer la",
-        "welcome.watch_tutorials_prefix":
-            "Ver tutoriales en vídeo en",
+        "welcome.watch_tutorials_prefix": "Ver tutoriales en vídeo en",
         "welcome.deploy_now": "Desplegar ahora",
         "password.show": "Mostrar contraseña",
         "password.hide": "Ocultar contraseña",
@@ -131,25 +139,18 @@ export function buildMainEsTranslations(): Record<string, string> {
             "Se ha enviado un nuevo enlace de verificación a su dirección de correo electrónico.",
         "settings.profile.save_button": "Guardar",
         "settings.security.page_title": "Ajustes de seguridad",
-        "settings.security.password_title":
-            "Actualizar la contraseña",
+        "settings.security.password_title": "Actualizar la contraseña",
         "settings.security.password_description":
             "Utilice una contraseña larga y difícil de adivinar para proteger su cuenta",
-        "settings.security.current_password_label":
-            "Contraseña actual",
-        "settings.security.current_password_placeholder":
-            "Contraseña actual",
+        "settings.security.current_password_label": "Contraseña actual",
+        "settings.security.current_password_placeholder": "Contraseña actual",
         "settings.security.new_password_label": "Nueva contraseña",
-        "settings.security.new_password_placeholder":
-            "Nueva contraseña",
-        "settings.security.confirm_password_label":
-            "Confirmar la contraseña",
+        "settings.security.new_password_placeholder": "Nueva contraseña",
+        "settings.security.confirm_password_label": "Confirmar la contraseña",
         "settings.security.confirm_password_placeholder":
             "Confirmar la contraseña",
-        "settings.security.save_password_button":
-            "Guardar la contraseña",
-        "settings.security.two_factor_title":
-            "Autenticación de dos factores",
+        "settings.security.save_password_button": "Guardar la contraseña",
+        "settings.security.two_factor_title": "Autenticación de dos factores",
         "settings.security.two_factor_description":
             "Gestione la configuración de su autenticación de dos factores",
         "settings.security.two_factor_enabled_message":
@@ -175,24 +176,19 @@ export function buildMainEsTranslations(): Record<string, string> {
             "Activar la autenticación de dos factores",
         "auth.two_factor.setup.enable_description":
             "Para finalizar la activación de la autenticación de dos factores, escanee el código QR o introduzca la clave de configuración en su aplicación de autenticación",
-        "auth.two_factor.setup.manual_or":
-            "o introduzca el código manualmente",
+        "auth.two_factor.setup.manual_or": "o introduzca el código manualmente",
         "auth.two_factor.setup.close_button": "Cerrar",
         "auth.two_factor.setup.continue_button": "Continuar",
-        "auth.two_factor.recovery_codes.title":
-            "Códigos de recuperación 2FA",
+        "auth.two_factor.recovery_codes.title": "Códigos de recuperación 2FA",
         "auth.two_factor.recovery_codes.description":
             "Los códigos de recuperación le permiten recuperar el acceso si pierde su dispositivo 2FA. Guárdelos en un gestor de contraseñas seguro.",
-        "auth.two_factor.recovery_codes.view":
-            "Ver códigos de recuperación",
+        "auth.two_factor.recovery_codes.view": "Ver códigos de recuperación",
         "auth.two_factor.recovery_codes.hide":
             "Ocultar códigos de recuperación",
-        "auth.two_factor.recovery_codes.regenerate":
-            "Regenerar códigos",
+        "auth.two_factor.recovery_codes.regenerate": "Regenerar códigos",
         "auth.two_factor.recovery_codes.regenerate_help":
             "Cada código de recuperación puede utilizarse una vez para acceder a su cuenta y se eliminará después de su uso. Si necesita más, haga clic en Regenerar códigos arriba.",
-        "auth.two_factor.recovery_codes.list_aria":
-            "Códigos de recuperación",
+        "auth.two_factor.recovery_codes.list_aria": "Códigos de recuperación",
         "auth.two_factor.recovery_codes.loading_aria":
             "Cargando códigos de recuperación",
         "support.new_ticket": "Nuevo ticket",
@@ -207,7 +203,8 @@ export function buildMainEsTranslations(): Record<string, string> {
         "checkout.steps.payment": "Pago",
         "checkout.steps.confirmation": "Confirmación",
         "checkout.title": "Información del viajero",
-        "checkout.subtitle": "Estos datos se compartirán con el proveedor para preparar su reserva.",
+        "checkout.subtitle":
+            "Estos datos se compartirán con el proveedor para preparar su reserva.",
         "checkout.identity": "Identidad",
         "checkout.contact": "Datos de contacto",
         "checkout.special_requests": "Solicitudes especiales",
@@ -218,12 +215,15 @@ export function buildMainEsTranslations(): Record<string, string> {
         "checkout.nationality_placeholder": "Ej.: Francesa, Belga, Suiza...",
         "checkout.email": "Correo electrónico",
         "checkout.email_placeholder": "su@email.com",
-        "checkout.email_hint": "La confirmación de la reserva se enviará a esta dirección.",
+        "checkout.email_hint":
+            "La confirmación de la reserva se enviará a esta dirección.",
         "checkout.phone": "Teléfono",
         "checkout.phone_placeholder": "+34 612 345 678",
-        "checkout.phone_hint": "Útil en caso de imprevisto el día de la actividad.",
+        "checkout.phone_hint":
+            "Útil en caso de imprevisto el día de la actividad.",
         "checkout.message_label": "Mensaje al proveedor",
-        "checkout.message_placeholder": "Alergias, accesibilidad, cumpleaños, preferencias especiales...",
+        "checkout.message_placeholder":
+            "Alergias, accesibilidad, cumpleaños, preferencias especiales...",
         "checkout.back": "Volver al carrito",
         "checkout.continue": "Continuar — Pago",
         "checkout.order": "Su reserva",
@@ -233,8 +233,10 @@ export function buildMainEsTranslations(): Record<string, string> {
         "checkout.total_vat": "Total con impuestos",
         "checkout.errors.first_name": "El nombre es obligatorio.",
         "checkout.errors.last_name": "El apellido es obligatorio.",
-        "checkout.errors.email_required": "El correo electrónico es obligatorio.",
-        "checkout.errors.email_invalid": "Introduzca un correo electrónico válido.",
+        "checkout.errors.email_required":
+            "El correo electrónico es obligatorio.",
+        "checkout.errors.email_invalid":
+            "Introduzca un correo electrónico válido.",
         "checkout.errors.phone": "El teléfono es obligatorio.",
         "checkout.errors.nationality": "La nacionalidad es obligatoria.",
 
@@ -242,7 +244,8 @@ export function buildMainEsTranslations(): Record<string, string> {
         "payment.steps.information": "Información",
         "payment.steps.confirmation": "Confirmación",
         "payment.title": "Finalizar la reserva",
-        "payment.subtitle": "Este paso confirma la reserva y guarda el importe validado por el servidor.",
+        "payment.subtitle":
+            "Este paso confirma la reserva y guarda el importe validado por el servidor.",
         "payment.summary_title": "Resumen de validación",
         "payment.traveler": "Viajero",
         "payment.email": "Correo electrónico",
@@ -252,8 +255,10 @@ export function buildMainEsTranslations(): Record<string, string> {
         "payment.pay_later": "A pagar más tarde",
         "payment.pay_now": "A pagar ahora",
         "payment.syncing": "Comprobando el importe con el servidor...",
-        "payment.sync_error": "No se pudo volver a validar el importe con el servidor.",
-        "payment.submit_error": "No se pudo registrar la reserva. Inténtelo de nuevo.",
+        "payment.sync_error":
+            "No se pudo volver a validar el importe con el servidor.",
+        "payment.submit_error":
+            "No se pudo registrar la reserva. Inténtelo de nuevo.",
         "payment.back": "Volver",
         "payment.confirming": "Guardando...",
         "payment.verifying": "Verificando...",
@@ -264,10 +269,12 @@ export function buildMainEsTranslations(): Record<string, string> {
         "payment.service_fee": "Gastos de servicio",
         "payment.total_vat": "Total con impuestos",
 
-        "confirmation.empty": "No se encontró ninguna confirmación para la referencia",
+        "confirmation.empty":
+            "No se encontró ninguna confirmación para la referencia",
         "confirmation.back_home": "Volver al inicio",
         "confirmation.title": "¡Reserva confirmada!",
-        "confirmation.subtitle": "Su reserva se ha registrado correctamente. Se enviará un resumen a",
+        "confirmation.subtitle":
+            "Su reserva se ha registrado correctamente. Se enviará un resumen a",
         "confirmation.reference": "Referencia",
         "confirmation.stay": "Su estancia",
         "confirmation.start_date": "Fecha de inicio",
@@ -290,14 +297,17 @@ export function buildMainEsTranslations(): Record<string, string> {
         "confirmation.total": "Total con impuestos",
         "confirmation.paid_online": "Pagado online",
         "confirmation.pay_onsite": "A pagar en el lugar",
-        "confirmation.cash_guaranteed": "Reserva garantizada — Pago en el lugar",
+        "confirmation.cash_guaranteed":
+            "Reserva garantizada — Pago en el lugar",
         "confirmation.commission_paid": "Comisión pagada online",
         "confirmation.payment_received": "Pago recibido",
         "confirmation.next_steps": "Próximos pasos",
         "confirmation.next1_title": "Confirmación por correo",
-        "confirmation.next1_desc": "Se enviará un resumen completo a su correo electrónico en unos minutos.",
+        "confirmation.next1_desc":
+            "Se enviará un resumen completo a su correo electrónico en unos minutos.",
         "confirmation.next2_title": "Contacto del proveedor",
-        "confirmation.next2_desc": "El proveedor se pondrá en contacto con usted en 24 horas para finalizar la logística.",
+        "confirmation.next2_desc":
+            "El proveedor se pondrá en contacto con usted en 24 horas para finalizar la logística.",
         "confirmation.next3_title": "Disfrute de la experiencia",
         "confirmation.next3_desc": "Solo queda preparar las maletas.",
         "confirmation.discover_more": "Descubrir más actividades",
